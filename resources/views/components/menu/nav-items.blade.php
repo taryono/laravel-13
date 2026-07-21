@@ -1,0 +1,23 @@
+{{-- resources/views/components/menu/nav-items.blade.php --}}
+@foreach ($items as $item)
+    <div class="bnsp-nav-item {{ $item->open ? 'open' : '' }}">
+        @if ($item->hasChildren())
+            <a href="#" class="bnsp-nav-link bnsp-nav-parent" data-tooltip="{{ $item->text }}">
+                <x-menu.icon :icon="$item->icon" :icon-type="$item->iconType" />
+                <span class="nav-label flex-grow-1">{{ $item->text }}</span>
+                <span class="material-symbols-outlined chevron">chevron_right</span>
+            </a>
+            <ul class="bnsp-submenu" data-flyout-text="{{ $item->flyoutTitle }}">
+                @foreach ($item->children as $child)
+                    <li><x-menu.nav-items :items="[$child]" /></li>
+                @endforeach
+            </ul>
+        @else
+            <a href="{{ $item->url ?? '#' }}" class="bnsp-nav-link {{ $item->active ? 'active' : '' }}"
+                data-tooltip="{{ $item->text }}">
+                <x-menu.icon :icon="$item->icon" :icon-type="$item->iconType" />
+                <span class="nav-label">{{ $item->text }}</span>
+            </a>
+        @endif
+    </div>
+@endforeach
