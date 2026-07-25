@@ -2,9 +2,7 @@
 
 namespace App\Listeners;
 
-use App\Events\Login;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Auth\Events\Login;   
 use Illuminate\Support\Facades\Log;
 
 class SetRoleSessionOnLogin
@@ -24,21 +22,18 @@ class SetRoleSessionOnLogin
     {
         $user = $event->user;
 
-        // Ambil data
-        $role_ids = $user->roles->pluck('id')->toArray();
-        $isSuper = $user->roles->where('name', 'superuser')->isNotEmpty();
+        $roles = $user->roles; // pastikan sudah eager load kalau perlu
+        $role_ids = $roles->pluck('id')->toArray();
+        $default_role = $user->roles()->firstWhere('is_default', 1);
+        $isSuper = $roles->contains('name', 'superuser');
         $login_as = $isSuper ? 'superuser' : 'user';
 
-        // ✅ Tulis Log untuk pengecekan
-        Log::info('[Login Session] User ID: ' . $user->id);
-        Log::info('[Login Session] Role IDs: ', $role_ids);
-        Log::info('[Login Session] Login As: ' . $login_as);
+        Log::info('[LOGIN BERHASIL] User: ' . $user->email);
+        Log::info('[LOGIN BERHASIL] Role IDs: ', $role_ids);
+        Log::info('[LOGIN BERHASIL] Superuser: ' . ($isSuper ? 'YA' : 'TIDAK'));
 
-        // Simpan ke session seperti biasa
         session()->put('role_ids', $role_ids);
         session()->put('user_auth.login_as', $login_as);
-
-        // Opsional: Cek ulang apakah sudah tersimpan
-        Log::info('[Login Session] Session role_ids setelah disimpan: ', [session('role_ids')]);
+        session()->put('user_auth.role_as', $default_role->name ?? 'user');
     }
 }

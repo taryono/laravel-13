@@ -5,7 +5,7 @@ const hamburger = document.getElementById('bnspHamburger');
 const backdrop = document.getElementById('bnspBackdrop');
 const isDesktop = () => window.matchMedia('(min-width: 992px)').matches; 
 var isCollapsed = false;
-
+ 
 // ===== Judul flyout menu (mode sidebar menyusut) =====
 // Menyisipkan <li> judul di awal setiap submenu yang punya atribut
 // data-flyout-title, agar urutan tampil selalu benar di semua browser
@@ -41,6 +41,7 @@ function bindNavParentClicks(container, respectSidebarCollapse) {
 }
 
 const LAYOUT_STORAGE_KEY = 'bnsp-layout-mode'; // 'sidebar' | 'topbar'
+const COLLAPSED_STORAGE_KEY = 'sidebar-collapsed-mode'; // 'collapsed' | 'expanded'
 const layoutToggleBtn = document.getElementById('bnspLayoutToggle');
 const layoutToggleIcon = layoutToggleBtn.querySelector('.material-symbols-outlined');
 
@@ -93,9 +94,16 @@ function applyLayoutMode(mode) {
     }
 }
 
+function applySideBarMode(mode) {
+    const isCollapsed = mode === 'collapsed';
+    sidebar.classList.toggle('collapsed', isCollapsed);
+    mainWrapper.classList.toggle('collapsed', isCollapsed);
+}
+
 const savedLayoutMode = localStorage.getItem(LAYOUT_STORAGE_KEY) || 'sidebar';
 applyLayoutMode(savedLayoutMode);
-
+const savedSidebarMode = localStorage.getItem(COLLAPSED_STORAGE_KEY) || 'expanded';
+applySideBarMode(savedSidebarMode);
 layoutToggleBtn.addEventListener('click', () => {
     const nextMode = document.body.classList.contains('bnsp-layout-topbar') ? 'sidebar' : 'topbar';
     applyLayoutMode(nextMode);
@@ -110,15 +118,10 @@ hamburger.addEventListener('click', () => {
         sidebar.classList.toggle('mobile-open');
         backdrop.classList.toggle('show');
     }
-    // isCollapsed = sidebar.classList.contains('collapsed');
-
-    // if (isCollapsed) {
-    //     // Saat menyusut: hapus pembatas scroll agar flyout lancar
-    //     document.querySelector('.bnsp-sidebar > nav').style.overflowY = 'visible';
-    // } else {
-    //     // Saat terbuka: aktifkan scroll
-    //     document.querySelector('.bnsp-sidebar > nav').style.overflowY = 'auto';
-    // }
+    nextSidebarMode = sidebar.classList.contains('collapsed') ? 'collapsed' : 'expanded';
+    applySideBarMode(nextSidebarMode);
+    localStorage.setItem(COLLAPSED_STORAGE_KEY, nextSidebarMode);
+   
 });
 
 backdrop.addEventListener('click', () => {

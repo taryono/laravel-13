@@ -28,21 +28,8 @@ class AuthenticatedSessionController extends Controller
         $request->authenticate();
 
          // ==== TARUH KODE KAMU DISINI ====
-        $user = auth()->user();
-        $role_ids = $user->roles->pluck('id')->toArray();
-        $isSuper = $user->roles->where('name', 'superuser')->isNotEmpty();
-        $login_as = $isSuper ? 'superuser' : 'user';
-
-        // Log untuk cek
-        Log::info('[LOGIN BERHASIL] User: ' . $user->email);
-        Log::info('[LOGIN BERHASIL] Role IDs: ', $role_ids);
-        Log::info('[LOGIN BERHASIL] Superuser: ' . ($isSuper ? 'YA' : 'TIDAK'));
-
-        // Simpan ke session
-        session()->put('role_ids', $role_ids);
-        session()->put('user_auth.login_as', $login_as);
-        // =================================
-
+        $user = auth()->user(); // Mendapatkan user yang sedang login
+        Log::info('User ' . $user->email . ' logged in.');
         
         $request->session()->regenerate();
 
