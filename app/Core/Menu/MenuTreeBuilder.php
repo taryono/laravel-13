@@ -26,29 +26,6 @@ class MenuTreeBuilder
             });
         // Tidak ada sort() di sini — urutan sudah benar dari query di repository
     }
-
-    /**
-     * Filter permission rekursif berdasarkan module_id, bukan kolom role langsung.
-     * Item tanpa module_id (murni grouping) tetap tampil selama ada child yang lolos.
-     */
-    // public function filterByPermission(Collection $items, array $allowedModuleIds, bool $isSuperUser): Collection
-    // {
-    //     if ($isSuperUser) return $items;
-
-    //     return $items
-    //         ->filter(fn (MenuItem $i) => $i->module_id === null || in_array($i->module_id, $allowedModuleIds))
-    //         ->map(function (MenuItem $item) use ($allowedModuleIds, $isSuperUser) {
-    //             if (!empty($item->children)) {
-    //                 $item->children = $this->filterByPermission(
-    //                     collect($item->children), $allowedModuleIds, $isSuperUser
-    //                 )->values()->all();
-    //             }
-    //             return $item;
-    //         })
-    //         ->filter(fn (MenuItem $i) => $i->url !== null || $i->hasChildren())
-    //         ->values();
-    // }
-
     public function filterByPermission(Collection $items, array $allowedModuleIds, bool $isSuperUser): Collection
     {
         // Karena sudah disaring lewat kolom 'role' di Repository,

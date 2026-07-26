@@ -40,14 +40,15 @@ function bindNavParentClicks(container, respectSidebarCollapse) {
     });
 }
 
-const LAYOUT_STORAGE_KEY = 'bnsp-layout-mode'; // 'sidebar' | 'topbar'
-const COLLAPSED_STORAGE_KEY = 'sidebar-collapsed-mode'; // 'collapsed' | 'expanded'
+const LAYOUT_STORAGE_KEY = 'bnsp-layout-mode'+'-'+window.loginAs; // 'sidebar' | 'topbar'
+const COLLAPSED_STORAGE_KEY = 'sidebar-collapsed-mode'+'-'+window.loginAs; // 'collapsed' | 'expanded'
 const layoutToggleBtn = document.getElementById('bnspLayoutToggle');
 const layoutToggleIcon = layoutToggleBtn.querySelector('.material-symbols-outlined');
 
 
 function updateToggleVisibility() {
     layoutToggleBtn.style.display = isDesktop() ? '' : 'none';
+    // window.location.reload();
     // atau kalau mau invert logic-nya (tampil di mobile, sembunyi di desktop),
     // tinggal balik kondisinya
 }
@@ -71,8 +72,95 @@ function buildTopNav() {
     // itu penyebab bug "klik dua kali ke-toggle, jadi kelihatan
     // tidak terjadi apa-apa" yang sempat muncul sebelumnya.
     bindNavParentClicks(topnav, false);
-}
+    
+} 
+// ===== Priority+ Overflow Navigation untuk Topnav =====
+// Disesuaikan dengan struktur asli: item adalah <div class="bnsp-nav-item">
+// langsung sebagai anak dari <nav id="bnspTopnav">, didahului
+// oleh .bnsp-topnav-brand yang harus selalu tetap terlihat.
+
+function initTopnavOverflow() {
+    const topnav = document.getElementById('bnspTopnav');
+    if (!topnav) return;
+
+    const brand = topnav.querySelector(':scope > .bnsp-topnav-brand');
+
+    // Buat item "Lainnya" sekali saja, mengikuti pola struktur item lain
+    let moreItem = document.getElementById('bnspTopnavMore');
+    if (!moreItem) {
+        moreItem = document.createElement('div');
+        moreItem.id = 'bnspTopnavMore';
+        moreItem.className = 'bnsp-nav-item bnsp-topnav-more';
+        moreItem.innerHTML = `
+            <a href="#" class="bnsp-nav-link bnsp-nav-parent">
+                <span class="material-symbols-outlined">more_horiz</span>
+                <span class="nav-label flex-grow-1">Lainnya</span>
+                <span class="material-symbols-outlined chevron">chevron_right</span>
+            </a>
+            <ul class="bnsp-submenu bnsp-topnav-more-menu" data-flyout-text="Lainnya" data-flyout-title="Lainnya"></ul>
+        `;
+        topnav.appendChild(moreItem);
+        bindNavParentClicks(moreItem, false); // sama seperti listener item topnav lain
+    }
+    const moreMenu = moreItem.querySelector('.bnsp-topnav-more-menu');
+
+    // Simpan urutan asli item (di luar brand & tombol "Lainnya") satu kali saja,
+    // supaya posisi tiap item bisa dikembalikan dengan tepat setiap recalculate
+    if (!topnav._originalOrder) {
+        topnav._originalOrder = Array.from(topnav.children).filter(
+            el => el !== moreItem && el !== brand && el.classList.contains('bnsp-nav-item')
+        );
+    }
+
+    function recalculate() {
+        // Kembalikan semua item ke posisi asal sebelum dihitung ulang
+        topnav._originalOrder.forEach(item => topnav.insertBefore(item, moreItem));
+        moreMenu.innerHTML = '';
+        moreItem.style.display = 'none';
+
+        const containerWidth = topnav.clientWidth;
+        const brandWidth = brand ? brand.offsetWidth : 0;
+        const moreBtnWidth = moreItem.querySelector('a').offsetWidth || 110;
+
+        let usedWidth = brandWidth;
+        const overflowItems = [];
+
+        topnav._originalOrder.forEach(item => {
+            usedWidth += item.offsetWidth;
+            if (usedWidth > containerWidth - moreBtnWidth) {
+                overflowItems.push(item);
+            }
+        });
+
+        if (overflowItems.length > 0) {
+            moreItem.style.display = '';
+            overflowItems.forEach(item => {
+                // moreMenu adalah <ul>, jadi tiap item dibungkus <li> —
+                // sama seperti pola submenu nested yang sudah ada (Dit, Master)
+                const li = document.createElement('li');
+                li.appendChild(item); // pindahkan node asli, bukan clone,
+                                       // jadi semua data-ajax-url & submenu ikut terbawa
+                moreMenu.appendChild(li);
+            });
+        }
+    }
+
+    // Observe parent container topnav (bukan topnav itu sendiri) supaya
+    // tidak infinite loop, dan tetap reaktif saat sidebar collapse/expand
+    // mengubah lebar area yang tersedia untuk topnav
+    const resizeObserver = new ResizeObserver(() => {
+        requestAnimationFrame(recalculate);
+    });
+    resizeObserver.observe(topnav.parentElement || topnav);
+
+    requestAnimationFrame(recalculate);
+    // window.location.reload();
+} 
+
 buildTopNav();
+// Panggil SETELAH buildTopNav(), supaya menu sudah ter-clone semua
+initTopnavOverflow();
+
 updateToggleVisibility();
 
 // Pasang listener supaya reaktif terhadap perubahan ukuran window
@@ -108,6 +196,7 @@ layoutToggleBtn.addEventListener('click', () => {
     const nextMode = document.body.classList.contains('bnsp-layout-topbar') ? 'sidebar' : 'topbar';
     applyLayoutMode(nextMode);
     localStorage.setItem(LAYOUT_STORAGE_KEY, nextMode);
+    window.location.reload();
 });
 
 hamburger.addEventListener('click', () => {

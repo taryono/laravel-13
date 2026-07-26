@@ -925,3 +925,115 @@
          top: 0;
      }
  }
+
+ /* HANYA link yang TIDAK punya kelas induk menu yang ditindak */
+ .bnsp-sidebar.collapsed .bnsp-submenu li .bnsp-nav-link[data-tooltip]:not(.bnsp-nav-parent):hover::after {
+     content: none !important;
+     display: none !important;
+ }
+
+ .bnsp-sidebar.collapsed .bnsp-submenu {
+     max-height: calc(100vh - 80px);
+     /* atau sesuaikan, misal calc(100vh - 100px) */
+     overflow-y: auto;
+     overflow-x: hidden;
+ }
+
+ .bnsp-topnav-more-menu {
+     right: 0;
+     left: auto;
+     /* dropdown "Lainnya" biasanya nempel di kanan, bukan kiri seperti submenu lain */
+ }
+
+ /* ============================================================
+   Nested submenu DI DALAM dropdown "Lainnya" → mode accordion
+   inline, bukan flyout ke samping. Supaya tidak ter-clip oleh
+   overflow-y:auto pada dropdown level pertama, dan ikut ter-scroll
+   bersama parent-nya.
+   ============================================================ */
+
+ /* Matikan posisi absolute + hover-trigger flyout khusus di sini,
+   ganti jadi block statis yang tinggi/tampilnya dikontrol .open */
+ .bnsp-topnav-more-menu .bnsp-nav-item>.bnsp-submenu {
+     position: static;
+     left: auto;
+     top: auto;
+     margin: 0;
+     padding: 0;
+     background: transparent;
+     box-shadow: none;
+     border-radius: 0;
+     display: block;
+     max-height: 0;
+     overflow: hidden;
+     transition: max-height .25s ease;
+ }
+
+ .bnsp-topnav-more-menu .bnsp-nav-item.open>.bnsp-submenu {
+     max-height: 32rem;
+     padding: .25rem 0;
+ }
+
+ /* Jembatan hover milik flyout topnav biasa tidak relevan lagi
+   di sini karena sudah full-klik, bukan hover — matikan */
+ .bnsp-topnav-more-menu .bnsp-nav-item:hover>.bnsp-submenu::before,
+ .bnsp-topnav-more-menu .bnsp-nav-item:focus-within>.bnsp-submenu::before {
+     content: none;
+ }
+
+ /* Indentasi bertingkat ala sidebar, supaya hierarki tetap kebaca
+   walau sudah flat mengalir ke bawah */
+ .bnsp-topnav-more-menu .bnsp-submenu .bnsp-nav-link {
+     padding-left: 1.75rem !important;
+     justify-content: flex-start;
+ }
+
+ .bnsp-topnav-more-menu .bnsp-submenu .bnsp-submenu .bnsp-nav-link {
+     padding-left: 2.75rem !important;
+ }
+
+ @media (min-width: 992px) {
+
+     /* Kelas ini ditambahkan oleh JS saat ruang di bawah tidak cukup */
+     .bnsp-sidebar.collapsed .bnsp-nav-item:hover>.bnsp-submenu.bnsp-flyout-up,
+     .bnsp-sidebar.collapsed .bnsp-nav-item:focus-within>.bnsp-submenu.bnsp-flyout-up {
+         top: auto;
+         bottom: -.5rem;
+     }
+
+     /* Jembatan hover ikut menyesuaikan saat flyout dibuka ke atas */
+     .bnsp-sidebar.collapsed .bnsp-nav-item:hover>.bnsp-submenu.bnsp-flyout-up::before,
+     .bnsp-sidebar.collapsed .bnsp-nav-item:focus-within>.bnsp-submenu.bnsp-flyout-up::before {
+         top: auto;
+         bottom: 0;
+     }
+
+     /* Jaring pengaman: kalau submenu tetap lebih tinggi dari ruang yang
+       dihitung JS, aktifkan scroll internal alih-alih overflow ke luar layar */
+     .bnsp-sidebar.collapsed .bnsp-nav-item>.bnsp-submenu {
+         overflow-y: auto;
+         overflow-x: hidden;
+     }
+
+     .bnsp-sidebar.collapsed .bnsp-nav-item>.bnsp-submenu::-webkit-scrollbar {
+         width: 5px;
+     }
+
+     .bnsp-sidebar.collapsed .bnsp-nav-item>.bnsp-submenu::-webkit-scrollbar-thumb {
+         background: rgba(255, 255, 255, .2);
+         border-radius: 3px;
+     }
+
+
+     /* HANYA link yang TIDAK punya kelas induk menu yang ditindak */
+     /* .bnsp-sidebar.collapsed .bnsp-submenu li .bnsp-nav-link[data-tooltip]:not(.bnsp-nav-parent):hover::after {
+         content: none !important;
+         display: none !important;
+     } */
+
+     /* .bnsp-sidebar.collapsed .bnsp-submenu {
+         max-height: calc(100vh - 80px); 
+         overflow-y: auto;
+         overflow-x: hidden;
+     } */
+ }

@@ -1,7 +1,7 @@
 @foreach ($items as $item)
     <div class="bnsp-nav-item {{ $item->open ? 'open' : '' }}">
         @if ($item->hasChildren())
-            <a href="#" class="bnsp-nav-link bnsp-nav-parent" data-tooltip="{{ $item->text }}">
+            <a href="#" class="bnsp-nav-link bnsp-nav-parent">
                 <x-menu.icon :icon="$item->icon" :icon-type="$item->iconType" />
                 <span class="nav-label flex-grow-1">{{ $item->text }}</span>
                 <span class="material-symbols-outlined chevron">chevron_right</span>
