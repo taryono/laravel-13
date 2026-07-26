@@ -1,7 +1,6 @@
-@extends(layout())
+@extends('layouts.app')
 
 @section('title', $title)
 @section('content')
-
-    @include("{$path}::list")
+    @include("Asesi::list")
 @stop

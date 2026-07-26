@@ -6,3 +6,11 @@ const token = document.querySelector('meta[name="csrf-token"]');
 if (token) {
   window.axios.defaults.headers.common['X-CSRF-TOKEN'] = token.content;
 }
+
+
+import $ from 'jquery';
+window.$ = window.jQuery = $;
+
+// Tambahkan ini
+import 'datatables.net';
+import 'datatables.net-bs5';

@@ -1,0 +1,38 @@
+<section class="content">
+    <div class="container-fluid">
+        {{ Form::model($approval, ['method' => 'PUT', 'route' => ['role.update', roles->id], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
+
+        <div class="card card-primary">
+            <div class="card-header">
+                <h3 class="card-title">{{ say('Role') }}</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        @forelse ($forms as $key => $form)
+                            <div class="row">
+                                <div class="col-md-12 mb-3">
+                                    <label>{{ say($form['label']) }}</label>
+                                    {!! $form['content'] !!}
+                                </div>
+                            </div>
+                        @empty
+                            <p>{{ say('Data Tidak Ditemukan') }}</p>
+                        @endforelse
+                    </div> 
+                </div>
+            </div>
+            <div class="card-footer">
+                {!! submit(['class' => 'btn btn-primary', 'value' => 'Submit', 'style' => 'float:right; margin-left:20px']) !!} &nbsp;
+                {!! cancel([
+                    'class' => 'btn btn-danger',                
+                    'style' => 'float:right',
+                    'url' => route('role.index'),
+                ]) !!}
+            </div>
+        </div>
+        {{ Form::close() }}
+        <!-- /.row -->
+    </div>
+    <!-- /.container-fluid -->
+</section> 

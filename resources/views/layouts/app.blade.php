@@ -22,7 +22,7 @@
         rel="stylesheet">
 
     <link rel="stylesheet" href="{{ asset('assets/css/dashboard.css') }}">
-
+    <link rel="stylesheet" href="{{ asset('vendor/datatables/datatables.css') }}">
     @stack('styles')
 
 </head>
@@ -48,17 +48,18 @@
 
         <x-topbar />
 
-        <main class="flex-grow-1 p-4 mx-auto w-100" style="max-width:1320px;">
+        <main class="flex-grow-1 p-4 mx-auto w-100 main-content" style="max-width:1320px;">
             @yield('content')
         </main>
 
         <x-footer />
 
     </div>
-
+    <script src="https://code.jquery.com/jquery-4.0.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="{{ asset('vendor/datatables/datatables.js') }}"></script>
     <script src="{{ asset('assets/js/dashboard.js') }}"></script>
     <script src="{{ asset('assets/js/core.js') }}"></script>
     <script src="{{ asset('assets/js/modal.js') }}"></script>

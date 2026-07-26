@@ -8,3 +8,11 @@ if (!function_exists('isSuperUser')) {
     
     }
 }
+
+if (!function_exists('say')) {
+    function say($text)
+    {
+        return $text;
+    
+    }
+}

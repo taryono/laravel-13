@@ -2,19 +2,15 @@
 
 namespace App\Modules\Asesi\Controllers;
 
-use App\Http\Controllers\MainController;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreAsesi;
 use Illuminate\Http\Request;
 use Models\Asesi as Asesi;
 use View;
 use Yajra\Datatables\Datatables;
 
-class AsesiController extends MainController
-{
-    public function __construct()
-    {
-        parent::__construct(new Asesi(), 'Asesi', say("Asesi"), null);
-    }
+class AsesiController extends Controller
+{ 
 
     /**
      * Display a listing of the resource.
@@ -22,8 +18,8 @@ class AsesiController extends MainController
      * @return \Illuminate\Http\Response
      */
     public function index()
-    { 
-        return view('Asesi::index');
+    {   
+        return view('Asesi::index', ['title' => 'Asesi']);
     }
 
     public function draw()

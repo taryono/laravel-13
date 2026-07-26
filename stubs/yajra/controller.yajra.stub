@@ -1,0 +1,60 @@
+<?php
+
+namespace {{controllerNamespace}};
+
+use App\Models\{{modelName}};
+use App\DataTables\{{modelName}}DataTable;
+use Illuminate\Http\Request;
+
+class {{modelName}}Controller extends Controller
+{
+    public function index({{modelName}}DataTable $dataTable)
+    {
+        // Menggunakan namespace kustom modul untuk Blade view
+        return $dataTable->render('{{modelName}}::index', ['title]'=> 'Data {{title}}');
+    }
+
+    public function create()
+    {
+        return view('{{modelName}}::create');
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+
+        {{modelName}}::create($validated);
+
+        return redirect()->route('{{modelRoutePrefix}}.index')
+            ->with('success', 'Data {{modelName}} berhasil ditambahkan.');
+    }
+
+    public function edit({{modelName}} ${{modelVariable}})
+    {
+        return view('{{modelName}}::edit', compact('{{modelVariable}}'));
+    }
+
+    public function update(Request $request, {{modelName}} ${{modelVariable}})
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+
+        ${{modelVariable}}->update($validated);
+
+        return redirect()->route('{{modelRoutePrefix}}.index')
+            ->with('success', 'Data {{modelName}} berhasil diperbarui.');
+    }
+
+    public function destroy({{modelName}} ${{modelVariable}})
+    {
+        ${{modelVariable}}->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Data {{modelName}} berhasil dihapus.'
+        ]);
+    }
+}
