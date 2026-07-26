@@ -295,9 +295,17 @@ document.addEventListener('DOMContentLoaded', function () {
                 title: 'Gagal Memuat',
                 text: 'Terjadi kesalahan saat memuat halaman. Silakan coba lagi.',
                 confirmButtonText: 'Baik'
-            });
+            }); 
         } finally {
             isLoading = false;
+            // show warning 
+            contentContainer.innerHTML = `
+                <div class="d-flex align-items-center justify-content-center py-5">    
+                    <span class="material-symbols-outlined">warning</span>                 
+                    <span>Gagal memuat halaman...</span> 
+
+                </div>
+            `;
         }
     }
 

@@ -199,8 +199,15 @@
      }
 
      /* hide the normal accordion submenu while collapsed — hover flyout takes over */
+     /* .bnsp-sidebar.collapsed .bnsp-nav-item>.bnsp-submenu {
+         max-height: 0 !important;
+     } */
+
      .bnsp-sidebar.collapsed .bnsp-nav-item>.bnsp-submenu {
          max-height: 0 !important;
+         overflow-y: auto;
+         overflow-x: hidden;
+         transition: max-height .25s ease;
      }
 
      /* -------------------------------------------------------

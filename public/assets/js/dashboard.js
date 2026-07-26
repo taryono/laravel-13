@@ -18,7 +18,12 @@ function initFlyoutTitles() {
         submenu.insertBefore(li, submenu.firstChild);
     });
 }
+
+
+
+
 initFlyoutTitles();
+
 
 // ===== Mode layout: sidebar <-> topbar =====
 // Menu HANYA ditulis sekali di dalam sidebar. buildTopNav() menyalin
@@ -283,3 +288,41 @@ document.addEventListener('click', (e) => {
         });
     }
 });
+
+// ===== Flyout collision detection (sidebar collapsed) =====
+// Mengukur ruang tersedia di atas/bawah item sebelum flyout dibuka,
+// lalu memutuskan arah buka + tinggi maksimal, supaya flyout tidak
+// pernah terpotong oleh tepi browser walau item-nya dekat bawah layar.
+
+// function initFlyoutPositioning() {
+//     document.querySelectorAll('.bnsp-sidebar > nav .bnsp-nav-item').forEach(item => {
+//         const submenu = item.querySelector(':scope > .bnsp-submenu');
+//         if (!submenu) return;
+//         item.addEventListener('mouseenter', () => positionFlyout(item, submenu));
+//         item.addEventListener('focusin', () => positionFlyout(item, submenu));
+//     });
+// }
+
+// function positionFlyout(item, submenu) {
+//     if (!isDesktop() || !sidebar.classList.contains('collapsed')) return;
+
+//     // Reset dulu ke kondisi default (buka ke bawah) supaya scrollHeight
+//     // yang diukur adalah tinggi natural, bukan sisa dari perhitungan lama
+//     submenu.classList.remove('bnsp-flyout-up');
+//     submenu.style.maxHeight = '';
+
+//     const itemRect = item.getBoundingClientRect();
+//     const naturalHeight = submenu.scrollHeight;
+//     const margin = 12; // jarak aman ke tepi layar
+//     const spaceBelow = window.innerHeight - itemRect.top - margin;
+//     const spaceAbove = itemRect.bottom - margin;
+
+//     if (naturalHeight > spaceBelow && spaceAbove > spaceBelow) {
+//         // ruang di atas lebih luas daripada di bawah -> buka ke atas
+//         submenu.classList.add('bnsp-flyout-up');
+//         submenu.style.maxHeight = Math.floor(Math.max(spaceAbove, 120)) + 'px';
+//     } else {
+//         submenu.style.maxHeight = Math.floor(Math.max(spaceBelow, 120)) + 'px';
+//     }
+// }
+// initFlyoutPositioning();
