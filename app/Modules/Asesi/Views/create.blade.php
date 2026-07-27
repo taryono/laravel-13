@@ -6,7 +6,9 @@
     <div class="card-body">
         <div class="row">
             <div class="col-md-6 mb-3">
+                @dump($forms)
                 @forelse ($forms as $key => $form)
+                 @if(!isset($form['label'])) @continue @endif
                     <div class="form-group">
                         <label for="name">{{ say($form['label']) }}</label>
                         {!! $form['content'] !!}

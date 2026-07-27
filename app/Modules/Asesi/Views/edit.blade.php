@@ -1,3 +1,8 @@
+@extends('layouts.app')
+
+@section('content')
+<div class="container">
+
 <div class="card card-primary"> 
     <form
         method="POST"
@@ -21,9 +26,8 @@
                 <div class="col-md-6 mb-3">
 
                     @forelse ($forms as $key => $form)
-
-                        <div class="form-group">
-
+                        @if(!isset($form['label'])) @continue @endif
+                        <div class="form-group"> 
                             <label for="{{ $key }}">
                                 {{ say($form['label']) }}
                             </label>
@@ -67,3 +71,6 @@
     </form>
 
 </div>
+
+</div>
+@endsection

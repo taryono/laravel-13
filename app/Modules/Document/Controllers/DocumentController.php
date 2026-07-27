@@ -3,7 +3,7 @@
 namespace App\Modules\Document\Controllers;
 
 use App\DataTables\DocumentDataTable;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\MainController;
 use App\Models\Document;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 use Throwable;
 
-class DocumentController extends Controller
+class DocumentController extends MainController
 {
     /**
      * Display a listing of the resource.

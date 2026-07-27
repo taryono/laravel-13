@@ -12,7 +12,20 @@ if (!function_exists('isSuperUser')) {
 if (!function_exists('say')) {
     function say($text)
     {
-        return $text;
-    
+        return $text;    
+    }
+}
+
+if (!function_exists('getkDarkMode')) {
+    function getkDarkMode()
+    {
+        return  false;    
+    }
+}
+
+if (!function_exists('renderFields')) {
+    function renderFields()
+    {
+        return  [];    
     }
 }

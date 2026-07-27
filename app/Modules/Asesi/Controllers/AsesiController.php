@@ -3,7 +3,7 @@
 namespace App\Modules\Asesi\Controllers;
 
 use App\DataTables\AsesiDataTable;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\MainController;
 use App\Models\Asesi;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 use Throwable;
 
-class AsesiController extends Controller
+class AsesiController extends MainController
 {
     /**
      * Display a listing of the resource.
@@ -45,8 +45,9 @@ class AsesiController extends Controller
      * Show the form for creating a new resource.
      */
     public function create(): View
-    {
-        return view('Asesi::create');
+    {   $asesi = new Asesi();
+        $forms = $this->getForm($asesi);
+        return view('Asesi::create', compact('forms'));
     }
 
     /**
@@ -97,9 +98,11 @@ class AsesiController extends Controller
     public function edit($id): View
     {
         $asesi = Asesi::findOrFail($id);
+        $forms = $this->getForm($asesi);
+         
         return view(
             'Asesi::edit',
-            compact('asesi')
+            compact('asesi', 'forms')
         );
     }
 

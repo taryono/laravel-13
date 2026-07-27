@@ -1,12 +1,12 @@
 <?php
 
 namespace App\Modules\Asesor\Controllers;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\MainController;
 use App\Models\Asesor;
 use App\DataTables\AsesorDataTable;
 use Illuminate\Http\Request;
 
-class AsesorController extends Controller
+class AsesorController extends MainController
 {
 
     public function index(Request $request, AsesorDataTable $dataTable)

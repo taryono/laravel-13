@@ -60,12 +60,13 @@ class FormLib
     public function getFields(): self
     {
         try {
+            
             if (!$this->model) return $this;
 
             // Ambil daftar field dengan cache
             $all_fields = $this->getFilteredFields();
             if (empty($all_fields)) return $this;
-
+            
             // Ambil info kolom SEKALI saja (hindari query berulang)
             $columns = $this->getColums();
             $darkModeClass = getkDarkMode() ? "bg-dark text-white" : 'bg-light text-black';

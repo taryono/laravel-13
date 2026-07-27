@@ -14,6 +14,7 @@
         "laravel/framework": "^12.0",
         "laravel/sanctum": "^4.3",
         "laravel/tinker": "^2.10.1",
+        "nekhbet/laravel-collective-html": "^1.0",
         "yajra/laravel-datatables": "^12.0",
         "yajra/laravel-datatables-html": "^12.7"
     },

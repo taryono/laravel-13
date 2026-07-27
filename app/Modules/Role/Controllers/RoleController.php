@@ -5,9 +5,9 @@ namespace App\Modules\Role\Controllers;
 use App\Models\Role;
 use App\DataTables\RoleDataTable;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\MainController;
 
-class RoleController extends Controller
+class RoleController extends MainController
 {
     public function index(RoleDataTable $dataTable)
     {
