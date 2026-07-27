@@ -13,7 +13,7 @@
             </ul>
         @else
             {{-- Ubah href jadi # dan simpan url asli di data-ajax-url --}}
-            <a href="#" class="bnsp-nav-link {{ $item->active ? 'active' : '' }}"
+            <a href="{{ $item->url ?? '#' }}" class="bnsp-nav-link {{ $item->active ? 'active' : '' }}"
                 data-ajax-url="{{ $item->url ?? '#' }}" data-tooltip="{{ $item->text }}">
                 <x-menu.icon :icon="$item->icon" :icon-type="$item->iconType" />
                 <span class="nav-label">{{ $item->text }}</span>

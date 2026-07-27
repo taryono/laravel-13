@@ -17,12 +17,11 @@ Route::group(['prefix' => 'asesi', 'namespace' => 'App\Modules\Asesi\Controllers
     Route::get('/create', ['as' => 'asesi.create', 'uses' => 'AsesiController@create']);
     Route::get('/show/{id}', ['as' => 'asesi.show', 'uses' => 'AsesiController@show']);
     Route::get('/preview/{id}', ['as' => 'asesi.preview', 'uses' => 'AsesiController@preview']);
+    Route::get('/print/{id}', ['as' => 'asesi.print', 'uses' => 'AsesiController@print']);
+
     Route::post('/store', ['as' => 'asesi.store', 'uses' => 'AsesiController@store']);
     Route::get('/edit/{id}', ['as' => 'asesi.edit', 'uses' => 'AsesiController@edit']);
     Route::put('/update/{id}', ['as' => 'asesi.update', 'uses' => 'AsesiController@update']);
     Route::delete('/delete/{id}', ['as' => 'asesi.destroy', 'uses' => 'AsesiController@destroy']);
-    Route::get('signaturepad', ['as' => 'asesi.signaturepad', 'uses' => 'AsesiController@signaturepad']);
-    Route::post('signaturepad', ['as' => 'asesi.upload', 'uses' => 'AsesiController@upload']);
-    Route::get('/draw', ['as' => 'asesi.draw', 'uses' => 'AsesiController@draw']);
-    Route::get('/email_verification/{id}', ['as' => 'asesi.toggleStatusEmailVerification', 'uses' => 'AsesiController@toggleStatusEmailVerification']);
+    
 });

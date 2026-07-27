@@ -2,244 +2,249 @@
 
 namespace App\Modules\Asesi\Controllers;
 
+use App\DataTables\AsesiDataTable;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreAsesi;
+use App\Models\Asesi;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Models\Asesi as Asesi;
-use View;
-use Yajra\Datatables\Datatables;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\View\View;
+use Throwable;
 
 class AsesiController extends Controller
-{ 
-
+{
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * Handles both:
+     * - Normal page request
+     * - Yajra DataTables AJAX request
      */
-    public function index()
-    {   
-        return view('Asesi::index', ['title' => 'Asesi']);
-    }
-
-    public function draw()
-    {  
-        if (request()->ajax()) {
-            if ($this->fields) {
-                $sql = Asesi::select(["users.id","users.name","users.cellphone", "users.email","users.created_at", "users.email_verified_at"]);
-            } else {
-                $sql = Asesi::select('*');
-            } 
-            if ($this->with) {
-                $sql->with(["user"]);
-            }
-            if (request()->has('search')) {
-                $sql = \App\Filters\GlobalSearch::search($sql, $this->with, $this->fields);
-            } 
-            $sql->whereHas('user'); 
-            $sql->leftJoin('users', 'asesis.user_id', '=', 'users.id');
-
-            $data = $sql->limit($this->_limit)
-                ->orderBy('created_at', 'desc')->get();
-            return Datatables::of($data)->addIndexColumn()
-                ->addColumn('cellphone', function ($row) {
-                    if($row){
-                        $phone = $row?->cellphone; 
-                        $phone = str_replace(['62','+62'], ['0','0'], $phone);
-                        $formatted = chunk_split($phone, 4, '-');
-                        $formatted = rtrim($formatted, '-');
-                        $formatted = str_replace(['62','+62'], ['0','0'], $formatted);
-                        return (!empty($formatted))?'<span class="text-success"><i class="fab fa-whatsapp text-bold"></i> &nbsp;'.$formatted.'</span>':'-';
-                    }else{
-                        return '-';
-                    }
-                })->addColumn('status', function ($row) {
-                    if($row){
-                        return !is_null($row->email_verified_at)?1:0;
-                    }else{
-                        return '-';
-                    }
-                })->addColumn('register_date', function ($row) {
-                     return  DateToIndo($row->created_at);
-                })
-                ->addColumn('action', function ($row) {
-                    return  hapus(['url' => route('user.destroy', $row->id), 'title' => 'Hapus Asesi', 'can' => 'asesi-destroy']);
-                })
-                ->addColumn('verification_status', function ($row) {
-                    if($row){ 
-                        return checkbox('email_verification_status', 'email_verification_status', $row->id, !is_null($row->email_verified_at), !is_null($row->email_verified_at)?1:0, route('asesi.toggleStatusEmailVerification', $row->id));                        
-                    }else{
-                        return '-';
-                    }
-                })
-                ->rawColumns(['action', 'verification_status', 'cellphone'])
-                ->make(true);
+    public function index(
+        Request $request,
+        AsesiDataTable $dataTable
+    ) {
+        /*
+         * Yajra DataTables request contains "draw".
+         *
+         * Example:
+         * /asesi?draw=1&start=0&length=10
+         */
+        if ($request->filled('draw')) {
+            return $dataTable->ajax();
         }
 
+        return $dataTable->render(
+            'Asesi::index'
+        );
     }
 
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
+     * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(): View
     {
-        $this->getForm();
-
         return view('Asesi::create');
     }
 
     /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  request()
-     * @return \Illuminate\Http\Response
+     * Store a newly created resource.
      */
-    public function store(StoreAsesi $request)
+    public function store(Request $request)
     {
-        $message = null;
+        $validated = $request->validate([
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+        ]);
+
         try {
-            $asesor = Asesi::create($this->_serialize($request));
-            if ($asesor) {
+            $model = DB::transaction(function () use ($validated) {
+                return Asesi::create($validated);
+            });
 
-            } else {
+            return $this->successResponse(
+                $request,
+                'Data Asesi berhasil ditambahkan.',
+                $model
+            );
 
-            }
+        } catch (Throwable $e) {
 
-        } catch (\Throwable $e) {
-            return getError($e);
+            Log::error(
+                'Gagal menambahkan Asesi.',
+                [
+                    'exception' => $e,
+                    'data' => $validated,
+                    'user_id' => auth()->id(),
+                ]
+            );
+
+            return $this->errorResponse(
+                $request,
+                'Data Asesi gagal ditambahkan.'
+            );
         }
-
-        return response()->json(['status' => 'success', 'message' => $message, 'redirectTo' => route('asesi.index')], 200);
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  $this->_model  $asesi
-     * @return \Illuminate\Http\Response
-     */
-    public function show($asesi_id)
-    {
-        $asesi = $this->_model::find($asesi_id);
-        $message = null;
-        try {
-            return view('Asesi::show', ['asesi' => $asesi]);
-        } catch (\Throwable $e) {
-            return getError($e);
-        }
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  $this->_model  $asesi
-     * @return \Illuminate\Http\Response
-     */
-    public function preview($asesi_id)
-    {
-        $asesi = $this->_model::find($asesi_id);
-        return view('Asesi::preview', ['asesi' => $asesi]);
     }
 
     /**
      * Show the form for editing the specified resource.
-     *
-     * @param  $this->_model  $asesi
-     * @return \Illuminate\Http\Response
      */
-    public function edit($asesi_id)
+    public function edit($id): View
     {
-        $asesi = $this->_model::find($asesi_id);
-        $this->getForm($asesi);
-        return view('Asesi::edit', ['asesi' => $asesi]);
+        $asesi = Asesi::findOrFail($id);
+        return view(
+            'Asesi::edit',
+            compact('asesi')
+        );
     }
 
     /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  request()
-     * @param  $this->_model  $asesi
-     * @return \Illuminate\Http\Response
+     * Update the specified resource.
      */
-    public function update(Request $request, $asesi_id)
-    {
+    public function update(
+        Request $request,
+        $id
+    ) {
+        $validated = $request->validate([
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+        ]);
+
         try {
 
-            $asesi = $this->_model::find($asesi_id); 
-            $users = request()->input("user");
-            $institutions = request()->input("institution");
-            $data_asesi = request()->input("asesi");
+            $asesi = Asesi::findOrFail($id);
+            DB::transaction(function () use (
+                $asesi,
+                $validated
+            ) {
+                $asesi->update($validated);
+            });
 
-            if ($asesi) {
-                $user = $asesi->user;
-                $user->update($users);
-                $asesi->update($data_asesi); 
-                $institution =\Models\Institution::updateOrCreate([
-                    "name"=> $institutions["name"]
-                ], $institutions); 
-                $asesi->institution_id = $institution->id;
-                $asesi->position = $institution->position;
-                $asesi->save();
+            return $this->successResponse(
+                $request,
+                'Data Asesi berhasil diperbarui.',
+                $asesi
+            );
 
-                $area = $this->area();
-                if(!is_null($area)){
-                    $asesi->update($area);
-                }
+        } catch (Throwable $e) {
 
-                if($asesi->country_id == 0 || $asesi->country_id == null){
-                    $asesi->country_id = 100;
-                    $asesi->save();
-                }
+            Log::error(
+                'Gagal memperbarui Asesi.',
+                [
+                    'exception' => $e,
+                    'Asesi_id' => $asesi->getKey(),
+                    'data' => $validated,
+                    'user_id' => auth()->id(),
+                ]
+            );
 
-            }
-
-        } catch (\Throwable $e) {  
-             return getError($e);
+            return $this->errorResponse(
+                $request,
+                'Data Asesi gagal diperbarui.'
+            );
         }
-        return response()->json(['status' => 'success', 'message' => 'Update Asesi Berhasil.'], 200);
     }
 
     /**
-     * Remove the specified resource from storage.
-     *
-     * @param  $this->_model  $asesi
-     * @return \Illuminate\Http\Response
+     * Remove the specified resource.
      */
-    public function destroy($id)
-    {
+    public function destroy(
+        Request $request,
+        Asesi $asesi
+    ): JsonResponse|RedirectResponse {
         try {
-            $asesi = $this->_model::find($id);
-        
-            if ($asesi) { 
+
+            DB::transaction(function () use ($asesi) {
                 $asesi->delete();
-            } else {
-                return response()->json(['status' => 'error', 'message' => 'Data Tidak Ditemukan.'], 400);
-            }
-        } catch (\Throwable $e) {
-            return getError($e);
+            });
 
+            return $this->successResponse(
+                $request,
+                'Data Asesi berhasil dihapus.'
+            );
+
+        } catch (Throwable $e) {
+
+            Log::error(
+                'Gagal menghapus Asesi.',
+                [
+                    'exception' => $e,
+                    'Asesi_id' => $asesi->getKey(),
+                    'user_id' => auth()->id(),
+                ]
+            );
+
+            return $this->errorResponse(
+                $request,
+                'Data Asesi gagal dihapus.'
+            );
         }
-        return response()->json(['status' => 'success', 'message' => 'Hapus Data Berhasil.', 'redirectTo' => route('asesor.index')], 200);
     }
 
-    public function toggleStatusEmailVerification($id)
-    { 
-        try {
-            $model = \App\Models\User::findOrFail($id);
-            if ($model) {
-                if($model->email_verified_at){
-                    $model->email_verified_at = null;
-                }else{
-                    $model->email_verified_at = now();
-                    $model->email_verification_ip =  request()->ip();
-                } 
-                $model->save();
+    /**
+     * Return successful response.
+     */
+    protected function successResponse(
+        Request $request,
+        string $message,
+        $data = null
+    ): JsonResponse|RedirectResponse {
+
+        if ($this->isAjaxRequest($request)) {
+
+            $response = [
+                'success' => true,
+                'message' => $message,
+            ];
+
+            if ($data !== null) {
+                $response['data'] = $data;
             }
-        } catch (\Throwable $e) {
-            return getError($e);
+
+            return response()->json($response);
         }
-        return response()->json(['status' => 'success', 'message' => 'Update Status Verifikasi Email Berhasil.'], 200);
+
+        return redirect()
+            ->route('asesi.index')
+            ->with('success', $message);
+    }
+
+    /**
+     * Return failed response.
+     */
+    protected function errorResponse(
+        Request $request,
+        string $message,
+        int $status = 500
+    ): JsonResponse|RedirectResponse {
+
+        if ($this->isAjaxRequest($request)) {
+
+            return response()->json([
+                'success' => false,
+                'message' => $message,
+            ], $status);
+        }
+
+        return redirect()
+            ->back()
+            ->withInput()
+            ->with('error', $message);
+    }
+
+    /**
+     * Determine whether the request expects an AJAX response.
+     */
+    protected function isAjaxRequest(Request $request): bool
+    {
+        return $request->ajax() || $request->expectsJson();
     }
 }

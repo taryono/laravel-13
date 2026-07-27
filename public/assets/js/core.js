@@ -18,7 +18,7 @@ function getMeta(name) {
     const el = document.querySelector(`meta[name="${name}"]`);
     return el ? el.content : null;
 }
-
+var datatable_content = '';
 // ==============================================
 // 3. KONFIGURASI AXIOS GLOBAL (SETELAH AXIOS ADA)
 // ==============================================
@@ -243,7 +243,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 || doc.body?.innerHTML 
                 || response.data 
                 || '<p class="text-danger">Konten tidak ditemukan</p>';
-            contentContainer.innerHTML = kontenBaru;
+            if(datatable_content == '') {
+                datatable_content = kontenBaru;
+                contentContainer.innerHTML = datatable_content;
+                if ($.fn.DataTable && window.LaravelDataTables) {
+                    Object.keys(window.LaravelDataTables).forEach(id => { 
+                        const table = window.LaravelDataTables[id]; 
+                        const el = document.getElementById(id);
+                        if (el && !$.fn.dataTable.isDataTable(el)) {
+                            table.draw();
+                        } else {
+                            table.ajax.reload(null, false);
+                        }
+                    });
+                }
+            }else{
+                contentContainer.innerHTML = datatable_content;
+                return;
+            }
+            
             window.history.pushState({ path: url }, '', url);
 
             // ➕ BARU: Baca judul dari meta atau header
@@ -271,20 +289,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Tangan klik pada link menu
-    menuLinks.forEach(link => {
-        link.addEventListener('click', e => {
-            e.preventDefault();
-            if (isLoading) return; // ➕ BARU: Cegah klik beruntun
-            const url = link.dataset.ajaxUrl;
-            console.log(url)
-            // Hapus status aktif dari semua menu
-            document.querySelectorAll('.bnsp-nav-link').forEach(el => el.classList.remove('active'));
-             // Beri status aktif pada menu yang diklik
-            link.classList.add('active');
-            // Muat konten
-            loadContent(url);
-        });
-    });
+    // menuLinks.forEach(link => {
+    //     link.addEventListener('click', e => {
+    //         e.preventDefault();
+    //         if (isLoading) return; // ➕ BARU: Cegah klik beruntun
+    //         const url = link.dataset.ajaxUrl;
+    //         console.log(url)
+    //         // Hapus status aktif dari semua menu
+    //         document.querySelectorAll('.bnsp-nav-link').forEach(el => el.classList.remove('active'));
+    //          // Beri status aktif pada menu yang diklik
+    //         link.classList.add('active');
+    //         // Muat konten
+    //         loadContent(url);
+    //     });
+    // });
 
     // Tangani tombol maju/mundur browser
     window.addEventListener('popstate', e => {
@@ -311,23 +329,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Tambahkan fungsi lain yang perlu dijalankan ulang sesuai kebutuhan
         FormValidator.reinitAll(contentContainer);
         // ➕ BARU: Jalankan inisialisasi tombol & form yang sudah kita buat
-        initCoreElements();
-
-         // ✅ Jalankan ulang inisialisasi DataTables
-        // ✅ HANYA jalankan jika DataTables BENAR-BENAR ada
-        if ($.fn.DataTable && window.LaravelDataTables) {
-            Object.keys(window.LaravelDataTables).forEach(id => {
-                console.log(id)
-                const table = window.LaravelDataTables[id];
-                console.log(table)
-                const el = document.getElementById(id);
-                if (el && !$.fn.dataTable.isDataTable(el)) {
-                    table.draw();
-                } else {
-                    table.ajax.reload(null, false);
-                }
-            });
-        }
+        initCoreElements(); 
     }
 
     // Jalankan pertama kali saat halaman dibuka

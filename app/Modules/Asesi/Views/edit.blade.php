@@ -1,27 +1,69 @@
-<section class="content">
+<div class="card card-primary"> 
+    <form
+        method="POST"
+        action="{{ route('asesi.update', $asesi->id) }}"
+        class="form-horizontal"
+        enctype="multipart/form-data"
+    >
 
-    <div class="container-fluid">
-        {{ Form::model($asesi, ['method' => 'PUT', 'route' => ['asesi.update', $asesi->id], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
+        @csrf
 
-        @forelse ($forms as $key => $form)
+        <div class="card-header">
+            <h3 class="card-title">
+                {{ say('Asesi') }}
+            </h3>
+        </div>
+
+        <div class="card-body">
+
             <div class="row">
-                <div class="col-md-12 mb-3">
-                    <label>{{ say($form['label']) }}</label>
-                    {!! $form['content'] !!}
+
+                <div class="col-md-6 mb-3">
+
+                    @forelse ($forms as $key => $form)
+
+                        <div class="form-group">
+
+                            <label for="{{ $key }}">
+                                {{ say($form['label']) }}
+                            </label>
+
+                            {!! $form['content'] !!}
+
+                        </div>
+
+                    @empty
+
+                        <p>
+                            {{ say('Data Tidak Ditemukan') }}
+                        </p>
+
+                    @endforelse
+
                 </div>
+
             </div>
-        @empty
-            <p>{{ say('Data Tidak Ditemukan') }}</p>
-        @endforelse
-        {{ Form::close() }}
-        <!-- /.row -->
-    </div>
-    <!-- /.container-fluid -->
-</section>
-<!-- /.content -->
-<script>
-    $(function() {
-        spreadData({!! json_encode($asesi) !!});
-        $('.selectpicker').selectpicker('refresh');
-    });
-</script>
+
+        </div>
+
+        <div class="card-footer">
+
+            <button
+                type="submit"
+                class="btn btn-primary"
+            >
+                Simpan
+            </button>
+
+            <a
+                href="{{ route('document.index') }}"
+                class="btn btn-secondary"
+            >
+                Batal
+            </a>
+
+        </div>
+
+    </form>
+
+</div>

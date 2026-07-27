@@ -8,102 +8,419 @@ use Illuminate\Support\Str;
 
 class MakeCrudYajraCommand extends Command
 {
-    protected $signature = 'make:crud-yajra {name : Nama Model (contoh: Product)}';
-    protected $description = 'Otomatis membuat CRUD komplit dengan struktur Modular 100% terisolasi';
+    protected $signature = 'make:crud-yajra
+                            {name : Nama Model (contoh: Product)}';
+
+    protected $description = 'Otomatis membuat CRUD lengkap dengan Yajra DataTables dan struktur Modular';
 
     public function handle()
     {
-        $name = ucfirst($this->argument('name'));
-        
-        // Cek semua file stub yang dibutuhkan
-        if (!file_exists(base_path('stubs/yajra/controller.yajra.stub')) || 
-            !file_exists(base_path('stubs/yajra/index.yajra.stub')) ||
-            !file_exists(base_path('stubs/yajra/route.yajra.stub'))) {
-            $this->error('File stub tidak lengkap! Pastikan controller.yajra.stub, index.yajra.stub, dan route.yajra.stub sudah ada di folder stubs/.');
-            return Command::FAILURE;
+        $name = Str::studly($this->argument('name'));
+
+        /*
+        |--------------------------------------------------------------------------
+        | 1. Validasi Stub
+        |--------------------------------------------------------------------------
+        */
+
+        $requiredStubs = [
+            'controller.yajra.stub',
+            'datatables.service.stub',
+            'index.yajra.stub',
+            'create.yajra.stub',
+            'edit.yajra.stub',
+            'route.yajra.stub',
+        ];
+
+        foreach ($requiredStubs as $stub) {
+            $path = base_path("stubs/yajra/{$stub}");
+
+            if (!File::exists($path)) {
+                $this->error(
+                    "Stub tidak ditemukan: stubs/yajra/{$stub}"
+                );
+
+                return Command::FAILURE;
+            }
         }
 
-        // Setup path lokasi folder Modul
+        /*
+        |--------------------------------------------------------------------------
+        | 2. Setup Module
+        |--------------------------------------------------------------------------
+        */
+
         $modulePath = app_path("Modules/{$name}");
-        $controllerNamespace = "App\Modules\\{$name}\Controllers";
-        $viewFolderKebab = Str::kebab($name); // contoh: Product -> product
+
+        $controllerNamespace =
+            "App\\Modules\\{$name}\\Controllers";
+
+        $viewFolderKebab = Str::kebab($name);
+
+        $modelVariable = Str::camel($name);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Route Prefix
+        |--------------------------------------------------------------------------
+        |
+        | Contoh:
+        | Asesi -> asesi
+        | Asesor -> asesor
+        | AcademicYear -> academic-year
+        |
+        */
+
+        $modelRoutePrefix = Str::kebab($name);
+
+        /*
+        |--------------------------------------------------------------------------
+        | DataTable ID
+        |--------------------------------------------------------------------------
+        |
+        | Contoh:
+        | Asesi -> asesi-table
+        | Asesor -> asesor-table
+        |
+        */
+
+        $modelTableId = "{$modelRoutePrefix}-table";
+
+        /*
+        |--------------------------------------------------------------------------
+        | Title
+        |--------------------------------------------------------------------------
+        */
+
+        $title = Str::title(
+            str_replace('-', ' ', $modelRoutePrefix)
+        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | Replacements
+        |--------------------------------------------------------------------------
+        */
 
         $replacements = [
             '{{modelName}}'           => $name,
+            '{{modelVariable}}'       => $modelVariable,
             '{{controllerNamespace}}' => $controllerNamespace,
-            '{{modelVariable}}'       => Str::camel($name),
             '{{modelViewFolder}}'     => $viewFolderKebab,
-            // '{{modelRoutePrefix}}'    => Str::kebab(Str::plural($name)),
-            '{{modelRoutePrefix}}'    => Str::kebab(Str::single($name)),
-            '{{modelTableId}}'        => Str::kebab(Str::plural($name)),
-            '{{title}}'      => Str::kebab(Str::plural($name))
+            '{{modelRoutePrefix}}'    => $modelRoutePrefix,
+            '{{modelTableId}}'        => $modelTableId,
+            '{{title}}'               => $title,
         ];
 
-        $this->info("Memulai scaffolding Full Modular untuk {$name}...");
+        $this->newLine();
 
-        // 1. Buat Model & Migration bawaan Laravel (Masih di folder default core)
-        $this->call('make:model', ['name' => $name, '-m' => true]);
+        $this->info(
+            "Memulai scaffolding CRUD Yajra untuk {$name}..."
+        );
 
-        // 2. Buat Yajra DataTable Service Class
-        $this->call('datatables:make', ['name' => $name]);
-
-        // 3. Buat Folder & File Controller di dalam modul
-        $this->generateController($name, $modulePath, $replacements);
-
-        // 4. Buat Folder & File Views di dalam modul
-        $this->generateViews($modulePath, $replacements);
-
-        // 5. Buat File routes.php di dalam modul
-        $this->generateRoutes($modulePath, $replacements);
+        /*
+        |--------------------------------------------------------------------------
+        | 3. Model & Migration
+        |--------------------------------------------------------------------------
+        */
 
         $this->newLine();
-        $this->info("✨ CRUD Modular {$name} sukses dibuat di App/Modules/{$name}!");
-        $this->line("👉 Agar Laravel mendeteksi View dan Route dari modul ini, pastikan Anda mendaftarkannya.");
-        
+
+        $this->info('Membuat Model & Migration...');
+
+        $this->call('make:model', [
+            'name' => $name,
+            '-m'   => true,
+        ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | 4. Generate Yajra DataTable
+        |--------------------------------------------------------------------------
+        */
+
+        $this->newLine();
+
+        $this->generateDataTable(
+            $name,
+            $replacements
+        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | 5. Generate Controller
+        |--------------------------------------------------------------------------
+        */
+
+        $this->newLine();
+
+        $this->generateController(
+            $name,
+            $modulePath,
+            $replacements
+        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | 6. Generate Views
+        |--------------------------------------------------------------------------
+        */
+
+        $this->newLine();
+
+        $this->generateViews(
+            $modulePath,
+            $replacements
+        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | 7. Generate Routes
+        |--------------------------------------------------------------------------
+        */
+
+        $this->newLine();
+
+        $this->generateRoutes(
+            $modulePath,
+            $replacements
+        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | Done
+        |--------------------------------------------------------------------------
+        */
+
+        $this->newLine();
+
+        $this->info(
+            "✨ CRUD Yajra {$name} berhasil dibuat!"
+        );
+
+        $this->line('');
+        $this->line(
+            "📁 Module   : app/Modules/{$name}"
+        );
+
+        $this->line(
+            "📊 DataTable: app/DataTables/{$name}DataTable.php"
+        );
+
+        $this->line(
+            "🗃 Model    : app/Models/{$name}.php"
+        );
+
+        $this->line(
+            "🌐 Route    : {$modelRoutePrefix}"
+        );
+
+        $this->line(
+            "📋 Table ID : {$modelTableId}"
+        );
+
+        $this->newLine();
+        \Artisan::call('cache:clear');
+        \Artisan::call('config:clear');
+        \Artisan::call('route:clear');
+        \Artisan::call('view:clear');
+        \Artisan::call('optimize');
         return Command::SUCCESS;
     }
 
-    protected function generateController($name, $modulePath, $replacements)
-    {
+    /**
+     * Generate Yajra DataTable Service Class.
+     */
+    protected function generateDataTable(
+        string $name,
+        array $replacements
+    ): void {
+        $dir = app_path('DataTables');
+
+        if (!File::exists($dir)) {
+            File::makeDirectory(
+                $dir,
+                0755,
+                true
+            );
+        }
+
+        $stubPath = base_path(
+            'stubs/yajra/datatables.service.stub'
+        );
+
+        $stub = File::get($stubPath);
+
+        $template = str_replace(
+            array_keys($replacements),
+            array_values($replacements),
+            $stub
+        );
+
+        $file = "{$dir}/{$name}DataTable.php";
+
+        if (File::exists($file)) {
+            $this->warn(
+                "⚠ DataTable sudah ada, dilewati: {$file}"
+            );
+
+            return;
+        }
+
+        File::put(
+            $file,
+            $template
+        );
+
+        $this->info(
+            "✔ DataTable: {$file}"
+        );
+    }
+
+    /**
+     * Generate Controller.
+     */
+    protected function generateController(
+        string $name,
+        string $modulePath,
+        array $replacements
+    ): void {
         $dir = "{$modulePath}/Controllers";
-        if (!File::exists($dir)) File::makeDirectory($dir, 0755, true);
 
-        $stub = File::get(base_path('stubs/yajra/controller.yajra.stub'));
-        $template = str_replace(array_keys($replacements), array_values($replacements), $stub);
-        
-        File::put("{$dir}/{$name}Controller.php", $template);
-        $this->info("✔ Controller: {$dir}/{$name}Controller.php");
+        if (!File::exists($dir)) {
+            File::makeDirectory(
+                $dir,
+                0755,
+                true
+            );
+        }
+
+        $stubPath = base_path(
+            'stubs/yajra/controller.yajra.stub'
+        );
+
+        $stub = File::get($stubPath);
+
+        $template = str_replace(
+            array_keys($replacements),
+            array_values($replacements),
+            $stub
+        );
+
+        $file = "{$dir}/{$name}Controller.php";
+
+        if (File::exists($file)) {
+            $this->warn(
+                "⚠ Controller sudah ada, dilewati: {$file}"
+            );
+
+            return;
+        }
+
+        File::put(
+            $file,
+            $template
+        );
+
+        $this->info(
+            "✔ Controller: {$file}"
+        );
     }
 
-    protected function generateViews($modulePath, $replacements)
-    {
+    /**
+     * Generate Views.
+     */
+    protected function generateViews(
+        string $modulePath,
+        array $replacements
+    ): void {
         $dir = "{$modulePath}/Views";
-        if (!File::exists($dir)) File::makeDirectory($dir, 0755, true);
 
-        // Generate index.blade.php
-        $stubIndex = File::get(base_path('stubs/yajra/index.yajra.stub'));
-        $templateIndex = str_replace(array_keys($replacements), array_values($replacements), $stubIndex);
-        File::put("{$dir}/index.blade.php", $templateIndex); 
+        if (!File::exists($dir)) {
+            File::makeDirectory(
+                $dir,
+                0755,
+                true
+            );
+        }
 
-        // Generate index.blade.php
-        $stubCreate = File::get(base_path('stubs/yajra/create.yajra.stub'));
-        $templateCreate = str_replace(array_keys($replacements), array_values($replacements), $stubCreate);
-        File::put("{$dir}/create.blade.php", $templateCreate); 
+        $views = [
+            'index.yajra.stub'  => 'index.blade.php',
+            'create.yajra.stub' => 'create.blade.php',
+            'edit.yajra.stub'   => 'edit.blade.php',
+        ];
 
-        // Generate index.blade.php
-        $stubEdit = File::get(base_path('stubs/yajra/edit.yajra.stub'));
-        $templateEdit = str_replace(array_keys($replacements), array_values($replacements), $stubEdit);
-        File::put("{$dir}/edit.blade.php", $templateEdit);
+        foreach ($views as $stubName => $fileName) {
 
-        $this->info("✔ Views: Berhasil dibuat di {$dir}/");
+            $stubPath = base_path(
+                "stubs/yajra/{$stubName}"
+            );
+
+            $stub = File::get($stubPath);
+
+            $template = str_replace(
+                array_keys($replacements),
+                array_values($replacements),
+                $stub
+            );
+
+            $file = "{$dir}/{$fileName}";
+
+            if (File::exists($file)) {
+                $this->warn(
+                    "⚠ View sudah ada, dilewati: {$file}"
+                );
+
+                continue;
+            }
+
+            File::put(
+                $file,
+                $template
+            );
+
+            $this->info(
+                "✔ View: {$file}"
+            );
+        }
     }
 
-    protected function generateRoutes($modulePath, $replacements)
-    {
-        $stub = File::get(base_path('stubs/yajra/route.yajra.stub'));
-        $template = str_replace(array_keys($replacements), array_values($replacements), $stub);
-        
-        File::put("{$modulePath}/routes.php", $template);
-        $this->info("✔ Routes: {$modulePath}/routes.php");
+    /**
+     * Generate Routes.
+     */
+    protected function generateRoutes(
+        string $modulePath,
+        array $replacements
+    ): void {
+        $stubPath = base_path(
+            'stubs/yajra/route.yajra.stub'
+        );
+
+        $stub = File::get($stubPath);
+
+        $template = str_replace(
+            array_keys($replacements),
+            array_values($replacements),
+            $stub
+        );
+
+        $file = "{$modulePath}/routes.php";
+
+        if (File::exists($file)) {
+            $this->warn(
+                "⚠ Routes sudah ada, dilewati: {$file}"
+            );
+
+            return;
+        }
+
+        File::put(
+            $file,
+            $template
+        );
+
+        $this->info(
+            "✔ Routes: {$file}"
+        );
     }
 }

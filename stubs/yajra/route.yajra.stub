@@ -11,19 +11,17 @@ use Illuminate\Support\Facades\Route;
 | and give it the controller to call when that URI is requested.
 |
  */
-Route::group(['prefix' => '{{modelRoutePrefix}}', 'namespace' => 'App\Modules\Approval\Controllers', 'middleware' => ['web', 'role:admin','preventBackHistory']], function () {
-    Route::get('/', ['as' => 'approval.index', 'uses' => '{{modelName}}Controller@index']);
-    Route::any('/search', ['as' => 'approval.search', 'uses' => '{{modelName}}Controller@search']);
-    Route::get('/create', ['as' => 'approval.create', 'uses' => '{{modelName}}Controller@create']);
-    Route::get('/show/{id}', ['as' => 'approval.show', 'uses' => '{{modelName}}Controller@show']);
-    Route::get('/preview/{id}', ['as' => 'approval.preview', 'uses' => '{{modelName}}Controller@preview']);
-    Route::get('/print/{id}', ['as' => 'approval.print', 'uses' => '{{modelName}}Controller@print']);
+Route::group(['prefix' => '{{modelRoutePrefix}}', 'namespace' => 'App\Modules\{{modelName}}\Controllers', 'middleware' => ['web']], function () {
+    Route::get('/', ['as' => '{{modelRoutePrefix}}.index', 'uses' => '{{modelName}}Controller@index']);
+    Route::any('/search', ['as' => '{{modelRoutePrefix}}.search', 'uses' => '{{modelName}}Controller@search']);
+    Route::get('/create', ['as' => '{{modelRoutePrefix}}.create', 'uses' => '{{modelName}}Controller@create']);
+    Route::get('/show/{id}', ['as' => '{{modelRoutePrefix}}.show', 'uses' => '{{modelName}}Controller@show']);
+    Route::get('/preview/{id}', ['as' => '{{modelRoutePrefix}}.preview', 'uses' => '{{modelName}}Controller@preview']);
+    Route::get('/print/{id}', ['as' => '{{modelRoutePrefix}}.print', 'uses' => '{{modelName}}Controller@print']);
 
-    Route::post('/store', ['as' => 'approval.store', 'uses' => '{{modelName}}Controller@store']);
-    Route::get('/edit/{id}', ['as' => 'approval.edit', 'uses' => '{{modelName}}Controller@edit']);
-    Route::put('/update/{id}', ['as' => 'approval.update', 'uses' => '{{modelName}}Controller@update']);
-    Route::delete('/delete/{id}', ['as' => 'approval.destroy', 'uses' => '{{modelName}}Controller@destroy']);
-    Route::get('signaturepad', ['as' => 'approval.signaturepad', 'uses' => '{{modelName}}Controller@signaturepad']);
-    Route::post('signaturepad', ['as' => 'approval.upload', 'uses' => '{{modelName}}Controller@upload']);
-    Route::get('draw', ['as' => 'approval.draw', 'uses' => '{{modelName}}Controller@draw']);
+    Route::post('/store', ['as' => '{{modelRoutePrefix}}.store', 'uses' => '{{modelName}}Controller@store']);
+    Route::get('/edit/{id}', ['as' => '{{modelRoutePrefix}}.edit', 'uses' => '{{modelName}}Controller@edit']);
+    Route::put('/update/{id}', ['as' => '{{modelRoutePrefix}}.update', 'uses' => '{{modelName}}Controller@update']);
+    Route::delete('/delete/{id}', ['as' => '{{modelRoutePrefix}}.destroy', 'uses' => '{{modelName}}Controller@destroy']);
+    
 });

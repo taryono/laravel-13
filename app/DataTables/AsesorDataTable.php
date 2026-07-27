@@ -22,16 +22,33 @@ class AsesorDataTable extends DataTable
     public function dataTable(QueryBuilder $query): EloquentDataTable
 {
     return (new EloquentDataTable($query))
-        ->addColumn('action', function($row) {
+        ->addColumn('action', function ($row) {
             return '
-                <a href="'.route('asesor.edit', $row->id).'" class="btn btn-sm btn-info">
-                    <span class="material-symbols">edit</span>
-                </a>
-                <button class="btn btn-sm btn-danger" 
-                        data-confirm-delete="true" 
-                        data-url="'.route('asesor.destroy', $row->id).'">
-                    <span class="material-symbols">delete</span>
-                </button>
+                <div class="d-flex justify-content-center gap-1">
+
+                    <a
+                        href="' . route('asesor.edit', $row->id) . '"
+                        class="btn btn-sm btn-info"
+                        title="Edit"
+                    >
+                        <span class="material-symbols-outlined">
+                            edit
+                        </span>
+                    </a>
+
+                    <button
+                        type="button"
+                        class="btn btn-sm btn-danger"
+                        data-confirm-delete="true"
+                        data-url="' . route('asesor.destroy', $row->id) . '"
+                        title="Hapus"
+                    >
+                        <span class="material-symbols-outlined">
+                            delete
+                        </span>
+                    </button>
+
+                </div>
             ';
         })
         ->rawColumns(['action']) // ✅ WAJIB: izinkan tampilan HTML
@@ -54,22 +71,49 @@ class AsesorDataTable extends DataTable
     public function html(): HtmlBuilder
     {
         return $this->builder()
-                    ->setTableId('asesor-table')
-                    ->columns($this->getColumns())
-                    ->minifiedAjax(route('asesor.index'))
-                    ->orderBy(1)
-                    ->selectStyleSingle()
-                    ->parameters([
-                        'dom' => 'frtip',
-                    ])
-                    ->buttons([
-                        Button::make('excel'),
-                        Button::make('csv'),
-                        Button::make('pdf'),
-                        Button::make('print'),
-                        Button::make('reset'),
-                        Button::make('reload')
-                    ]);
+            ->setTableId('asesor-table')
+            ->columns($this->getColumns())
+            ->minifiedAjax(route('asesor.index'))
+            ->orderBy(1)
+            ->selectStyleSingle()
+            ->parameters([
+                'dom' => '<"row mb-3"' .
+                            '<"col-md-6 d-flex align-items-center"B>' .
+                            '<"col-md-6"f>' .
+                        '>' .
+                        'rt' .
+                        '<"row mt-3"' .
+                            '<"col-md-6"i>' .
+                            '<"col-md-6 d-flex justify-content-md-end"p>' .
+                        '>',
+                'autoWidth' => false,
+                'responsive' => true,
+            ])
+            ->buttons([
+                Button::make('excel')
+                    ->text('<span class="material-symbols-outlined align-middle me-1">download</span> Excel')
+                     ->className('btn btn-success'),
+
+                Button::make('csv')
+                    ->text('<span class="material-symbols-outlined align-middle me-1">description</span> CSV')
+                    ->className('btn btn-info'),
+
+                Button::make('pdf')
+                    ->text('<span class="material-symbols-outlined align-middle me-1">picture_as_pdf</span> PDF')
+                    ->className('btn btn-danger'),
+
+                Button::make('print')
+                    ->text('<span class="material-symbols-outlined align-middle me-1">print</span> Print')
+                    ->className('btn btn-primary'),
+
+                Button::make([
+                    'text' => '<span class="material-symbols-outlined align-middle">refresh</span>',
+                    'className' => 'btn btn-secondary',
+                    'action' => 'function (e, dt, node, config) {
+                        dt.ajax.reload(null, false);
+                    }',
+                ])->className('btn btn-secondary'), 
+            ]);
     }
 
     /**
@@ -78,13 +122,20 @@ class AsesorDataTable extends DataTable
     public function getColumns(): array
     {
         return [
-            Column::make('id'),
-            Column::make('name'), 
+            Column::make('id')
+                ->title('ID')
+                ->width(80)
+                ->addClass('text-center'),
+
+            Column::make('name')
+                ->title('Nama Asesor'),
+
             Column::computed('action')
-                  ->exportable(false)
-                  ->printable(false)
-                  ->width(60)
-                  ->addClass('text-center'),
+                ->title('Aksi')
+                ->width(100)
+                ->addClass('text-center')
+                ->orderable(false)
+                ->searchable(false),
         ];
     }
 

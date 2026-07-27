@@ -17,24 +17,9 @@ class AsesorController extends Controller
         }
 
         // Jika buka halaman biasa / lewat menu AJAX, kembalikan tampilan lengkap
-         return view('Asesor::index', [
-            'title' => 'Daftar Asesor',
-            'html' => $dataTable->html()
-        ]);
-    }
-    public function draw(AsesorDataTable $dataTable)
-    {  
-         if ($request->filled('draw')) {
-            return $dataTable->ajax();
-        }
-    }
- 
-    public function indexOld()
-    {   $dataTable = new AsesorDataTable();
+        return $dataTable->render('Asesor::index');
+    } 
     
-        return view('Asesor::index', ['title' => 'Asesi', 'html' => $dataTable->html()]);
-    }
-
     public function create()
     {
         return view('Asesor::create');

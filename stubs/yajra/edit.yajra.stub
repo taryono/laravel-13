@@ -1,6 +1,6 @@
 <section class="content">
     <div class="container-fluid">
-        {{ Form::model($approval, ['method' => 'PUT', 'route' => ['{{modelRoutePrefix}}.update', {{modelRoutePrefix}}->id], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
+        {{ Form::model(${{modelRoutePrefix}}, ['method' => 'PUT', 'route' => ['{{modelRoutePrefix}}.update', ${{modelRoutePrefix}}->id], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
 
         <div class="card card-primary">
             <div class="card-header">

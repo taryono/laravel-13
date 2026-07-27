@@ -2,59 +2,247 @@
 
 namespace {{controllerNamespace}};
 
-use App\Models\{{modelName}};
 use App\DataTables\{{modelName}}DataTable;
+use App\Http\Controllers\Controller;
+use App\Models\{{modelName}};
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\View\View;
+use Throwable;
 
 class {{modelName}}Controller extends Controller
 {
-    public function index({{modelName}}DataTable $dataTable)
-    {
-        // Menggunakan namespace kustom modul untuk Blade view
-        return $dataTable->render('{{modelName}}::index', ['title]'=> 'Data {{title}}');
+    /**
+     * Display a listing of the resource.
+     *
+     * Handles both:
+     * - Normal page request
+     * - Yajra DataTables AJAX request
+     */
+    public function index(
+        Request $request,
+        {{modelName}}DataTable $dataTable
+    ) {
+        /*
+         * Yajra DataTables request contains "draw".
+         *
+         * Example:
+         * /{{modelRoutePrefix}}?draw=1&start=0&length=10
+         */
+        if ($request->filled('draw')) {
+            return $dataTable->ajax();
+        }
+
+        return $dataTable->render(
+            '{{modelName}}::index'
+        );
     }
 
-    public function create()
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create(): View
     {
         return view('{{modelName}}::create');
     }
 
+    /**
+     * Store a newly created resource.
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+            ],
         ]);
 
-        {{modelName}}::create($validated);
+        try {
+            $model = DB::transaction(function () use ($validated) {
+                return {{modelName}}::create($validated);
+            });
 
-        return redirect()->route('{{modelRoutePrefix}}.index')
-            ->with('success', 'Data {{modelName}} berhasil ditambahkan.');
+            return $this->successResponse(
+                $request,
+                'Data {{modelName}} berhasil ditambahkan.',
+                $model
+            );
+
+        } catch (Throwable $e) {
+
+            Log::error(
+                'Gagal menambahkan {{modelName}}.',
+                [
+                    'exception' => $e,
+                    'data' => $validated,
+                    'user_id' => auth()->id(),
+                ]
+            );
+
+            return $this->errorResponse(
+                $request,
+                'Data {{modelName}} gagal ditambahkan.'
+            );
+        }
     }
 
-    public function edit({{modelName}} ${{modelVariable}})
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit({{modelName}} ${{modelVariable}}): View
     {
-        return view('{{modelName}}::edit', compact('{{modelVariable}}'));
+        return view(
+            '{{modelName}}::edit',
+            compact('{{modelVariable}}')
+        );
     }
 
-    public function update(Request $request, {{modelName}} ${{modelVariable}})
-    {
+    /**
+     * Update the specified resource.
+     */
+    public function update(
+        Request $request,
+        {{modelName}} ${{modelVariable}}
+    ) {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+            ],
         ]);
 
-        ${{modelVariable}}->update($validated);
+        try {
 
-        return redirect()->route('{{modelRoutePrefix}}.index')
-            ->with('success', 'Data {{modelName}} berhasil diperbarui.');
+            DB::transaction(function () use (
+                ${{modelVariable}},
+                $validated
+            ) {
+                ${{modelVariable}}->update($validated);
+            });
+
+            return $this->successResponse(
+                $request,
+                'Data {{modelName}} berhasil diperbarui.',
+                ${{modelVariable}}
+            );
+
+        } catch (Throwable $e) {
+
+            Log::error(
+                'Gagal memperbarui {{modelName}}.',
+                [
+                    'exception' => $e,
+                    '{{modelName}}_id' => ${{modelVariable}}->getKey(),
+                    'data' => $validated,
+                    'user_id' => auth()->id(),
+                ]
+            );
+
+            return $this->errorResponse(
+                $request,
+                'Data {{modelName}} gagal diperbarui.'
+            );
+        }
     }
 
-    public function destroy({{modelName}} ${{modelVariable}})
-    {
-        ${{modelVariable}}->delete();
+    /**
+     * Remove the specified resource.
+     */
+    public function destroy(
+        Request $request,
+        {{modelName}} ${{modelVariable}}
+    ): JsonResponse|RedirectResponse {
+        try {
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Data {{modelName}} berhasil dihapus.'
-        ]);
+            DB::transaction(function () use (${{modelVariable}}) {
+                ${{modelVariable}}->delete();
+            });
+
+            return $this->successResponse(
+                $request,
+                'Data {{modelName}} berhasil dihapus.'
+            );
+
+        } catch (Throwable $e) {
+
+            Log::error(
+                'Gagal menghapus {{modelName}}.',
+                [
+                    'exception' => $e,
+                    '{{modelName}}_id' => ${{modelVariable}}->getKey(),
+                    'user_id' => auth()->id(),
+                ]
+            );
+
+            return $this->errorResponse(
+                $request,
+                'Data {{modelName}} gagal dihapus.'
+            );
+        }
+    }
+
+    /**
+     * Return successful response.
+     */
+    protected function successResponse(
+        Request $request,
+        string $message,
+        $data = null
+    ): JsonResponse|RedirectResponse {
+
+        if ($this->isAjaxRequest($request)) {
+
+            $response = [
+                'success' => true,
+                'message' => $message,
+            ];
+
+            if ($data !== null) {
+                $response['data'] = $data;
+            }
+
+            return response()->json($response);
+        }
+
+        return redirect()
+            ->route('{{modelRoutePrefix}}.index')
+            ->with('success', $message);
+    }
+
+    /**
+     * Return failed response.
+     */
+    protected function errorResponse(
+        Request $request,
+        string $message,
+        int $status = 500
+    ): JsonResponse|RedirectResponse {
+
+        if ($this->isAjaxRequest($request)) {
+
+            return response()->json([
+                'success' => false,
+                'message' => $message,
+            ], $status);
+        }
+
+        return redirect()
+            ->back()
+            ->withInput()
+            ->with('error', $message);
+    }
+
+    /**
+     * Determine whether the request expects an AJAX response.
+     */
+    protected function isAjaxRequest(Request $request): bool
+    {
+        return $request->ajax() || $request->expectsJson();
     }
 }
