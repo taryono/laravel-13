@@ -48,13 +48,12 @@ class QuestionController extends MainController
      * Show the form for creating a new resource.
      */
     public function create(): View
-    {   $model = new Question();
-        $forms = $this->getForm($model);
+    {   $question = new Question();
+        $forms = $this->getForm($question);
         return view(
-            'Question::edit',
-            compact('module', 'forms')
-        );
-        return view('Question::create');
+            'Question::create',
+            compact('question', 'forms')
+        ); 
     }
 
     /**
@@ -102,8 +101,8 @@ class QuestionController extends MainController
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Question $question): View
-    {
+    public function edit($id): View
+    {   $question = $this->model->findOrFail($id);
         $forms = $this->getForm($question);
         return view(
             'Question::edit',

@@ -203,7 +203,7 @@ class FormTypeDataTable extends DataTable
                         </span> CSV'
                     )
                     ->className(
-                        'btn btn-outline-secondary btn-sm'
+                        'btn btn-primary btn-sm'
                     ),
 
                 Button::make('pdf')

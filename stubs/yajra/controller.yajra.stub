@@ -50,11 +50,12 @@ class {{modelName}}Controller extends MainController
      * Show the form for creating a new resource.
      */
     public function create(): View
-    {   $model = new {{modelName}}();
-        $forms = $this->getForm($model);
+    {   
+        ${{modelVariable}} = new {{modelName}}();
+        $forms = $this->getForm(${{modelVariable}});
         return view(
             '{{modelName}}::edit',
-            compact('module', 'forms')
+            compact('{{modelVariable}}', 'forms')
         );
         return view('{{modelName}}::create');
     }
@@ -104,8 +105,8 @@ class {{modelName}}Controller extends MainController
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit({{modelName}} ${{modelVariable}}): View
-    {
+    public function edit($id): View
+    {   ${{modelVariable}} = $this->model->findOrFail($id);
         $forms = $this->getForm(${{modelVariable}});
         return view(
             '{{modelName}}::edit',
@@ -116,10 +117,7 @@ class {{modelName}}Controller extends MainController
     /**
      * Update the specified resource.
      */
-    public function update(
-        Request $request,
-        {{modelName}} ${{modelVariable}}
-    ) {
+    public function update(Request $request,$id) {
         $validated = $request->validate([
             'name' => [
                 'required',
@@ -129,7 +127,7 @@ class {{modelName}}Controller extends MainController
         ]);
 
         try {
-
+            ${{modelVariable}} = $this->model->findOrFail($id);
             DB::transaction(function () use (
                 ${{modelVariable}},
                 $validated
@@ -165,12 +163,9 @@ class {{modelName}}Controller extends MainController
     /**
      * Remove the specified resource.
      */
-    public function destroy(
-        Request $request,
-        {{modelName}} ${{modelVariable}}
-    ): JsonResponse|RedirectResponse {
+    public function destroy(Request $request,$id): JsonResponse|RedirectResponse {
         try {
-
+             ${{modelVariable}} = $this->model->findOrFail($id);
             DB::transaction(function () use (${{modelVariable}}) {
                 ${{modelVariable}}->delete();
             });

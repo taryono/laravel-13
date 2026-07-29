@@ -203,7 +203,7 @@ class CompetenceDataTable extends DataTable
                         </span> CSV'
                     )
                     ->className(
-                        'btn btn-outline-secondary btn-sm'
+                        'btn btn-primary btn-sm'
                     ),
 
                 Button::make('pdf')
@@ -247,20 +247,20 @@ class CompetenceDataTable extends DataTable
     protected function getColumns(): array
     {
         // Daftar kolom yang dikirim dari command: id', 'name
-        $kolomDariCommand = explode("', '", "id', 'name");
+        $kolomDariCommand = explode("', '", "name");
 
         // Ubah jadi format Column::make()
-        $daftarKolom = [];
-        foreach ($kolomDariCommand as $namaKolom) {
-            $daftarKolom[] = Column::make($namaKolom)->title(ucwords(str_replace('_', ' ', $namaKolom)));
-        }
-
         $daftarKolom[] = Column::make('DT_RowIndex')
                 ->title('No')
                 ->orderable(false)
                 ->searchable(false)
                 ->width(80)
                 ->addClass('text-center');
+        foreach ($kolomDariCommand as $namaKolom) {
+            $daftarKolom[] = Column::make($namaKolom)->title(ucwords(str_replace('_', ' ', $namaKolom)));
+        }
+
+        
 
         // Tambah kolom Aksi di paling akhir
         $daftarKolom[] = Column::computed('action')

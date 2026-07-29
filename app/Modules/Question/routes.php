@@ -15,13 +15,13 @@ Route::group(['prefix' => 'dit/question', 'namespace' => 'App\Modules\Question\C
     Route::get('/', ['as' => 'question.index', 'uses' => 'QuestionController@index']);
     Route::any('/search', ['as' => 'question.search', 'uses' => 'QuestionController@search']);
     Route::get('/create', ['as' => 'question.create', 'uses' => 'QuestionController@create']);
-    Route::get('/show/{question}', ['as' => 'question.show', 'uses' => 'QuestionController@show']);
-    Route::get('/preview/{question}', ['as' => 'question.preview', 'uses' => 'QuestionController@preview']);
-    Route::get('/print/{question}', ['as' => 'question.print', 'uses' => 'QuestionController@print']);
+    Route::get('/show/{id}', ['as' => 'question.show', 'uses' => 'QuestionController@show']);
+    Route::get('/preview/{id}', ['as' => 'question.preview', 'uses' => 'QuestionController@preview']);
+    Route::get('/print/{id}', ['as' => 'question.print', 'uses' => 'QuestionController@print']);
 
     Route::post('/store', ['as' => 'question.store', 'uses' => 'QuestionController@store']);
-    Route::get('/edit/{question}', ['as' => 'question.edit', 'uses' => 'QuestionController@edit']);
-    Route::put('/update/{question}', ['as' => 'question.update', 'uses' => 'QuestionController@update']);
-    Route::delete('/delete/{question}', ['as' => 'question.destroy', 'uses' => 'QuestionController@destroy']);
+    Route::get('/edit/{id}', ['as' => 'question.edit', 'uses' => 'QuestionController@edit']);
+    Route::put('/update/{id}', ['as' => 'question.update', 'uses' => 'QuestionController@update']);
+    Route::delete('/delete/{id}', ['as' => 'question.destroy', 'uses' => 'QuestionController@destroy']);
     
 });
