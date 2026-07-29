@@ -15,59 +15,41 @@ class CertificationDataTable extends DataTable
     /**
      * Build DataTable response.
      */
-    public function dataTable(
-        QueryBuilder $query
-    ): EloquentDataTable {
-
+    public function dataTable(QueryBuilder $query): EloquentDataTable
+    {
         return (new EloquentDataTable($query))
-
             ->addColumn('action', function ($row) {
-
                 return '
                     <div class="d-flex justify-content-center gap-1">
 
-                        <a
-                            href="' . route(
-                                'certification.edit',
-                                $row->id
-                            ) . '"
-                            class="btn btn-sm btn-info edit"
-                            title="Edit"
-                        >
-                            <span class="material-symbols-outlined">
-                                edit
-                            </span>
-                        </a>
+                        <button
+                            type="button"
+                            class="btn btn-sm btn-primary"
+                            data-toggle="ajax-modal"
+                            data-size="lg"
+                            data-method="GET"
+                            data-title="Detail Sertifikasi '.$row->name.'"
+                            data-url="'. route('certification.edit', $row->id).'"
+                            data-submit=\'<button class="btn btn-primary" type="button">Simpan</button>\'
+                            data-cancel=\'<button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Batal</button>\'>
+                            <span class="material-symbols-outlined">edit</span>
+                        </button>
 
                         <button
                             type="button"
                             class="btn btn-sm btn-danger delete"
                             data-confirm-delete="true"
-                            data-url="' . route(
-                                'certification.destroy',
-                                $row->id
-                            ) . '"
+                            data-url="' . route('certification.destroy', $row->id) . '"
                             title="Hapus"
                         >
-                            <span class="material-symbols-outlined">
-                                delete
-                            </span>
+                            <span class="material-symbols-outlined">delete</span>
                         </button>
 
                     </div>
                 ';
             })
-
-            /*
-             * Allow HTML from action column.
-             */
-            ->rawColumns([
-                'action',
-            ])
-
-            /*
-             * Use database primary key as DataTables row ID.
-             */
+            ->addIndexColumn()
+            ->rawColumns(['action']) // ✅ Tetap wajib ada!
             ->setRowId('id');
     }
 
@@ -90,8 +72,8 @@ class CertificationDataTable extends DataTable
 
             /*
              * Example:
-             * Asesi -> asesi-table
-             * Asesor -> asesor-table
+             * certification -> certification-table
+             * Sertifikasi -> certification-table
              */
             ->setTableId(
                 'certification-table'
@@ -220,7 +202,7 @@ class CertificationDataTable extends DataTable
                         </span> CSV'
                     )
                     ->className(
-                        'btn btn-outline-secondary btn-sm'
+                        'btn  btn-sm'
                     ),
 
                 Button::make('pdf')
@@ -259,9 +241,8 @@ class CertificationDataTable extends DataTable
     public function getColumns(): array
     {
         return [
-
-            Column::make('id')
-                ->title('ID')
+            Column::make('DT_RowIndex')
+            ->title('No')
                 ->width(80)
                 ->addClass('text-center'),
 
@@ -274,7 +255,6 @@ class CertificationDataTable extends DataTable
                 ->addClass('text-center')
                 ->orderable(false)
                 ->searchable(false),
-
         ];
     }
 

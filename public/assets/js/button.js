@@ -18,11 +18,15 @@ document.addEventListener('DOMContentLoaded', function () {
     function applyMode(mode) {
         if (mode === 'dark') {
             body.classList.add('dark-mode');
+            document.documentElement.setAttribute('data-bs-theme', 'dark');
+            body.classList.remove('light-mode');
             icon.textContent = 'light_mode';
             toggleBtn.classList.remove('btn-light');
             toggleBtn.classList.add('btn-dark');
         } else {
+            document.documentElement.setAttribute('data-bs-theme', 'light');
             body.classList.remove('dark-mode');
+            body.classList.add('light-mode');
             icon.textContent = 'dark_mode';
             toggleBtn.classList.remove('btn-dark');
             toggleBtn.classList.add('btn-light');

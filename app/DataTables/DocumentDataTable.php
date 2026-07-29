@@ -15,59 +15,41 @@ class DocumentDataTable extends DataTable
     /**
      * Build DataTable response.
      */
-    public function dataTable(
-        QueryBuilder $query
-    ): EloquentDataTable {
-
+    public function dataTable(QueryBuilder $query): EloquentDataTable
+    {
         return (new EloquentDataTable($query))
-
             ->addColumn('action', function ($row) {
-
                 return '
                     <div class="d-flex justify-content-center gap-1">
 
-                        <a
-                            href="' . route(
-                                'document.edit',
-                                $row->id
-                            ) . '"
-                            class="btn btn-sm btn-info edit"
-                            title="Edit"
-                        >
-                            <span class="material-symbols-outlined">
-                                edit
-                            </span>
-                        </a>
+                        <button
+                            type="button"
+                            class="btn btn-sm btn-primary"
+                            data-toggle="ajax-modal"
+                            data-size="lg"
+                            data-method="GET"
+                            data-title="Detail document '.$row->name.'"
+                            data-url="'. route('document.edit', $row->id).'"
+                            data-submit=\'<button class="btn btn-primary" type="button">Simpan</button>\'
+                            data-cancel=\'<button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Batal</button>\'>
+                            <span class="material-symbols-outlined">edit</span>
+                        </button>
 
                         <button
                             type="button"
                             class="btn btn-sm btn-danger delete"
                             data-confirm-delete="true"
-                            data-url="' . route(
-                                'document.destroy',
-                                $row->id
-                            ) . '"
+                            data-url="' . route('document.destroy', $row->id) . '"
                             title="Hapus"
                         >
-                            <span class="material-symbols-outlined">
-                                delete
-                            </span>
+                            <span class="material-symbols-outlined">delete</span>
                         </button>
 
                     </div>
                 ';
             })
-
-            /*
-             * Allow HTML from action column.
-             */
-            ->rawColumns([
-                'action',
-            ])
-
-            /*
-             * Use database primary key as DataTables row ID.
-             */
+            ->addIndexColumn()
+            ->rawColumns(['action']) // ✅ Tetap wajib ada!
             ->setRowId('id');
     }
 
@@ -90,8 +72,8 @@ class DocumentDataTable extends DataTable
 
             /*
              * Example:
-             * Asesi -> asesi-table
-             * Asesor -> asesor-table
+             * document -> document-table
+             * Sertifikasi -> document-table
              */
             ->setTableId(
                 'document-table'
@@ -220,7 +202,7 @@ class DocumentDataTable extends DataTable
                         </span> CSV'
                     )
                     ->className(
-                        'btn btn-outline-secondary btn-sm'
+                        'btn  btn-sm'
                     ),
 
                 Button::make('pdf')
@@ -260,8 +242,8 @@ class DocumentDataTable extends DataTable
     {
         return [
 
-            Column::make('id')
-                ->title('ID')
+            Column::make('DT_RowIndex')
+            ->title('No')
                 ->width(80)
                 ->addClass('text-center'),
 

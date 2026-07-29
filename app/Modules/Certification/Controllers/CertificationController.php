@@ -15,6 +15,10 @@ use Throwable;
 
 class CertificationController extends MainController
 {
+
+    public function __construct(){
+        parent::__construct(new Certification());
+    }
     /**
      * Display a listing of the resource.
      *
@@ -94,11 +98,11 @@ class CertificationController extends MainController
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Certification $certification): View
-    {
+    public function edit($id): View
+    {   $certification = Certification::find($id);
         return view(
             'Certification::edit',
-            compact('certification')
+            compact('certification', 'forms')
         );
     }
 

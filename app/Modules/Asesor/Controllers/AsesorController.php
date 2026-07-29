@@ -2,12 +2,16 @@
 
 namespace App\Modules\Asesor\Controllers;
 use App\Http\Controllers\MainController;
-use App\Models\Asesor;
+use Models\Asesor;
 use App\DataTables\AsesorDataTable;
 use Illuminate\Http\Request;
 
 class AsesorController extends MainController
 {
+
+    public function __construct(){
+        parent::__construct(new Asesor());
+    }
 
     public function index(Request $request, AsesorDataTable $dataTable)
     { 
@@ -38,12 +42,13 @@ class AsesorController extends MainController
             ->with('success', 'Data Asesor berhasil ditambahkan.');
     }
 
-    public function edit(Asesor $asesor)
-    {
-        return view('Asesor::edit', compact('asesor'));
+    public function edit($id)
+    {   $asesor = Asesor::find($id);
+        $forms = $this->getForm($this->model);
+        return view('Asesor::edit', compact('asesor', 'forms'));
     }
 
-    public function update(Request $request, Asesor $asesor)
+    public function update(Request $request,  $asesor)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',

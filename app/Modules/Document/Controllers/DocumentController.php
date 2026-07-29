@@ -15,6 +15,10 @@ use Throwable;
 
 class DocumentController extends MainController
 {
+    public function __construct(){
+        parent::__construct(new Document());
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -94,11 +98,12 @@ class DocumentController extends MainController
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Document $document): View
+    public function edit($id): View
     {
+        $document = Document::find($id);
         return view(
             'Document::edit',
-            compact('document')
+            compact('document', 'forms')
         );
     }
 

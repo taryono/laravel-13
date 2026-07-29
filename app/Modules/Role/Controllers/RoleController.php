@@ -9,6 +9,10 @@ use App\Http\Controllers\MainController;
 
 class RoleController extends MainController
 {
+    public function __construct(){
+        parent::__construct(new Role());
+    }
+
     public function index(RoleDataTable $dataTable)
     {
         // Menggunakan namespace kustom modul untuk Blade view
@@ -32,9 +36,9 @@ class RoleController extends MainController
             ->with('success', 'Data Role berhasil ditambahkan.');
     }
 
-    public function edit(Role $role)
-    {
-        return view('Role::edit', compact('role'));
+    public function edit($id)
+    {   $role = Role::find($id);
+        return view('Role::edit', compact('role', 'forms'));
     }
 
     public function update(Request $request, Role $role)

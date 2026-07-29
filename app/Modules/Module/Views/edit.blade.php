@@ -1,38 +1,16 @@
-<section class="content">
-    <div class="container-fluid">
-        {{ Form::model($module, ['method' => 'PUT', 'route' => ['module.update', $module], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($module, ['method' => 'PUT', 'route' => ['module.update', $module->id], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
+@forelse ($forms as $key => $form)
+    @if(!isset($form['label'])) @continue @endif
+    <div class="form-group"> 
+        <label for="{{ $key }}">
+            {{ say($form['label']) }}
+        </label> 
+        {!! $form['content'] !!} 
+    </div> 
+    @empty 
+    <p>
+        {{ say('Data Tidak Ditemukan') }}
+    </p>
 
-        <div class="card card-primary">
-            <div class="card-header">
-                <h3 class="card-title">{{ say('Module') }}</h3>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        @forelse ($forms as $key => $form)
-                            <div class="row">
-                                <div class="col-md-12 mb-3">
-                                    <label>{{ say($form['label']) }}</label>
-                                    {!! $form['content'] !!}
-                                </div>
-                            </div>
-                        @empty
-                            <p>{{ say('Data Tidak Ditemukan') }}</p>
-                        @endforelse
-                    </div> 
-                </div>
-            </div>
-            <div class="card-footer">
-                {!! submit(['class' => 'btn btn-primary', 'value' => 'Submit', 'style' => 'float:right; margin-left:20px']) !!} &nbsp;
-                {!! cancel([
-                    'class' => 'btn btn-danger',                
-                    'style' => 'float:right',
-                    'url' => route('module.index'),
-                ]) !!}
-            </div>
-        </div>
-        {{ Form::close() }}
-        <!-- /.row -->
-    </div>
-    <!-- /.container-fluid -->
-</section> 
+@endforelse
+{{ Form::close() }}

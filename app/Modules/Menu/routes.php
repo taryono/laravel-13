@@ -15,13 +15,13 @@ Route::group(['prefix' => 'menu', 'namespace' => 'App\Modules\Menu\Controllers',
     Route::get('/', ['as' => 'menu.index', 'uses' => 'MenuController@index']);
     Route::any('/search', ['as' => 'menu.search', 'uses' => 'MenuController@search']);
     Route::get('/create', ['as' => 'menu.create', 'uses' => 'MenuController@create']);
-    Route::get('/show/[menu]', ['as' => 'menu.show', 'uses' => 'MenuController@show']);
-    Route::get('/preview/[menu]', ['as' => 'menu.preview', 'uses' => 'MenuController@preview']);
-    Route::get('/print/[menu]', ['as' => 'menu.print', 'uses' => 'MenuController@print']);
+    Route::get('/show/{id}', ['as' => 'menu.show', 'uses' => 'MenuController@show']);
+    Route::get('/preview/{id}', ['as' => 'menu.preview', 'uses' => 'MenuController@preview']);
+    Route::get('/print/{id}', ['as' => 'menu.print', 'uses' => 'MenuController@print']);
 
     Route::post('/store', ['as' => 'menu.store', 'uses' => 'MenuController@store']);
-    Route::get('/edit/[menu]', ['as' => 'menu.edit', 'uses' => 'MenuController@edit']);
-    Route::put('/update/[menu]', ['as' => 'menu.update', 'uses' => 'MenuController@update']);
-    Route::delete('/delete/[menu]', ['as' => 'menu.destroy', 'uses' => 'MenuController@destroy']);
+    Route::get('/edit/{id}', ['as' => 'menu.edit', 'uses' => 'MenuController@edit']);
+    Route::put('/update/{id}', ['as' => 'menu.update', 'uses' => 'MenuController@update']);
+    Route::delete('/delete/{id}', ['as' => 'menu.destroy', 'uses' => 'MenuController@destroy']);
     
 });

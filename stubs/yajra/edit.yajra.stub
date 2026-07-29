@@ -1,38 +1,17 @@
-<section class="content">
-    <div class="container-fluid">
-        {{ Form::model(${{modelRoutePrefix}}, ['method' => 'PUT', 'route' => ['{{modelRoutePrefix}}.update', ${{modelRoutePrefix}}], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
-
-        <div class="card card-primary">
-            <div class="card-header">
-                <h3 class="card-title">{{ say('{{modelName}}') }}</h3>
-            </div>
-            <div class="card-body">
+{{ Form::model(${{modelRoutePrefix}}, ['method' => 'PUT', 'route' => ['{{modelRoutePrefix}}.update', ${{modelRoutePrefix}}->id], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            @forelse ($forms as $key => $form)
                 <div class="row">
-                    <div class="col-md-6 mb-3">
-                        @forelse ($forms as $key => $form)
-                            <div class="row">
-                                <div class="col-md-12 mb-3">
-                                    <label>{{ say($form['label']) }}</label>
-                                    {!! $form['content'] !!}
-                                </div>
-                            </div>
-                        @empty
-                            <p>{{ say('Data Tidak Ditemukan') }}</p>
-                        @endforelse
-                    </div> 
+                    <div class="col-md-12 mb-3">
+                        <label>{{ say($form['label']) }}</label>
+                        {!! $form['content'] !!}
+                    </div>
                 </div>
-            </div>
-            <div class="card-footer">
-                {!! submit(['class' => 'btn btn-primary', 'value' => 'Submit', 'style' => 'float:right; margin-left:20px']) !!} &nbsp;
-                {!! cancel([
-                    'class' => 'btn btn-danger',                
-                    'style' => 'float:right',
-                    'url' => route('{{modelRoutePrefix}}.index'),
-                ]) !!}
-            </div>
-        </div>
-        {{ Form::close() }}
-        <!-- /.row -->
-    </div>
-    <!-- /.container-fluid -->
-</section> 
+            @empty
+                <p>{{ say('Data Tidak Ditemukan') }}</p>
+            @endforelse
+        </div> 
+    </div> 
+{{ Form::close() }}
+<!-- /.row -->

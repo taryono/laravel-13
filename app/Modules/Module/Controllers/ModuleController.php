@@ -15,6 +15,9 @@ use Throwable;
 
 class ModuleController extends MainController
 {
+    public function __construct(){
+        parent::__construct(new Module());
+    }
     /**
      * Display a listing of the resource.
      *
@@ -94,8 +97,9 @@ class ModuleController extends MainController
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Module $module): View
+    public function edit($id): View
     {
+        $module = Module::find($id);
         $forms = $this->getForm($module);
         return view(
             'Module::edit',

@@ -21,7 +21,7 @@ Route::group(['prefix' => 'module', 'namespace' => 'App\Modules\Module\Controlle
 
     Route::post('/store', ['as' => 'module.store', 'uses' => 'ModuleController@store']);
     Route::get('/edit/{id}', ['as' => 'module.edit', 'uses' => 'ModuleController@edit']);
-    Route::put('/update/[module]', ['as' => 'module.update', 'uses' => 'ModuleController@update']);
+    Route::put('/update/{id}', ['as' => 'module.update', 'uses' => 'ModuleController@update']);
     Route::delete('/delete/{id}', ['as' => 'module.destroy', 'uses' => 'ModuleController@destroy']);
     
 });

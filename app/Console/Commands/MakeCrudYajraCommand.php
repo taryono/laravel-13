@@ -8,12 +8,14 @@ use Illuminate\Support\Str;
 
 class MakeCrudYajraCommand extends Command
 {
+    // Tambahkan opsi --column di signature
     protected $signature = 'make:crud-yajra
-                            {name : Nama Model (contoh: Product)}';
+                            {name : Nama Model (contoh: Product)}
+                            {--columns= : Daftar kolom untuk DataTable, pisahkan dengan koma (contoh: id,name,email)}';
 
     protected $description = 'Otomatis membuat CRUD lengkap dengan Yajra DataTables dan struktur Modular';
 
-    public function handle()
+    public function handleOld()
     {
         $name = Str::studly($this->argument('name'));
 
@@ -208,7 +210,7 @@ class MakeCrudYajraCommand extends Command
         );
 
         $this->line(
-            "🗃 Model    : app/Models/{$name}.php"
+            "🗃 Model    : Models/{$name}.php"
         );
 
         $this->line(
@@ -225,6 +227,134 @@ class MakeCrudYajraCommand extends Command
         \Artisan::call('route:clear');
         \Artisan::call('view:clear');
         \Artisan::call('optimize');
+        return Command::SUCCESS;
+    }
+
+    /**
+     * Execute the console command.
+     *
+     * @return int
+     */
+    public function handle()
+    {
+        $name = Str::studly($this->argument('name'));
+        
+        // Ambil nilai --columns jika ada
+        $columnsOption = $this->option('columns');
+        $columnsArray = $columnsOption ? array_map('trim', explode(',', $columnsOption)) : ['id', 'name'];
+        $columnsString = implode("', '", $columnsArray); // Untuk dipakai di stub
+        $columnsListHtml = implode(', ', $columnsArray);  // Untuk tampilan di blade jika perlu
+
+        /*
+        |--------------------------------------------------------------------------
+        | 1. Validasi Stub
+        |--------------------------------------------------------------------------
+        */
+
+        $requiredStubs = [
+            'controller.yajra.stub',
+            'datatables.service.stub',
+            'index.yajra.stub',
+            'create.yajra.stub',
+            'edit.yajra.stub',
+            'route.yajra.stub',
+        ];
+
+        foreach ($requiredStubs as $stub) {
+            $path = base_path("stubs/yajra/{$stub}");
+
+            if (!File::exists($path)) {
+                $this->error("Stub tidak ditemukan: stubs/yajra/{$stub}");
+                return Command::FAILURE;
+            }
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | 2. Setup Module
+        |--------------------------------------------------------------------------
+        */
+
+        $modulePath = app_path("Modules/{$name}");
+        $controllerNamespace = "App\\Modules\\{$name}\\Controllers";
+        $viewFolderKebab = Str::kebab($name);
+        $modelVariable = Str::camel($name);
+        $modelRoutePrefix = Str::kebab($name);
+        $modelTableId = "{$modelRoutePrefix}-table";
+        $title = Str::title(str_replace('-', ' ', $modelRoutePrefix));
+
+        /*
+        |--------------------------------------------------------------------------
+        | Tambahkan variabel kolom ke replacements
+        |--------------------------------------------------------------------------
+        */
+        $replacements = [
+            '{{modelName}}'           => $name,
+            '{{modelVariable}}'       => $modelVariable,
+            '{{controllerNamespace}}' => $controllerNamespace,
+            '{{modelViewFolder}}'     => $viewFolderKebab,
+            '{{modelRoutePrefix}}'    => $modelRoutePrefix,
+            '{{modelTableId}}'        => $modelTableId,
+            '{{title}}'               => $title,
+            '{{columnsArray}}'        => $columnsString,
+            '{{columnsList}}'         => $columnsListHtml,
+        ];
+
+        $this->newLine();
+        $this->info("Memulai scaffolding CRUD Yajra untuk {$name}...");
+        $this->info("Kolom yang dipakai: " . implode(', ', $columnsArray));
+
+        /*
+        |--------------------------------------------------------------------------
+        | 3. Model & Migration
+        |--------------------------------------------------------------------------
+        */
+        $this->newLine();
+        $this->info('Membuat Model & Migration...');
+        $this->call('make:model', [
+            'name' => $name,
+            '-m'   => true,
+        ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | 4 - 7. Sama seperti sebelumnya
+        |--------------------------------------------------------------------------
+        */
+        $this->newLine();
+        $this->generateDataTable($name, $replacements);
+
+        $this->newLine();
+        $this->generateController($name, $modulePath, $replacements);
+
+        $this->newLine();
+        $this->generateViews($modulePath, $replacements);
+
+        $this->newLine();
+        $this->generateRoutes($modulePath, $replacements);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Done
+        |--------------------------------------------------------------------------
+        */
+        $this->newLine();
+        $this->info("✨ CRUD Yajra {$name} berhasil dibuat!");
+        $this->line('');
+        $this->line("📁 Module   : app/Modules/{$name}");
+        $this->line("📊 DataTable: app/DataTables/{$name}DataTable.php");
+        $this->line("🗃 Model    :  Models/{$name}.php");
+        $this->line("🌐 Route    : {$modelRoutePrefix}");
+        $this->line("📋 Table ID : {$modelTableId}");
+        $this->line("📌 Kolom    : " . implode(', ', $columnsArray));
+
+        $this->newLine();
+        \Artisan::call('cache:clear');
+        \Artisan::call('config:clear');
+        \Artisan::call('route:clear');
+        \Artisan::call('view:clear');
+        \Artisan::call('optimize');
+        
         return Command::SUCCESS;
     }
 

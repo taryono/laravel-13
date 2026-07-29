@@ -22,6 +22,5 @@ Route::group(['prefix' => 'asesi', 'namespace' => 'App\Modules\Asesi\Controllers
     Route::post('/store', ['as' => 'asesi.store', 'uses' => 'AsesiController@store']);
     Route::get('/edit/{id}', ['as' => 'asesi.edit', 'uses' => 'AsesiController@edit']);
     Route::put('/update/{id}', ['as' => 'asesi.update', 'uses' => 'AsesiController@update']);
-    Route::delete('/delete/{id}', ['as' => 'asesi.destroy', 'uses' => 'AsesiController@destroy']);
-    
+    Route::delete('/delete/{id}', ['as' => 'asesi.destroy', 'uses' => 'AsesiController@destroy']);    
 });

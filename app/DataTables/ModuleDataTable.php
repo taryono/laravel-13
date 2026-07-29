@@ -15,59 +15,41 @@ class ModuleDataTable extends DataTable
     /**
      * Build DataTable response.
      */
-    public function dataTable(
-        QueryBuilder $query
-    ): EloquentDataTable {
-
+    public function dataTable(QueryBuilder $query): EloquentDataTable
+    {
         return (new EloquentDataTable($query))
-
             ->addColumn('action', function ($row) {
-
                 return '
                     <div class="d-flex justify-content-center gap-1">
 
-                        <a
-                            href="' . route(
-                                'module.edit',
-                                $row->id
-                            ) . '"
-                            class="btn btn-sm btn-info edit"
-                            title="Edit"
-                        >
-                            <span class="material-symbols-outlined">
-                                edit
-                            </span>
-                        </a>
+                        <button
+                            type="button"
+                            class="btn btn-sm btn-primary"
+                            data-toggle="ajax-modal"
+                            data-size="lg"
+                            data-method="GET"
+                            data-title="Detail Module '.$row->name.'"
+                            data-url="'. route('module.edit', $row->id).'"
+                            data-submit=\'<button class="btn btn-primary" type="button">Simpan</button>\'
+                            data-cancel=\'<button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Batal</button>\'>
+                            <span class="material-symbols-outlined">edit</span>
+                        </button>
 
                         <button
                             type="button"
                             class="btn btn-sm btn-danger delete"
                             data-confirm-delete="true"
-                            data-url="' . route(
-                                'module.destroy',
-                                $row->id
-                            ) . '"
+                            data-url="' . route('module.destroy', $row->id) . '"
                             title="Hapus"
                         >
-                            <span class="material-symbols-outlined">
-                                delete
-                            </span>
+                            <span class="material-symbols-outlined">delete</span>
                         </button>
 
                     </div>
                 ';
             })
-
-            /*
-             * Allow HTML from action column.
-             */
-            ->rawColumns([
-                'action',
-            ])
-
-            /*
-             * Use database primary key as DataTables row ID.
-             */
+            ->addIndexColumn()
+            ->rawColumns(['action']) // ✅ Tetap wajib ada!
             ->setRowId('id');
     }
 
@@ -84,14 +66,14 @@ class ModuleDataTable extends DataTable
     /**
      * Configure DataTable HTML builder.
      */
-    public function html(): HtmlBuilder
+     public function html(): HtmlBuilder
     {
         return $this->builder()
 
             /*
              * Example:
-             * Asesi -> asesi-table
-             * Asesor -> asesor-table
+             * module -> module-table
+             * Sertifikasi -> module-table
              */
             ->setTableId(
                 'module-table'
@@ -174,7 +156,7 @@ class ModuleDataTable extends DataTable
 
                     'search' => 'Cari:',
 
-                    'lengthMenu' =>
+                    'lengthmodule' =>
                         'Tampilkan _MENU_ data',
 
                     'info' =>
@@ -220,7 +202,7 @@ class ModuleDataTable extends DataTable
                         </span> CSV'
                     )
                     ->className(
-                        'btn btn-outline-secondary btn-sm'
+                        'btn  btn-sm'
                     ),
 
                 Button::make('pdf')
@@ -260,8 +242,8 @@ class ModuleDataTable extends DataTable
     {
         return [
 
-            Column::make('id')
-                ->title('ID')
+            Column::make('DT_RowIndex')
+            ->title('No')
                 ->width(80)
                 ->addClass('text-center'),
 

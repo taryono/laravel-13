@@ -15,6 +15,9 @@ use Throwable;
 
 class MenuController extends MainController
 {
+    public function __construct(){
+        parent::__construct(new Menu());
+    }
     /**
      * Display a listing of the resource.
      *
@@ -99,8 +102,9 @@ class MenuController extends MainController
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Menu $menu): View
+    public function edit($id): View
     {
+        $menu = Menu::find($id);
         $forms = $this->getForm($menu);
         return view(
             'Menu::edit',

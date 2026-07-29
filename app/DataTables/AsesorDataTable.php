@@ -2,7 +2,7 @@
 
 namespace App\DataTables;
 
-use App\Models\Asesor;
+use Models\Asesor;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
@@ -20,40 +20,42 @@ class AsesorDataTable extends DataTable
      * @param QueryBuilder<Asesor> $query Results from query() method.
      */
     public function dataTable(QueryBuilder $query): EloquentDataTable
-{
-    return (new EloquentDataTable($query))
-        ->addColumn('action', function ($row) {
-            return '
-                <div class="d-flex justify-content-center gap-1">
+    {
+        return (new EloquentDataTable($query))
+            ->addColumn('action', function ($row) {
+                return '
+                    <div class="d-flex justify-content-center gap-1">
 
-                    <a
-                        href="' . route('asesor.edit', $row->id) . '"
-                        class="btn btn-sm btn-info edit"
-                        title="Edit"
-                    >
-                        <span class="material-symbols-outlined">
-                            edit
-                        </span>
-                    </a>
+                        <button
+                            type="button"
+                            class="btn btn-sm btn-primary"
+                            data-toggle="ajax-modal"
+                            data-size="lg"
+                            data-method="GET"
+                            data-title="Detail Asesor '.$row->name.'"
+                            data-url="'. route('asesor.edit', $row->id).'"
+                            data-submit=\'<button class="btn btn-primary" type="button">Simpan</button>\'
+                            data-cancel=\'<button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Batal</button>\'>
+                            <span class="material-symbols-outlined">edit</span>
+                        </button>
 
-                    <button
-                        type="button"
-                        class="btn btn-sm btn-danger delete"
-                        data-confirm-delete="true"
-                        data-url="' . route('asesor.destroy', $row->id) . '"
-                        title="Hapus"
-                    >
-                        <span class="material-symbols-outlined">
-                            delete
-                        </span>
-                    </button>
+                        <button
+                            type="button"
+                            class="btn btn-sm btn-danger delete"
+                            data-confirm-delete="true"
+                            data-url="' . route('asesor.destroy', $row->id). '"
+                            title="Hapus"
+                        >
+                            <span class="material-symbols-outlined">delete</span>
+                        </button>
 
-                </div>
-            ';
-        })
-        ->rawColumns(['action']) // ✅ WAJIB: izinkan tampilan HTML
-        ->setRowId('id');
-}
+                    </div>
+                ';
+            })
+            ->addIndexColumn()
+            ->rawColumns(['action']) // ✅ Tetap wajib ada!
+            ->setRowId('id');
+    }
 
     /**
      * Get the query source of dataTable.
@@ -77,34 +79,131 @@ class AsesorDataTable extends DataTable
             ->orderBy(1)
             ->selectStyleSingle()
             ->parameters([
-                'dom' => '<"row mb-3"' .
-                            '<"col-md-6 d-flex align-items-center"B>' .
-                            '<"col-md-6"f>' .
-                        '>' .
-                        'rt' .
-                        '<"row mt-3"' .
-                            '<"col-md-6"i>' .
-                            '<"col-md-6 d-flex justify-content-md-end"p>' .
-                        '>',
+
+                /*
+                 * Custom Bootstrap 5 layout.
+                 */
+                'dom' =>
+                    '<"row mb-3"' .
+                        '<"col-md-6 d-flex align-items-center"B>' .
+                        '<"col-md-6"f>' .
+                    '>' .
+                    'rt' .
+                    '<"row mt-3"' .
+                        '<"col-md-6"i>' .
+                        '<"col-md-6 d-flex justify-content-md-end"p>' .
+                    '>',
+
+                /*
+                 * Let CSS / column configuration
+                 * control widths.
+                 */
                 'autoWidth' => false,
+
+                /*
+                 * Responsive DataTable.
+                 */
                 'responsive' => true,
+
+                /*
+                 * Processing indicator.
+                 */
+                'processing' => true,
+
+                /*
+                 * Server-side processing.
+                 */
+                'serverSide' => true,
+
+                /*
+                 * Save DataTable state.
+                 */
+                'stateSave' => false,
+
+                /*
+                 * Language.
+                 */
+                'language' => [
+                    'processing' => '
+                        <div class="d-flex align-items-center gap-2">
+                            <div
+                                class="spinner-border spinner-border-sm text-primary"
+                                role="status"
+                            ></div>
+                            <span>Memuat data...</span>
+                        </div>
+                    ',
+
+                    'search' => 'Cari:',
+
+                    'lengthMenu' =>
+                        'Tampilkan _MENU_ data',
+
+                    'info' =>
+                        'Menampilkan _START_ sampai _END_ dari _TOTAL_ data',
+
+                    'infoEmpty' =>
+                        'Tidak ada data',
+
+                    'zeroRecords' =>
+                        'Data tidak ditemukan',
+
+                    'emptyTable' =>
+                        'Belum ada data',
+
+                    'paginate' => [
+                        'first' => 'Awal',
+                        'last' => 'Akhir',
+                        'next' => '›',
+                        'previous' => '‹',
+                    ],
+                ],
             ])
+
+            /*
+             * DataTable buttons.
+             */
             ->buttons([
+
                 Button::make('excel')
-                    ->text('<span class="material-symbols-outlined align-middle me-1">download</span> Excel')
-                     ->className('btn btn-success'),
+                    ->text(
+                        '<span class="material-symbols-outlined align-middle me-1">
+                            download
+                        </span> Excel'
+                    )
+                    ->className(
+                        'btn btn-success btn-sm'
+                    ),
 
                 Button::make('csv')
-                    ->text('<span class="material-symbols-outlined align-middle me-1">description</span> CSV')
-                    ->className('btn btn-info'),
+                    ->text(
+                        '<span class="material-symbols-outlined align-middle me-1">
+                            description
+                        </span> CSV'
+                    )
+                    ->className(
+                        'btn  btn-sm'
+                    ),
 
                 Button::make('pdf')
-                    ->text('<span class="material-symbols-outlined align-middle me-1">picture_as_pdf</span> PDF')
-                    ->className('btn btn-danger'),
+                    ->text(
+                        '<span class="material-symbols-outlined align-middle me-1">
+                            picture_as_pdf
+                        </span> PDF'
+                    )
+                    ->className(
+                        'btn btn-danger btn-sm'
+                    ),
 
                 Button::make('print')
-                    ->text('<span class="material-symbols-outlined align-middle me-1">print</span> Print')
-                    ->className('btn btn-primary'),
+                    ->text(
+                        '<span class="material-symbols-outlined align-middle me-1">
+                            print
+                        </span> Print'
+                    )
+                    ->className(
+                        'btn btn-primary btn-sm'
+                    ),
 
                 Button::make([
                     'text' => '<span class="material-symbols-outlined align-middle">refresh</span>',
@@ -112,7 +211,7 @@ class AsesorDataTable extends DataTable
                     'action' => 'function (e, dt, node, config) {
                         dt.ajax.reload(null, false);
                     }',
-                ])->className('btn btn-secondary'), 
+                ])->className('btn btn-secondary'),
             ]);
     }
 
@@ -122,13 +221,13 @@ class AsesorDataTable extends DataTable
     public function getColumns(): array
     {
         return [
-            Column::make('id')
-                ->title('ID')
+            Column::make('DT_RowIndex')
+            ->title('No')
                 ->width(80)
                 ->addClass('text-center'),
 
             Column::make('name')
-                ->title('Nama Asesor'),
+                ->title('Nama'),
 
             Column::computed('action')
                 ->title('Aksi')

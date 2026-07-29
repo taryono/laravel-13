@@ -4,7 +4,7 @@ namespace App\Modules\Asesi\Controllers;
 
 use App\DataTables\AsesiDataTable;
 use App\Http\Controllers\MainController;
-use App\Models\Asesi;
+use Models\Asesi;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -15,6 +15,9 @@ use Throwable;
 
 class AsesiController extends MainController
 {
+    public function __construct(){
+        parent::__construct(new Asesi());
+    }
     /**
      * Display a listing of the resource.
      *
@@ -96,8 +99,7 @@ class AsesiController extends MainController
      * Show the form for editing the specified resource.
      */
     public function edit($id): View
-    {
-        $asesi = Asesi::findOrFail($id);
+    {    $asesi = Asesi::find($id);
         $forms = $this->getForm($asesi);
          
         return view(
@@ -109,10 +111,7 @@ class AsesiController extends MainController
     /**
      * Update the specified resource.
      */
-    public function update(
-        Request $request,
-        $id
-    ) {
+    public function update(  Request $request,$asesi ): JsonResponse{
         $validated = $request->validate([
             'name' => [
                 'required',

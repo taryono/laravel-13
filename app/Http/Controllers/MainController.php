@@ -22,8 +22,9 @@ use Illuminate\Support\Facades\Log;
 
 class MainController extends Controller
 {
-    public function __construct(){
-
+    protected $model;
+    public function __construct($model){
+        $this->model = $model;
     }
 
     public function getForm($model){

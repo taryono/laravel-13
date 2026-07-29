@@ -23,7 +23,4 @@ Route::group(['prefix' => 'asesor', 'namespace' => 'App\Modules\Asesor\Controlle
     Route::get('/edit/{id}', ['as' => 'asesor.edit', 'uses' => 'AsesorController@edit']);
     Route::put('/update/{id}', ['as' => 'asesor.update', 'uses' => 'AsesorController@update']);
     Route::delete('/delete/{id}', ['as' => 'asesor.destroy', 'uses' => 'AsesorController@destroy']);
-    Route::get('signaturepad', ['as' => 'asesor.signaturepad', 'uses' => 'AsesorController@signaturepad']);
-    Route::post('signaturepad', ['as' => 'asesor.upload', 'uses' => 'AsesorController@upload']);
-    Route::get('draw', ['as' => 'asesor.draw', 'uses' => 'AsesorController@draw']);
 });

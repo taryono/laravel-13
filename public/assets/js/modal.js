@@ -4,7 +4,7 @@
  *
  * Cara pakai di Blade:
  * <button
- *     data-bs-toggle="#dynamicModal"
+ *     data-toggle="ajax-modal"
  *     data-size="lg"
  *     data-method="GET"
  *     data-title="Detail Produk #{{ $product->id }}"
@@ -19,19 +19,15 @@
     'use strict';
 
     const MODAL_ID = 'dynamicModal';
-    let currentAbortController = null; // untuk cancel request lama kalau modal dibuka ulang cepat
+    let currentAbortController = null;
 
     function getMeta(name) {
         const el = document.querySelector(`meta[name="${name}"]`);
         return el ? el.content : null;
     }
 
-    /**
-     * Pastikan struktur modal ada di DOM. Kalau belum ada, buat sekali saja.
-     */
     function ensureModalExists() {
-        let modalEl = document.getElementById(MODAL_ID);
-        if (modalEl) return modalEl;
+        if (document.getElementById(MODAL_ID)) return;
 
         const wrapper = document.createElement('div');
         wrapper.innerHTML = `
@@ -40,7 +36,7 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="modalTitle"></h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
                         </div>
                         <div class="modal-body" id="modalContent"></div>
                         <div class="modal-footer" id="modalFooter"></div>
@@ -49,12 +45,8 @@
             </div>
         `;
         document.body.appendChild(wrapper.firstElementChild);
-        return document.getElementById(MODAL_ID);
     }
 
-    /**
-     * Ambil daftar tombol footer dari data-attribute tombol trigger.
-     */
     function extractButtonOptions(triggerEl) {
         const buttons = [];
         if (triggerEl.dataset.submit) buttons.push(triggerEl.dataset.submit);
@@ -63,50 +55,46 @@
         return buttons;
     }
 
-    /**
-     * Set ukuran modal-dialog berdasarkan opsi size.
-     */
     function applyModalSize(size) {
         const dialogEl = document.getElementById('modalSize');
-        dialogEl.className = 'modal-dialog'; // reset dulu
+        dialogEl.className = 'modal-dialog';
 
         const sizeMap = {
             sm: 'modal-sm',
             lg: 'modal-lg',
-            l: 'modal-lg', // alias biar kompatibel sama kode lama kamu
+            l: 'modal-lg',
             xl: 'modal-xl',
         };
 
-        if (sizeMap[size]) {
-            dialogEl.classList.add(sizeMap[size]);
-        }
+        if (sizeMap[size]) dialogEl.classList.add(sizeMap[size]);
     }
 
-    /**
-     * Tampilkan modal dan load konten via AJAX (fetch).
-     */
     async function openDynamicModalWithAjax(options) {
-        const modalEl = ensureModalExists();
+        ensureModalExists();
+        const modalEl = document.getElementById(MODAL_ID);
 
         applyModalSize(options.size);
-
         document.getElementById('modalTitle').innerHTML = options.title || '';
         document.getElementById('modalContent').innerHTML = `
             <div class="text-center py-4">
                 <div class="spinner-border" role="status">
-                    <span class="visually-hidden">Loading...</span>
+                    <span class="visually-hidden">Memuat...</span>
                 </div>
             </div>
         `;
         document.getElementById('modalFooter').innerHTML = (options.buttons || []).join('');
 
+        // Cek apakah Bootstrap sudah dimuat
+        if (!window.bootstrap) {
+            console.error('Bootstrap tidak ditemukan! Pastikan bootstrap.bundle.min.js sudah dimuat.');
+            return;
+        }
+
         const modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
         modalInstance.show();
 
-        // Batalkan request sebelumnya kalau ada (misal user klik cepat 2 tombol berbeda)
-        if (currentAbortController) {
-            currentAbortController.abort();
-        }
+        // Batalkan request lama
+        if (currentAbortController) currentAbortController.abort();
         currentAbortController = new AbortController();
 
         try {
@@ -115,13 +103,12 @@
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
                     'X-CSRF-TOKEN': getMeta('_token'),
+                    'Accept': 'text/html',
                 },
                 signal: currentAbortController.signal,
             });
 
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status} ${response.statusText}`);
-            }
+            if (!response.ok) throw new Error(`Kesalahan: ${response.status} ${response.statusText}`);
 
             const html = await response.text();
             document.getElementById('modalContent').innerHTML = html;
@@ -130,7 +117,6 @@
                 options.onContentLoaded(html);
             }
         } catch (error) {
-            // Abort tidak dianggap error sungguhan (misal modal ditutup/diganti cepat)
             if (error.name === 'AbortError') return;
 
             document.getElementById('modalContent').innerHTML = `
@@ -141,11 +127,7 @@
         }
     }
 
-    /**
-     * Bind semua tombol trigger modal yang ada di halaman saat ini.
-     * Pakai event delegation supaya tombol yang di-render dinamis
-     * (misal lewat AJAX/datatable) tetap otomatis ke-bind.
-     */
+    // Event klik yang konsisten dengan atribut data-toggle="ajax-modal"
     document.addEventListener('click', function (e) {
         const trigger = e.target.closest('[data-toggle="ajax-modal"]');
         if (!trigger) return;
@@ -161,6 +143,5 @@
         });
     });
 
-    // Expose ke global scope kalau ada kebutuhan panggil manual dari file lain
     window.openDynamicModalWithAjax = openDynamicModalWithAjax;
 })();

@@ -15,59 +15,42 @@ class {{modelName}}DataTable extends DataTable
     /**
      * Build DataTable response.
      */
-    public function dataTable(
-        QueryBuilder $query
-    ): EloquentDataTable {
 
+      public function dataTable(QueryBuilder $query): EloquentDataTable
+    {
         return (new EloquentDataTable($query))
-
             ->addColumn('action', function ($row) {
-
                 return '
                     <div class="d-flex justify-content-center gap-1">
 
                         <button
-                            data-url="' . route(
-                                '{{modelRoutePrefix}}.edit',
-                                $row->id
-                            ) . '"
-                            class="btn btn-sm btn-info delete"
-                            title="Edit"
-                        >
-                            <span class="material-symbols-outlined">
-                                edit
-                            </span>
+                            type="button"
+                            class="btn btn-sm btn-primary"
+                            data-toggle="ajax-modal"
+                            data-size="lg"
+                            data-method="GET"
+                            data-title="Detail {{modelName}} '.$row->name.'"
+                            data-url="'. route('{{modelRoutePrefix}}.edit', $row).'"
+                            data-submit=\'<button class="btn btn-primary" type="button">Simpan</button>\'
+                            data-cancel=\'<button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Batal</button>\'>
+                            <span class="material-symbols-outlined">edit</span>
                         </button>
 
                         <button
                             type="button"
                             class="btn btn-sm btn-danger delete"
                             data-confirm-delete="true"
-                            data-url="' . route(
-                                '{{modelRoutePrefix}}.destroy',
-                                $row->id
-                            ) . '"
+                            data-url="' . route('{{modelRoutePrefix}}.destroy', $row) . '"
                             title="Hapus"
                         >
-                            <span class="material-symbols-outlined">
-                                delete
-                            </span>
+                            <span class="material-symbols-outlined">delete</span>
                         </button>
 
                     </div>
                 ';
             })
-
-            /*
-             * Allow HTML from action column.
-             */
-            ->rawColumns([
-                'action',
-            ])
-
-            /*
-             * Use database primary key as DataTables row ID.
-             */
+            ->addIndexColumn()
+            ->rawColumns(['action']) // ✅ Tetap wajib ada!
             ->setRowId('id');
     }
 
@@ -256,26 +239,38 @@ class {{modelName}}DataTable extends DataTable
     /**
      * Get DataTable columns.
      */
-    public function getColumns(): array
+    /**
+     * Ambil daftar kolom secara OTOMATIS dari perintah artisan
+     *
+     * @return array
+     */
+    protected function getColumns(): array
     {
-        return [
+        // Daftar kolom yang dikirim dari command: {{columnsArray}}
+        $kolomDariCommand = explode("', '", "{{columnsArray}}");
 
-            Column::make('id')
-                ->title('ID')
-                ->width(50)
-                ->addClass('text-center'),
+        // Ubah jadi format Column::make()
+        $daftarKolom = [];
+        foreach ($kolomDariCommand as $namaKolom) {
+            $daftarKolom[] = Column::make($namaKolom)->title(ucwords(str_replace('_', ' ', $namaKolom)));
+        }
 
-            Column::make('name')
-                ->title('Nama'),
-
-            Column::computed('action')
-                ->title('Aksi')
-                ->width(100)
-                ->addClass('text-center')
+        $daftarKolom[] = Column::make('DT_RowIndex')
+                ->title('No')
                 ->orderable(false)
-                ->searchable(false),
+                ->searchable(false)
+                ->width(80)
+                ->addClass('text-center');
 
-        ];
+        // Tambah kolom Aksi di paling akhir
+        $daftarKolom[] = Column::computed('action')
+                                ->exportable(false)
+                                ->printable(false)
+                                ->width(120)
+                                ->addClass('text-center')
+                                ->title('Aksi');
+
+        return $daftarKolom;
     }
 
     /**
