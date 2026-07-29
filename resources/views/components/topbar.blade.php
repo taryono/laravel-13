@@ -9,6 +9,10 @@
     </div>
 
     <div class="d-flex align-items-center gap-2 ms-3">
+        <!-- Toggle dark mode layout yang tampil saat halaman light mode -->
+        <button class="btn btn-light me-2" id="darkModeToggle">
+            <span class="material-symbols-outlined" id="darkModeIcon">dark_mode</span>
+        </button>
         <!-- Notifikasi -->
         <div class="dropdown">
             <button class="bnsp-icon-btn" type="button" id="notifDropdown" data-bs-toggle="dropdown"

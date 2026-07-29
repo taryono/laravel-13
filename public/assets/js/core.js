@@ -398,4 +398,4 @@ window.FormValidator = {
 // Jalankan pendaftaran aturan kustom satu kali saja
 if (typeof $ !== 'undefined' && $.validator) {
     FormValidator.initCustomRules();
-} 
+}

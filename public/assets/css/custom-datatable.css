@@ -40,7 +40,7 @@
 }
 
 /* Table header */
-#asesor-table thead th {
+.dataTable.dtr-inline thead th {
     background-color: #f8f9fa;
     color: #495057;
     font-size: 0.8rem;
@@ -53,7 +53,7 @@
 }
 
 /* Table body */
-#asesor-table tbody td {
+.dataTable.dtr-inline tbody td {
     padding: 0.75rem;
     font-size: 0.9rem;
     color: #343a40;
@@ -61,21 +61,21 @@
 }
 
 /* Hover */
-#asesor-table tbody tr {
+.dataTable.dtr-inline tbody tr {
     transition: background-color 0.15s ease-in-out;
 }
 
-#asesor-table tbody tr:hover {
+.dataTable.dtr-inline tbody tr:hover {
     background-color: rgba(13, 110, 253, 0.035);
 }
 
 /* Action column */
-#asesor-table td:last-child {
+.dataTable.dtr-inline td:last-child {
     white-space: nowrap;
 }
 
 /* Action buttons */
-#asesor-table td .btn {
+.dataTable.dtr-inline td .btn {
     width: 34px;
     height: 34px;
     padding: 0;
@@ -85,7 +85,7 @@
     border-radius: 0.4rem;
 }
 
-#asesor-table td .material-symbols-outlined {
+.dataTable.dtr-inline td .material-symbols-outlined {
     font-size: 18px;
 }
 
