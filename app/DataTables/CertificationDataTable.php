@@ -31,7 +31,7 @@ class CertificationDataTable extends DataTable
                                 'certification.edit',
                                 $row->id
                             ) . '"
-                            class="btn btn-sm btn-info"
+                            class="btn btn-sm btn-info edit"
                             title="Edit"
                         >
                             <span class="material-symbols-outlined">
@@ -41,7 +41,7 @@ class CertificationDataTable extends DataTable
 
                         <button
                             type="button"
-                            class="btn btn-sm btn-danger"
+                            class="btn btn-sm btn-danger delete"
                             data-confirm-delete="true"
                             data-url="' . route(
                                 'certification.destroy',

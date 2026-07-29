@@ -2,7 +2,7 @@
 
 namespace App\DataTables;
 
-use App\Models\{{modelName}};
+use Models\{{modelName}};
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
@@ -26,22 +26,22 @@ class {{modelName}}DataTable extends DataTable
                 return '
                     <div class="d-flex justify-content-center gap-1">
 
-                        <a
-                            href="' . route(
+                        <button
+                            data-url="' . route(
                                 '{{modelRoutePrefix}}.edit',
                                 $row->id
                             ) . '"
-                            class="btn btn-sm btn-info"
+                            class="btn btn-sm btn-info delete"
                             title="Edit"
                         >
                             <span class="material-symbols-outlined">
                                 edit
                             </span>
-                        </a>
+                        </button>
 
                         <button
                             type="button"
-                            class="btn btn-sm btn-danger"
+                            class="btn btn-sm btn-danger delete"
                             data-confirm-delete="true"
                             data-url="' . route(
                                 '{{modelRoutePrefix}}.destroy',
@@ -262,7 +262,7 @@ class {{modelName}}DataTable extends DataTable
 
             Column::make('id')
                 ->title('ID')
-                ->width(80)
+                ->width(50)
                 ->addClass('text-center'),
 
             Column::make('name')

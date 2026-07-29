@@ -10,9 +10,6 @@ class ViewServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
-        View::composer('components.sidebar', MenuComposer::class);
-
-        // Kalau topnav juga component/partial terpisah, daftarkan juga:
-        // View::composer('components.topnav', MenuComposer::class);
+        View::composer('components.sidebar', MenuComposer::class); 
     }
 }

@@ -3,7 +3,7 @@
 namespace {{controllerNamespace}};
 
 use App\DataTables\{{modelName}}DataTable;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\MainController;
 use App\Models\{{modelName}};
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 use Throwable;
 
-class {{modelName}}Controller extends Controller
+class {{modelName}}Controller extends MainController
 {
     /**
      * Display a listing of the resource.
@@ -45,7 +45,12 @@ class {{modelName}}Controller extends Controller
      * Show the form for creating a new resource.
      */
     public function create(): View
-    {
+    {   $model = new {{modelName}}();
+        $forms = $this->getForm($model);
+        return view(
+            '{{modelName}}::edit',
+            compact('module', 'forms')
+        );
         return view('{{modelName}}::create');
     }
 
@@ -96,9 +101,10 @@ class {{modelName}}Controller extends Controller
      */
     public function edit({{modelName}} ${{modelVariable}}): View
     {
+        $forms = $this->getForm(${{modelVariable}});
         return view(
             '{{modelName}}::edit',
-            compact('{{modelVariable}}')
+            compact('{{modelVariable}}', 'forms')
         );
     }
 

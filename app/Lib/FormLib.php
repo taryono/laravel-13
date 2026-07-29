@@ -100,7 +100,7 @@ class FormLib
             }
 
             // Gabungkan hasil
-            $this->forms = array_filter($this->forms) + ['group_fields' => array_filter($group_fields)];
+            $this->forms = array_filter($this->forms);
             
             return $this;
 

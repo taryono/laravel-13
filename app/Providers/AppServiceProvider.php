@@ -34,13 +34,7 @@ class AppServiceProvider extends ServiceProvider
             // FIX: Menggunakan Route::group() untuk meload file routes.php secara aman
             if (File::exists("{$module}/routes.php")) {
                 Route::group([], "{$module}/routes.php");
-            }
-
-            // Daftarkan folder Views milik modul dengan Namespace kustom (product::index)
-            // if (File::exists("{$module}/Views")) {
-            //     View::addNamespace($kebabName, "{$module}/Views");
-            // }
-
+            } 
             if (File::exists("{$module}/Views")) {
                 View::addNamespace($moduleName, "{$module}/Views");
             }

@@ -15,13 +15,13 @@ Route::group(['prefix' => '{{modelRoutePrefix}}', 'namespace' => 'App\Modules\{{
     Route::get('/', ['as' => '{{modelRoutePrefix}}.index', 'uses' => '{{modelName}}Controller@index']);
     Route::any('/search', ['as' => '{{modelRoutePrefix}}.search', 'uses' => '{{modelName}}Controller@search']);
     Route::get('/create', ['as' => '{{modelRoutePrefix}}.create', 'uses' => '{{modelName}}Controller@create']);
-    Route::get('/show/{id}', ['as' => '{{modelRoutePrefix}}.show', 'uses' => '{{modelName}}Controller@show']);
-    Route::get('/preview/{id}', ['as' => '{{modelRoutePrefix}}.preview', 'uses' => '{{modelName}}Controller@preview']);
-    Route::get('/print/{id}', ['as' => '{{modelRoutePrefix}}.print', 'uses' => '{{modelName}}Controller@print']);
+    Route::get('/show/[{{modelRoutePrefix}}]', ['as' => '{{modelRoutePrefix}}.show', 'uses' => '{{modelName}}Controller@show']);
+    Route::get('/preview/[{{modelRoutePrefix}}]', ['as' => '{{modelRoutePrefix}}.preview', 'uses' => '{{modelName}}Controller@preview']);
+    Route::get('/print/[{{modelRoutePrefix}}]', ['as' => '{{modelRoutePrefix}}.print', 'uses' => '{{modelName}}Controller@print']);
 
     Route::post('/store', ['as' => '{{modelRoutePrefix}}.store', 'uses' => '{{modelName}}Controller@store']);
-    Route::get('/edit/{id}', ['as' => '{{modelRoutePrefix}}.edit', 'uses' => '{{modelName}}Controller@edit']);
-    Route::put('/update/{id}', ['as' => '{{modelRoutePrefix}}.update', 'uses' => '{{modelName}}Controller@update']);
-    Route::delete('/delete/{id}', ['as' => '{{modelRoutePrefix}}.destroy', 'uses' => '{{modelName}}Controller@destroy']);
+    Route::get('/edit/[{{modelRoutePrefix}}]', ['as' => '{{modelRoutePrefix}}.edit', 'uses' => '{{modelName}}Controller@edit']);
+    Route::put('/update/[{{modelRoutePrefix}}]', ['as' => '{{modelRoutePrefix}}.update', 'uses' => '{{modelName}}Controller@update']);
+    Route::delete('/delete/[{{modelRoutePrefix}}]', ['as' => '{{modelRoutePrefix}}.destroy', 'uses' => '{{modelName}}Controller@destroy']);
     
 });

@@ -5,5 +5,6 @@ use App\Providers\AppServiceProvider;
 return [
     AppServiceProvider::class,
     ViewServiceProvider::class,
-    EventServiceProvider::class
+    EventServiceProvider::class,
+    AuthServiceProvider::class
 ];

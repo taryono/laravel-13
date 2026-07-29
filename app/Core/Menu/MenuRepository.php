@@ -31,4 +31,22 @@ class MenuRepository
             ->get()
             ->map(fn (Menu $m) => MenuItem::fromModel($m));
     }
+
+    /**
+     * Ambil SEMUA menu tanpa filter apapun — khusus keperluan admin management.
+     * Admin harus bisa lihat & edit menu yang tidak aktif/tidak publish sekalipun.
+     */
+    public function allForAdmin(): Collection
+    {
+        return Menu::query()
+            ->orderBy('sequence')
+            ->orderBy('name')
+            ->get()
+            ->map(fn (Menu $m) => MenuItem::fromModel($m));
+    }
+
+    public function findRaw(int $id): Menu
+    {
+        return Menu::findOrFail($id);
+    }
 }

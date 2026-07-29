@@ -219,7 +219,7 @@ window.initCoreElements = function () {
 // ==============================================
 document.addEventListener('DOMContentLoaded', () => {
     const contentContainer = document.querySelector('main.main-content');
-    const menuLinks = document.querySelectorAll('.bnsp-nav-link:not(.bnsp-nav-parent)');
+    const editButton = document.querySelectorAll('.edit');
     let isLoading = false;
 
     async function loadContent(url) {
@@ -239,28 +239,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const parser = new DOMParser();
             const doc = parser.parseFromString(response.data, 'text/html');
             
-            const kontenBaru = doc.querySelector('.main-content')?.innerHTML 
+            const newContent = doc.querySelector('.main-content')?.innerHTML 
                 || doc.body?.innerHTML 
                 || response.data 
                 || '<p class="text-danger">Konten tidak ditemukan</p>';
-            if(datatable_content == '') {
-                datatable_content = kontenBaru;
-                contentContainer.innerHTML = datatable_content;
-                if ($.fn.DataTable && window.LaravelDataTables) {
-                    Object.keys(window.LaravelDataTables).forEach(id => { 
-                        const table = window.LaravelDataTables[id]; 
-                        const el = document.getElementById(id);
-                        if (el && !$.fn.dataTable.isDataTable(el)) {
-                            table.draw();
-                        } else {
-                            table.ajax.reload(null, false);
-                        }
-                    });
-                }
-            }else{
-                contentContainer.innerHTML = datatable_content;
-                return;
-            }
+            contentContainer.innerHTML = newContent;
             
             window.history.pushState({ path: url }, '', url);
 
@@ -289,20 +272,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Tangan klik pada link menu
-    // menuLinks.forEach(link => {
-    //     link.addEventListener('click', e => {
-    //         e.preventDefault();
-    //         if (isLoading) return; // ➕ BARU: Cegah klik beruntun
-    //         const url = link.dataset.ajaxUrl;
-    //         console.log(url)
-    //         // Hapus status aktif dari semua menu
-    //         document.querySelectorAll('.bnsp-nav-link').forEach(el => el.classList.remove('active'));
-    //          // Beri status aktif pada menu yang diklik
-    //         link.classList.add('active');
-    //         // Muat konten
-    //         loadContent(url);
-    //     });
-    // });
+    editButton.forEach(link => {
+        link.addEventListener('click', e => {
+            e.preventDefault();
+            if (isLoading) return; // ➕ BARU: Cegah klik beruntun
+            const url = link.dataset.ajaxUrl;
+            // Muat konten
+            loadContent(url);
+        });
+    });
 
     // Tangani tombol maju/mundur browser
     window.addEventListener('popstate', e => {
@@ -420,28 +398,4 @@ window.FormValidator = {
 // Jalankan pendaftaran aturan kustom satu kali saja
 if (typeof $ !== 'undefined' && $.validator) {
     FormValidator.initCustomRules();
-}
-
-var form =`<form data-validate="true" data-url="/user/simpan" data-success-message="Pengguna berhasil disimpan">
-    <div class="mb-3">
-        <label>Nama Lengkap</label>
-        <input type="text" name="nama" class="form-control" 
-               data-rule-required="true" data-rule-minlength="3">
-    </div>
-    <div class="mb-3">
-        <label>Email</label>
-        <input type="email" name="email" class="form-control" 
-               data-rule-required="true" data-rule-email="true">
-    </div>
-    <div class="mb-3">
-        <label>No. HP</label>
-        <input type="text" name="hp" class="form-control" 
-               data-rule-required="true" data-rule-phone_id="true">
-    </div>
-    <div class="mb-3">
-        <label>NIP</label>
-        <input type="text" name="nip" class="form-control" 
-               data-rule-nip="true">
-    </div>
-    <button type="submit" class="btn btn-primary">Simpan</button>
-</form>`;
+} 

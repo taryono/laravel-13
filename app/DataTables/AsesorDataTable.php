@@ -28,7 +28,7 @@ class AsesorDataTable extends DataTable
 
                     <a
                         href="' . route('asesor.edit', $row->id) . '"
-                        class="btn btn-sm btn-info"
+                        class="btn btn-sm btn-info edit"
                         title="Edit"
                     >
                         <span class="material-symbols-outlined">
@@ -38,7 +38,7 @@ class AsesorDataTable extends DataTable
 
                     <button
                         type="button"
-                        class="btn btn-sm btn-danger"
+                        class="btn btn-sm btn-danger delete"
                         data-confirm-delete="true"
                         data-url="' . route('asesor.destroy', $row->id) . '"
                         title="Hapus"

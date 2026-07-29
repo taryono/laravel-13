@@ -26,19 +26,19 @@ class AsesiDataTable extends DataTable
             return '
                 <div class="d-flex justify-content-center gap-1">
 
-                    <a
-                        href="' . route('asesi.edit', $row->id) . '"
-                        class="btn btn-sm btn-info"
+                    <button
+                        data-url="' . route('asesi.edit', $row->id) . '"
+                        class="btn btn-sm btn-info edit"
                         title="Edit"
                     >
                         <span class="material-symbols-outlined">
                             edit
                         </span>
-                    </a>
+                    </button>
 
                     <button
                         type="button"
-                        class="btn btn-sm btn-danger"
+                        class="btn btn-sm btn-danger delete"
                         data-confirm-delete="true"
                         data-url="' . route('asesi.destroy', $row->id) . '"
                         title="Hapus"
@@ -99,10 +99,8 @@ class AsesiDataTable extends DataTable
         return [
             Column::make('id'),
             Column::make('name'),
-            Column::computed('action')
-                  ->exportable(false)
-                  ->printable(false)
-                  ->width(60)
+            Column::computed('action') 
+                  ->width(100)
                   ->addClass('text-center'),
         ];
     }

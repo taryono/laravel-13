@@ -4,12 +4,12 @@
  *
  * Cara pakai di Blade:
  * <button
- *     data-toggle="ajax-modal"
+ *     data-bs-toggle="#dynamicModal"
  *     data-size="lg"
  *     data-method="GET"
  *     data-title="Detail Produk #{{ $product->id }}"
  *     data-url="{{ route('products.modal-detail', $product->id) }}"
- *     data-submit='<button class="btn btn-primary" type="button" onclick="saveProduct({{ $product->id }})">Simpan</button>'
+ *     data-submit='<button class="btn btn-primary" type="button">Simpan</button>'
  *     data-cancel='<button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Batal</button>'>
  *     Lihat Detail
  * </button>
