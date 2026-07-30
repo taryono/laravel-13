@@ -27,8 +27,8 @@ class Role extends BasedModel
      * @return Some_Return_Value
      */
 
-    public function action_role()
+    public function actions()
     {
-        return $this->hasMany(ActionRole::class);
+        return $this->hasMany(Action::class, 'action_role');
     }
 }

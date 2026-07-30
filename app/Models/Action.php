@@ -40,8 +40,12 @@ class Action extends BasedModel
         return $this->belongsToMany(\App\Models\User::class);
     }
 
-    public function role()
+    public function roles()
     {
-        return $this->belongsToMany(Role::class);
+        return $this->belongsToMany(Role::class, 'action_role');
+    }
+
+    public function users() {
+        return $this->belongsToMany(User::class, 'permission_user');
     }
 }

@@ -18,9 +18,13 @@ Route::group(['prefix' => 'menu_management', 'namespace' => 'App\Modules\MenuMan
     Route::get('/create', ['as' => 'menu_management.create', 'uses' => 'MenuManagementController@create']);
     Route::get('/show/{id}', ['as' => 'menu_management.show', 'uses' => 'MenuManagementController@show']);
     Route::post('/store', ['as' => 'menu_management.store', 'uses' => 'MenuManagementController@store']);
-    Route::get('/edit/{id}', ['as' => 'menu_management.edit', 'uses' => 'MenuManagementController@edit']);
-    Route::put('/update/{id}', ['as' => 'menu_management.update', 'uses' => 'MenuManagementController@update']);
-    Route::delete('/delete/{id}', ['as' => 'menu_management.destroy', 'uses' => 'MenuManagementController@destroy']); 
+    // ACL hanya di route yang butuh granular check
+    Route::get('/edit/{id}', ['as' => 'menu_management.edit', 'uses' => 'MenuManagementController@edit'])
+        ->middleware('acl:update,App\Models\User');
+    Route::put('/update/{id}', ['as' => 'menu_management.update', 'uses' => 'MenuManagementController@update'])
+        ->middleware('acl:update,App\Models\User');
+    Route::delete('/delete/{id}', ['as' => 'menu_management.destroy', 'uses' => 'MenuManagementController@destroy'])
+        ->middleware('acl:delete,App\Models\User');
 });
 
 Route::prefix('admin/menus')->middleware(['auth', 'superuser'])->group(function () {
