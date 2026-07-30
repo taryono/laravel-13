@@ -1,5 +1,6 @@
 @foreach ($items as $item)
     <div class="bnsp-nav-item {{ $item->open ? 'open' : '' }}">
+        
         @if ($item->hasChildren())
             <a href="#" class="bnsp-nav-link bnsp-nav-parent">
                 <x-menu.icon :icon="$item->icon" :icon-type="$item->iconType" />

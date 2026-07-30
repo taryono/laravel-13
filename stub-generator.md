@@ -6,3 +6,5 @@ composer require nekhbet/laravel-collective-html
 
 
  php artisan make:crud-yajra Schedule --columns=id,name,competence_id,certification_id,date,start,end,location_id
+
+ php artisan make:crud-yajra AccessLog

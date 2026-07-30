@@ -58,7 +58,10 @@
             "Lib\\": [
                 "app/Lib"
             ]
-        }
+        },
+        "files": [
+            "app/Http/helpers.php"
+        ]
     },
     "scripts": {
         "setup": [

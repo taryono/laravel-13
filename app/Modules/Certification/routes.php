@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Route;
 | and give it the controller to call when that URI is requested.
 |
  */
-Route::group(['prefix' => 'certification', 'namespace' => 'App\Modules\Certification\Controllers', 'middleware' => ['web']], function () {
+Route::group(['prefix' => 'certification', 'namespace' => 'App\Modules\Certification\Controllers', 'middleware' => ['web', 'auth']], function () {
     Route::get('/', ['as' => 'certification.index', 'uses' => 'CertificationController@index']);
     Route::any('/search', ['as' => 'certification.search', 'uses' => 'CertificationController@search']);
     Route::get('/create', ['as' => 'certification.create', 'uses' => 'CertificationController@create']);

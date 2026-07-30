@@ -13,6 +13,13 @@
         <button class="btn btn-light me-2" id="darkModeToggle">
             <span class="material-symbols-outlined" id="darkModeIcon">dark_mode</span>
         </button>
+
+        <!-- Toggle mode layout: sidebar <-> topbar -->
+        <button class="bnsp-icon-btn bnsp-layout-toggle" type="button" id="bnspLayoutToggle"
+            aria-label="Ganti mode tampilan menu" title="Ganti ke tampilan menu atas">
+            <span class="material-symbols-outlined">view_agenda</span>
+        </button>
+        @if(auth()->check())
         <!-- Notifikasi -->
         <div class="dropdown">
             <button class="bnsp-icon-btn" type="button" id="notifDropdown" data-bs-toggle="dropdown"
@@ -40,14 +47,7 @@
                     <div class="notification-time">Kemarin</div>
                 </li>
             </ul>
-        </div>
-
-        <!-- Toggle mode layout: sidebar <-> topbar -->
-        <button class="bnsp-icon-btn bnsp-layout-toggle" type="button" id="bnspLayoutToggle"
-            aria-label="Ganti mode tampilan menu" title="Ganti ke tampilan menu atas">
-            <span class="material-symbols-outlined">view_agenda</span>
-        </button>
-
+        </div> 
         <!-- Pengaturan Cepat -->
         <div class="dropdown">
             <button class="bnsp-icon-btn" type="button" id="settingsDropdown" data-bs-toggle="dropdown"
@@ -91,7 +91,7 @@
                 <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuC8QXqfhf55Db1G_7iCJ6RxOrqozW_8NK1rQcH2FbUf8Usecta3J_NRv33NA4-HMWCGsbCSxtVTxbs0fahJ02YfrUZWhY6pTBIb37NLj62m5uKwjltiZZe3mTbGMBrCe9_WwRJqqt2UR0Dw3Boz9Y6-F7We1Zq8eb7XzNDyoSblO2O5Xr7XXXT-Hu2A5uWEWD4541Pd_6m1RmH9QRjRSnEnn32EOTz8n0n4YPD-lZxcLNjOcrSZ7ypv7D4iCm4G5PlZupLNZY8rYZE"
                     class="bnsp-avatar" alt="Foto profil Asesi Testing">
                 <div class="d-none d-lg-block text-start">
-                    <p class="mb-0 fw-bold small lh-1">{{ Auth::user()->name }}</p>
+                    <p class="mb-0 fw-bold small lh-1">{{ auth()->user()->name }}</p>
                     <p class="mb-0 text-muted" style="font-size:.75rem;">Pro Level</p>
                 </div>
             </div>
@@ -141,5 +141,6 @@
                 @endguest
             </ul>
         </div>
+        @endif
     </div>
 </header>

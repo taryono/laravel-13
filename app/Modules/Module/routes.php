@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Route;
 | and give it the controller to call when that URI is requested.
 |
  */
-Route::group(['prefix' => 'module', 'namespace' => 'App\Modules\Module\Controllers', 'middleware' => ['web']], function () {
+Route::group(['prefix' => 'module', 'namespace' => 'App\Modules\Module\Controllers', 'middleware' => ['web', 'auth']], function () {
     Route::get('/', ['as' => 'module.index', 'uses' => 'ModuleController@index']);
     Route::any('/search', ['as' => 'module.search', 'uses' => 'ModuleController@search']);
     Route::get('/create', ['as' => 'module.create', 'uses' => 'ModuleController@create']);

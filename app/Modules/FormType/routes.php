@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Route;
 | and give it the controller to call when that URI is requested.
 |
  */
-Route::group(['prefix' => 'form-type', 'namespace' => 'App\Modules\FormType\Controllers', 'middleware' => ['web']], function () {
+Route::group(['prefix' => 'form-type', 'namespace' => 'App\Modules\FormType\Controllers', 'middleware' => ['web', 'auth']], function () {
     Route::get('/', ['as' => 'form-type.index', 'uses' => 'FormTypeController@index']);
     Route::any('/search', ['as' => 'form-type.search', 'uses' => 'FormTypeController@search']);
     Route::get('/create', ['as' => 'form-type.create', 'uses' => 'FormTypeController@create']);

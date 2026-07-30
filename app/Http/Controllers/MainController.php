@@ -19,12 +19,21 @@ use App\Rules\FileExtensions;
 use App\Jobs\ConvertPdfToImageJob;
 use App\Helpers\UploadHelper;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Routing\Controllers\HasMiddleware;
 
-class MainController extends Controller
+class MainController extends Controller implements HasMiddleware
 {
     protected $model;
-    public function __construct($model){
+
+    public function __construct($model){ 
         $this->model = $model;
+    }
+
+    public static function middleware(): array
+    {
+        return [
+            'auth',
+        ];
     }
 
     public function getForm($model){

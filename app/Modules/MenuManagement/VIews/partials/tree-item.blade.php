@@ -1,6 +1,6 @@
 @foreach ($items as $item)
     <li class="menu-tree-item" data-id="{{ $item->id }}">
-        <div class="menu-tree-row d-flex align-items-center gap-2 p-2 border rounded mb-1 bg-white">
+        <div class="menu-tree-row d-flex align-items-center gap-2 p-2 border rounded mb-1">
             <span class="drag-handle" style="cursor:grab;">
                 <span class="material-symbols-outlined">drag_indicator</span>
             </span>
@@ -24,7 +24,7 @@
             <button class="btn btn-sm btn-outline-secondary" onclick="openMenuModal('edit', {{ $item->id }})">
                 <span class="material-symbols-outlined">edit</span>
             </button>
-            <button class="btn btn-sm btn-outline-danger" data-confirm-delete data-url="{{ route('admin.menus.destroy', $item->id) }}" data-method="DELETE">
+            <button class="btn btn-sm btn-outline-danger" data-confirm-delete data-url="{{ route('menu_management.destroy', $item->id) }}" data-method="DELETE">
                 <span class="material-symbols-outlined">delete</span>
             </button>
         </div>

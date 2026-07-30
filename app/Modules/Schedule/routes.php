@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Route;
 | and give it the controller to call when that URI is requested.
 |
  */
-Route::group(['prefix' => 'schedule', 'namespace' => 'App\Modules\Schedule\Controllers', 'middleware' => ['web']], function () {
+Route::group(['prefix' => 'schedule', 'namespace' => 'App\Modules\Schedule\Controllers', 'middleware' => ['web', 'auth']], function () {
     Route::get('/', ['as' => 'schedule.index', 'uses' => 'ScheduleController@index']);
     Route::any('/search', ['as' => 'schedule.search', 'uses' => 'ScheduleController@search']);
     Route::get('/create', ['as' => 'schedule.create', 'uses' => 'ScheduleController@create']);

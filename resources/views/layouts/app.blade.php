@@ -7,8 +7,8 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="_token" content="{{ csrf_token() }}" />
-    <meta name="user_id" content="{{ auth()->user()->id }}" />
-    <meta name="login_as" content="{{ session('user_auth.role_as') }}" />
+    <meta name="user_id" content="{{ auth()->user()?->id ?? null }}" />
+    <meta name="login_as" content="{{ session('user_auth.role_as')?? null }}" />
     <title>
         @yield('title', 'Dashboard')
 
@@ -30,7 +30,6 @@
 </head>
 
 <body>
-
     <x-sidebar />
     <!-- Backdrop for mobile drawer -->
     <div class="bnsp-backdrop" id="bnspBackdrop"></div>
@@ -47,9 +46,7 @@
     </nav>
 
     <div class="bnsp-main-wrapper" id="bnspMainWrapper">
-
-        <x-topbar />
-
+        <x-topbar /> 
         <main class="flex-grow-1 p-4 mx-auto w-100 main-content" style="max-width:1320px;">
             @yield('content')
         </main>

@@ -14,6 +14,9 @@ use Models\Role; // sesuaikan kalau bukan pakai spatie/permission
 
 class MenuManagementController extends MainController
 {
+     public function __construct(){
+        parent::__construct(null);
+    }
     public function index()
     {
         $items = (new MenuRepository())->allForAdmin();
