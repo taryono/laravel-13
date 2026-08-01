@@ -3,371 +3,293 @@
 namespace Lib;
 
 use Form;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use View;
 
 class FormLib
 {
-    // Konstanta agar mudah diubah & terpusat
-    protected const CACHE_PREFIX = 'formlib_';
-    protected const CACHE_TTL = 3600; // 1 jam
-    protected const DEFAULT_EXCEPTIONS = ['remember_token', 'created_at', 'updated_at', 'deleted_at'];
-    protected const FIELD_AREA = ['country_id', 'region_id', 'city_id', 'district_id'];
     protected const TARGET_AREA = [
-        "country_id" => "region_id",
-        "region_id" => "city_id",
-        "city_id" => "district_id",
-        "district_id" => "subdistrict_id",
-        "subdistrict_id" => null
+        "country_id"     => "region_id",
+        "region_id"      => "city_id",
+        "city_id"        => "district_id",
+        "district_id"    => "subdistrict_id",
+        "subdistrict_id" => null,
     ];
 
-    // Properti dengan tipe jelas
     public $model;
     public $object;
     public $relations = [];
     public $names = [];
     public $forms = [];
+    public $groupedForms = []; // FIX: dulu field ber-group dibuang, sekarang disimpan di sini
     public $comment;
     public $required;
     public $excludes = [];
     public $array_data;
     public $classes;
     public $default;
-    public $attributes; // Perbaiki typo: attributtes → attributes
+    public $attributes;
     public $default_class;
     public $custom_fields = [];
     public $groups = [];
     public $set_fields = [];
 
-    public function __construct($model = null, $object = null, array $custom_fields = [])
-    {
+    protected SchemaColumnReader $columnReader;
+    protected RelationDataResolver $relationResolver;
+
+    public function __construct(
+        $model = null,
+        $object = null,
+        array $custom_fields = [],
+        ?SchemaColumnReader $columnReader = null,
+        ?RelationDataResolver $relationResolver = null
+    ) {
         $this->model = $model;
         $this->object = $object ?? $model;
         $this->custom_fields = $custom_fields;
-        
+
+        // Dependency injection dengan default, supaya class ini mudah dites
+        // (tinggal inject mock/fake dari luar) tanpa mengubah cara pemakaian lama.
+        $this->columnReader = $columnReader ?? new SchemaColumnReader();
+        $this->relationResolver = $relationResolver ?? new RelationDataResolver();
+
         View::share('object', $this->object);
     }
 
     /**
-     * Proses utama untuk menghasilkan field form
+     * Proses utama untuk menghasilkan field form.
      */
     public function getFields(): self
     {
         try {
-            
             if (!$this->model) return $this;
 
-            // Ambil daftar field dengan cache
-            $all_fields = $this->getFilteredFields();
+            $all_fields = $this->columnReader->getFilteredFields($this->model);
             if (empty($all_fields)) return $this;
-            
-            // Ambil info kolom SEKALI saja (hindari query berulang)
-            $columns = $this->getColums();
+
+            $columns = $this->columnReader->getColumns($this->model);
             $darkModeClass = getkDarkMode() ? "bg-dark text-white" : 'bg-light text-black';
             $group_fields = [];
 
-            // Ambil SEMUA data relasi SEKALI saja (HILANGKAN N+1)
-            $relationData = $this->preloadAllRelationData($all_fields);
+            $relationData = $this->relationResolver->preloadAll($all_fields, $this->model);
 
             foreach ($all_fields as $field) {
-                // Skip field yang tidak perlu
                 if ($this->shouldSkipField($field)) continue;
 
-                // Proses field relasi (berakhiran _id)
                 if (Str::endsWith($field, "_id")) {
-                    $this->processRelationField(
-                        $field, 
-                        $columns, 
-                        $relationData, 
-                        $darkModeClass
-                    );
+                    $this->processRelationField($field, $columns, $relationData, $darkModeClass);
                     continue;
                 }
 
-                // Proses field biasa
-                $this->processRegularField(
-                    $field, 
-                    $columns, 
-                    $darkModeClass, 
-                    $group_fields
-                );
+                $this->processRegularField($field, $columns, $darkModeClass, $group_fields);
             }
 
-            // Gabungkan hasil
             $this->forms = array_filter($this->forms);
-            
+
+            // FIX: sebelumnya $group_fields (diisi processRegularField via reference
+            // saat field masuk daftar $this->groups) tidak pernah disimpan ke mana pun,
+            // sehingga field yang dikelompokkan hilang total dari hasil akhir.
+            $this->groupedForms = array_filter($group_fields);
+
             return $this;
 
         } catch (\Throwable $e) {
+            // FIX: sebelumnya error di production tidak pernah di-log sama sekali.
+            report($e);
+
             if (app()->isLocal()) dd($e->getMessage(), $e->getLine());
+
             abort(response()->json([
                 'status' => 'error',
-                'message' => say("Sepertinya ada kesalahan sistem")
+                'message' => say("Sepertinya ada kesalahan sistem"),
             ], 400));
         }
     }
 
-    /**
-     * Ambil daftar field yang sudah difilter dengan cache
-     */
-    protected function getFilteredFields(): array
+    protected function processRelationField(string $field, $columns, array $relationData, string $darkMode): void
     {
-        $cacheKey = self::CACHE_PREFIX . 'fields_' . $this->model->getTable();
-        
-        return Cache::remember($cacheKey, self::CACHE_TTL, function () {
-            try {
-                $fields = $this->model->getConnection()
-                    ->getSchemaBuilder()
-                    ->getColumnListing($this->model->getTable());
+        $name = str_replace("_id", "", $field);
+        $label = !empty($columns->{$field}->comment) ? $columns->{$field}->comment : $name;
+        $comment = !empty($columns->{$field}->comment) ? $columns->{$field}->comment : '';
+        $modelClass = $this->relationResolver->resolveModelClass($name);
 
-                return array_diff($fields, self::DEFAULT_EXCEPTIONS);
-            } catch (\Throwable $e) {
-                report($e);
-                return [];
-            }
-        });
-    }
+        if (!class_exists($modelClass)) return;
 
-    /**
-     * Ambil SEMUA data relasi sekaligus (SOLUSI N+1)
-     */
-    protected function preloadAllRelationData(array $fields): array
-    {
-        $data = [];
-        
-        foreach ($fields as $field) {
-            if (!Str::endsWith($field, "_id")) continue;
-            if (in_array($field, ["parent_id", "node_id", "object_id"])) continue;
+        $relationType = $this->relationResolver->getRelationType($this->model, $name);
+        $formName = $field;
+        $multiple = [];
 
-            $name = str_replace("_id", "", $field);
-            $modelClass = $this->resolveModelClass($name);
-            
-            if (!class_exists($modelClass)) continue;
-
-            // Cache setiap data relasi
-            $cacheKey = self::CACHE_PREFIX . 'rel_' . Str::snake(class_basename($modelClass));
-            
-            $data[$field] = Cache::remember($cacheKey, self::CACHE_TTL, function () use ($modelClass, $field, $name) {
-                $model = new $modelClass;
-                
-                // Logika khusus model
-                if ($model->getTable() == "statuses") {
-                    return $model->where('group', Str::singular($this->model->getTable()))
-                                ->pluck('name', 'id')->toArray();
-                }
-                
-                if ($field == "role_id") {
-                    return $model->where('id', '!=', 1)->pluck('name', 'id')->toArray();
-                }
-
-                return $model->pluck('name', 'id')->toArray();
-            });
+        if ($relationType === "hasMany") {
+            $formName .= "[]";
+            $multiple = ['multiple' => true];
         }
 
-        return $data;
+        // Sesuai perilaku asli: relasi belongsTo dilewati (di-handle di tempat lain).
+        if ($relationType === "belongsTo") return;
+
+        $this->names[$field] = $relationData[$field] ?? [];
+        $default = $this->object?->{$field};
+
+        if (array_key_exists($field, self::TARGET_AREA)) {
+            $this->forms[$field] = $this->buildAreaSelect($field, $label, $comment, $relationData, $default, $multiple);
+            return;
+        }
+
+        $this->forms[$field] = [
+            'label' => ucfirst(say($label)),
+            'content' => Form::select(
+                $formName,
+                collect(['' => say('-- Pilih --')])->merge($relationData[$field] ?? []),
+                $default,
+                $this->cleanAttributes([
+                    'class' => "form-control selectpicker required {$darkMode}",
+                    'id' => $field,
+                    'data-title' => "-- Pilih " . ucfirst(say($label)) . "-- ",
+                    'data-live-search' => 'true',
+                    'required' => 'required',
+                    'data-width' => '100%',
+                ] + $multiple)
+            ),
+            'comment' => $comment,
+        ];
     }
 
     /**
-     * Proses field relasi
+     * Bangun select untuk field wilayah berjenjang (country/region/city/district).
+     *
+     * FIX BUG: sebelumnya untuk city_id/district_id, opsi select selalu dikosongkan
+     * (mengandalkan AJAX cascading), sehingga saat form EDIT dibuka, value yang
+     * tersimpan tidak muncul di opsi -> dropdown terlihat kosong/salah meski data
+     * ada di database. Sekarang jika ada default value tersimpan, kita pastikan
+     * opsi tersebut tetap disediakan (walau daftar lengkap tetap dimuat via AJAX).
      */
-    protected function processRelationField(string $field, $columns, array $relationData, string $darkMode): void
-{
-    $name = str_replace("_id", "", $field);
-    $label = !empty($columns->{$field}->comment) ? $columns->{$field}->comment : $name;
-    $modelClass = $this->resolveModelClass($name);
+    protected function buildAreaSelect(string $field, string $label, string $comment, array $relationData, $default, array $multiple): array
+    {
+        $isEagerLoaded = in_array($field, ["country_id", "region_id"]);
+        $selectData = $isEagerLoaded ? ($relationData[$field] ?? []) : [];
 
-    if (!class_exists($modelClass)) return;
+        // Jika field belum di-eager-load tapi ada default value tersimpan (mode edit),
+        // ambil minimal SATU opsi (value tersimpan) supaya tidak hilang dari tampilan.
+        if (!$isEagerLoaded && $default && isset($relationData[$field][$default])) {
+            $selectData = [$default => $relationData[$field][$default]];
+        }
 
-    $relationType = $this->getRelationType($name);
-    $formName = $field;
-    $multiple = [];
+        $target = self::TARGET_AREA[$field];
 
-    if ($relationType === "hasMany") {
-        $formName .= "[]";
-        $multiple = ['multiple' => true];
-    }
-
-    // === PENTING: Sesuai kode asli, jika belongsTo langsung lewati ===
-    if ($relationType === "belongsTo") return;
-
-    $this->names[$field] = $relationData[$field] ?? [];
-    $default = $this->object?->{$field};
-
-    if (array_key_exists($field, self::TARGET_AREA)) {
-        // Jika ingin semua field area langsung punya data, hapus kondisi in_array dibawah
-        $selectData = in_array($field, ["country_id", "region_id"]) ? ($relationData[$field] ?? []) : [];
-        
-        $this->forms[$field] = [
+        return [
             'label' => ucfirst(say($label)),
-            'content' => Form::select($formName, 
-                collect(['' => say('-- Pilih --')])->merge($selectData ?? []),
-                $default, 
-                [
+            'content' => Form::select(
+                $field,
+                collect(['' => say('-- Pilih --')])->merge($selectData),
+                $default,
+                $this->cleanAttributes([
                     'class' => 'selectpicker form-select form-control text-p-black font-weight-600 p-shadow-3 area',
                     'id' => $field,
-                    'model' => self::TARGET_AREA[$field] ? str_replace("_id", "", self::TARGET_AREA[$field]) : null,
-                    'data-target' => self::TARGET_AREA[$field] ? "#" . self::TARGET_AREA[$field] : null,
+                    'model' => $target ? str_replace("_id", "", $target) : null,
+                    'data-target' => $target ? "#{$target}" : null,
                     'data-url' => '/filterArea',
                 ] + $multiple)
+            ),
+            'comment' => $comment,
         ];
-        return;
     }
 
-    $this->forms[$field] = [
-        'label' => ucfirst(say($label)),
-        'content' => Form::select($formName, 
-            collect(['' => say('-- Pilih --')])->merge($relationData[$field] ?? []),
-            $default, 
-            [
+    protected function processRegularField(string $field, $columns, string $darkMode, array &$group_fields): void
+    {
+        $required = $columns->{$field}->is_null === 'NO' ? "required" : null;
+        $label = !empty($columns->{$field}->comment) ? $columns->{$field}->comment : $field;
+        $comment = !empty($columns->{$field}->comment) ? $columns->{$field}->comment : '';
+        $originType = Schema::getColumnType($this->model->getTable(), $field);
+        $type = Config::get("data_types.{$originType}", 'text');
+
+        // FIX: sebelumnya $required (bisa null) dimasukkan sebagai elemen array
+        // numerik mentah ("$required" langsung, tanpa key), yang berisiko
+        // menghasilkan attribute HTML aneh tergantung implementasi Form::.
+        // Sekarang pakai key eksplisit lalu dibersihkan lewat cleanAttributes().
+        $attributes = $this->cleanAttributes([
+            'class' => "form-control font-size-100 {$field}",
+            'id' => $field,
+            'rows' => 3,
+            'cols' => 10,
+            'required' => $required,
+        ]);
+
+        if (in_array($type, ['text', 'textarea'])) {
+            $attributes['class'] .= ' comment';
+        }
+
+        $value = $this->object?->{$field};
+        $customRender = renderFields()[$field] ?? null;
+
+        if (isset($this->set_fields[$field])) {
+            $content = $this->set_fields[$field];
+        } elseif ($customRender) {
+            $content = Blade::render($customRender);
+        } elseif (is_array($value)) {
+            $content = Form::select($field, ['' => say('-- Pilih --')], $value, $this->cleanAttributes([
                 'class' => "form-control selectpicker required {$darkMode}",
                 'id' => $field,
                 'data-title' => "-- Pilih " . ucfirst(say($label)) . "-- ",
                 'data-live-search' => 'true',
-                'required',
+                'required' => 'required',
                 'data-width' => '100%',
-            ] + $multiple)
-    ];
-}
+                'multiple' => 'multiple',
+            ]));
+        } else {
+            $content = Form::{$type}($field, $value, $attributes);
+        }
 
-protected function processRegularField(string $field, $columns, string $darkMode, array &$group_fields): void
-{
-    $required = $columns->{$field}->is_null === 'NO' ? "required" : null;
-    $label = !empty($columns->{$field}->comment) ? $columns->{$field}->comment : $field;
-    
-    $originType = Schema::getColumnType($this->model->getTable(), $field);
-    $type = Config::get("data_types.{$originType}", 'text');
-    
-    $attributes = [
-        'class' => "form-control font-size-100 {$field}",
-        'id' => $field,
-        'rows' => 3,
-        'cols' => 10,
-        $required
-    ];
-
-    if (in_array($type, ['text', 'textarea'])) {
-        $attributes['class'] .= ' comment';
-    }
-
-    $value = $this->object?->{$field};
-    $customRender = renderFields()[$field] ?? null;
-
-    // Ambil konten
-    if (isset($this->set_fields[$field])) {
-        $content = $this->set_fields[$field];
-    } elseif ($customRender) {
-        $content = Blade::render($customRender);
-    } elseif (is_array($value)) {
-        $content = Form::select($field, ['' => say('-- Pilih --')], $value, [
-            'class' => "form-control selectpicker required {$darkMode}",
-            'id' => $field,
-            'data-title' => "-- Pilih " . ucfirst(say($label)) . "-- ",
-            'data-live-search' => 'true',
-            'required',
-            'data-width' => '100%',
-            'multiple'
-        ]);
-    } else {
-        $content = Form::{$type}($field, $value, $attributes);
-    }
-
-    // === LOGIKA PENYIMPANAN KEMBALI SEPERTI ASLI ===
-    if (!empty($this->groups) && is_array($this->groups) && in_array($field, $this->groups)) {
-        $group_fields[$field] = [
+        $fieldData = [
             'label' => ucfirst(say($label)),
-            'content' => $content
+            'content' => $content,
+            'comment' => $comment,
         ];
-    } else {
-        $this->forms[$field] = [
-            'label' => ucfirst(say($label)),
-            'content' => $content
-        ];
+
+        if (!empty($this->groups) && is_array($this->groups) && in_array($field, $this->groups)) {
+            $group_fields[$field] = $fieldData;
+        } else {
+            $this->forms[$field] = $fieldData;
+        }
     }
-}
 
     /**
-     * Cek apakah field harus dilewati
+     * Hilangkan attribute bernilai null supaya tidak lolos ke helper Form::,
+     * yang bisa berperilaku tidak terduga terhadap elemen array ber-value null.
      */
+    protected function cleanAttributes(array $attributes): array
+    {
+        return array_filter($attributes, fn($value) => $value !== null);
+    }
+
     protected function shouldSkipField(string $field): bool
     {
         if ($field === "id") return true;
         if (!empty($this->custom_fields) && !in_array($field, $this->custom_fields)) return true;
         if (!empty($this->excludes) && in_array($field, $this->excludes)) return true;
-        
+
         return false;
     }
 
     /**
-     * Tentukan namespace model secara otomatis
-     */
-    protected function resolveModelClass(string $name): string
-    {
-        $studly = ucwords(Str::camel($name));
-        return $name === "user" 
-            ? "\App\Models\\{$studly}" 
-            : "\Models\\{$studly}";
-    }
-
-    /**
-     * Ambil info kolom tabel dengan cache
+     * Ambil info kolom tabel (delegasi ke SchemaColumnReader, dipertahankan
+     * di sini agar signature publik lama tetap kompatibel).
      */
     public function getColums($table = null)
     {
-        $table ??= $this->model->getTable();
-        $cacheKey = self::CACHE_PREFIX . 'cols_' . $table;
-
-        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($table) {
-            $db = $this->model->getConnection()->getConfig()['database'];
-            $columns = [];
-
-            $results = DB::select("SHOW FULL COLUMNS FROM {$db}.{$table}");
-
-            foreach ($results as $col) {
-                if (in_array($col->Field, self::DEFAULT_EXCEPTIONS)) continue;
-                
-                $columns[$col->Field] = (object)[
-                    "type" => $col->Type,
-                    "is_null" => $col->Null,
-                    "key" => $col->Key,
-                    "default" => $col->Default,
-                    "extra" => $col->Extra,
-                    "privileges" => $col->Privileges,
-                    "comment" => str_replace("\r\n", " ", $col->Comment),
-                ];
-            }
-
-            return (object)$columns;
-        });
+        return $this->columnReader->getColumns($this->model, $table);
     }
 
-    /**
-     * Tentukan tipe relasi model
-     */
     public function getRelationType(string $method): string
     {
-        $relation = $this->model->{$method}();
-        $class = get_class($relation);
-        
-        return str_replace("Illuminate\Database\Eloquent\Relations\\", "", $class);
+        return $this->relationResolver->getRelationType($this->model, $method);
     }
 
-    /**
-     * Update komentar kolom
-     */
     public function updateComment(string $table, string $field, string $comment): void
     {
-        Schema::table($table, function (Blueprint $table) use ($field, $comment) {
-            $table->string($field, 255)->comment($comment)->change();
-        });
-
-        // Hapus cache setelah update
-        Cache::forget(self::CACHE_PREFIX . 'cols_' . $table);
+        $this->columnReader->updateComment($table, $field, $comment);
     }
 
     // --- Getter & Setter (dipertahankan agar kompatibel dengan kode lama) ---
@@ -380,6 +302,8 @@ protected function processRegularField(string $field, $columns, string $darkMode
     public function setNames($names): self { $this->names = $names; return $this; }
     public function getForms() { return $this->forms; }
     public function setForms($forms): self { $this->forms = $forms; return $this; }
+    public function getGroupedForms() { return $this->groupedForms; }
+    public function setGroupedForms($groupedForms): self { $this->groupedForms = $groupedForms; return $this; }
     public function getComment() { return $this->comment; }
     public function setComment($comment): self { $this->comment = $comment; return $this; }
     public function getRequired() { return $this->required; }

@@ -18,22 +18,31 @@ class SetRoleSessionOnLogin
     /**
      * Handle the event.
      */
-     public function handle(Login $event)
+    // app/Listeners/SetRoleSessionOnLogin.php
+    public function handle(Login $event)
     {
         $user = $event->user;
 
-        $roles = $user->roles; // pastikan sudah eager load kalau perlu
-        $role_ids = $roles->pluck('id')->toArray();
-        $default_role = $user->roles()->firstWhere('is_default', 1);
-        $isSuper = $roles->contains('name', 'superuser');
-        $login_as = $isSuper ? 'superuser' : 'user';
+        // Ambil semua role milik user beserta data pivot-nya
+        $roles = $user->roles;
 
-        Log::info('[LOGIN BERHASIL] User: ' . $user->email);
-        Log::info('[LOGIN BERHASIL] Role IDs: ', $role_ids);
-        Log::info('[LOGIN BERHASIL] Superuser: ' . ($isSuper ? 'YA' : 'TIDAK'));
+        // Cari yang ditandai sebagai default di tabel pivot
+        $default_role = $roles->firstWhere('pivot.is_default', 1);
 
-        session()->put('role_ids', $role_ids);
-        session()->put('user_auth.login_as', $login_as);
-        session()->put('user_auth.role_as', $default_role->name ?? 'user');
+        // Jika belum ada yang ditandai default, ambil role pertama dan tandai otomatis
+        if (!$default_role && $roles->isNotEmpty()) {
+            $default_role = $roles->first();
+            // Update otomatis agar nanti tidak bingung
+            $user->roles()->updateExistingPivot($default_role->id, ['is_default' => 1]);
+        }
+
+        // Jika benar-benar tidak punya role
+        if (!$default_role) {
+            session()->forget(['user_auth', 'all_role_ids', 'active_role_id']);
+            return;
+        }
+
+        // Simpan ke session
+        $user->setAuthSession($default_role, $roles);
     }
 }

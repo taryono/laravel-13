@@ -4,14 +4,18 @@ namespace Models;
 
 class Role extends BasedModel
 {
-    public function user()
+    public function users(): BelongsToMany
     {
-        return $this->belongsToMany(\App\Models\User::class);
+        return $this->belongsToMany(\Models\User::class, 'role_user')
+            ->withPivot(['is_default'])
+            ->withTimestamps();
     }
 
-    public function menu()
+     public function menus(): BelongsToMany
     {
-        return $this->belongsToMany(Menu::class);
+        return $this->belongsToMany(Menu::class, 'menu_role')
+            ->withPivot(['is_view', 'is_create', 'is_edit', 'is_delete'])
+            ->withTimestamps();
     }
 
     public function hasAction($id)
@@ -29,6 +33,6 @@ class Role extends BasedModel
 
     public function actions()
     {
-        return $this->hasMany(Action::class, 'action_role');
-    }
+        return $this->hasMany(Action::class, 'action_role')->withTimestamps();;
+    } 
 }

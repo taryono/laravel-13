@@ -2,7 +2,7 @@
 
 namespace App\Modules\Role\Controllers;
 
-use App\Models\Role;
+use Models\Role;
 use App\DataTables\RoleDataTable;
 use Illuminate\Http\Request;
 use App\Http\Controllers\MainController;
@@ -13,8 +13,11 @@ class RoleController extends MainController
         parent::__construct(new Role());
     }
 
-    public function index(RoleDataTable $dataTable)
+    public function index(Request $request,RoleDataTable $dataTable)
     {
+         if ($request->filled('draw')) {
+            return $dataTable->ajax();
+        }
         // Menggunakan namespace kustom modul untuk Blade view
         return $dataTable->render('Role::index', ['title' => 'Data Role']);
     }
@@ -38,7 +41,11 @@ class RoleController extends MainController
 
     public function edit($id)
     {   $role = Role::find($id);
-        return view('Role::edit', compact('role', 'forms'));
+      
+        $result = $this->getForm($role);
+        $forms = $result['forms'];
+        $groupedForms = $result['grouped'];
+        return view('Role::edit', compact('role', 'forms', 'groupedForms'));
     }
 
     public function update(Request $request, Role $role)

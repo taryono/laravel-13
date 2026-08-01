@@ -54,10 +54,9 @@ class ActionPermissionController extends MainController
         $actionPermission = new ActionPermission();
         $forms = $this->getForm($actionPermission);
         return view(
-            'ActionPermission::edit',
+            'ActionPermission::create',
             compact('actionPermission', 'forms')
-        );
-        return view('ActionPermission::create');
+        ); 
     }
 
     /**

@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Models;
+namespace Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ActionPermission extends Model
+class CrudGenerator extends BasedModel
 {
     //
 }

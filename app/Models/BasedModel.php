@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 
 class BasedModel extends Model
@@ -32,19 +33,9 @@ class BasedModel extends Model
         parent::boot();
 
         static::addGlobalScope('certification_id', function (Builder $builder) {
-            $table = $builder->getModel()->getTable(); 
-            if($table == "preparations"){
-                if(Session()->get('certification_id') != null){ 
-                    $builder->where('preparations.certification_id', Session()->get('certification_id'));
-                }
-            } 
-
+            $table = $builder->getModel()->getTable();
         });
-        static::saving(function ($model) {
-            if($model instanceof \Models\CertificationRequestStatus){
-                $model->user_id = auth()->user()->id;
-            }
-        });
+         
     }
 
     protected function _getFields($model)

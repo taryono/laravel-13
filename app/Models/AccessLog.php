@@ -4,7 +4,7 @@ namespace Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class AccessLog extends Model
+class AccessLog extends BasedModel
 {
     //
 }

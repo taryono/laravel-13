@@ -31,7 +31,7 @@ class PolicyDataTable extends DataTable
                             data-method="GET"
                             data-title="Detail Policy '.$row->name.'"
                             data-url="'. route('policy.edit', $row).'"
-                            data-submit=\'<button class="btn btn-primary" type="button">Simpan</button>\'
+                            data-submit=\'<button class="btn btn-primary modal-submit" type="button">Simpan</button>\'
                             data-cancel=\'<button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Batal</button>\'>
                             <span class="material-symbols-outlined">edit</span>
                         </button>

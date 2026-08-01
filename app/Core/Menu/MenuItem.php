@@ -29,11 +29,12 @@ class MenuItem
         $item->parent_id = $menu->parent_id ?: null;
         $item->module_id = $menu->module_id;
         $item->text = ucwords(strtolower(str_replace('_', ' ', $menu->text)));
+        $item->title = ucwords(strtolower(str_replace('_', ' ', $menu->title)));
         $item->icon = $menu->icon;
         $item->iconType = $menu->icon_type ?? 'material';
         $item->url = $menu->url;
         $item->action = $menu->action;
-        $item->permission = $menu->can; // kolom `can` jadi izin
+        $item->can = $menu->can; // kolom `can` jadi izin
         $item->flyoutTitle = $menu->flyout_title ?? $item->text;
         $item->isTopnav = (int) $menu->menu_type_id === 1;
         $item->sort_order = $menu->sequence; // ambil dari kolom sequence

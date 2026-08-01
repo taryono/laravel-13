@@ -2,7 +2,7 @@
 
 namespace App\DataTables;
 
-use Models\UserPermission;
+use Models\CrudGenerator;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
@@ -10,7 +10,7 @@ use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
 use Yajra\DataTables\Services\DataTable;
 
-class UserPermissionDataTable extends DataTable
+class CrudGeneratorDataTable extends DataTable
 {
     /**
      * Build DataTable response.
@@ -29,9 +29,9 @@ class UserPermissionDataTable extends DataTable
                             data-toggle="ajax-modal"
                             data-size="lg"
                             data-method="GET"
-                            data-title="Detail UserPermission '.$row->name.'"
-                            data-url="'. route('user-permission.edit', $row).'"
-                            data-submit=\'<button class="btn btn-primary" type="button">Simpan</button>\'
+                            data-title="Detail CrudGenerator '.$row->name.'"
+                            data-url="'. route('crud-generator.edit', $row).'"
+                            data-submit=\'<button class="btn btn-primary modal-submit" type="button">Simpan</button>\'
                             data-cancel=\'<button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Batal</button>\'>
                             <span class="material-symbols-outlined">edit</span>
                         </button>
@@ -40,7 +40,7 @@ class UserPermissionDataTable extends DataTable
                             type="button"
                             class="btn btn-sm btn-danger delete"
                             data-confirm-delete="true"
-                            data-url="' . route('user-permission.destroy', $row) . '"
+                            data-url="' . route('crud-generator.destroy', $row) . '"
                             title="Hapus"
                         >
                             <span class="material-symbols-outlined">delete</span>
@@ -58,7 +58,7 @@ class UserPermissionDataTable extends DataTable
      * Get query source of DataTable.
      */
     public function query(
-        UserPermission $model
+        CrudGenerator $model
     ): QueryBuilder {
 
         return $model->newQuery();
@@ -77,7 +77,7 @@ class UserPermissionDataTable extends DataTable
              * Asesor -> asesor-table
              */
             ->setTableId(
-                'user-permission-table'
+                'crud-generator-table'
             )
 
             ->columns(
@@ -88,7 +88,7 @@ class UserPermissionDataTable extends DataTable
              * Server-side AJAX endpoint.
              */
             ->minifiedAjax(
-                route('user-permission.index')
+                route('crud-generator.index')
             )
 
             /*
@@ -278,6 +278,6 @@ class UserPermissionDataTable extends DataTable
      */
     protected function filename(): string
     {
-        return 'UserPermission_' . date('YmdHis');
+        return 'CrudGenerator_' . date('YmdHis');
     }
 }

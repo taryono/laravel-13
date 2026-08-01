@@ -50,14 +50,18 @@ class ActionController extends MainController
      * Show the form for creating a new resource.
      */
     public function create(): View
-    {   
+    {
         $action = new Action();
-        $forms = $this->getForm($action);
+ 
+        // getForm() sekarang return ['forms' => ..., 'grouped' => ...]
+        $result = $this->getForm($action);
+        $forms = $result['forms'];
+        $groupedForms = $result['grouped'];
+ 
         return view(
             'Action::edit',
-            compact('action', 'forms')
+            compact('action', 'forms', 'groupedForms')
         );
-        return view('Action::create');
     }
 
     /**
@@ -106,13 +110,17 @@ class ActionController extends MainController
      * Show the form for editing the specified resource.
      */
     public function edit($id): View
-    {   $action = $this->model->findOrFail($id);
-        $forms = $this->getForm($action);
+    {   
+        $action = $this->model->findOrFail($id);
+        $result = $this->getForm($action);
+        $forms = $result['forms'];
+        $groupedForms = $result['grouped'];
         return view(
             'Action::edit',
-            compact('action', 'forms')
+            compact('action', 'forms', 'groupedForms')
         );
     }
+
 
     /**
      * Update the specified resource.

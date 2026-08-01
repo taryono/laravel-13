@@ -2,30 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller; 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Response;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
-use PhpOffice\PhpWord\IOFactory;
-use PhpOffice\PhpWord\PhpWord;
-use PhpOffice\PhpWord\TemplateProcessor; //  Import class PhpWord
-use View;
-use App\Rules\FileExtensions;
-use App\Jobs\ConvertPdfToImageJob;
-use App\Helpers\UploadHelper;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Routing\Controllers\HasMiddleware;
+use Lib\FormLib;
 
 class MainController extends Controller implements HasMiddleware
 {
     protected $model;
 
-    public function __construct($model){ 
+    // FIX: beri default null supaya class ini (dan turunannya yang tidak
+    // override constructor) tetap bisa di-resolve otomatis oleh container,
+    // dan controller yang tidak butuh $model tidak wajib pass argumen.
+    public function __construct($model = null)
+    {
         $this->model = $model;
     }
 
@@ -36,7 +25,32 @@ class MainController extends Controller implements HasMiddleware
         ];
     }
 
-    public function getForm($model){
-        return (new \Lib\FormLib($model))->getFields()->getForms();
+    /**
+     * Generate field form dari sebuah model/object.
+     *
+     * FIX: sebelumnya hanya me-return $forms->getForms(), sehingga field yang
+     * dikelompokkan lewat setGroups() hilang tanpa cara mengaksesnya dari
+     * controller/blade. Sekarang return array asosiatif berisi 'forms' (field
+     * biasa) dan 'grouped' (field yang dikelompokkan), supaya keduanya bisa
+     * dirender terpisah di blade.
+     *
+     * @param object $model     model/instance sumber field
+     * @param array  $groups    (opsional) daftar field yang mau dikelompokkan
+     * @param array  $customFields (opsional) daftar field yang mau ditampilkan saja
+     */
+    public function getForm($model, array $groups = [], array $customFields = []): array
+    {
+        $formLib = new FormLib($model, $model, $customFields);
+
+        if (!empty($groups)) {
+            $formLib->setGroups($groups);
+        }
+
+        $formLib->getFields();
+
+        return [
+            'forms' => $formLib->getForms(),
+            'grouped' => $formLib->getGroupedForms(),
+        ];
     }
 }

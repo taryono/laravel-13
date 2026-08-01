@@ -1,37 +1,37 @@
 <?php
-
+// app/Modules/MenuManagement/routes.php
 use Illuminate\Support\Facades\Route;
-use App\Modules\MenuManagement\Controllers\MenuManagementController;
 /*
 |--------------------------------------------------------------------------
 | Application Routes
 |--------------------------------------------------------------------------
-|
-| Here is where you can register all of the routes for an application.
-| It's a breeze. Simply tell Laravel the URIs it should respond to
-| and give it the controller to call when that URI is requested.
-| , 'superuser'
- */
-Route::group(['prefix' => 'menu_management', 'namespace' => 'App\Modules\MenuManagement\Controllers', 'middleware' => ['web', 'auth','superuser']], function () {
-    Route::get('/', ['as' => 'menu_management.index', 'uses' => 'MenuManagementController@index']);
-    Route::any('/search', ['as' => 'menu_management.search', 'uses' => 'MenuManagementController@search']);
-    Route::get('/create', ['as' => 'menu_management.create', 'uses' => 'MenuManagementController@create']);
-    Route::get('/show/{id}', ['as' => 'menu_management.show', 'uses' => 'MenuManagementController@show']);
-    Route::post('/store', ['as' => 'menu_management.store', 'uses' => 'MenuManagementController@store']);
-    // ACL hanya di route yang butuh granular check
-    Route::get('/edit/{id}', ['as' => 'menu_management.edit', 'uses' => 'MenuManagementController@edit'])
-        ->middleware('acl:update,App\Models\User');
-    Route::put('/update/{id}', ['as' => 'menu_management.update', 'uses' => 'MenuManagementController@update'])
-        ->middleware('acl:update,App\Models\User');
-    Route::delete('/delete/{id}', ['as' => 'menu_management.destroy', 'uses' => 'MenuManagementController@destroy'])
-        ->middleware('acl:delete,App\Models\User');
-});
+*/
+Route::group([
+    'prefix'    => 'menu_management',
+    'namespace' => 'App\Modules\MenuManagement\Controllers',
+    'middleware' => ['web', 'auth', 'superuser'],
+    'as'        => 'menu_management.',
+], function () {
 
-Route::prefix('admin/menus')->middleware(['auth', 'superuser'])->group(function () {
-    Route::get('/', [MenuManagementController::class, 'index'])->name('admin.menus.index');
-    Route::post('/', [MenuManagementController::class, 'store'])->name('admin.menus.store');
-    Route::get('/{menu}', [MenuManagementController::class, 'show'])->name('admin.menus.show');
-    Route::put('/{menu}', [MenuManagementController::class, 'update'])->name('admin.menus.update');
-    Route::delete('/{menu}', [MenuManagementController::class, 'destroy'])->name('admin.menus.destroy');
-    Route::post('/reorder/save', [MenuManagementController::class, 'reorder'])->name('admin.menus.reorder');
+    // CRUD menu
+    Route::get('/', ['as' => 'index', 'uses' => 'MenuManagementController@index']);
+    Route::post('/', ['as' => 'store', 'uses' => 'MenuManagementController@store']);
+    Route::get('/{menu}', ['as' => 'show', 'uses' => 'MenuManagementController@show']);
+    Route::put('/{menu}', ['as' => 'update', 'uses' => 'MenuManagementController@update']);
+    Route::delete('/{menu}', ['as' => 'destroy', 'uses' => 'MenuManagementController@destroy']);
+
+    // Drag & drop reorder
+    Route::post('/reorder/save', ['as' => 'reorder', 'uses' => 'MenuManagementController@reorder']);
+
+    // Assign role + flag CRUD ke menu (menu_role)
+    Route::post('/{menu}/roles', ['as' => 'roles.sync', 'uses' => 'MenuManagementController@syncRoles']);
+
+    // CRUD action per menu
+    Route::get('/{menu}/actions', ['as' => 'actions.index', 'uses' => 'MenuManagementController@actionsIndex']);
+    Route::post('/{menu}/actions', ['as' => 'actions.store', 'uses' => 'MenuManagementController@storeAction']);
+    Route::put('/actions/{action}', ['as' => 'actions.update', 'uses' => 'MenuManagementController@updateAction']);
+    Route::delete('/actions/{action}', ['as' => 'actions.destroy', 'uses' => 'MenuManagementController@destroyAction']);
+
+    // Assign action ke role/user (action_role, action_user)
+    Route::post('/actions/{action}/access', ['as' => 'actions.syncAccess', 'uses' => 'MenuManagementController@syncActionAccess']);
 });

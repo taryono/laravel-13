@@ -4,7 +4,7 @@ namespace App\Modules\User\Controllers;
 
 use App\DataTables\UserDataTable;
 use App\Http\Controllers\MainController;
-use Models\User;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;

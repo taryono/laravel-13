@@ -51,10 +51,9 @@ class MenuController extends MainController
     {   $model = new Menu();
         $forms = $this->getForm($model);
         return view(
-            'Menu::edit',
+            'Menu::create',
             compact('module', 'forms')
         );
-        return view('Menu::create');
     }
 
     /**

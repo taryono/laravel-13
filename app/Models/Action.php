@@ -4,22 +4,14 @@ namespace Models;
 
 class Action extends BasedModel
 {
-    /**
-     * @foreign
-     * @comment=Relasi ke modul
-     * @on=module
-     * @references=id
-     * @type=unsignedBigInteger
-     * @column=module_id
-     * @nullable
-     * @onDelete=cascade 
-     * @onUpdate=cascade
-     * @constraintName=fk_actions_modules
-     * 
-     */
-    public function module()
+    protected $fillable = [
+        'menu_id', 'name', 'display_name', 'description',
+        'is_allow_view', 'is_allow_create', 'is_allow_edit', 'is_allow_delete', 'is_active'
+    ]; 
+
+    public function menu()
     {
-        return $this->belongsTo(Module::class);
+        return $this->belongsTo(Menu::class);
     }
 
     /**
@@ -35,17 +27,13 @@ class Action extends BasedModel
      * @constraintName=fk_actions_users
      * 
      */
-    public function user()
+    public function users()
     {
-        return $this->belongsToMany(\App\Models\User::class);
+        return $this->belongsToMany(\App\Models\User::class, 'action_user');
     }
 
     public function roles()
     {
         return $this->belongsToMany(Role::class, 'action_role');
-    }
-
-    public function users() {
-        return $this->belongsToMany(User::class, 'permission_user');
-    }
+    } 
 }

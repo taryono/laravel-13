@@ -54,10 +54,9 @@ class AccessLogController extends MainController
         $accessLog = new AccessLog();
         $forms = $this->getForm($accessLog);
         return view(
-            'AccessLog::edit',
+            'AccessLog::create',
             compact('accessLog', 'forms')
-        );
-        return view('AccessLog::create');
+        ); 
     }
 
     /**

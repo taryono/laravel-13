@@ -1,4 +1,4 @@
-{{ Form::model($user-permission, ['method' => 'PUT', 'route' => ['user-permission.update', $user-permission->id], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($crud-generator, ['method' => 'PUT', 'route' => ['crud-generator.update', $crud-generator->id], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
     <div class="row">
         <div class="col-md-6 mb-3">
             @forelse ($forms as $key => $form)

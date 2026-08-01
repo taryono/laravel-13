@@ -1,23 +1,24 @@
+{{-- resources/views/components/menu/nav-items.blade.php --}}
 @foreach ($items as $item)
-    <div class="bnsp-nav-item {{ $item->open ? 'open' : '' }}">
+    <div class="bnsp-nav-item {{ $item->children->isNotEmpty() ? 'open' : '' }}">
         
-        @if ($item->hasChildren())
+        @if ($item->children->isNotEmpty())
             <a href="#" class="bnsp-nav-link bnsp-nav-parent">
-                <x-menu.icon :icon="$item->icon" :icon-type="$item->iconType" />
-                <span class="nav-label flex-grow-1">{{ $item->text }}</span>
+                {{-- Sesuaikan parameter ikon sesuai kolom baru --}}
+                <x-menu.icon :icon="$item->icon" :icon-type="$item->icon_type" />
+                <span class="nav-label flex-grow-1">{{ $item->title }}</span>
                 <span class="material-symbols-outlined chevron">chevron_right</span>
             </a>
-            <ul class="bnsp-submenu" data-flyout-text="{{ $item->flyoutTitle }}" data-flyout-title="{{ $item->text }}" data-flyout-url="{{ $item->url ?? '#' }}">
+            <ul class="bnsp-submenu" data-flyout-text="{{ $item->flyoutTitle }}" data-flyout-title="{{ $item->title }}" data-flyout-url="{{ $item->route ?? '#' }}">
                 @foreach ($item->children as $child)
                     <li><x-menu.nav-items :items="[$child]" /></li>
                 @endforeach
             </ul>
         @else
-            {{-- Ubah href jadi # dan simpan url asli di data-ajax-url --}}
-            <a href="{{ $item->url ?? '#' }}" class="bnsp-nav-link {{ $item->active ? 'active' : '' }}"
-                data-ajax-url="{{ $item->url ?? '#' }}" data-tooltip="{{ $item->text }}">
-                <x-menu.icon :icon="$item->icon" :icon-type="$item->iconType" />
-                <span class="nav-label">{{ $item->text }}</span>
+            <a href="/{{ $item->url ?? '#' }}" class="bnsp-nav-link {{ request()->is($item->route) ? 'active' : '' }}"
+                data-ajax-url="{{ $item->route ?? '#' }}" data-tooltip="{{ $item->title }}">
+                <x-menu.icon :icon="$item->icon" :icon-type="$item->icon_type" />
+                <span class="nav-label">{{ $item->title }}</span>
             </a>
         @endif
     </div>

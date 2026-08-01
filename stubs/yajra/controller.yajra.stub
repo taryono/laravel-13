@@ -15,8 +15,8 @@ use Throwable;
 
 class {{modelName}}Controller extends MainController
 {
-
-    public function __construct(){
+    public function __construct()
+    {
         parent::__construct(new {{modelName}}());
     }
 
@@ -50,14 +50,16 @@ class {{modelName}}Controller extends MainController
      * Show the form for creating a new resource.
      */
     public function create(): View
-    {   
+    {
         ${{modelVariable}} = new {{modelName}}();
-        $forms = $this->getForm(${{modelVariable}});
+        $result = $this->getForm(${{modelVariable}});
+        $forms = $result['forms'];
+        $groupedForms = $result['grouped'];
+
         return view(
             '{{modelName}}::edit',
-            compact('{{modelVariable}}', 'forms')
+            compact('{{modelVariable}}', 'forms', 'groupedForms')
         );
-        return view('{{modelName}}::create');
     }
 
     /**
@@ -66,11 +68,7 @@ class {{modelName}}Controller extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => [
-                'required',
-                'string',
-                'max:255',
-            ],
+{{validationRules}}
         ]);
 
         try {
@@ -106,28 +104,30 @@ class {{modelName}}Controller extends MainController
      * Show the form for editing the specified resource.
      */
     public function edit($id): View
-    {   ${{modelVariable}} = $this->model->findOrFail($id);
-        $forms = $this->getForm(${{modelVariable}});
+    {
+        ${{modelVariable}} = $this->model->findOrFail($id);
+        $result = $this->getForm(${{modelVariable}});
+        $forms = $result['forms'];
+        $groupedForms = $result['grouped'];
+
         return view(
             '{{modelName}}::edit',
-            compact('{{modelVariable}}', 'forms')
+            compact('{{modelVariable}}', 'forms', 'groupedForms')
         );
     }
 
     /**
      * Update the specified resource.
      */
-    public function update(Request $request,$id) {
+    public function update(Request $request, $id)
+    {
         $validated = $request->validate([
-            'name' => [
-                'required',
-                'string',
-                'max:255',
-            ],
+{{validationRules}}
         ]);
 
         try {
             ${{modelVariable}} = $this->model->findOrFail($id);
+
             DB::transaction(function () use (
                 ${{modelVariable}},
                 $validated
@@ -143,11 +143,16 @@ class {{modelName}}Controller extends MainController
 
         } catch (Throwable $e) {
 
+            // FIX: pakai $id mentah untuk logging, BUKAN
+            // ${{modelVariable}}->getKey(), karena kalau findOrFail() di atas
+            // yang melempar exception, variabel ${{modelVariable}} belum
+            // ter-assign -- referensi ke ->getKey() di sini akan memicu
+            // error baru di dalam blok catch.
             Log::error(
                 'Gagal memperbarui {{modelName}}.',
                 [
                     'exception' => $e,
-                    '{{modelName}}_id' => ${{modelVariable}}->getKey(),
+                    '{{modelName}}_id' => $id,
                     'data' => $validated,
                     'user_id' => auth()->id(),
                 ]
@@ -163,9 +168,11 @@ class {{modelName}}Controller extends MainController
     /**
      * Remove the specified resource.
      */
-    public function destroy(Request $request,$id): JsonResponse|RedirectResponse {
+    public function destroy(Request $request, $id): JsonResponse|RedirectResponse
+    {
         try {
-             ${{modelVariable}} = $this->model->findOrFail($id);
+            ${{modelVariable}} = $this->model->findOrFail($id);
+
             DB::transaction(function () use (${{modelVariable}}) {
                 ${{modelVariable}}->delete();
             });
@@ -177,11 +184,13 @@ class {{modelName}}Controller extends MainController
 
         } catch (Throwable $e) {
 
+            // FIX: sama seperti update(), pakai $id mentah, bukan
+            // ${{modelVariable}}->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus {{modelName}}.',
                 [
                     'exception' => $e,
-                    '{{modelName}}_id' => ${{modelVariable}}->getKey(),
+                    '{{modelName}}_id' => $id,
                     'user_id' => auth()->id(),
                 ]
             );

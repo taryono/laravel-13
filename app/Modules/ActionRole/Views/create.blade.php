@@ -3,7 +3,7 @@
         <div class="col-md-6 mb-3">
             @forelse ($forms as $key => $form)
                 <div class="form-group">
-                    <label for="name">{{ say($form['label']) }}</label>
+                    <label for="{{ $key }}">{{ say($form['label']) }}</label>
                     {!! $form['content'] !!}
                 </div>
             @empty

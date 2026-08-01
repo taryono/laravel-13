@@ -54,10 +54,9 @@ class ActionRoleController extends MainController
         $actionRole = new ActionRole();
         $forms = $this->getForm($actionRole);
         return view(
-            'ActionRole::edit',
+            'ActionRole::create',
             compact('actionRole', 'forms')
         );
-        return view('ActionRole::create');
     }
 
     /**

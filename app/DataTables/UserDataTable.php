@@ -2,7 +2,7 @@
 
 namespace App\DataTables;
 
-use Models\User;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
@@ -31,7 +31,7 @@ class UserDataTable extends DataTable
                             data-method="GET"
                             data-title="Detail User '.$row->name.'"
                             data-url="'. route('user.edit', $row).'"
-                            data-submit=\'<button class="btn btn-primary" type="button">Simpan</button>\'
+                            data-submit=\'<button class="btn btn-primary modal-submit" type="button">Simpan</button>\'
                             data-cancel=\'<button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Batal</button>\'>
                             <span class="material-symbols-outlined">edit</span>
                         </button>
