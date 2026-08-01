@@ -52,12 +52,13 @@ class UserController extends MainController
     public function create(): View
     {   
         $user = new User();
-        $forms = $this->getForm($user);
+        $result = $this->getForm($user); 
+        $forms = $result['forms'];
+        $groupedForms = $result['grouped'];
         return view(
-            'User::edit',
-            compact('user', 'forms')
-        );
-        return view('User::create');
+            'User::create',
+            compact('user', 'forms','groupedForms')
+        ); 
     }
 
     /**
@@ -106,12 +107,12 @@ class UserController extends MainController
      * Show the form for editing the specified resource.
      */
     public function edit($id): View
-    {   $user = $this->model->findOrFail($id);
-        $forms = $this->getForm($user);
-        return view(
-            'User::edit',
-            compact('user', 'forms')
-        );
+    {   
+        $user = $this->model->findOrFail($id);
+        $result = $this->getForm($user); 
+        $forms = $result['forms'];
+        $groupedForms = $result['grouped'];
+        return view('User::edit', compact('role', 'forms', 'groupedForms')); 
     }
 
     /**

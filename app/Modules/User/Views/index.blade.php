@@ -4,8 +4,19 @@
 <div class="container">
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">Daftar User</h5>
-            <a href="{{ route('user.create') }}" class="btn btn-primary btn-sm">Tambah Baru</a>
+            <h5 class="mb-0">Daftar User</h5> 
+            <button
+                type="button"
+                class="btn btn-sm btn-primary"
+                data-toggle="ajax-modal"
+                data-size="lg"
+                data-method="GET"
+                data-title="Create Data User"
+                data-url="{{route('user.create')}}"
+                data-submit='<button class="btn btn-primary modal-submit" type="button">Simpan</button>'
+                data-cancel='<button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Batal</button>'>
+                <span class=""><i class="fas fa-users"></i> Tambah Baru</span>
+            </button>
         </div>
         <div class="card-body">
             @if(session('success'))

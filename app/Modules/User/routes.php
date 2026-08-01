@@ -15,13 +15,13 @@ Route::group(['prefix' => 'user', 'namespace' => 'App\Modules\User\Controllers',
     Route::get('/', ['as' => 'user.index', 'uses' => 'UserController@index']);
     Route::any('/search', ['as' => 'user.search', 'uses' => 'UserController@search']);
     Route::get('/create', ['as' => 'user.create', 'uses' => 'UserController@create']);
-    Route::get('/show/{user}', ['as' => 'user.show', 'uses' => 'UserController@show']);
-    Route::get('/preview/{user}', ['as' => 'user.preview', 'uses' => 'UserController@preview']);
-    Route::get('/print/{user}', ['as' => 'user.print', 'uses' => 'UserController@print']);
+    Route::get('/show/{id}', ['as' => 'user.show', 'uses' => 'UserController@show']);
+    Route::get('/preview/{id}', ['as' => 'user.preview', 'uses' => 'UserController@preview']);
+    Route::get('/print/{id}', ['as' => 'user.print', 'uses' => 'UserController@print']);
 
     Route::post('/store', ['as' => 'user.store', 'uses' => 'UserController@store']);
-    Route::get('/edit/{user}', ['as' => 'user.edit', 'uses' => 'UserController@edit']);
-    Route::put('/update/{user}', ['as' => 'user.update', 'uses' => 'UserController@update']);
-    Route::delete('/delete/{user}', ['as' => 'user.destroy', 'uses' => 'UserController@destroy']);
+    Route::get('/edit/{id}', ['as' => 'user.edit', 'uses' => 'UserController@edit']);
+    Route::put('/update/{id}', ['as' => 'user.update', 'uses' => 'UserController@update']);
+    Route::delete('/delete/{id}', ['as' => 'user.destroy', 'uses' => 'UserController@destroy']);
     
 });
