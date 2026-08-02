@@ -112,7 +112,7 @@ class UserController extends MainController
         $result = $this->getForm($user); 
         $forms = $result['forms'];
         $groupedForms = $result['grouped'];
-        return view('User::edit', compact('role', 'forms', 'groupedForms')); 
+        return view('User::edit', compact('user', 'forms', 'groupedForms')); 
     }
 
     /**
@@ -166,7 +166,14 @@ class UserController extends MainController
      */
     public function destroy(Request $request,$id): JsonResponse|RedirectResponse {
         try {
-             $user = $this->model->findOrFail($id);
+            
+            $user = $this->model->find($id);
+            if(!$user){
+                return $this->errorResponse(
+                    $request,
+                    'Data User tidak ditemukan.'
+                );
+            }
             DB::transaction(function () use ($user) {
                 $user->delete();
             });
@@ -182,7 +189,7 @@ class UserController extends MainController
                 'Gagal menghapus User.',
                 [
                     'exception' => $e,
-                    'User_id' => $user->getKey(),
+                    'User_id' => $id,
                     'user_id' => auth()->id(),
                 ]
             );

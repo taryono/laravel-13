@@ -12,17 +12,13 @@ class DatabaseSeeder extends Seeder
 
     /**
      * Seed the application's database.
+     * php artisan db:seed --class=MenuManagementMenuSeeder
+     * php artisan db:seed --class=AclSeeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory(100)->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
-
+        User::factory(10)->create(); 
         //  $this->call(AclSeeder::class);
-        $this->call(MenuManagementMenuSeeder::class);
+        // $this->call(MenuManagementMenuSeeder::class);
     }
 }

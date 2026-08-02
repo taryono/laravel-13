@@ -34,15 +34,16 @@ class RoleDataTable extends DataTable
                             data-method="GET"
                             data-title="Detail Role '.$row->name.'"
                             data-url="'. route('role.edit', $row->id).'"
-                            data-submit=\'<button class="btn btn-primary modal-submit" type="button">Simpan</button>\'
+                            data-submit=\'<button class="btn btn-primary modal-submit" type="button" data-datatable-id="role-table">Simpan</button>\'
                             data-cancel=\'<button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Batal</button>\'>
                             <span class="material-symbols-outlined">edit</span>
                         </button>
 
                         <button
                             type="button"
-                            class="btn btn-sm btn-danger delete"
+                            class="btn btn-sm btn-danger delete-button"
                             data-confirm-delete="true"
+                            data-is_execute_drawer="true"
                             data-url="' . route('role.destroy', $row->id) . '"
                             title="Hapus"
                         >

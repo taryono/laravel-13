@@ -20,7 +20,10 @@
                     <table class="table table-sm align-middle" id="menuRolesTable">
                         <thead>
                             <tr>
-                                <th style="width: 5%"></th>
+                                 <th style="width: 5%" class="text-center">
+                                    <input type="checkbox" class="form-check-input" id="menuRolesCheckAllMaster"
+                                        title="Centang semua role & semua hak akses">
+                                </th>
                                 <th>Role</th>
                                 <th class="text-center">View</th>
                                 <th class="text-center">Create</th>

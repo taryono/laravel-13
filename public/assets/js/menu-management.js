@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('actionCreateForm').addEventListener('submit', handleActionCreateSubmit);
 
     initSortableTree();
+     initMenuRolesCheckAll();
 });
 
 function populateSelect(elId, items, valueKey, labelKey, placeholder) {
@@ -374,4 +375,54 @@ function serializeTree(ulEl) {
         });
     });
     return items;
+}
+
+// ==============================================
+// CHECK ALL — Kelola Role modal
+// ==============================================
+function initMenuRolesCheckAll() {
+    const tbody = document.getElementById('menuRolesTableBody');
+    const masterCheckbox = document.getElementById('menuRolesCheckAllMaster');
+
+    // Event delegation di tbody, aman walau baris dirender ulang tiap modal dibuka
+    tbody.addEventListener('change', (e) => {
+        const target = e.target;
+
+        // Klik checkbox "role-enabled" di satu baris -> centang/uncheck 4 permission baris itu
+        if (target.classList.contains('role-enabled')) {
+            const tr = target.closest('tr');
+            tr.querySelectorAll('[data-flag]').forEach(cb => {
+                cb.checked = target.checked;
+            });
+        }
+
+        // Kalau salah satu permission diklik manual, sinkronkan checkbox role-enabled di baris itu
+        if (target.matches('[data-flag]')) {
+            const tr = target.closest('tr');
+            const roleEnabled = tr.querySelector('.role-enabled');
+            const flags = tr.querySelectorAll('[data-flag]');
+            const anyChecked = [...flags].some(cb => cb.checked);
+            roleEnabled.checked = anyChecked; // ikut tercentang kalau minimal 1 permission aktif
+        }
+
+        syncMasterCheckbox();
+    });
+
+    // Klik checkbox master di header -> centang/uncheck semua role + semua permission
+    masterCheckbox.addEventListener('change', (e) => {
+        const checked = e.target.checked;
+        tbody.querySelectorAll('.role-enabled, [data-flag]').forEach(cb => {
+            cb.checked = checked;
+        });
+    });
+
+    function syncMasterCheckbox() {
+        const allBoxes = tbody.querySelectorAll('.role-enabled, [data-flag]');
+        if (allBoxes.length === 0) {
+            masterCheckbox.checked = false;
+            return;
+        }
+        const allChecked = [...allBoxes].every(cb => cb.checked);
+        masterCheckbox.checked = allChecked;
+    }
 }

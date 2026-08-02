@@ -18,7 +18,6 @@ Route::group(['prefix' => 'role', 'namespace' => 'App\Modules\Role\Controllers',
     Route::get('/show/{id}', ['as' => 'role.show', 'uses' => 'RoleController@show']);
     Route::get('/preview/{id}', ['as' => 'role.preview', 'uses' => 'RoleController@preview']);
     Route::get('/print/{id}', ['as' => 'role.print', 'uses' => 'RoleController@print']);
-
     Route::post('/store', ['as' => 'role.store', 'uses' => 'RoleController@store']);
     Route::get('/edit/{id}', ['as' => 'role.edit', 'uses' => 'RoleController@edit']);
     Route::put('/update/{id}', ['as' => 'role.update', 'uses' => 'RoleController@update']);

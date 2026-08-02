@@ -38,7 +38,7 @@ class CrudGeneratorDataTable extends DataTable
 
                         <button
                             type="button"
-                            class="btn btn-sm btn-danger delete"
+                            class="btn btn-sm btn-danger delete-button"
                             data-confirm-delete="true"
                             data-url="' . route('crud-generator.destroy', $row) . '"
                             title="Hapus"

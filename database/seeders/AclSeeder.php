@@ -70,12 +70,12 @@ class AclSeeder extends Seeder
         );
 
         $menuUser = Menu::firstOrCreate(
-            ['slug' => 'users'],
+            ['slug' => 'user'],
             [
                 'parent_id' => $menuMaster->id,
                 'title' => 'Pengguna',
                 'icon' => 'fas fa-users',
-                'route' => 'users.index',
+                'route' => 'user.index',
                 'type' => 'sidebar',
                 'sort_order' => 1,
                 'is_active' => 1,
@@ -99,7 +99,7 @@ class AclSeeder extends Seeder
         // 3. BUAT AKSI / IZIN PER MENU
         // =============================================
         Action::firstOrCreate(
-            ['name' => 'users-view'],
+            ['name' => 'user-view'],
             [
                 'menu_id' => $menuUser->id,
                 'display_name' => 'Lihat Daftar Pengguna',
@@ -112,7 +112,7 @@ class AclSeeder extends Seeder
         );
 
         Action::firstOrCreate(
-            ['name' => 'users-manage'],
+            ['name' => 'user-manage'],
             [
                 'menu_id' => $menuUser->id,
                 'display_name' => 'Kelola Pengguna',
@@ -158,7 +158,7 @@ class AclSeeder extends Seeder
             if (!$act->roles->contains($roleSuper->id)) $act->roles()->attach($roleSuper->id);
         }
 
-        $adminActions = Action::whereIn('name', ['users-view', 'users-manage'])->get();
+        $adminActions = Action::whereIn('name', ['user-view', 'user-manage'])->get();
         foreach ($adminActions as $act) {
             if (!$act->roles->contains($roleAdmin->id)) $act->roles()->attach($roleAdmin->id);
         }

@@ -85,6 +85,10 @@ class FormLib
                 }
 
                 $this->processRegularField($field, $columns, $darkModeClass, $group_fields);
+                if($field == "password"){
+                    // add password confirmation field
+                    $this->processRegularField("password_confirmation", $columns, $darkModeClass, $group_fields);
+                }
             }
 
             $this->forms = array_filter($this->forms);
@@ -199,11 +203,26 @@ class FormLib
 
     protected function processRegularField(string $field, $columns, string $darkMode, array &$group_fields): void
     {
-        $required = $columns->{$field}->is_null === 'NO' ? "required" : null;
-        $label = !empty($columns->{$field}->comment) ? $columns->{$field}->comment : $field;
-        $comment = !empty($columns->{$field}->comment) ? $columns->{$field}->comment : '';
-        $originType = Schema::getColumnType($this->model->getTable(), $field);
-        $type = Config::get("data_types.{$originType}", 'text');
+        if($field === "password_confirmation"){ 
+            $required = null;
+            $label = "Password Confirmation";
+            $comment = '';
+            $originType = "text";
+            $type = "password";
+        }elseif($field === "password"){
+            $required = null;
+            $label = "Password";
+            $comment = '';
+            $originType = "text";
+            $type = "password";
+        }else{
+            $required = $columns->{$field}->is_null === 'NO' ? "required" : null;
+            $label = !empty($columns->{$field}->comment) ? $columns->{$field}->comment : $field;
+            $comment = !empty($columns->{$field}->comment) ? $columns->{$field}->comment : '';
+            $originType = Schema::getColumnType($this->model->getTable(), $field);
+            $type = Config::get("data_types.{$originType}", 'text');
+        }
+        
 
         // FIX: sebelumnya $required (bisa null) dimasukkan sebagai elemen array
         // numerik mentah ("$required" langsung, tanpa key), yang berisiko
@@ -217,11 +236,13 @@ class FormLib
             'required' => $required,
         ]);
 
-        if (in_array($type, ['text', 'textarea'])) {
+        if (in_array($type, ['text', 'textarea']) &&  !in_array($field, ['password', 'password_confirmation'])) {
             $attributes['class'] .= ' comment';
         }
-
-        $value = $this->object?->{$field};
+        $value = null;
+        if( !in_array($field, ['password', 'password_confirmation'])){
+            $value = $this->object?->{$field};
+        }
         $customRender = renderFields()[$field] ?? null;
 
         if (isset($this->set_fields[$field])) {
@@ -239,7 +260,9 @@ class FormLib
                 'multiple' => 'multiple',
             ]));
         } else {
-            $content = Form::{$type}($field, $value, $attributes);
+            $content = in_array($field, ['password', 'password_confirmation'])
+            ? Form::password($field, $attributes)
+            : Form::{$type}($field, $value, $attributes);
         }
 
         $fieldData = [
