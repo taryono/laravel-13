@@ -12,6 +12,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 use Throwable;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
+use App\Rules\StrongPassword;
 
 class UserController extends MainController
 {
@@ -72,8 +75,9 @@ class UserController extends MainController
                 'string',
                 'max:255',
             ],
+            'password'              => ['required', 'string', 'min:8', 'confirmed', new StrongPassword()],
+            'password_confirmation' => 'required', 'same:password', 'min:8',
         ]);
-
         try {
             $model = DB::transaction(function () use ($validated) {
                 return User::create($validated);
@@ -91,7 +95,7 @@ class UserController extends MainController
                 'Gagal menambahkan User.',
                 [
                     'exception' => $e,
-                    'data' => $validated,
+                    'data' => Arr::except($validated, ['password']), // jangan log password meski sudah hashed
                     'user_id' => auth()->id(),
                 ]
             );
@@ -118,21 +122,33 @@ class UserController extends MainController
     /**
      * Update the specified resource.
      */
-    public function update(Request $request,$id) {
+    public function update(Request $request, $id)
+    {
         $validated = $request->validate([
             'name' => [
                 'required',
                 'string',
                 'max:255',
             ],
+            'password' => [
+                'nullable', // boleh dikosongkan -> berarti password tidak diganti
+                'confirmed',
+                new StrongPassword(),
+            ],
         ]);
 
+        // Kalau field password dikosongkan, jangan ikut-ikutan di-update ke
+        // null / string kosong -- buang saja dari payload.
+        if (empty($validated['password'])) {
+            unset($validated['password']);
+        } 
+
+        // FIX: pindahkan findOrFail() ke luar try, atau tangkap ModelNotFoundException
+        // secara terpisah, supaya $user selalu terdefinisi sebelum dipakai di catch.
+        $user = $this->model->findOrFail($id);
+
         try {
-            $user = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $user,
-                $validated
-            ) {
+            DB::transaction(function () use ($user, $validated) {
                 $user->update($validated);
             });
 
@@ -148,8 +164,8 @@ class UserController extends MainController
                 'Gagal memperbarui User.',
                 [
                     'exception' => $e,
-                    'User_id' => $user->getKey(),
-                    'data' => $validated,
+                    'user_id_target' => $user->getKey(),
+                    'data' => Arr::except($validated, ['password']),
                     'user_id' => auth()->id(),
                 ]
             );

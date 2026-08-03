@@ -18,7 +18,7 @@ class UserDataTable extends DataTable
      * ulang ("id', 'name") — sekarang jadi array biasa agar tidak rapuh
      * terhadap karakter khusus (koma, apostrof) pada nama kolom.
      */
-    protected array $columns = ['id', 'name'];
+    protected array $columns = ['id', 'name', 'email'];
 
     /**
      * Build DataTable response.
@@ -100,7 +100,9 @@ class UserDataTable extends DataTable
      */
     public function query(User $model): QueryBuilder
     {
-        return $model->newQuery();
+        return $model->newQuery()->whereHas('roles', function ($query) {
+            $query->where('name', '!=', 'super-admin');
+        });
     }
 
     /**
@@ -271,8 +273,7 @@ class UserDataTable extends DataTable
         $daftarKolom = collect($this->columns)
             ->map(fn (string $kolom) => Column::make($kolom)
                 ->title(ucwords(str_replace('_', ' ', $kolom))))
-            ->all();
-
+            ->all(); 
         $daftarKolom[] = Column::make('DT_RowIndex')
             ->title('No')
             ->orderable(false)

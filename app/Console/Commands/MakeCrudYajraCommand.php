@@ -46,13 +46,20 @@ class MakeCrudYajraCommand extends Command
         // FIX: sanitasi kolom dari --columns (trim, buang kosong, snake_case,
         // buang karakter selain huruf/angka/underscore) supaya tidak ada
         // input aneh yang lolos mentah ke dalam stub.
+        //
+        // Kolom "id" SENGAJA tidak pernah dimasukkan ke daftar kolom
+        // tampilan -- baik saat default maupun saat diminta eksplisit lewat
+        // --columns=id,name,... -- karena nomor urut baris sudah disediakan
+        // oleh kolom "No" (DT_RowIndex) di getColumns(). Penyaringannya
+        // dilakukan di dalam sanitizeColumns() supaya berlaku konsisten di
+        // kedua jalur (default & eksplisit) tanpa duplikasi logic.
         $columnsOption = $this->option('columns');
         $columnsArray = $columnsOption
             ? $this->sanitizeColumns($columnsOption)
-            : ['id', 'name'];
+            : ['name'];
 
         if (empty($columnsArray)) {
-            $this->error('Daftar kolom (--columns) tidak valid / kosong setelah sanitasi.');
+            $this->error('Daftar kolom (--columns) tidak valid / kosong setelah sanitasi (kolom "id" selalu diabaikan karena sudah diwakili kolom "No").');
             return Command::FAILURE;
         }
 
@@ -201,7 +208,10 @@ class MakeCrudYajraCommand extends Command
 
     /**
      * Bersihkan input --columns: trim, buang entri kosong, snake_case,
-     * dan buang karakter selain huruf/angka/underscore.
+     * buang karakter selain huruf/angka/underscore, dan buang kolom "id"
+     * (nomor urut baris sudah disediakan lewat kolom "No" / DT_RowIndex,
+     * jadi "id" tidak pernah perlu tampil sebagai kolom sendiri -- baik
+     * dari default maupun saat diminta eksplisit lewat --columns=id,...).
      */
     protected function sanitizeColumns(string $columnsOption): array
     {
@@ -212,7 +222,9 @@ class MakeCrudYajraCommand extends Command
             return preg_replace('/[^a-z0-9_]/', '', $col);
         }, $columns);
 
-        return array_values(array_filter($columns, fn($col) => $col !== ''));
+        $columns = array_filter($columns, fn($col) => $col !== '' && $col !== 'id');
+
+        return array_values($columns);
     }
 
     /**

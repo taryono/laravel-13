@@ -2,7 +2,7 @@
 
 namespace App\DataTables;
 
-use Models\{{modelName}};
+use {{namespace}}\{{modelName}};
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
@@ -13,41 +13,20 @@ use Yajra\DataTables\Services\DataTable;
 class {{modelName}}DataTable extends DataTable
 {
     /**
+     * Kolom yang ditampilkan di tabel (selain DT_RowIndex & action).
+     * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
+     * opsi --columns.
+     */
+    protected array $columns = {{columnsArray}};
+
+    /**
      * Build DataTable response.
      */
-
-      public function dataTable(QueryBuilder $query): EloquentDataTable
+    public function dataTable(QueryBuilder $query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
             ->addColumn('action', function ($row) {
-                return '
-                    <div class="d-flex justify-content-center gap-1">
-
-                        <button
-                            type="button"
-                            class="btn btn-sm btn-primary"
-                            data-toggle="ajax-modal"
-                            data-size="lg"
-                            data-method="GET"
-                            data-title="Detail {{modelName}} '.$row->name.'"
-                            data-url="'. route('{{modelRoutePrefix}}.edit', $row).'"
-                            data-submit=\'<button class="btn btn-primary modal-submit" type="button" data-datatable-id="{{modelTableId}}">Simpan</button>\'
-                            data-cancel=\'<button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Batal</button>\'>
-                            <span class="material-symbols-outlined">edit</span>
-                        </button>
-
-                        <button
-                            type="button"
-                            class="btn btn-sm btn-danger delete"
-                            data-confirm-delete="true"
-                            data-url="' . route('{{modelRoutePrefix}}.destroy', $row) . '"
-                            title="Hapus"
-                        >
-                            <span class="material-symbols-outlined">delete</span>
-                        </button>
-
-                    </div>
-                ';
+                return $this->renderActionButtons($row);
             })
             ->addIndexColumn()
             ->rawColumns(['action']) // ✅ Tetap wajib ada!
@@ -55,12 +34,72 @@ class {{modelName}}DataTable extends DataTable
     }
 
     /**
+     * Render tombol aksi (edit & delete) untuk satu baris.
+     *
+     * - $row->name di-escape dengan e() untuk mencegah XSS/attribute
+     *   breakout jika nilainya mengandung karakter " atau <script>.
+     * - Payload data-datatable-context dibangun via json_encode() lalu
+     *   di-escape dengan htmlspecialchars() supaya valid ditaruh di
+     *   dalam attribute HTML (bukan concat string manual yang rawan
+     *   attribute-nya terpotong).
+     * - Class tombol delete WAJIB "delete-button" (bukan "delete") supaya
+     *   cocok dengan selector di public/assets/js/button.js:
+     *   .on('click', '.delete-button', this.handleDeleteButton)
+     */
+    protected function renderActionButtons($row): string
+    {
+        $title = e('Detail {{modelName}} ' . $row->name);
+
+        $context = htmlspecialchars(
+            json_encode([
+                'executeDraw' => true,
+                'tableId'     => '{{modelTableId}}',
+                'reloadDelay' => 500,
+            ]),
+            ENT_QUOTES,
+            'UTF-8'
+        );
+
+        $editUrl   = e(route('{{modelRoutePrefix}}.edit', $row));
+        $deleteUrl = e(route('{{modelRoutePrefix}}.destroy', $row));
+
+        return <<<HTML
+            <div class="d-flex justify-content-center gap-1">
+
+                <button
+                    type="button"
+                    class="btn btn-sm btn-primary"
+                    data-toggle="ajax-modal"
+                    data-size="lg"
+                    data-method="GET"
+                    data-title="{$title}"
+                    data-url="{$editUrl}"
+                    data-datatable-context='{$context}'
+                    data-submit='<button class="btn btn-primary modal-submit" type="button" data-is_execute_drawer="true" data-datatable-id="{{modelTableId}}">Simpan</button>'
+                    data-cancel='<button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Batal</button>'>
+                    <span class="material-symbols-outlined">edit</span>
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-sm btn-danger delete-button"
+                    data-confirm-delete="true"
+                    data-is_execute_drawer="true"
+                    data-url="{$deleteUrl}"
+                    title="Hapus"
+                >
+                    <span class="material-symbols-outlined">delete</span>
+                </button>
+
+            </div>
+        HTML;
+    }
+
+    /**
      * Get query source of DataTable.
      */
-    public function query(
-        {{modelName}} $model
-    ): QueryBuilder {
-
+    public function query({{modelName}} $model): QueryBuilder
+    {
         return $model->newQuery();
     }
 
@@ -76,20 +115,14 @@ class {{modelName}}DataTable extends DataTable
              * Asesi -> asesi-table
              * Asesor -> asesor-table
              */
-            ->setTableId(
-                '{{modelTableId}}'
-            )
+            ->setTableId('{{modelTableId}}')
 
-            ->columns(
-                $this->getColumns()
-            )
+            ->columns($this->getColumns())
 
             /*
              * Server-side AJAX endpoint.
              */
-            ->minifiedAjax(
-                route('{{modelRoutePrefix}}.index')
-            )
+            ->minifiedAjax(route('{{modelRoutePrefix}}.index'))
 
             /*
              * Default sorting:
@@ -157,20 +190,15 @@ class {{modelName}}DataTable extends DataTable
 
                     'search' => 'Cari:',
 
-                    'lengthMenu' =>
-                        'Tampilkan _MENU_ data',
+                    'lengthMenu' => 'Tampilkan _MENU_ data',
 
-                    'info' =>
-                        'Menampilkan _START_ sampai _END_ dari _TOTAL_ data',
+                    'info' => 'Menampilkan _START_ sampai _END_ dari _TOTAL_ data',
 
-                    'infoEmpty' =>
-                        'Tidak ada data',
+                    'infoEmpty' => 'Tidak ada data',
 
-                    'zeroRecords' =>
-                        'Data tidak ditemukan',
+                    'zeroRecords' => 'Data tidak ditemukan',
 
-                    'emptyTable' =>
-                        'Belum ada data',
+                    'emptyTable' => 'Belum ada data',
 
                     'paginate' => [
                         'first' => 'Awal',
@@ -192,9 +220,7 @@ class {{modelName}}DataTable extends DataTable
                             download
                         </span> Excel'
                     )
-                    ->className(
-                        'btn btn-success btn-sm'
-                    ),
+                    ->className('btn btn-success btn-sm'),
 
                 Button::make('csv')
                     ->text(
@@ -202,9 +228,7 @@ class {{modelName}}DataTable extends DataTable
                             description
                         </span> CSV'
                     )
-                    ->className(
-                        'btn btn-primary btn-sm'
-                    ),
+                    ->className('btn btn-primary btn-sm'),
 
                 Button::make('pdf')
                     ->text(
@@ -212,9 +236,7 @@ class {{modelName}}DataTable extends DataTable
                             picture_as_pdf
                         </span> PDF'
                     )
-                    ->className(
-                        'btn btn-danger btn-sm'
-                    ),
+                    ->className('btn btn-danger btn-sm'),
 
                 Button::make('print')
                     ->text(
@@ -222,9 +244,7 @@ class {{modelName}}DataTable extends DataTable
                             print
                         </span> Print'
                     )
-                    ->className(
-                        'btn btn-primary btn-sm'
-                    ),
+                    ->className('btn btn-primary btn-sm'),
 
                 Button::make([
                     'text' => '<span class="material-symbols-outlined align-middle">refresh</span>',
@@ -238,37 +258,33 @@ class {{modelName}}DataTable extends DataTable
 
     /**
      * Get DataTable columns.
-     */
-    /**
-     * Ambil daftar kolom secara OTOMATIS dari perintah artisan
      *
-     * @return array
+     * Dibangun langsung dari property $columns (array literal yang sudah
+     * digenerate di atas oleh make:crud-yajra) -- tidak lagi pakai
+     * explode() dari string literal seperti versi lama, yang rapuh
+     * terhadap karakter khusus pada nama kolom.
      */
     protected function getColumns(): array
     {
-        // Daftar kolom yang dikirim dari command: {{columnsArray}}
-        $kolomDariCommand = explode("', '", "{{columnsArray}}");
-
-        // Ubah jadi format Column::make()
-        $daftarKolom = [];
-        foreach ($kolomDariCommand as $namaKolom) {
-            $daftarKolom[] = Column::make($namaKolom)->title(ucwords(str_replace('_', ' ', $namaKolom)));
-        }
+        $daftarKolom = collect($this->columns)
+            ->map(fn (string $kolom) => Column::make($kolom)
+                ->title(ucwords(str_replace('_', ' ', $kolom))))
+            ->all();
 
         $daftarKolom[] = Column::make('DT_RowIndex')
-                ->title('No')
-                ->orderable(false)
-                ->searchable(false)
-                ->width(80)
-                ->addClass('text-center');
+            ->title('No')
+            ->orderable(false)
+            ->searchable(false)
+            ->width(80)
+            ->addClass('text-center');
 
         // Tambah kolom Aksi di paling akhir
         $daftarKolom[] = Column::computed('action')
-                                ->exportable(false)
-                                ->printable(false)
-                                ->width(120)
-                                ->addClass('text-center')
-                                ->title('Aksi');
+            ->exportable(false)
+            ->printable(false)
+            ->width(120)
+            ->addClass('text-center')
+            ->title('Aksi');
 
         return $daftarKolom;
     }
