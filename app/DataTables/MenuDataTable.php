@@ -30,6 +30,7 @@ class MenuDataTable extends DataTable
                             data-method="GET"
                             data-title="Detail Menu '.$row->name.'"
                             data-url="'. route('menu.edit', $row->id).'"
+                            data-datatable-context=\'{"executeDraw":true,"tableId":"action-table","reloadDelay":500}\'
                             data-submit=\'<button class="btn btn-primary modal-submit" type="button" data-datatable-id="menu-table">Simpan</button>\'
                             data-cancel=\'<button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Batal</button>\'>
                             <span class="material-symbols-outlined">edit</span>

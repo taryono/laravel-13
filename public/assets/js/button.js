@@ -1,6 +1,26 @@
 /**
  * public/assets/js/button.js
- * BUTTON.JS - REFACTORED 2026
+ * BUTTON.JS - REFACTORED 2026 (v2 - bugfix pass)
+ * =======================================================================
+ *
+ * Perubahan dari versi sebelumnya:
+ * 1. handleModalSubmit yang double-defined -> disatukan jadi satu definisi.
+ * 2. DataTableContext.restore() sebelumnya dipanggil DUA KALI untuk satu
+ *    DataTableContext.set() (sekali di dalam Ajax.submitFormData, sekali
+ *    lagi di callback onSuccess/onError pemanggilnya). Ini bikin stack
+ *    context ke-pop dua kali dan bisa salah restore context punya
+ *    operasi lain yang sedang berjalan bersamaan. Sekarang aturan
+ *    tunggal: SIAPA YANG MEMANGGIL set() -> DIA YANG restore(). Ajax
+ *    helper generik (submitFormData/deleteWithConfirm) tidak lagi
+ *    melakukan restore sendiri.
+ * 3. Semua reload tabel disatukan lewat DataTableHelper.reload() /
+ *    reloadWithContext(), termasuk yang sebelumnya masih pakai variabel
+ *    global `datatable` secara langsung (handleFormSubmit,
+ *    handleDeleteFile, handleRetryObservation).
+ * 4. utils.parseErrors sekarang benar-benar dipakai di semua path error,
+ *    bukan dead code lagi.
+ * 5. console.log di-gate lewat helper log() supaya tidak berisik di
+ *    production; aktifkan lewat window.APP_DEBUG = true.
  * =======================================================================
  */
 
@@ -16,32 +36,39 @@
     }
     window.__buttonJsInitialized = true;
 
-    console.log('📦 Loading Button.js...');
+    // =============================================
+    // 1.5 DEBUG-GATED LOGGER
+    // =============================================
+    const DEBUG = window.APP_DEBUG === true;
+    const log = (...args) => { if (DEBUG) console.log(...args); };
+    const warn = (...args) => { if (DEBUG) console.warn(...args); };
+
+    log('📦 Loading Button.js...');
 
     // =============================================
-    // 2. WAIT FOR APPCORE (TAMBAHKAN INI)
+    // 2. WAIT FOR APPCORE
     // =============================================
     function waitForAppCore(callback, retries = 30) {
         if (typeof AppCore !== 'undefined' && AppCore) {
-            console.log('✅ AppCore detected');
+            log('✅ AppCore detected');
             callback();
             return;
         }
-        
+
         if (retries === 0) {
-            console.warn('⚠️ AppCore not available after timeout, using fallback mode');
+            warn('⚠️ AppCore not available after timeout, using fallback mode');
             callback();
             return;
         }
-        
-        console.log(`⏳ Waiting for AppCore... (${retries} retries left)`);
+
+        log(`⏳ Waiting for AppCore... (${retries} retries left)`);
         setTimeout(() => {
             waitForAppCore(callback, retries - 1);
         }, 100);
     }
 
     // =============================================
-    // 3. MAIN INITIALIZATION (DI DALAM WAIT)
+    // 3. MAIN INITIALIZATION
     // =============================================
     function initializeButtonJS() {
         // Cek dependensi (AppCore optional)
@@ -52,13 +79,13 @@
 
         const missingDeps = deps.filter(dep => typeof window[dep.global] === 'undefined');
         if (missingDeps.length > 0) {
-            console.warn('⚠️ Button.js: Missing dependencies:', missingDeps.map(d => d.name).join(', '));
+            warn('⚠️ Button.js: Missing dependencies:', missingDeps.map(d => d.name).join(', '));
             // Tetap lanjutkan
         }
 
         const hasAppCore = typeof AppCore !== 'undefined' && AppCore;
         if (!hasAppCore) {
-            console.warn('⚠️ Button.js: Running in fallback mode (without AppCore)');
+            warn('⚠️ Button.js: Running in fallback mode (without AppCore)');
         }
 
         // =============================================
@@ -69,74 +96,233 @@
             TOAST_DURATION: 5000,
             RELOAD_DELAY: 1000,
             DEFAULT_CONFIRM_TITLE: 'Apakah Anda Yakin?',
-            DEFAULT_DELETE_TITLE: 'Apakah Anda Yakin Untuk Hapus Data ini?', 
+            DEFAULT_DELETE_TITLE: 'Apakah Anda Yakin Untuk Hapus Data ini?',
         };
 
-        // ✅ TAMBAHKAN HELPER UNTUK DATATABLE
+        // =============================================
+        // 4.5. GLOBAL DATA TABLE CONTEXT
+        // =============================================
+        const DataTableContext = {
+            // Default context
+            _context: {
+                executeDraw: true,
+                tableId: null,
+                reloadDelay: 1000,
+                autoCloseModal: true,
+                showNotification: true
+            },
+
+            // Stack untuk menyimpan multiple context (jika ada banyak tabel)
+            _stack: [],
+
+            /**
+             * Set context untuk operasi saat ini.
+             * PENTING: setiap pemanggilan set() WAJIB dipasangkan dengan
+             * TEPAT SATU pemanggilan restore() oleh pemanggil yang sama,
+             * supaya stack tidak desync.
+             */
+            set: function(options = {}) {
+                // Simpan context lama ke stack
+                this._stack.push({ ...this._context });
+
+                // Update dengan options baru
+                this._context = {
+                    ...this._context,
+                    ...options
+                };
+
+                log('📊 DataTable Context Set:', this._context);
+                return this._context;
+            },
+
+            /**
+             * Reset ke context sebelumnya.
+             */
+            restore: function() {
+                if (this._stack.length > 0) {
+                    this._context = this._stack.pop();
+                    log('📊 DataTable Context Restored:', this._context);
+                }
+                return this._context;
+            },
+
+            /**
+             * Get current context
+             */
+            get: function() {
+                return this._context;
+            },
+
+            /**
+             * Get specific value
+             */
+            getValue: function(key, defaultValue = null) {
+                return this._context[key] !== undefined ? this._context[key] : defaultValue;
+            },
+
+            /**
+             * Clear all context
+             */
+            clear: function() {
+                this._context = {
+                    executeDraw: true,
+                    tableId: null,
+                    reloadDelay: 1000,
+                    autoCloseModal: true,
+                    showNotification: true
+                };
+                this._stack = [];
+                log('📊 DataTable Context Cleared');
+            },
+
+            /**
+             * Auto-detect table ID dari DOM
+             */
+            detectTableId: function() {
+                // Coba dari element yang aktif
+                const $activeTable = $('table.dataTable:visible').first();
+                if ($activeTable.length) {
+                    const id = $activeTable.attr('id');
+                    if (id) {
+                        this._context.tableId = id;
+                        return id;
+                    }
+                }
+
+                // Coba dari URL atau meta
+                const url = window.location.href;
+                const match = url.match(/table[-_]?id=([^&]+)/i);
+                if (match) {
+                    this._context.tableId = match[1];
+                    return match[1];
+                }
+
+                return null;
+            }
+        };
+
+        // Expose ke global
+        window.DataTableContext = DataTableContext;
+
+        // =============================================
+        // 4.6. DATATABLE HELPER
+        // =============================================
         const DataTableHelper = {
             /**
-             * Reload DataTable dengan aman
-             * Mendukung berbagai cara inisialisasi DataTable
+             * Get target table berdasarkan context atau parameter
              */
-            reload: (table = null) => {
-                // Coba dari parameter
+            _getTargetTable: function(table = null) {
+                // 1. Dari parameter
                 if (table && typeof table.draw === 'function') {
-                    table.draw();
-                    return true;
+                    return table;
                 }
-                
-                // Coba dari variabel global 'datatable'
+
+                // 2. Dari context tableId
+                const tableId = DataTableContext.getValue('tableId');
+                if (tableId) {
+                    const $table = $(`#${tableId}`);
+                    if ($table.length) {
+                        try {
+                            const dt = $table.DataTable();
+                            if (dt && typeof dt.draw === 'function') {
+                                return dt;
+                            }
+                        } catch (e) {}
+                    }
+                }
+
+                // 3. Dari variabel global
                 if (typeof datatable !== 'undefined' && datatable !== null && typeof datatable.draw === 'function') {
-                    datatable.draw();
-                    return true;
+                    return datatable;
                 }
-                
-                // Coba dari variabel global 'table'
+
                 if (typeof table !== 'undefined' && table !== null && typeof table.draw === 'function') {
-                    table.draw();
-                    return true;
+                    return table;
                 }
-                
-                // Coba dari jQuery selector (cari DataTable yang aktif)
+
+                // 4. Auto-detect dari DOM
                 const $tables = $('table.dataTable');
                 if ($tables.length > 0) {
                     try {
-                        const dt = $tables.DataTable();
+                        const dt = $tables.first().DataTable();
                         if (dt && typeof dt.draw === 'function') {
-                            dt.draw();
-                            return true;
+                            // Simpan ID ke context
+                            const id = $tables.first().attr('id');
+                            if (id) {
+                                DataTableContext.set({ tableId: id });
+                            }
+                            return dt;
                         }
-                    } catch (e) {
-                        // Ignore
-                    }
+                    } catch (e) {}
                 }
-                
-                console.warn('⚠️ DataTable tidak ditemukan untuk di-reload');
+
+                warn('⚠️ DataTable tidak ditemukan untuk di-reload');
+                return null;
+            },
+
+            /**
+             * Reload DataTable dengan aman
+             */
+            reload: function(table = null) {
+                const dt = this._getTargetTable(table);
+                if (dt) {
+                    dt.draw();
+                    return true;
+                }
                 return false;
             },
-            
+
             /**
-             * Clear cache dan reload (untuk server-side processing)
+             * Reload dengan clear cache
              */
-            reloadWithCacheClear: (table = null) => {
-                // Coba clear cache dulu
-                if (table && typeof table.clearCache === 'function') {
-                    table.clearCache();
-                    table.draw();
-                    return true;
-                }
-                
-                // Coba dari global datatable
-                if (typeof datatable !== 'undefined' && datatable !== null) {
-                    if (typeof datatable.clearCache === 'function') {
-                        datatable.clearCache();
+            reloadWithCacheClear: function(table = null) {
+                const dt = this._getTargetTable(table);
+                if (dt) {
+                    if (typeof dt.clearCache === 'function') {
+                        dt.clearCache();
                     }
-                    datatable.draw();
+                    dt.draw();
                     return true;
                 }
-                
-                // Fallback ke reload biasa
-                return DataTableHelper.reload(table);
+                return false;
+            },
+
+            /**
+             * Reload dengan delay (untuk kasus tertentu)
+             */
+            reloadDelayed: function(delay = null, table = null) {
+                const delayTime = delay || DataTableContext.getValue('reloadDelay', 1000);
+                setTimeout(() => {
+                    this.reload(table);
+                }, delayTime);
+            },
+
+            /**
+             * Reload dengan semua opsi dari context
+             */
+            reloadWithContext: function(table = null) {
+                const context = DataTableContext.get();
+                const dt = this._getTargetTable(table);
+
+                if (!dt) return false;
+
+                // Clear cache jika diminta
+                if (context.clearCache) {
+                    if (typeof dt.clearCache === 'function') {
+                        dt.clearCache();
+                    }
+                }
+
+                // Draw dengan delay
+                if (context.reloadDelay > 0) {
+                    setTimeout(() => {
+                        dt.draw();
+                    }, context.reloadDelay);
+                } else {
+                    dt.draw();
+                }
+
+                return true;
             }
         };
 
@@ -147,7 +333,7 @@
             csrfToken: () => {
                 const token = $('meta[name="csrf-token"]').attr('content');
                 if (token) return token;
-                
+
                 if (hasAppCore && AppCore.utils) {
                     return AppCore.utils.getMeta('csrf-token');
                 }
@@ -161,14 +347,14 @@
 
             setButtonLoading: ($button, loadingHtml = CONFIG.SPINNER_HTML) => {
                 if (!$button || !$button.length) return () => {};
-                
+
                 const originalHtml = $button.html();
                 const originalDisabled = $button.prop('disabled');
-                
+
                 $button.prop('disabled', true)
                        .addClass('loading')
                        .html(loadingHtml);
-                
+
                 return () => {
                     $button.prop('disabled', originalDisabled)
                            .removeClass('loading')
@@ -182,12 +368,30 @@
                 }
             },
 
-            parseErrors: (xhr) => {
-                if (xhr.responseJSON?.errors) {
-                    const errors = Object.values(xhr.responseJSON.errors).flat();
-                    return errors.join('<br>');
+            /**
+             * Ambil pesan error yang paling relevan, baik dari response
+             * jQuery XHR (xhr.responseJSON) maupun dari error object hasil
+             * fetch/AppCore (error.response.data). Dipakai konsisten di
+             * semua path error di bawah - sebelumnya fungsi ini dead code.
+             */
+            parseErrors: (error) => {
+                // Bentuk jQuery XHR langsung
+                if (error?.responseJSON?.errors) {
+                    return Object.values(error.responseJSON.errors).flat().join('<br>');
                 }
-                return xhr.responseJSON?.message || xhr.statusText || 'Terjadi kesalahan';
+                if (error?.responseJSON?.message) {
+                    return error.responseJSON.message;
+                }
+
+                // Bentuk AppCore / axios-like: error.response.data
+                if (error?.response?.data?.errors) {
+                    return Object.values(error.response.data.errors).flat().join('<br>');
+                }
+                if (error?.response?.data?.message) {
+                    return error.response.data.message;
+                }
+
+                return error?.statusText || error?.message || 'Terjadi kesalahan';
             }
         };
 
@@ -197,7 +401,7 @@
         const UI = {
             notify: (status, message) => {
                 if (!message) return;
-                
+
                 if (hasAppCore && AppCore.ui) {
                     if (status === 'success') {
                         AppCore.ui.notify.success(message);
@@ -241,7 +445,7 @@
                         cancelButtonText: 'Batal'
                     };
                     const config = { ...defaults, ...options };
-                    
+
                     return Swal.fire({
                         ...config,
                         showCancelButton: true,
@@ -257,7 +461,7 @@
                     alert(title);
                     return Promise.resolve();
                 }
-                
+
                 return Swal.fire({
                     icon: 'warning',
                     title,
@@ -272,20 +476,31 @@
         // 7. AJAX HELPERS
         // =============================================
         const Ajax = {
+            /**
+             * Catatan: fungsi ini TIDAK melakukan DataTableContext.restore()
+             * sendiri. Siapa pun yang men-set context sebelum memanggil
+             * fungsi ini bertanggung jawab me-restore-nya (lihat
+             * EventHandlers.handleModalSubmit sebagai contoh pola yang
+             * benar). Ini mencegah double-restore yang bisa membuat stack
+             * context desync ketika ada beberapa operasi berjalan hampir
+             * bersamaan.
+             */
             submitFormData: async ($form, opts = {}) => {
                 const {
                     button = null,
                     closeButton = null,
-                    executeDraw = false,
-                    fallbackReload = false,
-                    reloadDelay = CONFIG.RELOAD_DELAY,
+                    executeDraw = true,
+                    tableId = null,
+                    reloadDelay = 1000,
+                    autoCloseModal = true,
+                    showNotification = true,
                     onSuccess = null,
                     onError = null
                 } = opts;
 
                 const $button = button ? $(button) : null;
                 const restoreButton = $button ? utils.setButtonLoading($button) : (() => {});
-                
+
                 const formData = new FormData($form[0]);
                 const url = $form.attr('action');
                 const method = $form.attr('method') || 'POST';
@@ -298,7 +513,7 @@
                             return;
                         }
                     }
-                    console.log('📦 Submitting form...submitFormData');
+                    log('📦 Submitting form...submitFormData');
                     let response;
                     if (hasAppCore && AppCore.ajax) {
                         response = await AppCore.ajax.request({
@@ -321,40 +536,50 @@
                             });
                         });
                     }
-                    
+
                     if (response.status === 'success' || response.success === true) {
                         $form[0].reset();
-                        
-                        if (closeButton) $(closeButton).trigger('click');
-                        
-                        if (ctx.executeDraw) {
-                            DataTableHelper.reloadWithCacheClear();
-                        } else if (response.redirectTo) {
+
+                        // Auto close modal
+                        if (autoCloseModal && closeButton) {
+                            $(closeButton).trigger('click');
+                        }
+
+                        // Reload DataTable
+                        if (executeDraw) {
+                            if (tableId) {
+                                DataTableHelper.reloadDelayed(reloadDelay, $(`#${tableId}`).DataTable());
+                            } else {
+                                DataTableHelper.reloadWithContext();
+                            }
+                        }
+
+                        // Redirect jika ada
+                        if (response.redirectTo) {
                             setTimeout(() => {
                                 window.location.href = response.redirectTo;
                             }, reloadDelay);
-                        } else if (response.reloadPage || fallbackReload) {
-                            setTimeout(() => {
-                                window.location.reload();
-                            }, reloadDelay);
                         }
-                        
-                        UI.notify('success', response.message);
-                        
-                        if (onSuccess) onSuccess(response);
+
+                        // Notification
+                        if (showNotification) {
+                            UI.notify('success', response.message);
+                        }
+
                     } else {
                         UI.notify('error', response.message || 'Terjadi kesalahan');
                         if (onError) onError(response);
-                    } 
+                    }
                     restoreButton();
+                    if (onSuccess) onSuccess(response);
                     $form.find('button[type="submit"]').prop('disabled', false);
 
                 } catch (error) {
                     restoreButton();
                     $form.find('button[type="submit"]').prop('disabled', false);
-                    
+
                     if (onError) onError(error);
-                    UI.notify('error', error.response?.data?.message || 'Terjadi kesalahan');
+                    UI.notify('error', utils.parseErrors(error));
                 }
             },
 
@@ -375,7 +600,7 @@
 
                 try {
                     let response;
-                    console.log('📦 Submitting form...deleteWithConfirm');
+                    log('📦 Submitting form...deleteWithConfirm');
                     if (hasAppCore && AppCore.ajax) {
                         response = await AppCore.ajax.request({
                             url,
@@ -401,7 +626,7 @@
 
                 } catch (error) {
                     if (onError) onError(error);
-                    UI.notify('error', error.response?.data?.message || 'Gagal menghapus data');
+                    UI.notify('error', utils.parseErrors(error));
                     throw error;
                 }
             },
@@ -430,7 +655,7 @@
 
                 try {
                     let response;
-                    console.log('📦 Submitting form...getWithConfirm');
+                    log('📦 Submitting form...getWithConfirm');
                     if (hasAppCore && AppCore.ajax) {
                         response = await AppCore.ajax.request({
                             url,
@@ -459,7 +684,7 @@
                     return response;
 
                 } catch (error) {
-                    await Swal.fire('Error!', 'Terjadi kesalahan.', 'error');
+                    await Swal.fire('Error!', utils.parseErrors(error), 'error');
                     throw error;
                 }
             },
@@ -467,7 +692,7 @@
             loadModalContent: async (url, $modal, title, opts = {}) => {
                 const $target = $modal.find('.modal-body');
                 const $title = $modal.find('h5.modal-title');
-                
+
                 if ($title.length) {
                     $title.html('<span></span>').find('span').text(title || '');
                 }
@@ -500,7 +725,7 @@
                     }
 
                     if (opts.afterLoad) opts.afterLoad($target);
-                    
+
                     if (hasAppCore && AppCore.refresh) {
                         AppCore.refresh($target[0]);
                     }
@@ -509,7 +734,7 @@
                     $target.removeClass('loading').html(`
                         <div class="alert alert-danger">
                             <i class="fas fa-exclamation-circle me-2"></i>
-                            Gagal memuat konten: ${error.message || 'Terjadi kesalahan'}
+                            Gagal memuat konten: ${utils.parseErrors(error)}
                         </div>
                     `);
                 }
@@ -531,53 +756,124 @@
                     .on('click', '.deleteFile', this.handleDeleteFile)
                     .on('click', '.deleteIconFile', this.handleDeleteIconFile)
                     .on('click', '#retry-observation', this.handleRetryObservation)
-                    .on('change', 'input.email_verification_status', this.handleEmailVerification);
+                    .on('change', 'input.email_verification_status', this.handleEmailVerification)
+                    .on('click', '[data-datatable-context]', this.handleSetContext)
+                    .on('click', '[data-datatable-reset]', this.handleResetContext);
             },
 
+            /**
+             * HANDLE SET CONTEXT DARI ATTRIBUTE
+             * Contoh penggunaan:
+             * <button data-datatable-context='{"executeDraw":true,"tableId":"action-table"}'>
+             */
+            handleSetContext: function(e) {
+                const $button = $(this);
+                const contextData = $button.data('datatable-context');
+
+                if (contextData) {
+                    if (typeof contextData === 'string') {
+                        try {
+                            const parsed = JSON.parse(contextData);
+                            DataTableContext.set(parsed);
+                        } catch (e) {
+                            warn('⚠️ Invalid JSON in data-datatable-context');
+                        }
+                    } else {
+                        DataTableContext.set(contextData);
+                    }
+                }
+            },
+
+            /**
+             * HANDLE RESET CONTEXT
+             */
+            handleResetContext: function(e) {
+                e.preventDefault();
+                DataTableContext.restore();
+            },
+
+            /**
+             * Handle klik tombol submit di dalam modal.
+             *
+             * Pola yang benar untuk context stack:
+             * set() dipanggil sekali di sini -> restore() juga dipanggil
+             * TEPAT SEKALI di sini (lewat onSuccess/onError), dan
+             * Ajax.submitFormData TIDAK ikut melakukan restore.
+             */
             handleModalSubmit: function(e) {
                 e.preventDefault();
-                
+
                 const $button = $(this);
                 const $form = $button.closest('.modal-content').find('form');
                 const $closeButton = $button.closest('.modal').find('button.btn-close');
-                const executeDraw = utils.toBool($button.attr('data-is_execute_drawer'), true);
-                
-                 
+
+                // Ambil dari context atau attribute
+                let executeDraw = DataTableContext.getValue('executeDraw', true);
+                let tableId = DataTableContext.getValue('tableId');
+
+                // Override dari attribute jika ada
+                if ($button.attr('data-is_execute_drawer') !== undefined) {
+                    executeDraw = utils.toBool($button.attr('data-is_execute_drawer'), true);
+                }
+                if ($button.attr('data-datatable-id')) {
+                    tableId = $button.attr('data-datatable-id');
+                }
+
+                // Set context sebelum submit
+                DataTableContext.set({
+                    executeDraw,
+                    tableId,
+                    autoCloseModal: DataTableContext.getValue('autoCloseModal', true)
+                });
+
                 Ajax.submitFormData($form, {
                     button: $button,
                     closeButton: $closeButton,
-                    executeDraw
+                    executeDraw,
+                    tableId,
+                    onSuccess: function(response) {
+                        DataTableContext.restore();
+                    },
+                    onError: function(error) {
+                        DataTableContext.restore();
+                    }
                 });
             },
 
+            /**
+             * Handle klik tombol dengan class .submit-button.
+             *
+             * Sebelumnya method ini di-reference di init() tapi tidak
+             * pernah didefinisikan (this.handleSubmitButton === undefined),
+             * yang membuat jQuery .on() menerima handler undefined dan
+             * salah menafsirkan selector '.submit-button' sebagai handler
+             * -> crash "Cannot create property 'guid' on string".
+             *
+             * Implementasi ini menyimpan context tombol (button, tombol
+             * close modal, flag executeDraw) ke $form.data('submitCtx'),
+             * lalu men-trigger event native 'submit' pada form terdekat.
+             * handleFormSubmit sudah dirancang untuk membaca
+             * $form.data('submitCtx') persis untuk kasus ini.
+             */
             handleSubmitButton: function(e) {
                 e.preventDefault();
 
                 const $button = $(this);
-                const formTarget = $button.attr('data-form-target');
-                const $form = formTarget ? $(formTarget) : $button.closest('form');
-                
+                const $form = $button.closest('form');
+
                 if (!$form.length) {
-                    UI.notify('error', 'Form tidak ditemukan');
+                    warn('⚠️ .submit-button diklik tapi tidak ditemukan <form> terdekat');
                     return;
                 }
-
-                const isNeedSign = utils.toBool($button.attr('data-is_need_sign'), false);
-                const executeDraw = utils.toBool($button.attr('data-is_execute_drawer'), true);
 
                 $form.data('submitCtx', {
-                    targetElement: $button.data('target'),
+                    targetElement: $form.data('target'),
                     button: $button,
                     closeButton: $button.closest('.modal').find('button.btn-close'),
-                    executeDraw
+                    executeDraw: utils.toBool($button.attr('data-is_execute_drawer'), true)
                 });
 
-                if (!isNeedSign) {
-                    $form.trigger('submit');
-                    return;
-                }
-
-                this.proceedSignedSubmit($form, $button);
+                $form.trigger('submit');
             },
 
             proceedSignedSubmit: async function($form, $button) {
@@ -592,7 +888,7 @@
 
             handleFormSubmit: function(e) {
                 e.preventDefault();
-                
+
                 const $form = $(this);
                 const ctx = $form.data('submitCtx') || {
                     targetElement: $form.data('target'),
@@ -600,7 +896,7 @@
                     closeButton: $form.closest('.modal').find('button.btn-close'),
                     executeDraw: utils.toBool($form.attr('data-is_execute_drawer'), false)
                 };
-                
+
                 $form.removeData('submitCtx');
 
                 if ($form.validate && $form.data('validator')) {
@@ -646,7 +942,7 @@
                 ajaxPromise
                     .then(response => {
                         restoreButton();
-                        console.log('📦 Submitting form...handleFormSubmit');
+                        log('📦 Submitting form...handleFormSubmit');
                         if (response.status === 'success' || response.success === true) {
                             UI.notify('success', response.message || 'Data berhasil disimpan');
                             $(document).trigger('form:saved', [$form.attr('id')]);
@@ -670,25 +966,27 @@
                         if (ctx.closeButton && ctx.closeButton.length) {
                             ctx.closeButton.trigger('click');
                         }
-                        
-                        if (ctx.executeDraw && typeof datatable !== 'undefined' && datatable !== null) {
-                            datatable.draw();
+
+                        // Disatukan lewat DataTableHelper (sebelumnya
+                        // langsung memanggil variabel global `datatable`).
+                        if (ctx.executeDraw) {
+                            DataTableHelper.reload();
                         }
                     })
                     .catch(error => {
                         restoreButton();
-                        UI.notify('error', error.response?.data?.message || 'Terjadi kesalahan');
+                        UI.notify('error', utils.parseErrors(error));
                     });
             },
 
             handleInlineNavigation: function(e) {
                 e.preventDefault();
-                
+
                 const href = $(this).attr('data-url');
                 if (href && href.length > 0 && href !== '#') {
                     $('.btn-close').trigger('click');
                 }
-                
+
                 if (typeof loadSliceData === 'function') {
                     loadSliceData(href, null, 'div.main-content');
                 } else {
@@ -698,11 +996,11 @@
 
             handleBackButton: function(e) {
                 e.preventDefault();
-                
+
                 const href = $(this).attr('data-url');
                 if (href && href.length > 0 && href !== '#') {
                     window.history.pushState({ urlPath: href }, '', href);
-                    
+
                     if (typeof loadSliceData === 'function') {
                         loadSliceData(href, null, 'div.main-content');
                     } else {
@@ -711,23 +1009,55 @@
                 }
             },
 
+            /**
+             * Handle klik tombol delete.
+             *
+             * Sama seperti handleModalSubmit: set() dan restore() dipanggil
+             * di tempat yang sama (di sini), Ajax.deleteWithConfirm tidak
+             * ikut me-restore context.
+             */
             handleDeleteButton: function() {
-                const url = $(this).data('url');
+                const $button = $(this);
+                const url = $button.data('url');
+
+                // Ambil dari attribute atau context
+                let executeDraw = utils.toBool($button.attr('data-is_execute_drawer'), true);
+                let tableId = $button.attr('data-datatable-id') || DataTableContext.getValue('tableId');
+
+                // Jika executeDraw dari context tapi tidak override
+                if ($button.attr('data-is_execute_drawer') === undefined) {
+                    executeDraw = DataTableContext.getValue('executeDraw', true);
+                }
+
+                // Set context sebelum delete
+                DataTableContext.set({
+                    executeDraw,
+                    tableId
+                });
+
                 Ajax.deleteWithConfirm(url, {
-                    onSuccess: () => {
-                         if (executeDraw) {
-                            DataTableHelper.reloadWithCacheClear();
+                    onSuccess: function(response) {
+                        if (executeDraw) {
+                            if (tableId) {
+                                DataTableHelper.reload($(`#${tableId}`).DataTable());
+                            } else {
+                                DataTableHelper.reloadWithContext();
+                            }
                         }
+                        DataTableContext.restore();
+                    },
+                    onError: function(error) {
+                        DataTableContext.restore();
                     }
                 });
             },
 
             handleDeleteFile: function(e) {
                 e.preventDefault();
-                
+
                 const $row = $(this).closest('tr');
                 const url = $(this).parent().attr('data-url') || $(this).attr('data-url');
-                
+
                 if (!url) {
                     UI.notify('error', 'URL tidak ditemukan');
                     return;
@@ -736,16 +1066,16 @@
                 Ajax.deleteWithConfirm(url, {
                     onSuccess: () => {
                         $row.remove();
-                        if (typeof datatable !== 'undefined') {
-                            datatable.draw();
-                        }
+                        // Disatukan lewat DataTableHelper (sebelumnya
+                        // langsung memanggil variabel global `datatable`).
+                        DataTableHelper.reload();
                     }
                 });
             },
 
             handleDeleteIconFile: function(e) {
                 e.preventDefault();
-                
+
                 const $target = $(this).parent();
                 const $downloadLink = $(this).closest('form').find('.download-link');
                 const url = $(this).attr('data-url');
@@ -764,25 +1094,24 @@
 
             handleRetryObservation: function() {
                 const url = $(this).data('url');
-                
+
                 Ajax.getWithConfirm(url, {
                     confirmTitle: 'Konfirmasi',
                     confirmText: 'Apakah Anda yakin ingin mengulang observasi?',
                     confirmButtonText: 'Ya, Ulangi',
                     onSuccess: (response) => {
-                        if (typeof datatable !== 'undefined') {
-                            datatable.draw();
-                        }
+                        // Disatukan lewat DataTableHelper (sebelumnya
+                        // langsung memanggil variabel global `datatable`).
+                        DataTableHelper.reload();
                     }
                 });
             },
-
 
             handleEmailVerification: function() {
                 const $checkbox = $(this);
                 const url = $checkbox.data('url');
                 const isChecked = $checkbox.is(':checked');
-                
+
                 Ajax.getWithConfirm(url, {
                     confirmTitle: 'Konfirmasi Verifikasi Email',
                     confirmText: isChecked ? 'Aktifkan verifikasi email?' : 'Nonaktifkan verifikasi email?',
@@ -846,7 +1175,7 @@
         function init() {
             EventHandlers.init();
             DarkMode.init();
-            console.log('✅ Button.js initialized successfully');
+            log('✅ Button.js initialized successfully');
         }
 
         // =============================================
@@ -883,6 +1212,5 @@
     // START - Tunggu AppCore
     // =============================================
     waitForAppCore(initializeButtonJS);
-    
 
 })();

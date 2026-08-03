@@ -29,8 +29,9 @@ class ActionDataTable extends DataTable
                             data-toggle="ajax-modal"
                             data-size="lg"
                             data-method="GET"
-                            data-title="Detail Action '.$row->name.'"
-                            data-url="'. route('action.edit', $row).'"
+                            data-title="Detail Action '.e($row->name).'"
+                            data-url="'. route('action.edit', e($row->id)).'"
+                            data-datatable-context=\'{"executeDraw":true,"tableId":"action-table","reloadDelay":500}\'
                             data-submit=\'<button class="btn btn-primary modal-submit" type="button" data-is_execute_drawer="true" data-datatable-id="action-table">Simpan</button>\'
                             data-cancel=\'<button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Batal</button>\'>
                             <span class="material-symbols-outlined">edit</span>

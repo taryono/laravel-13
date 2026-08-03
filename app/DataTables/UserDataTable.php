@@ -13,42 +13,21 @@ use Yajra\DataTables\Services\DataTable;
 class UserDataTable extends DataTable
 {
     /**
+     * Kolom yang ditampilkan di tabel (selain DT_RowIndex & action).
+     * Sebelumnya berasal dari string hasil artisan command yang di-explode
+     * ulang ("id', 'name") — sekarang jadi array biasa agar tidak rapuh
+     * terhadap karakter khusus (koma, apostrof) pada nama kolom.
+     */
+    protected array $columns = ['id', 'name'];
+
+    /**
      * Build DataTable response.
      */
-
-      public function dataTable(QueryBuilder $query): EloquentDataTable
+    public function dataTable(QueryBuilder $query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
             ->addColumn('action', function ($row) {
-                return '
-                    <div class="d-flex justify-content-center gap-1">
-
-                        <button
-                            type="button"
-                            class="btn btn-sm btn-primary"
-                            data-toggle="ajax-modal"
-                            data-size="lg"
-                            data-method="GET"
-                            data-title="Detail User '.$row->name.'"
-                            data-url="'. route('user.edit', $row).'"
-                            data-submit=\'<button class="btn btn-primary modal-submit" type="button" data-is_execute_drawer="true" data-datatable-id="user-table">Simpan</button>\'
-                            data-cancel=\'<button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Batal</button>\'>
-                            <span class="material-symbols-outlined">edit</span>
-                        </button>
-
-                        <button
-                            type="button"
-                            class="btn btn-sm btn-danger delete-button"
-                            data-confirm-delete="true"
-                            data-is_execute_drawer="true"
-                            data-url="' . route('user.destroy', $row) . '"
-                            title="Hapus"
-                        >
-                            <span class="material-symbols-outlined">delete</span>
-                        </button>
-
-                    </div>
-                ';
+                return $this->renderActionButtons($row);
             })
             ->addIndexColumn()
             ->rawColumns(['action']) // ✅ Tetap wajib ada!
@@ -56,12 +35,71 @@ class UserDataTable extends DataTable
     }
 
     /**
+     * Render tombol aksi (edit & delete) untuk satu baris.
+     *
+     * Catatan perbaikan:
+     * - $row->name di-escape dengan e() untuk mencegah XSS/attribute
+     *   breakout jika nama user mengandung karakter " atau <script>.
+     * - Payload JSON pada data-datatable-context sebelumnya rusak
+     *   (ada karakter " nyasar sebelum { sehingga attribute HTML
+     *   terpotong di kutip pertama). Sekarang dibangun via
+     *   json_encode() lalu di-escape dengan htmlspecialchars() agar
+     *   valid ditaruh di dalam attribute HTML.
+     */
+    protected function renderActionButtons($row): string
+    {
+        $title = e('Detail User ' . $row->name);
+
+        $context = htmlspecialchars(
+            json_encode([
+                'executeDraw' => true,
+                'tableId'     => 'user-table',
+                'reloadDelay' => 500,
+            ]),
+            ENT_QUOTES,
+            'UTF-8'
+        );
+
+        $editUrl   = e(route('user.edit', $row));
+        $deleteUrl = e(route('user.destroy', $row));
+
+        return <<<HTML
+            <div class="d-flex justify-content-center gap-1">
+
+                <button
+                    type="button"
+                    class="btn btn-sm btn-primary"
+                    data-toggle="ajax-modal"
+                    data-size="lg"
+                    data-method="GET"
+                    data-title="{$title}"
+                    data-url="{$editUrl}"
+                    data-datatable-context='{$context}'
+                    data-submit='<button class="btn btn-primary modal-submit" type="button" data-is_execute_drawer="true" data-datatable-id="user-table">Simpan</button>'
+                    data-cancel='<button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Batal</button>'>
+                    <span class="material-symbols-outlined">edit</span>
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-sm btn-danger delete-button"
+                    data-confirm-delete="true"
+                    data-is_execute_drawer="true"
+                    data-url="{$deleteUrl}"
+                    title="Hapus"
+                >
+                    <span class="material-symbols-outlined">delete</span>
+                </button>
+
+            </div>
+        HTML;
+    }
+
+    /**
      * Get query source of DataTable.
      */
-    public function query(
-        User $model
-    ): QueryBuilder {
-
+    public function query(User $model): QueryBuilder
+    {
         return $model->newQuery();
     }
 
@@ -77,20 +115,14 @@ class UserDataTable extends DataTable
              * Asesi -> asesi-table
              * Asesor -> asesor-table
              */
-            ->setTableId(
-                'user-table'
-            )
+            ->setTableId('user-table')
 
-            ->columns(
-                $this->getColumns()
-            )
+            ->columns($this->getColumns())
 
             /*
              * Server-side AJAX endpoint.
              */
-            ->minifiedAjax(
-                route('user.index')
-            )
+            ->minifiedAjax(route('user.index'))
 
             /*
              * Default sorting:
@@ -158,20 +190,15 @@ class UserDataTable extends DataTable
 
                     'search' => 'Cari:',
 
-                    'lengthMenu' =>
-                        'Tampilkan _MENU_ data',
+                    'lengthMenu' => 'Tampilkan _MENU_ data',
 
-                    'info' =>
-                        'Menampilkan _START_ sampai _END_ dari _TOTAL_ data',
+                    'info' => 'Menampilkan _START_ sampai _END_ dari _TOTAL_ data',
 
-                    'infoEmpty' =>
-                        'Tidak ada data',
+                    'infoEmpty' => 'Tidak ada data',
 
-                    'zeroRecords' =>
-                        'Data tidak ditemukan',
+                    'zeroRecords' => 'Data tidak ditemukan',
 
-                    'emptyTable' =>
-                        'Belum ada data',
+                    'emptyTable' => 'Belum ada data',
 
                     'paginate' => [
                         'first' => 'Awal',
@@ -193,9 +220,7 @@ class UserDataTable extends DataTable
                             download
                         </span> Excel'
                     )
-                    ->className(
-                        'btn btn-success btn-sm'
-                    ),
+                    ->className('btn btn-success btn-sm'),
 
                 Button::make('csv')
                     ->text(
@@ -203,9 +228,7 @@ class UserDataTable extends DataTable
                             description
                         </span> CSV'
                     )
-                    ->className(
-                        'btn btn-primary btn-sm'
-                    ),
+                    ->className('btn btn-primary btn-sm'),
 
                 Button::make('pdf')
                     ->text(
@@ -213,9 +236,7 @@ class UserDataTable extends DataTable
                             picture_as_pdf
                         </span> PDF'
                     )
-                    ->className(
-                        'btn btn-danger btn-sm'
-                    ),
+                    ->className('btn btn-danger btn-sm'),
 
                 Button::make('print')
                     ->text(
@@ -223,9 +244,7 @@ class UserDataTable extends DataTable
                             print
                         </span> Print'
                     )
-                    ->className(
-                        'btn btn-primary btn-sm'
-                    ),
+                    ->className('btn btn-primary btn-sm'),
 
                 Button::make([
                     'text' => '<span class="material-symbols-outlined align-middle">refresh</span>',
@@ -239,37 +258,35 @@ class UserDataTable extends DataTable
 
     /**
      * Get DataTable columns.
-     */
-    /**
-     * Ambil daftar kolom secara OTOMATIS dari perintah artisan
      *
-     * @return array
+     * Sebelumnya kolom didapat dari string literal hasil artisan command
+     * ("id', 'name") lalu di-explode ulang menggunakan pemisah "', '".
+     * Pendekatan ini rapuh: jika ada nama kolom yang mengandung apostrof,
+     * koma, atau formatnya berubah, hasilnya bisa salah tanpa error yang
+     * jelas. Sekarang kolom didefinisikan langsung sebagai array di
+     * properti $columns.
      */
     protected function getColumns(): array
     {
-        // Daftar kolom yang dikirim dari command: id', 'name
-        $kolomDariCommand = explode("', '", "id', 'name");
-
-        // Ubah jadi format Column::make()
-        $daftarKolom = [];
-        foreach ($kolomDariCommand as $namaKolom) {
-            $daftarKolom[] = Column::make($namaKolom)->title(ucwords(str_replace('_', ' ', $namaKolom)));
-        }
+        $daftarKolom = collect($this->columns)
+            ->map(fn (string $kolom) => Column::make($kolom)
+                ->title(ucwords(str_replace('_', ' ', $kolom))))
+            ->all();
 
         $daftarKolom[] = Column::make('DT_RowIndex')
-                ->title('No')
-                ->orderable(false)
-                ->searchable(false)
-                ->width(80)
-                ->addClass('text-center');
+            ->title('No')
+            ->orderable(false)
+            ->searchable(false)
+            ->width(80)
+            ->addClass('text-center');
 
         // Tambah kolom Aksi di paling akhir
         $daftarKolom[] = Column::computed('action')
-                                ->exportable(false)
-                                ->printable(false)
-                                ->width(120)
-                                ->addClass('text-center')
-                                ->title('Aksi');
+            ->exportable(false)
+            ->printable(false)
+            ->width(120)
+            ->addClass('text-center')
+            ->title('Aksi');
 
         return $daftarKolom;
     }

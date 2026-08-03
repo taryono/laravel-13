@@ -31,6 +31,7 @@ class ActionRoleDataTable extends DataTable
                             data-method="GET"
                             data-title="Detail ActionRole '.$row->name.'"
                             data-url="'. route('action-role.edit', $row).'"
+                            data-datatable-context=\'"{"executeDraw":true,"tableId":"action-role-table","reloadDelay":500}\'
                             data-submit=\'<button class="btn btn-primary modal-submit" type="button" data-datatable-id="action-role-table">Simpan</button>\'
                             data-cancel=\'<button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Batal</button>\'>
                             <span class="material-symbols-outlined">edit</span>

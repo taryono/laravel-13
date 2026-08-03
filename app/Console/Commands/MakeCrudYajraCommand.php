@@ -11,6 +11,7 @@ class MakeCrudYajraCommand extends Command
     protected $signature = 'make:crud-yajra
                             {name : Nama Model (contoh: Product)}
                             {--columns= : Daftar kolom untuk DataTable & validasi, pisahkan dengan koma (contoh: id,name,email)}
+                            {--namespace=Models : Namespace kustom untuk Model, mis. Models atau App\\Models}
                             {--no-menu : Jangan buat menu otomatis untuk super-admin}';
 
     protected $description = 'Otomatis membuat CRUD lengkap dengan Yajra DataTables dan struktur Modular';
@@ -36,7 +37,12 @@ class MakeCrudYajraCommand extends Command
     public function handle()
     {
         $name = Str::studly($this->argument('name'));
-        $modelNamespace = $this->option('model-namespace') ?: 'Models';
+
+        // FIX: sebelumnya memanggil $this->option('model-namespace') yang
+        // tidak terdaftar di $signature -> InvalidArgumentException.
+        // Sekarang pakai opsi --namespace yang sudah didaftarkan, default 'Models'.
+        $modelNamespace = $this->option('namespace') ?: 'Models';
+
         // FIX: sanitasi kolom dari --columns (trim, buang kosong, snake_case,
         // buang karakter selain huruf/angka/underscore) supaya tidak ada
         // input aneh yang lolos mentah ke dalam stub.
@@ -50,8 +56,15 @@ class MakeCrudYajraCommand extends Command
             return Command::FAILURE;
         }
 
-        $columnsString = implode("', '", $columnsArray); // untuk stub datatable, mis: ['id', 'name']
-        $columnsListHtml = implode(', ', $columnsArray);  // untuk tampilan blade
+        // FIX: sebelumnya $columnsString dibangun tanpa kurung siku/kutip
+        // pembuka-penutup (mis. "id', 'name"), yang hanya valid jika stub
+        // membungkusnya manual dengan explode() dari string literal --
+        // pola yang sama rapuhnya dengan bug yang sudah diperbaiki di
+        // UserDataTable.php. Sekarang kita generate array literal PHP yang
+        // lengkap dan valid, supaya stub tinggal assign langsung ke
+        // property: `protected array $columns = {{columnsArray}};`
+        $columnsPhpArray = "['" . implode("', '", $columnsArray) . "']";
+        $columnsListHtml = implode(', ', $columnsArray); // untuk tampilan blade
 
         /*
         |--------------------------------------------------------------------------
@@ -66,7 +79,7 @@ class MakeCrudYajraCommand extends Command
             'create.yajra.stub',
             'edit.yajra.stub',
             'route.yajra.stub',
-            'model.yajra.stub', // ✅ Tambahkan ini
+            'model.yajra.stub',
         ];
 
         foreach ($requiredStubs as $stub) {
@@ -92,6 +105,10 @@ class MakeCrudYajraCommand extends Command
         $modelTableId = "{$modelRoutePrefix}-table";
         $title = Str::title(str_replace('-', ' ', $modelRoutePrefix));
 
+        // FIX: $tableName sebelumnya dipakai di $replacements tanpa pernah
+        // didefinisikan -> Undefined variable $tableName (fatal).
+        $tableName = $this->getTableName($name);
+
         // FIX: bangun validation rules dari --columns, dipakai di controller.yajra.stub
         // untuk menggantikan rule hardcoded 'name' saja.
         $validationRules = $this->buildValidationRules($columnsArray);
@@ -104,11 +121,11 @@ class MakeCrudYajraCommand extends Command
             '{{modelRoutePrefix}}'    => $modelRoutePrefix,
             '{{modelTableId}}'        => $modelTableId,
             '{{title}}'               => $title,
-            '{{columnsArray}}'        => $columnsString,
+            '{{columnsArray}}'        => $columnsPhpArray,
             '{{columnsList}}'         => $columnsListHtml,
             '{{validationRules}}'     => $validationRules,
-            '{{namespace}}'           => $modelNamespace, // ✅ Tambahkan ini
-            '{{tableName}}'           => $tableName,      // ✅ Tambahkan ini
+            '{{namespace}}'           => $modelNamespace,
+            '{{tableName}}'           => $tableName,
         ];
 
         $this->newLine();
@@ -122,26 +139,21 @@ class MakeCrudYajraCommand extends Command
         */
         $this->newLine();
         $this->info('Membuat Model & Migration...');
-        // $this->call('make:model', [
-        //     'name' => $name,
-        //     '-m'   => true,
-        // ]);
         $this->generateModelWithCustomNamespace($name, $modelNamespace, $replacements);
+
         // Generate migration terpisah
         $this->call('make:migration', [
-            'name' => "create_{$this->getTableName($name)}_table",
-            '--create' => $this->getTableName($name),
+            'name' => "create_{$tableName}_table",
+            '--create' => $tableName,
         ]);
 
-    $this->warn("⚠ Model dibuat dengan namespace: {$modelNamespace}\\{$name}");
-        // PERHATIAN: make:model default membuat model di Models\{$name}.
-        // Jika project ini pakai namespace root "Models\" (tanpa App\), seperti
-        // yang diasumsikan controller.yajra.stub, pastikan composer.json sudah
-        // punya psr-4 mapping "Models\\": "Models/" DAN model di-generate ke
-        // folder yang benar -- kalau tidak, controller hasil generate akan
-        // "Class not found" saat dipanggil. Sesuaikan opsi make:model atau
-        // pindahkan file model secara manual sesuai konvensi project.
-        $this->warn("⚠ Cek namespace model {$name}: pastikan sesuai dengan 'use Models\\{$name};' di controller.");
+        $this->warn("⚠ Model dibuat dengan namespace: {$modelNamespace}\\{$name}");
+        // PERHATIAN: pastikan composer.json sudah punya psr-4 mapping yang
+        // sesuai untuk namespace ini (mis. "Models\\": "Models/" jika pakai
+        // namespace root "Models\", atau default "App\\": "app/" jika pakai
+        // "App\Models"). Kalau tidak sesuai, controller hasil generate akan
+        // "Class not found" saat dipanggil.
+        $this->warn("⚠ Cek namespace model {$name}: pastikan sesuai dengan 'use {$modelNamespace}\\{$name};' di controller.");
 
         $this->newLine();
         $this->generateDataTable($name, $replacements);
@@ -172,7 +184,7 @@ class MakeCrudYajraCommand extends Command
         $this->line('');
         $this->line("📁 Module   : app/Modules/{$name}");
         $this->line("📊 DataTable: app/DataTables/{$name}DataTable.php");
-        $this->line("🗃 Model    : Models/{$name}.php");
+        $this->line("🗃 Model    : {$modelNamespace}\\{$name}");
         $this->line("🌐 Route    : {$modelRoutePrefix}");
         $this->line("📋 Table ID : {$modelTableId}");
         $this->line('📌 Kolom    : ' . implode(', ', $columnsArray));
@@ -340,7 +352,7 @@ class MakeCrudYajraCommand extends Command
     protected function registerMenuForSuperAdmin(string $name, array $replacements): void
     {
         $superAdminRoleName = 'super-admin'; // Sesuaikan dengan role name Anda
-        
+
         // Cek apakah model Role dan Menu tersedia
         if (!class_exists(\Models\Role::class) || !class_exists(\Models\Menu::class)) {
             $this->warn('⚠ Model Role atau Menu tidak ditemukan, lewati registrasi menu.');
@@ -348,7 +360,7 @@ class MakeCrudYajraCommand extends Command
         }
 
         $role = \Models\Role::where('name', $superAdminRoleName)->first();
-        
+
         if (!$role) {
             $this->warn("⚠ Role '{$superAdminRoleName}' tidak ditemukan, lewati registrasi menu.");
             return;
@@ -360,7 +372,7 @@ class MakeCrudYajraCommand extends Command
             'parent_id' => null,
             'title' => $replacements['{{title}}'],
             'flyout_title' => null,
-            'icon' => $this->getIconForModel($name), // Method untuk ikon
+            'icon' => $this->getIconForModel($name),
             'icon_type' => 'material',
             'route' => "{$replacements['{{modelRoutePrefix}}']}.index",
             'url' => $replacements['{{modelRoutePrefix}}'],
@@ -396,7 +408,6 @@ class MakeCrudYajraCommand extends Command
      */
     protected function getIconForModel(string $name): string
     {
-        // Mapping ikon berdasarkan nama model
         $icons = [
             'Product' => 'inventory_2',
             'Category' => 'category',
@@ -416,34 +427,72 @@ class MakeCrudYajraCommand extends Command
     }
 
     /**
-     * Generate model dengan namespace kustom
+     * Generate model dengan namespace kustom.
+     *
+     * FIX: sebelumnya file model SELALU ditulis ke app_path("Models/...")
+     * (yaitu app/Models/), padahal warning di handle() secara eksplisit
+     * mengasumsikan namespace root "Models\" (tanpa "App\") yang mestinya
+     * dipetakan psr-4 ke folder "Models/" di ROOT project, bukan di dalam
+     * app/. Sekarang path file ditentukan dari namespace-nya sendiri lewat
+     * resolveModelPath(), supaya konsisten dengan opsi --namespace.
      */
-    protected function generateModelWithCustomNamespace(string $name, string $namespace, array $replacement): void
+    protected function generateModelWithCustomNamespace(string $name, string $namespace, array $replacements): void
     {
-        $modelPath = app_path("Models/{$name}.php");
-        
-        // Buat folder jika belum ada
-        if (!File::exists(app_path('Models'))) {
-            File::makeDirectory(app_path('Models'), 0755, true);
+        $modelPath = $this->resolveModelPath($namespace, $name);
+        $modelDir = dirname($modelPath);
+
+        if (!File::exists($modelDir)) {
+            File::makeDirectory($modelDir, 0755, true);
         }
-        
-        // Gunakan stub custom atau buat manual
-        $stub = $this->getModelStub($name, $namespace, $replacement);
+
+        $stub = $this->getModelStub($replacements);
         File::put($modelPath, $stub);
-        
+
         $this->info("✔ Model: {$modelPath} dengan namespace {$namespace}");
     }
 
     /**
-     * Generate stub model dengan namespace kustom
+     * Tentukan path file model dari namespace-nya.
+     *
+     * - Jika namespace diawali "App\", dianggap mengikuti struktur standar
+     *   Laravel -> dipetakan ke app/<sisa-namespace>/.
+     * - Selain itu, diasumsikan psr-4 mapping root-level (mis. namespace
+     *   "Models" -> folder "Models/" di root project), sesuai warning yang
+     *   ditampilkan ke user di handle().
+     *
+     * Catatan: ini heuristik. Kalau project punya psr-4 mapping custom di
+     * luar dua pola di atas, sesuaikan method ini atau pindahkan file model
+     * secara manual setelah generate.
      */
-    protected function getModelStub(string $name, string $namespace, array $replacement): string
+    protected function resolveModelPath(string $namespace, string $name): string
     {
-        $tableName = $this->getTableName($name);
-        
+        if (Str::startsWith($namespace, 'App\\')) {
+            $relative = Str::after($namespace, 'App\\');
+            $relativePath = $relative !== '' ? str_replace('\\', '/', $relative) . '/' : '';
+            return app_path("{$relativePath}{$name}.php");
+        }
+
+        $relativePath = str_replace('\\', '/', $namespace);
+        return base_path("{$relativePath}/{$name}.php");
+    }
+
+    /**
+     * Generate stub model dengan namespace kustom.
+     *
+     * FIX: sebelumnya method ini:
+     * 1. Menerima parameter $replacement (singular) tapi memakai variabel
+     *    $replacements (plural, tidak pernah didefinisikan di scope ini)
+     *    -> Undefined variable.
+     * 2. Tidak punya `return`, sehingga selalu balikin null dan file model
+     *    yang dihasilkan kosong.
+     * Kedua bug ini sudah diperbaiki di bawah.
+     */
+    protected function getModelStub(array $replacements): string
+    {
         $stubPath = base_path('stubs/yajra/model.yajra.stub');
         $stub = File::get($stubPath);
-        $template = str_replace(array_keys($replacements), array_values($replacements), $stub);
+
+        return str_replace(array_keys($replacements), array_values($replacements), $stub);
     }
 
     /**

@@ -34,6 +34,7 @@ class RoleDataTable extends DataTable
                             data-method="GET"
                             data-title="Detail Role '.$row->name.'"
                             data-url="'. route('role.edit', $row->id).'"
+                            data-datatable-context=\'{"executeDraw":true,"tableId":"role-table","reloadDelay":500}\'
                             data-submit=\'<button class="btn btn-primary modal-submit" type="button" data-datatable-id="role-table">Simpan</button>\'
                             data-cancel=\'<button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Batal</button>\'>
                             <span class="material-symbols-outlined">edit</span>

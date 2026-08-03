@@ -31,6 +31,7 @@ class PolicyDataTable extends DataTable
                             data-method="GET"
                             data-title="Detail Policy '.$row->name.'"
                             data-url="'. route('policy.edit', $row).'"
+                            data-datatable-context=\'{"executeDraw":true,"tableId":"policy-table","reloadDelay":500}\'
                             data-submit=\'<button class="btn btn-primary modal-submit" type="button" data-datatable-id="policy-table">Simpan</button>\'
                             data-cancel=\'<button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Batal</button>\'>
                             <span class="material-symbols-outlined">edit</span>
