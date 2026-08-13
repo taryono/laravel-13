@@ -2,7 +2,7 @@
 
 namespace Models;
 
-use App\Models\User;
+use Models\User;
 
 class RoleUser extends BasedModel
 {
@@ -14,6 +14,6 @@ class RoleUser extends BasedModel
     }
     public function user()
     {
-        return $this->belongsTo(\App\Models\User::class);
+        return $this->belongsTo(\Models\User::class);
     }
 }

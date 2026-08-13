@@ -13,9 +13,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class BasedModel extends Model
 {
     use HasFactory, SoftDeletes;
-
+   
     protected $guarded = ['id'];
     protected $casts = [
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
     ];
     public $timestamps = true;

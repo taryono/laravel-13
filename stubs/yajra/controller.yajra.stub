@@ -57,7 +57,7 @@ class {{modelName}}Controller extends MainController
         $groupedForms = $result['grouped'];
 
         return view(
-            '{{modelName}}::edit',
+            '{{modelName}}::create',
             compact('{{modelVariable}}', 'forms', 'groupedForms')
         );
     }

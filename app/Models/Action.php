@@ -29,7 +29,7 @@ class Action extends BasedModel
      */
     public function users()
     {
-        return $this->belongsToMany(\App\Models\User::class, 'action_user');
+        return $this->belongsToMany(\Models\User::class, 'action_user');
     }
 
     public function roles()
