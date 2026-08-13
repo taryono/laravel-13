@@ -2,7 +2,7 @@
 
 namespace App\DataTables;
 
-use Models\EduationLevel;
+use Models\EducationLevel;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
@@ -10,7 +10,7 @@ use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
 use Yajra\DataTables\Services\DataTable;
 
-class EduationLevelDataTable extends DataTable
+class EducationLevelDataTable extends DataTable
 {
     /**
      * Kolom yang ditampilkan di tabel (selain DT_RowIndex & action).
@@ -48,7 +48,7 @@ class EduationLevelDataTable extends DataTable
      */
     protected function renderActionButtons($row): string
     {
-        $title = e('Detail EduationLevel ' . $row->name);
+        $title = e('Detail EducationLevel ' . $row->name);
 
         $context = htmlspecialchars(
             json_encode([
@@ -98,7 +98,7 @@ class EduationLevelDataTable extends DataTable
     /**
      * Get query source of DataTable.
      */
-    public function query(EduationLevel $model): QueryBuilder
+    public function query(EducationLevel $model): QueryBuilder
     {
         return $model->newQuery();
     }
@@ -294,6 +294,6 @@ class EduationLevelDataTable extends DataTable
      */
     protected function filename(): string
     {
-        return 'EduationLevel_' . date('YmdHis');
+        return 'EducationLevel_' . date('YmdHis');
     }
 }

@@ -14,10 +14,10 @@ return new class extends Migration
         Schema::create('rooms', function (Blueprint $table) {
             $table->id();
             $table->foreignId('floor_id')->constrained()->onDelete('cascade');
-            $table->string('code')->unique(); // GED-A-01-101
-            $table->string('name'); // Ruang Kelas 1A, Lab Komputer
+            $table->string('code', 100)->unique(); // GED-A-01-101
+            $table->string('name',191); // Ruang Kelas 1A, Lab Komputer
             $table->string('room_number')->nullable(); // 101, 102
-            $table->integer('capacity')->nullable(); // Kapasitas orang
+            $table->integer('capacity')->nullable()->default(0); // Kapasitas orang
             $table->timestamps();
             $table->softDeletes();
         });

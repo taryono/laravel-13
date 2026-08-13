@@ -1,4 +1,4 @@
-{{ Form::open(['method' => 'POST', 'route' => ['trial-registration.store'], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
+{{ Form::open(['method' => 'POST', 'route' => ['trial_registration.store'], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
     <div class="row">
         <div class="col-md-6 mb-3">
             @forelse ($forms as $key => $form)

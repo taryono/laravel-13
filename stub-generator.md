@@ -41,10 +41,7 @@ php artisan make:crud-yajra CrudGenerator
 php artisan make:crud-yajra Product --columns=id,name,price
 
 # Menggunakan namespace custom
-php artisan make:crud-yajra Product --columns=id,name,price --model-namespace=App\\Models
-
-# Menggunakan namespace Models (default)
-php artisan make:crud-yajra Product --columns=id,name,price --model-namespace=Models
+php artisan make:crud-yajra Product --columns=id,name,price --namespace=App\\Models 
 
 # Tanpa membuat menu
 php artisan make:crud-yajra Product --columns=id,name,price --no-menu

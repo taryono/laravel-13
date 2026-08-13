@@ -17,7 +17,7 @@ class FacilityDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['code', 'name', 'description', 'location_id', 'capacity', 'is_active'];
+    protected array $columns = ['code', 'name', 'description', 'is_active'];
 
     /**
      * Build DataTable response.

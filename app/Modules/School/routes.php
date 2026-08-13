@@ -15,13 +15,13 @@ Route::group(['prefix' => 'school', 'namespace' => 'App\Modules\School\Controlle
     Route::get('/', ['as' => 'school.index', 'uses' => 'SchoolController@index']);
     Route::any('/search', ['as' => 'school.search', 'uses' => 'SchoolController@search']);
     Route::get('/create', ['as' => 'school.create', 'uses' => 'SchoolController@create']);
-    Route::get('/show/{school}', ['as' => 'school.show', 'uses' => 'SchoolController@show']);
-    Route::get('/preview/{school}', ['as' => 'school.preview', 'uses' => 'SchoolController@preview']);
-    Route::get('/print/{school}', ['as' => 'school.print', 'uses' => 'SchoolController@print']);
+    Route::get('/show/{id}', ['as' => 'school.show', 'uses' => 'SchoolController@show']);
+    Route::get('/preview/{id}', ['as' => 'school.preview', 'uses' => 'SchoolController@preview']);
+    Route::get('/print/{id}', ['as' => 'school.print', 'uses' => 'SchoolController@print']);
 
     Route::post('/store', ['as' => 'school.store', 'uses' => 'SchoolController@store']);
-    Route::get('/edit/{school}', ['as' => 'school.edit', 'uses' => 'SchoolController@edit']);
-    Route::put('/update/{school}', ['as' => 'school.update', 'uses' => 'SchoolController@update']);
-    Route::delete('/delete/{school}', ['as' => 'school.destroy', 'uses' => 'SchoolController@destroy']);
+    Route::get('/edit/{id}', ['as' => 'school.edit', 'uses' => 'SchoolController@edit']);
+    Route::put('/update/{id}', ['as' => 'school.update', 'uses' => 'SchoolController@update']);
+    Route::delete('/delete/{id}', ['as' => 'school.destroy', 'uses' => 'SchoolController@destroy']);
     
 });

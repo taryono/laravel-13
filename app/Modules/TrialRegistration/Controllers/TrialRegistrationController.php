@@ -226,7 +226,7 @@ class TrialRegistrationController extends MainController
         }
 
         return redirect()
-            ->route('trial-registration.index')
+            ->route('trial_registration.index')
             ->with('success', $message);
     }
 

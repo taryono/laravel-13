@@ -282,7 +282,7 @@
 
     <div class="step-node active" data-step="1">
       <div class="step-circle">1</div>
-      <div class="step-label">Info Sekolah</div>
+      <div class="step-label">Info yayasan/Sekolah</div>
     </div>
     <div class="step-node" data-step="2">
       <div class="step-circle">2</div>
@@ -311,12 +311,12 @@
       <!-- STEP 1 -->
       <div class="wizard-step fade-step" data-step="1">
         <div class="step-eyebrow">Langkah 1 dari 5</div>
-        <h3 class="step-heading">Informasi Sekolah &amp; Jabatan Anda</h3>
-        <p class="step-desc">Ceritakan sedikit tentang sekolah Anda supaya kami bisa menyiapkan akun yang tepat.</p>
+        <h3 class="step-heading">Informasi Yayasan/Sekolah &amp; Jabatan Anda</h3>
+        <p class="step-desc">Ceritakan sedikit tentang Yayasan/Sekolah Anda supaya kami bisa menyiapkan akun yang tepat.</p>
 
         <div class="row g-3">
           <div class="col-md-8">
-            <label class="form-label">Nama Sekolah</label>
+            <label class="form-label">Nama Yayasan/ Sekolah</label>
             <input type="text" class="form-control" name="nama_sekolah" placeholder="Contoh: SMA Harapan Bangsa" required>
           </div>
           <div class="col-md-4">
@@ -325,7 +325,7 @@
           </div>
           <div class="col-12">
             <label class="form-label">Jenjang Sekolah <span class="fw-normal text-muted">(bisa pilih lebih dari satu)</span></label>
-            <div class="d-flex flex-wrap gap-2" id="jenjangGroup">
+            <div class="d-flex flex-wrap gap-2" id="educationLevelGroup">
               <label class="chip-option">
                 <input type="checkbox" name="jenjang" value="paud">
                 <span>PAUD / TK</span>

@@ -12,16 +12,16 @@ use Illuminate\Support\Facades\Route;
 |
  */
 Route::group(['prefix' => 'facility-category', 'namespace' => 'App\Modules\FacilityCategory\Controllers', 'middleware' => ['web']], function () {
-    Route::get('/', ['as' => 'facility-category.index', 'uses' => 'FacilityCategoryController@index']);
-    Route::any('/search', ['as' => 'facility-category.search', 'uses' => 'FacilityCategoryController@search']);
-    Route::get('/create', ['as' => 'facility-category.create', 'uses' => 'FacilityCategoryController@create']);
-    Route::get('/show/{id}', ['as' => 'facility-category.show', 'uses' => 'FacilityCategoryController@show']);
-    Route::get('/preview/{id}', ['as' => 'facility-category.preview', 'uses' => 'FacilityCategoryController@preview']);
-    Route::get('/print/{id}', ['as' => 'facility-category.print', 'uses' => 'FacilityCategoryController@print']);
+    Route::get('/', ['as' => 'facility_category.index', 'uses' => 'FacilityCategoryController@index']);
+    Route::any('/search', ['as' => 'facility_category.search', 'uses' => 'FacilityCategoryController@search']);
+    Route::get('/create', ['as' => 'facility_category.create', 'uses' => 'FacilityCategoryController@create']);
+    Route::get('/show/{id}', ['as' => 'facility_category.show', 'uses' => 'FacilityCategoryController@show']);
+    Route::get('/preview/{id}', ['as' => 'facility_category.preview', 'uses' => 'FacilityCategoryController@preview']);
+    Route::get('/print/{id}', ['as' => 'facility_category.print', 'uses' => 'FacilityCategoryController@print']);
 
-    Route::post('/store', ['as' => 'facility-category.store', 'uses' => 'FacilityCategoryController@store']);
-    Route::get('/edit/{id}', ['as' => 'facility-category.edit', 'uses' => 'FacilityCategoryController@edit']);
-    Route::put('/update/{id}', ['as' => 'facility-category.update', 'uses' => 'FacilityCategoryController@update']);
-    Route::delete('/delete/{id}', ['as' => 'facility-category.destroy', 'uses' => 'FacilityCategoryController@destroy']);
+    Route::post('/store', ['as' => 'facility_category.store', 'uses' => 'FacilityCategoryController@store']);
+    Route::get('/edit/{id}', ['as' => 'facility_category.edit', 'uses' => 'FacilityCategoryController@edit']);
+    Route::put('/update/{id}', ['as' => 'facility_category.update', 'uses' => 'FacilityCategoryController@update']);
+    Route::delete('/delete/{id}', ['as' => 'facility_category.destroy', 'uses' => 'FacilityCategoryController@destroy']);
     
 });

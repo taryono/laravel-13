@@ -1,6 +1,7 @@
 <?php
 
 namespace Models; 
+
 class FacilityCategory extends BasedModel
 { 
     // Relasi

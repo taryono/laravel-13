@@ -109,6 +109,7 @@ class MakeCrudYajraCommand extends Command
         $viewFolderKebab = Str::kebab($name);
         $modelVariable = Str::camel($name);
         $modelRoutePrefix = Str::kebab($name);
+        $routePrefix = Str::snake($name);
         $modelTableId = "{$modelRoutePrefix}-table";
         $title = Str::title(str_replace('-', ' ', $modelRoutePrefix));
 
@@ -133,6 +134,7 @@ class MakeCrudYajraCommand extends Command
             '{{validationRules}}'     => $validationRules,
             '{{namespace}}'           => $modelNamespace,
             '{{tableName}}'           => $tableName,
+            '{{routePrefix}}'         => $routePrefix,
         ];
 
         $this->newLine();

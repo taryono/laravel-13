@@ -1,24 +1,9 @@
 <?php
 
-namespace {{namespace}};
+namespace Models; 
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
-
-class {{modelName}} extends Model
-{
-    use SoftDeletes;
-
-    protected $table = '{{tableName}}';
-    protected $guarded = ['id'];
-    public $timestamps = true;
-
-    protected $casts = [
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
-        'deleted_at' => 'datetime',
-    ];
-
+class {{modelName}} extends BasedModel
+{ 
     // Relasi
     // public function user()
     // {
@@ -26,8 +11,8 @@ class {{modelName}} extends Model
     // }
 
     // Scope
-    // public function scopeActive($query)
-    // {
-    //     return $query->where('is_active', true);
-    // }
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
 }

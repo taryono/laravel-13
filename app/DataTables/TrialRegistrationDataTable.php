@@ -60,8 +60,8 @@ class TrialRegistrationDataTable extends DataTable
             'UTF-8'
         );
 
-        $editUrl   = e(route('trial-registration.edit', $row));
-        $deleteUrl = e(route('trial-registration.destroy', $row));
+        $editUrl   = e(route('trial_registration.edit', $row));
+        $deleteUrl = e(route('trial_registration.destroy', $row));
 
         return <<<HTML
             <div class="d-flex justify-content-center gap-1">
@@ -122,7 +122,7 @@ class TrialRegistrationDataTable extends DataTable
             /*
              * Server-side AJAX endpoint.
              */
-            ->minifiedAjax(route('trial-registration.index'))
+            ->minifiedAjax(route('trial_registration.index'))
 
             /*
              * Default sorting:

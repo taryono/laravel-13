@@ -29,9 +29,11 @@ class FacilityCategorySeeder extends Seeder
                 'code' => 'OPERATIONAL',
                 'name' => 'Sarana Umum & Penunjang Operasional',
                 'description' => 'Fasilitas untuk mendukung operasional yayasan dan kenyamanan',
-                'created_at' => now(),
-                'updated_at' => now(),
+                'created_at' => now(), 'updated_at' => now(),
             ],
+            ['code' => 'sport', 'name' => 'Olahraga', 'description' => 'Fasilitas olahraga', 'created_at' => now(), 'updated_at' => now()],
+            ['code' => 'lab', 'name' => 'Laboratorium', 'description' => 'Fasilitas laboratorium', 'created_at' => now(), 'updated_at' => now()],
+            ['code' => 'class', 'name' => 'Ruang Kelas', 'description' => 'Fasilitas ruang kelas', 'created_at' => now(), 'updated_at' => now()],
         ]);
     }
 }

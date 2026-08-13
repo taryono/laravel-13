@@ -4,8 +4,8 @@
 <div class="container">
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">Daftar EduationLevel</h5>
-            <a href="{{ route('eduation-level.create') }}" class="btn btn-primary btn-sm">Tambah Baru</a>
+            <h5 class="mb-0">Daftar Dictionary</h5>
+            <a href="{{ route('dictionary.create') }}" class="btn btn-primary btn-sm">Tambah Baru</a>
         </div>
         <div class="card-body">
             @if(session('success'))
@@ -37,7 +37,7 @@
                     data: { _token: token },
                     success: function(response) {
                         if (response.success) {
-                            window.LaravelDataTables["eduation-level-table-table"].ajax.reload();
+                            window.LaravelDataTables["dictionary-table-table"].ajax.reload();
                         }
                     }
                 });

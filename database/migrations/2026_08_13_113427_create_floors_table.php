@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('floors', function (Blueprint $table) {
             $table->id();
             $table->foreignId('building_id')->constrained()->onDelete('cascade');
-            $table->string('code')->unique(); // GED-A-01, GED-A-02
-            $table->string('name'); // Lantai 1, Lantai 2, Basement
+            $table->string('code', 100)->unique(); // GED-A-01, GED-A-02
+            $table->string('name', 191); // Lantai 1, Lantai 2, Basement
             $table->integer('floor_number'); // 1, 2, -1 (basement)
             $table->timestamps();
             $table->softDeletes();

@@ -14,6 +14,7 @@ use Models\Role;
 use Models\User;
 use Models\School; 
 use Models\Position; 
+use Models\Package; 
 use Str;
 
 class WelcomeController extends Controller
@@ -33,10 +34,10 @@ class WelcomeController extends Controller
             $request->session()->put('trial_token', $registration->token);
         }
 
-        $modules = Module::where('is_active', true)->get();
+        $modules = Module::where('is_active', true)->pluck('id','name')->toArray();
         $roles = Role::all();
-        $positions = Position::where('is_active', true)->get();
-
+        $positions = Position::where('is_active', true)->pluck('id','name')->toArray();
+        $packages = Package::where('is_active', true)->pluck('id','name')->toArray();
         return view('trial_signup', compact('registration', 'modules', 'roles'));
     }
 
@@ -165,6 +166,9 @@ class WelcomeController extends Controller
 
     public function requestDemo()
     {
-        return view('request-demo');
+        $roles = Role::all();
+        $positions = Position::where('is_active', true)->pluck('id','name')->toArray();
+        $packages = Package::where('is_active', true)->pluck('id','name')->toArray();
+        return view('request-demo', compact('roles', 'positions', 'packages'));
     }
 }

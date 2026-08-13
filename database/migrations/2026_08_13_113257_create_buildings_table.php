@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('buildings', function (Blueprint $table) {
             $table->id();
-            $table->string('code')->unique(); // GED-A, GED-B
-            $table->string('name'); // Gedung Utama, Gedung TK, Gedung SMA
+            $table->string('code', 100)->unique(); // GED-A, GED-B
+            $table->string('name',191); // Gedung Utama, Gedung TK, Gedung SMA
             $table->string('address')->nullable();
             $table->integer('total_floors')->default(0);
             $table->timestamps();

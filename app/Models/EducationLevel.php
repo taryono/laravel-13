@@ -2,7 +2,7 @@
 
 namespace Models; 
 
-class EduationLevel extends BaseModel
+class EducationLevel extends BasedModel
 {  
     // Scope
     public function scopeActive($query)

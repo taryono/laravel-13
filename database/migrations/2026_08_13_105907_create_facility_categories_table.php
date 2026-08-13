@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('facility_categories', function (Blueprint $table) {
             $table->id();
-            $table->string('code')->unique();
-            $table->string('name');
+            $table->string('code', 100)->unique();
+            $table->string('name', 191);
             $table->text('description')->nullable();
             $table->timestamps();
             $table->softDeletes();

@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Modules\EduationLevel\Controllers;
+namespace App\Modules\EducationLevel\Controllers;
 
-use App\DataTables\EduationLevelDataTable;
+use App\DataTables\EducationLevelDataTable;
 use App\Http\Controllers\MainController;
-use Models\EduationLevel;
+use Models\EducationLevel;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -13,11 +13,11 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 use Throwable;
 
-class EduationLevelController extends MainController
+class EducationLevelController extends MainController
 {
     public function __construct()
     {
-        parent::__construct(new EduationLevel());
+        parent::__construct(new EducationLevel());
     }
 
     /**
@@ -29,20 +29,20 @@ class EduationLevelController extends MainController
      */
     public function index(
         Request $request,
-        EduationLevelDataTable $dataTable
+        EducationLevelDataTable $dataTable
     ) {
         /*
          * Yajra DataTables request contains "draw".
          *
          * Example:
-         * /eduation-level?draw=1&start=0&length=10
+         * /education-level?draw=1&start=0&length=10
          */
         if ($request->filled('draw')) {
             return $dataTable->ajax();
         }
 
         return $dataTable->render(
-            'EduationLevel::index'
+            'EducationLevel::index'
         );
     }
 
@@ -51,13 +51,13 @@ class EduationLevelController extends MainController
      */
     public function create(): View
     {
-        $eduationLevel = new EduationLevel();
-        $result = $this->getForm($eduationLevel);
+        $educationLevel = new EducationLevel();
+        $result = $this->getForm($educationLevel);
         $forms = $result['forms'];
         $groupedForms = $result['grouped'];
 
         return view(
-            'EduationLevel::edit',
+            'EducationLevel::edit',
             compact('eduationLevel', 'forms', 'groupedForms')
         );
     }
@@ -74,19 +74,19 @@ class EduationLevelController extends MainController
 
         try {
             $model = DB::transaction(function () use ($validated) {
-                return EduationLevel::create($validated);
+                return EducationLevel::create($validated);
             });
 
             return $this->successResponse(
                 $request,
-                'Data EduationLevel berhasil ditambahkan.',
+                'Data EducationLevel berhasil ditambahkan.',
                 $model
             );
 
         } catch (Throwable $e) {
 
             Log::error(
-                'Gagal menambahkan EduationLevel.',
+                'Gagal menambahkan EducationLevel.',
                 [
                     'exception' => $e,
                     'data' => $validated,
@@ -96,7 +96,7 @@ class EduationLevelController extends MainController
 
             return $this->errorResponse(
                 $request,
-                'Data EduationLevel gagal ditambahkan.'
+                'Data EducationLevel gagal ditambahkan.'
             );
         }
     }
@@ -106,13 +106,13 @@ class EduationLevelController extends MainController
      */
     public function edit($id): View
     {
-        $eduationLevel = $this->model->findOrFail($id);
-        $result = $this->getForm($eduationLevel);
+        $educationLevel = $this->model->findOrFail($id);
+        $result = $this->getForm($educationLevel);
         $forms = $result['forms'];
         $groupedForms = $result['grouped'];
 
         return view(
-            'EduationLevel::edit',
+            'EducationLevel::edit',
             compact('eduationLevel', 'forms', 'groupedForms')
         );
     }
@@ -128,33 +128,33 @@ class EduationLevelController extends MainController
         ]);
 
         try {
-            $eduationLevel = $this->model->findOrFail($id);
+            $educationLevel = $this->model->findOrFail($id);
 
             DB::transaction(function () use (
-                $eduationLevel,
+                $educationLevel,
                 $validated
             ) {
-                $eduationLevel->update($validated);
+                $educationLevel->update($validated);
             });
 
             return $this->successResponse(
                 $request,
-                'Data EduationLevel berhasil diperbarui.',
-                $eduationLevel
+                'Data EducationLevel berhasil diperbarui.',
+                $educationLevel
             );
 
         } catch (Throwable $e) {
 
             // FIX: pakai $id mentah untuk logging, BUKAN
-            // $eduationLevel->getKey(), karena kalau findOrFail() di atas
-            // yang melempar exception, variabel $eduationLevel belum
+            // $educationLevel->getKey(), karena kalau findOrFail() di atas
+            // yang melempar exception, variabel $educationLevel belum
             // ter-assign -- referensi ke ->getKey() di sini akan memicu
             // error baru di dalam blok catch.
             Log::error(
-                'Gagal memperbarui EduationLevel.',
+                'Gagal memperbarui EducationLevel.',
                 [
                     'exception' => $e,
-                    'EduationLevel_id' => $id,
+                    'EducationLevel_id' => $id,
                     'data' => $validated,
                     'user_id' => auth()->id(),
                 ]
@@ -162,7 +162,7 @@ class EduationLevelController extends MainController
 
             return $this->errorResponse(
                 $request,
-                'Data EduationLevel gagal diperbarui.'
+                'Data EducationLevel gagal diperbarui.'
             );
         }
     }
@@ -173,33 +173,33 @@ class EduationLevelController extends MainController
     public function destroy(Request $request, $id): JsonResponse|RedirectResponse
     {
         try {
-            $eduationLevel = $this->model->findOrFail($id);
+            $educationLevel = $this->model->findOrFail($id);
 
-            DB::transaction(function () use ($eduationLevel) {
-                $eduationLevel->delete();
+            DB::transaction(function () use ($educationLevel) {
+                $educationLevel->delete();
             });
 
             return $this->successResponse(
                 $request,
-                'Data EduationLevel berhasil dihapus.'
+                'Data EducationLevel berhasil dihapus.'
             );
 
         } catch (Throwable $e) {
 
             // FIX: sama seperti update(), pakai $id mentah, bukan
-            // $eduationLevel->getKey() yang bisa undefined.
+            // $educationLevel->getKey() yang bisa undefined.
             Log::error(
-                'Gagal menghapus EduationLevel.',
+                'Gagal menghapus EducationLevel.',
                 [
                     'exception' => $e,
-                    'EduationLevel_id' => $id,
+                    'EducationLevel_id' => $id,
                     'user_id' => auth()->id(),
                 ]
             );
 
             return $this->errorResponse(
                 $request,
-                'Data EduationLevel gagal dihapus.'
+                'Data EducationLevel gagal dihapus.'
             );
         }
     }
@@ -228,7 +228,7 @@ class EduationLevelController extends MainController
         }
 
         return redirect()
-            ->route('eduation-level.index')
+            ->route('education-level.index')
             ->with('success', $message);
     }
 

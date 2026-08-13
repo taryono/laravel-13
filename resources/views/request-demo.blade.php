@@ -10,68 +10,100 @@
                     <p class="lead text-light opacity-75">Isi formulir di bawah ini dan tim kami akan menghubungi Anda dalam waktu 1×24 jam.</p>
                 </div>
 
-                {{-- CARD FORM — menggunakan kelas custom --}}
+                {{-- CARD FORM — menggunakan Laravel Collective --}}
                 <div class="demo-card p-4 p-md-5">
-                    <form action="#" method="POST">
+                    {!! Form::open(['route' => 'submit_request_demo.form', 'method' => 'POST']) !!}
                         @csrf
 
                         <div class="row g-4">
                             {{-- Nama Sekolah --}}
                             <div class="col-md-6">
-                                <label class="form-label fw-semibold">Nama Sekolah</label>
-                                <input type="text" name="school_name" class="form-control form-control-lg" placeholder="Masukkan nama sekolah" required>
+                                {!! Form::label('school_name', 'Nama Sekolah', ['class' => 'form-label fw-semibold']) !!}
+                                {!! Form::text('school_name', null, [
+                                    'class' => 'form-control form-control-lg',
+                                    'placeholder' => 'Masukkan nama sekolah',
+                                    'required'
+                                ]) !!}
                             </div>
 
                             {{-- Nama Penanggung Jawab --}}
                             <div class="col-md-6">
-                                <label class="form-label fw-semibold">Nama Penanggung Jawab</label>
-                                <input type="text" name="person_name" class="form-control form-control-lg" placeholder="Nama lengkap Anda" required>
+                                {!! Form::label('person_name', 'Nama Penanggung Jawab', ['class' => 'form-label fw-semibold']) !!}
+                                {!! Form::text('person_name', null, [
+                                    'class' => 'form-control form-control-lg',
+                                    'placeholder' => 'Nama lengkap Anda',
+                                    'required'
+                                ]) !!}
                             </div>
 
                             {{-- Jabatan --}}
                             <div class="col-md-6">
-                                <label class="form-label fw-semibold">Jabatan</label>
-                                <input type="text" name="position" class="form-control form-control-lg" placeholder="Contoh: Kepala Sekolah, IT Admin" required>
+                                {!! Form::label('position', 'Jabatan', ['class' => 'form-label fw-semibold']) !!}
+                                {!! Form::text('position', null, [
+                                    'class' => 'form-control form-control-lg',
+                                    'placeholder' => 'Contoh: Kepala Sekolah, IT Admin',
+                                    'required'
+                                ]) !!}
                             </div>
 
                             {{-- Email --}}
                             <div class="col-md-6">
-                                <label class="form-label fw-semibold">Email</label>
-                                <input type="email" name="email" class="form-control form-control-lg" placeholder="email@sekolah.sch.id" required>
+                                {!! Form::label('email', 'Email', ['class' => 'form-label fw-semibold']) !!}
+                                {!! Form::email('email', null, [
+                                    'class' => 'form-control form-control-lg',
+                                    'placeholder' => 'email@sekolah.sch.id',
+                                    'required'
+                                ]) !!}
                             </div>
 
                             {{-- Nomor Telepon --}}
                             <div class="col-md-6">
-                                <label class="form-label fw-semibold">Nomor Telepon / WhatsApp</label>
-                                <input type="tel" name="phone" class="form-control form-control-lg" placeholder="0812xxxxxxx" required>
+                                {!! Form::label('phone', 'Nomor Telepon / WhatsApp', ['class' => 'form-label fw-semibold']) !!}
+                                {!! Form::tel('phone', null, [
+                                    'class' => 'form-control form-control-lg',
+                                    'placeholder' => '0812xxxxxxx',
+                                    'required'
+                                ]) !!}
                             </div>
 
                             {{-- Pilihan Paket --}}
                             <div class="col-md-6">
-                                <label class="form-label fw-semibold">Pilihan Paket</label>
-                                <select name="package" class="form-select form-select-lg" required>
-                                    <option value="">Pilih Paket</option>
-                                    <option value="starter">Paket Starter — Rp 300rb / bln</option>
-                                    <option value="professional">Paket Profesional — Rp 700rb / bln</option>
-                                    <option value="enterprise">Paket Enterprise — Harga Khusus</option>
-                                </select>
+                                {!! Form::label('package', 'Pilihan Paket', ['class' => 'form-label fw-semibold']) !!}
+                                {!! Form::select('package', [
+                                    '' => 'Pilih Paket',
+                                    'starter' => 'Paket Starter — Rp 300rb / bln',
+                                    'professional' => 'Paket Profesional — Rp 700rb / bln',
+                                    'enterprise' => 'Paket Enterprise — Harga Khusus',
+                                ], null, [
+                                    'class' => 'form-select form-select-lg',
+                                    'required'
+                                ]) !!}
                             </div>
 
                             {{-- Tanggal & Waktu Demo --}}
                             <div class="col-md-6">
-                                <label class="form-label fw-semibold">Tanggal & Waktu Demo</label>
-                                <input type="datetime-local" name="demo_datetime" class="form-control form-control-lg" required>
+                                {!! Form::label('demo_datetime', 'Tanggal & Waktu Demo', ['class' => 'form-label fw-semibold']) !!}
+                                {!! Form::datetimeLocal('demo_datetime', null, [
+                                    'class' => 'form-control form-control-lg',
+                                    'required'
+                                ]) !!}
                             </div>
 
                             {{-- Pesan / Keterangan Tambahan --}}
                             <div class="col-12">
-                                <label class="form-label fw-semibold">Pesan / Keterangan Tambahan</label>
-                                <textarea name="message" class="form-control" rows="4" placeholder="Tuliskan kebutuhan khusus atau pertanyaan Anda..."></textarea>
+                                {!! Form::label('message', 'Pesan / Keterangan Tambahan', ['class' => 'form-label fw-semibold']) !!}
+                                {!! Form::textarea('message', null, [
+                                    'class' => 'form-control',
+                                    'rows' => 4,
+                                    'placeholder' => 'Tuliskan kebutuhan khusus atau pertanyaan Anda...'
+                                ]) !!}
                             </div>
 
                             {{-- Tombol Submit --}}
                             <div class="col-12 mt-2">
-                                <button type="submit" class="btn btn-primary w-100 py-3">Jadwalkan Demo Sekarang</button>
+                                {!! Form::submit('Jadwalkan Demo Sekarang', [
+                                    'class' => 'btn btn-primary w-100 py-3'
+                                ]) !!}
                             </div>
 
                             {{-- Keterangan Bawah --}}
@@ -79,7 +111,7 @@
                                 <p class="text-muted small mb-0">Tim kami akan menghubungi Anda dalam 1×24 jam untuk konfirmasi.</p>
                             </div>
                         </div>
-                    </form>
+                    {!! Form::close() !!}
                 </div>
             </div>
         </div>
