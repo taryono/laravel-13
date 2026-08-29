@@ -2,10 +2,24 @@
 
 @section('content')
 <div class="container">
-     {{-- content here  --}}
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Daftar Module</h5>
+            <a href="{{ route('module.create') }}" class="btn btn-primary btn-sm">Tambah Baru</a>
+        </div>
+        <div class="card-body">
+            @if(session('success'))
+                <div class="alert alert-success">{{ session('success') }}</div>
+            @endif
+
+            <div class="table-responsive">
+                {!! $dataTable->table(['class' => 'table table-bordered table-striped w-100']) !!}
+            </div>
+        </div>
+    </div>
 </div>
 @endsection
 
-@push('scripts') 
-    </script>
+@push('scripts')
+    {!! $dataTable->scripts() !!}
 @endpush

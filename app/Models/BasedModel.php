@@ -8,11 +8,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-
+use App\Traits\HasUniqueCode;
 
 class BasedModel extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, HasUniqueCode;
    
     protected $guarded = ['id'];
     protected $casts = [

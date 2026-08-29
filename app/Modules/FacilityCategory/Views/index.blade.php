@@ -5,7 +5,7 @@
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="mb-0">Daftar FacilityCategory</h5>
-            <a href="{{ route('facility-category.create') }}" class="btn btn-primary btn-sm">Tambah Baru</a>
+            <a href="{{ route('facility_category.create') }}" class="btn btn-primary btn-sm">Tambah Baru</a>
         </div>
         <div class="card-body">
             @if(session('success'))
@@ -22,26 +22,4 @@
 
 @push('scripts')
     {!! $dataTable->scripts() !!}
-    
-    <script>
-        // Handle Delete via AJAX
-        $(document).on('click', '.delete-btn', function(e) {
-            e.preventDefault();
-            if (confirm('Apakah Anda yakin ingin menghapus data ini?')) {
-                let url = $(this).attr('href');
-                let token = $('meta[name="csrf-token"]').attr('content');
-                
-                $.ajax({
-                    url: url,
-                    type: 'DELETE',
-                    data: { _token: token },
-                    success: function(response) {
-                        if (response.success) {
-                            window.LaravelDataTables["facility-category-table-table"].ajax.reload();
-                        }
-                    }
-                });
-            }
-        });
-    </script>
 @endpush

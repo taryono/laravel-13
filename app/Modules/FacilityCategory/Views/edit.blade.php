@@ -1,4 +1,4 @@
-{{ Form::model($facility-category, ['method' => 'PUT', 'route' => ['facility-category.update', $facility-category->id], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($facility_category, ['method' => 'PUT', 'route' => ['facility_category.update', $facility_category->id], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
     <div class="row">
         <div class="col-md-6 mb-3">
             @forelse ($forms as $key => $form)

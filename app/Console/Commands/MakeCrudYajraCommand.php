@@ -22,6 +22,7 @@ class MakeCrudYajraCommand extends Command
      * Ini heuristik best-effort karena migration BELUM di-run saat command
      * ini jalan, jadi tipe kolom sesungguhnya belum bisa dibaca dari DB.
      * Developer tetap perlu review ulang rules yang digenerate.
+     * 
      */
     protected const COLUMN_TYPE_RULES = [
         'date'  => ['required', 'date'],
@@ -41,7 +42,7 @@ class MakeCrudYajraCommand extends Command
         // FIX: sebelumnya memanggil $this->option('model-namespace') yang
         // tidak terdaftar di $signature -> InvalidArgumentException.
         // Sekarang pakai opsi --namespace yang sudah didaftarkan, default 'Models'.
-        $modelNamespace = $this->option('namespace') ?: 'Models';
+        $modelNamespace = $this->option('namespace') ?: 'App\\Models';
 
         // FIX: sanitasi kolom dari --columns (trim, buang kosong, snake_case,
         // buang karakter selain huruf/angka/underscore) supaya tidak ada

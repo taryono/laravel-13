@@ -51,14 +51,14 @@ class FacilityCategoryController extends MainController
      */
     public function create(): View
     {
-        $facilityCategory = new FacilityCategory();
-        $result = $this->getForm($facilityCategory);
+        $facility_category = new FacilityCategory();
+        $result = $this->getForm($facility_category);
         $forms = $result['forms'];
         $groupedForms = $result['grouped'];
 
         return view(
             'FacilityCategory::create',
-            compact('facilityCategory', 'forms', 'groupedForms')
+            compact('facility_category', 'forms', 'groupedForms')
         );
     }
 
@@ -81,14 +81,14 @@ class FacilityCategoryController extends MainController
 
             return $this->successResponse(
                 $request,
-                'Data FacilityCategory berhasil ditambahkan.',
+                'Data facility_category berhasil ditambahkan.',
                 $model
             );
 
         } catch (Throwable $e) {
 
             Log::error(
-                'Gagal menambahkan FacilityCategory.',
+                'Gagal menambahkan facility_category.',
                 [
                     'exception' => $e,
                     'data' => $validated,
@@ -98,7 +98,7 @@ class FacilityCategoryController extends MainController
 
             return $this->errorResponse(
                 $request,
-                'Data FacilityCategory gagal ditambahkan.'
+                'Data facility_category gagal ditambahkan.'
             );
         }
     }
@@ -108,14 +108,14 @@ class FacilityCategoryController extends MainController
      */
     public function edit($id): View
     {
-        $facilityCategory = $this->model->findOrFail($id);
-        $result = $this->getForm($facilityCategory);
+        $facility_category = $this->model->findOrFail($id);
+        $result = $this->getForm($facility_category);
         $forms = $result['forms'];
         $groupedForms = $result['grouped'];
 
         return view(
             'FacilityCategory::edit',
-            compact('facilityCategory', 'forms', 'groupedForms')
+            compact('facility_category', 'forms', 'groupedForms')
         );
     }
 
@@ -132,33 +132,33 @@ class FacilityCategoryController extends MainController
         ]);
 
         try {
-            $facilityCategory = $this->model->findOrFail($id);
+            $facility_category = $this->model->findOrFail($id);
 
             DB::transaction(function () use (
-                $facilityCategory,
+                $facility_category,
                 $validated
             ) {
-                $facilityCategory->update($validated);
+                $facility_category->update($validated);
             });
 
             return $this->successResponse(
                 $request,
-                'Data FacilityCategory berhasil diperbarui.',
-                $facilityCategory
+                'Data facility_category berhasil diperbarui.',
+                $facility_category
             );
 
         } catch (Throwable $e) {
 
             // FIX: pakai $id mentah untuk logging, BUKAN
-            // $facilityCategory->getKey(), karena kalau findOrFail() di atas
-            // yang melempar exception, variabel $facilityCategory belum
+            // $facility_category->getKey(), karena kalau findOrFail() di atas
+            // yang melempar exception, variabel $facility_category belum
             // ter-assign -- referensi ke ->getKey() di sini akan memicu
             // error baru di dalam blok catch.
             Log::error(
-                'Gagal memperbarui FacilityCategory.',
+                'Gagal memperbarui facility_category.',
                 [
                     'exception' => $e,
-                    'FacilityCategory_id' => $id,
+                    'facility_category_id' => $id,
                     'data' => $validated,
                     'user_id' => auth()->id(),
                 ]
@@ -166,7 +166,7 @@ class FacilityCategoryController extends MainController
 
             return $this->errorResponse(
                 $request,
-                'Data FacilityCategory gagal diperbarui.'
+                'Data facility_category gagal diperbarui.'
             );
         }
     }
@@ -177,93 +177,34 @@ class FacilityCategoryController extends MainController
     public function destroy(Request $request, $id): JsonResponse|RedirectResponse
     {
         try {
-            $facilityCategory = $this->model->findOrFail($id);
+            $facility_category = $this->model->findOrFail($id);
 
-            DB::transaction(function () use ($facilityCategory) {
-                $facilityCategory->delete();
+            DB::transaction(function () use ($facility_category) {
+                $facility_category->delete();
             });
 
             return $this->successResponse(
                 $request,
-                'Data FacilityCategory berhasil dihapus.'
+                'Data facility_category berhasil dihapus.'
             );
 
         } catch (Throwable $e) {
 
             // FIX: sama seperti update(), pakai $id mentah, bukan
-            // $facilityCategory->getKey() yang bisa undefined.
+            // $facility_category->getKey() yang bisa undefined.
             Log::error(
-                'Gagal menghapus FacilityCategory.',
+                'Gagal menghapus facility_category.',
                 [
                     'exception' => $e,
-                    'FacilityCategory_id' => $id,
+                    'facility_category_id' => $id,
                     'user_id' => auth()->id(),
                 ]
             );
 
             return $this->errorResponse(
                 $request,
-                'Data FacilityCategory gagal dihapus.'
+                'Data facility_category gagal dihapus.'
             );
         }
-    }
-
-    /**
-     * Return successful response.
-     */
-    protected function successResponse(
-        Request $request,
-        string $message,
-        $data = null
-    ): JsonResponse|RedirectResponse {
-
-        if ($this->isAjaxRequest($request)) {
-
-            $response = [
-                'success' => true,
-                'message' => $message,
-            ];
-
-            if ($data !== null) {
-                $response['data'] = $data;
-            }
-
-            return response()->json($response);
-        }
-
-        return redirect()
-            ->route('facility-category.index')
-            ->with('success', $message);
-    }
-
-    /**
-     * Return failed response.
-     */
-    protected function errorResponse(
-        Request $request,
-        string $message,
-        int $status = 500
-    ): JsonResponse|RedirectResponse {
-
-        if ($this->isAjaxRequest($request)) {
-
-            return response()->json([
-                'success' => false,
-                'message' => $message,
-            ], $status);
-        }
-
-        return redirect()
-            ->back()
-            ->withInput()
-            ->with('error', $message);
-    }
-
-    /**
-     * Determine whether the request expects an AJAX response.
-     */
-    protected function isAjaxRequest(Request $request): bool
-    {
-        return $request->ajax() || $request->expectsJson();
-    }
+    } 
 }

@@ -16,6 +16,7 @@ use Throwable;
 class ActionController extends MainController
 {
 
+
     public function __construct(){
         parent::__construct(new Action());
     }
@@ -199,64 +200,5 @@ class ActionController extends MainController
                 'Data Action gagal dihapus.'
             );
         }
-    }
-
-    /**
-     * Return successful response.
-     */
-    protected function successResponse(
-        Request $request,
-        string $message,
-        $data = null
-    ): JsonResponse|RedirectResponse {
-
-        if ($this->isAjaxRequest($request)) {
-
-            $response = [
-                'success' => true,
-                'message' => $message,
-            ];
-
-            if ($data !== null) {
-                $response['data'] = $data;
-            }
-
-            return response()->json($response);
-        }
-
-        return redirect()
-            ->route('action.index')
-            ->with('success', $message);
-    }
-
-    /**
-     * Return failed response.
-     */
-    protected function errorResponse(
-        Request $request,
-        string $message,
-        int $status = 500
-    ): JsonResponse|RedirectResponse {
-
-        if ($this->isAjaxRequest($request)) {
-
-            return response()->json([
-                'success' => false,
-                'message' => $message,
-            ], $status);
-        }
-
-        return redirect()
-            ->back()
-            ->withInput()
-            ->with('error', $message);
-    }
-
-    /**
-     * Determine whether the request expects an AJAX response.
-     */
-    protected function isAjaxRequest(Request $request): bool
-    {
-        return $request->ajax() || $request->expectsJson();
-    }
+    } 
 }

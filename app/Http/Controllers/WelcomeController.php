@@ -35,10 +35,11 @@ class WelcomeController extends Controller
         }
 
         $modules = Module::where('is_active', true)->pluck('id','name')->toArray();
+        $student_ranges = \Models\StudentRange::where('is_active', true)->pluck('id','name')->toArray();
         $roles = Role::all();
         $positions = Position::where('is_active', true)->pluck('id','name')->toArray();
         $packages = Package::where('is_active', true)->pluck('id','name')->toArray();
-        return view('trial_signup', compact('registration', 'modules', 'roles'));
+        return view('trial_signup', compact('registration', 'modules', 'roles','student_ranges'));
     }
 
     public function saveStep(Request $request, int $step): JsonResponse
@@ -51,7 +52,7 @@ class WelcomeController extends Controller
             'npsn' => 'nullable|string|max:20',
             'education_level_id' => 'required|array|min:1',
             'education_level_id.*' => 'exists:education_levels,code',
-            'jumlah_siswa' => 'required|string',
+            'total_student' => 'required|string',
             'address' => 'nullable|string|max:255',
             'nama_user' => 'required|string|max:255',
             'position_id' => 'required|in:kepala_sekolah,wakil_kepala_sekolah,guru,tata_usaha,admin_it,lainnya',
@@ -108,7 +109,7 @@ class WelcomeController extends Controller
                 'name' => $registration->nama_sekolah,
                 'npsn' => $registration->npsn,
                 'education_level_id' => $registration->education_level_id,
-                'jumlah_siswa' => $registration->jumlah_siswa,
+                'total_student' => $registration->total_student,
                 'alamat' => $registration->address,
                 'status' => 'trial',
                 'trial_ends_at' => now()->addDays(14),

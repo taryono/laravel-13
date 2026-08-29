@@ -22,26 +22,4 @@
 
 @push('scripts')
     {!! $dataTable->scripts() !!}
-    
-    <script>
-        // Handle Delete via AJAX
-        $(document).on('click', '.delete-btn', function(e) {
-            e.preventDefault();
-            if (confirm('Apakah Anda yakin ingin menghapus data ini?')) {
-                let url = $(this).attr('href');
-                let token = $('meta[name="csrf-token"]').attr('content');
-                
-                $.ajax({
-                    url: url,
-                    type: 'DELETE',
-                    data: { _token: token },
-                    success: function(response) {
-                        if (response.success) {
-                            window.LaravelDataTables["school-table-table"].ajax.reload();
-                        }
-                    }
-                });
-            }
-        });
-    </script>
 @endpush

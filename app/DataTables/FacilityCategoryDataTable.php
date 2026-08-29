@@ -60,8 +60,8 @@ class FacilityCategoryDataTable extends DataTable
             'UTF-8'
         );
 
-        $editUrl   = e(route('facility-category.edit', $row));
-        $deleteUrl = e(route('facility-category.destroy', $row));
+        $editUrl   = e(route('facility_category.edit', $row));
+        $deleteUrl = e(route('facility_category.destroy', $row));
 
         return <<<HTML
             <div class="d-flex justify-content-center gap-1">
@@ -122,7 +122,7 @@ class FacilityCategoryDataTable extends DataTable
             /*
              * Server-side AJAX endpoint.
              */
-            ->minifiedAjax(route('facility-category.index'))
+            ->minifiedAjax(route('facility_category.index'))
 
             /*
              * Default sorting:

@@ -249,7 +249,7 @@
     .video-cta {
         position: relative;
         background: linear-gradient(180deg, rgba(10, 14, 28, 0.55), rgba(10, 14, 28, 0.85)),
-            url('https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1600&q=60') center/cover no-repeat;
+            url('{{asset("assets/images/photo-1517245386807-bb43f82c33c4.avif")}}') center/cover no-repeat;
         color: #fff;
         text-align: center;
         padding: 6rem 1rem;

@@ -11,8 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
-use Throwable;
-
+use Throwable; 
 class PositionController extends MainController
 {
     public function __construct()
@@ -20,35 +19,15 @@ class PositionController extends MainController
         parent::__construct(new Position());
     }
 
-    /**
-     * Display a listing of the resource.
-     *
-     * Handles both:
-     * - Normal page request
-     * - Yajra DataTables AJAX request
-     */
-    public function index(
-        Request $request,
-        PositionDataTable $dataTable
-    ) {
-        /*
-         * Yajra DataTables request contains "draw".
-         *
-         * Example:
-         * /position?draw=1&start=0&length=10
-         */
+    public function index(Request $request, PositionDataTable $dataTable)
+    {
         if ($request->filled('draw')) {
             return $dataTable->ajax();
         }
 
-        return $dataTable->render(
-            'Position::index'
-        );
+        return $dataTable->render('Position::index');
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create(): View
     {
         $position = new Position();
@@ -56,54 +35,32 @@ class PositionController extends MainController
         $forms = $result['forms'];
         $groupedForms = $result['grouped'];
 
-        return view(
-            'Position::create',
-            compact('position', 'forms', 'groupedForms')
-        );
+        return view('Position::edit', compact('position', 'forms', 'groupedForms'));
     }
 
-    /**
-     * Store a newly created resource.
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'code' => ['required', 'string', 'max:255'],
-            'name' => ['required', 'string', 'max:255'],
+            'code' => 'required|string|max:255|unique:positions,code',
+            'name' => 'required|string|max:255',
+            'level' => 'nullable|string|max:100',
+            'salary_range_min' => 'nullable|numeric|min:0',
+            'salary_range_max' => 'nullable|numeric|min:0|gte:salary_range_min',
+            'is_active' => 'boolean',
         ]);
 
         try {
-            $model = DB::transaction(function () use ($validated) {
+            $position = DB::transaction(function () use ($validated) {
                 return Position::create($validated);
             });
 
-            return $this->successResponse(
-                $request,
-                'Data Position berhasil ditambahkan.',
-                $model
-            );
-
+            return $this->successResponse($request, 'Data jabatan berhasil ditambahkan.', $position);
         } catch (Throwable $e) {
-
-            Log::error(
-                'Gagal menambahkan Position.',
-                [
-                    'exception' => $e,
-                    'data' => $validated,
-                    'user_id' => auth()->id(),
-                ]
-            );
-
-            return $this->errorResponse(
-                $request,
-                'Data Position gagal ditambahkan.'
-            );
+            Log::error('Gagal menambahkan jabatan.', ['exception' => $e, 'data' => $validated]);
+            return $this->errorResponse($request, 'Data jabatan gagal ditambahkan.');
         }
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit($id): View
     {
         $position = $this->model->findOrFail($id);
@@ -111,155 +68,51 @@ class PositionController extends MainController
         $forms = $result['forms'];
         $groupedForms = $result['grouped'];
 
-        return view(
-            'Position::edit',
-            compact('position', 'forms', 'groupedForms')
-        );
+        return view('Position::edit', compact('position', 'forms', 'groupedForms'));
     }
 
-    /**
-     * Update the specified resource.
-     */
     public function update(Request $request, $id)
     {
+        $position = $this->model->findOrFail($id);
+
         $validated = $request->validate([
-            'code' => ['required', 'string', 'max:255'],
-            'name' => ['required', 'string', 'max:255'],
+            'code' => 'required|string|max:255|unique:positions,code,' . $id,
+            'name' => 'required|string|max:255',
+            'level' => 'nullable|string|max:100',
+            'salary_range_min' => 'nullable|numeric|min:0',
+            'salary_range_max' => 'nullable|numeric|min:0|gte:salary_range_min',
+            'is_active' => 'boolean',
         ]);
 
         try {
-            $position = $this->model->findOrFail($id);
-
-            DB::transaction(function () use (
-                $position,
-                $validated
-            ) {
+            DB::transaction(function () use ($position, $validated) {
                 $position->update($validated);
             });
 
-            return $this->successResponse(
-                $request,
-                'Data Position berhasil diperbarui.',
-                $position
-            );
-
+            return $this->successResponse($request, 'Data jabatan berhasil diperbarui.', $position);
         } catch (Throwable $e) {
-
-            // FIX: pakai $id mentah untuk logging, BUKAN
-            // $position->getKey(), karena kalau findOrFail() di atas
-            // yang melempar exception, variabel $position belum
-            // ter-assign -- referensi ke ->getKey() di sini akan memicu
-            // error baru di dalam blok catch.
-            Log::error(
-                'Gagal memperbarui Position.',
-                [
-                    'exception' => $e,
-                    'Position_id' => $id,
-                    'data' => $validated,
-                    'user_id' => auth()->id(),
-                ]
-            );
-
-            return $this->errorResponse(
-                $request,
-                'Data Position gagal diperbarui.'
-            );
+            Log::error('Gagal memperbarui jabatan.', ['exception' => $e, 'position_id' => $id]);
+            return $this->errorResponse($request, 'Data jabatan gagal diperbarui.');
         }
     }
 
-    /**
-     * Remove the specified resource.
-     */
-    public function destroy(Request $request, $id): JsonResponse|RedirectResponse
+    public function destroy(Request $request, $id)
     {
         try {
             $position = $this->model->findOrFail($id);
+
+            if ($position->employees()->exists()) {
+                return $this->errorResponse($request, 'Jabatan tidak dapat dihapus karena masih memiliki karyawan.');
+            }
 
             DB::transaction(function () use ($position) {
                 $position->delete();
             });
 
-            return $this->successResponse(
-                $request,
-                'Data Position berhasil dihapus.'
-            );
-
+            return $this->successResponse($request, 'Data jabatan berhasil dihapus.');
         } catch (Throwable $e) {
-
-            // FIX: sama seperti update(), pakai $id mentah, bukan
-            // $position->getKey() yang bisa undefined.
-            Log::error(
-                'Gagal menghapus Position.',
-                [
-                    'exception' => $e,
-                    'Position_id' => $id,
-                    'user_id' => auth()->id(),
-                ]
-            );
-
-            return $this->errorResponse(
-                $request,
-                'Data Position gagal dihapus.'
-            );
+            Log::error('Gagal menghapus jabatan.', ['exception' => $e, 'position_id' => $id]);
+            return $this->errorResponse($request, 'Data jabatan gagal dihapus.');
         }
-    }
-
-    /**
-     * Return successful response.
-     */
-    protected function successResponse(
-        Request $request,
-        string $message,
-        $data = null
-    ): JsonResponse|RedirectResponse {
-
-        if ($this->isAjaxRequest($request)) {
-
-            $response = [
-                'success' => true,
-                'message' => $message,
-            ];
-
-            if ($data !== null) {
-                $response['data'] = $data;
-            }
-
-            return response()->json($response);
-        }
-
-        return redirect()
-            ->route('position.index')
-            ->with('success', $message);
-    }
-
-    /**
-     * Return failed response.
-     */
-    protected function errorResponse(
-        Request $request,
-        string $message,
-        int $status = 500
-    ): JsonResponse|RedirectResponse {
-
-        if ($this->isAjaxRequest($request)) {
-
-            return response()->json([
-                'success' => false,
-                'message' => $message,
-            ], $status);
-        }
-
-        return redirect()
-            ->back()
-            ->withInput()
-            ->with('error', $message);
-    }
-
-    /**
-     * Determine whether the request expects an AJAX response.
-     */
-    protected function isAjaxRequest(Request $request): bool
-    {
-        return $request->ajax() || $request->expectsJson();
     }
 }

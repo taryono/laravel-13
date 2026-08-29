@@ -146,6 +146,25 @@
                 });
             @endif
         });
+        
+        $(document).on('click', '.delete-btn', function(e) {
+            e.preventDefault();
+            if (confirm('Apakah Anda yakin ingin menghapus data ini?')) {
+                let url = $(this).attr('href');
+                let token = $('meta[name="csrf-token"]').attr('content');
+                
+                $.ajax({
+                    url: url,
+                    type: 'DELETE',
+                    data: { _token: token },
+                    success: function(response) {
+                        if (response.success) {
+                            window.LaravelDataTables["{{modelTableId}}-table"].ajax.reload();
+                        }
+                    }
+                });
+            }
+        });
     </script>
     
     @stack('scripts')
