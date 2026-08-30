@@ -2,7 +2,7 @@
 
 namespace App\DataTables;
 
-use App\Models\Dashboard;
+use App\Models\FinanceDashboard;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
@@ -10,7 +10,7 @@ use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
 use Yajra\DataTables\Services\DataTable;
 
-class DashboardDataTable extends DataTable
+class FinanceDashboardDataTable extends DataTable
 {
     /**
      * Kolom yang ditampilkan di tabel (selain DT_RowIndex & action).
@@ -48,7 +48,7 @@ class DashboardDataTable extends DataTable
      */
     protected function renderActionButtons($row): string
     {
-        $title = e('Detail Dashboard ' . $row->name);
+        $title = e('Detail FinanceDashboard ' . $row->name);
 
         $context = htmlspecialchars(
             json_encode([
@@ -98,7 +98,7 @@ class DashboardDataTable extends DataTable
     /**
      * Get query source of DataTable.
      */
-    public function query(Dashboard $model): QueryBuilder
+    public function query(FinanceDashboard $model): QueryBuilder
     {
         return $model->newQuery();
     }
@@ -294,6 +294,6 @@ class DashboardDataTable extends DataTable
      */
     protected function filename(): string
     {
-        return 'Dashboard_' . date('YmdHis');
+        return 'FinanceDashboard_' . date('YmdHis');
     }
 }

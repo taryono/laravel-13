@@ -18,7 +18,11 @@ class MainController extends Controller implements HasMiddleware
     public function __construct($model = null, $controller = null)
     {
         $this->model = $model; 
-        $this->controller = $controller?$controller:Str::snake($model->getModel()->getTable());
+        if($controller){
+            $this->controller = $controller;
+        }else{
+            $this->controller = Str::snake($model?$model->getModel()->getTable():'');
+        } 
     }
 
     public static function middleware(): array

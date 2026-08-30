@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Modules\Dashboard\Controllers;
+namespace App\Modules\FinanceDashboard\Controllers;
 
-use App\DataTables\DashboardDataTable;
+use App\DataTables\FinanceDashboardDataTable;
 use App\Http\Controllers\MainController;
-use Models\Dashboard;
+use Models\FinanceDashboard;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -18,7 +18,7 @@ use Models\JournalEntry;
 use Models\Invoice; 
 use Throwable; 
 
-class DashboardController extends Controller
+class FinanceDashboardController extends Controller
 {
     public function index(): View
     {
@@ -28,7 +28,7 @@ class DashboardController extends Controller
         $financeStats = $this->getFinanceStats();
         $recentActivities = $this->getRecentActivities();
 
-        return view('System::dashboard.index', compact('stats', 'payrollStats', 'financeStats', 'recentActivities'));
+        return view('System::finance_dashboard.index', compact('stats', 'payrollStats', 'financeStats', 'recentActivities'));
     }
 
     private function getStats(): array

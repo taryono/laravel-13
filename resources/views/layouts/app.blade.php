@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    
+
     {{-- ============================================= --}}
     {{-- 1. META TAGS (untuk core.js) --}}
     {{-- ============================================= --}}
@@ -12,7 +13,7 @@
     <meta name="login_as" content="{{ session('user_auth.role_as') ?? '' }}">
     <meta name="app-url" content="{{ config('app.url') }}">
     <meta name="env" content="{{ app()->environment() }}">
-    
+
     <title>@yield('title', config('app.name', 'Dashboard'))</title>
 
     {{-- ============================================= --}}
@@ -20,21 +21,26 @@
     {{-- ============================================= --}}
     {{-- Bootstrap 5.3 hanya 1x --}}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    
+
     {{-- Fonts --}}
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet">
+
     {{-- FontAwesome 6.5.1 (stable version) --}}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    
+
     {{-- DataTables CSS (hanya yang diperlukan) --}}
-    <link href="https://cdn.datatables.net/v/bs5/moment-2.29.4/jszip-3.10.1/dt-3.0.0/af-3.0.0/b-4.0.0/cr-3.0.0/cc-2.0.0/date-2.0.0/fc-6.0.0/fh-5.0.0/r-4.0.0/rr-2.0.0/sc-3.0.0/sb-2.0.0/sl-4.0.0/datatables.min.css" rel="stylesheet" integrity="sha384-YNHRxm6Vr29HJTQ8v1aLtlWi3mpEkk1B+elXLCf/7tFakByky4LC7vDLiRM6Fh4t" crossorigin="anonymous">
-    
+    <link
+        href="https://cdn.datatables.net/v/bs5/moment-2.29.4/jszip-3.10.1/dt-3.0.0/af-3.0.0/b-4.0.0/cr-3.0.0/cc-2.0.0/date-2.0.0/fc-6.0.0/fh-5.0.0/r-4.0.0/rr-2.0.0/sc-3.0.0/sb-2.0.0/sl-4.0.0/datatables.min.css"
+        rel="stylesheet" integrity="sha384-YNHRxm6Vr29HJTQ8v1aLtlWi3mpEkk1B+elXLCf/7tFakByky4LC7vDLiRM6Fh4t"
+        crossorigin="anonymous">
+
     {{-- Custom Styles --}}
     <link rel="stylesheet" href="{{ asset('assets/css/dashboard.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/custom-datatable.css') }}">
-    
+
     @stack('styles')
 </head>
 
@@ -53,7 +59,7 @@
             <span class="material-symbols-outlined">workspace_premium</span>
             <span>BNSP Portal</span>
         </div>
-        
+
         {{-- Flash Messages Container --}}
         <x-flash-messages />
     </nav>
@@ -63,7 +69,7 @@
     {{-- ============================================= --}}
     <div class="bnsp-main-wrapper" id="bnspMainWrapper">
         <x-topbar />
-        
+
         {{-- Main content with ID for dynamic loading --}}
         <main class="flex-grow-1 p-4 mx-auto w-100 main-content" id="mainContent" style="max-width:1320px;">
             @yield('content')
@@ -75,28 +81,35 @@
     {{-- ============================================= --}}
     {{-- 6. JAVASCRIPT (Optimized Order) --}}
     {{-- ============================================= --}}
-    
+
     {{-- jQuery 3.7.1 (stable) --}}
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    
+
     {{-- Bootstrap Bundle 5.3.3 --}}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    
+
     {{-- SweetAlert2 --}}
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
+
     {{-- Axios --}}
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    
+
     {{-- DataTables (minimal) --}}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js" integrity="sha384-VFQrHzqBh5qiJIU0uGU5CIW3+OWpdGGJM9LBnGbuIH2mkICcFZ7lPd/AAtI7SNf7" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js" integrity="sha384-/RlQG9uf0M2vcTw3CX7fbqgbj/h8wKxw7C3zu9/GxcBPRKOEcESxaxufwRXqzq6n" crossorigin="anonymous"></script>
-    <script src="https://cdn.datatables.net/v/bs5/moment-2.29.4/jszip-3.10.1/dt-3.0.0/af-3.0.0/b-4.0.0/cr-3.0.0/cc-2.0.0/date-2.0.0/fc-6.0.0/fh-5.0.0/r-4.0.0/rr-2.0.0/sc-3.0.0/sb-2.0.0/sl-4.0.0/datatables.min.js" integrity="sha384-OaKEle/U0cMG9jUTQQsGJE3gkQhgmqG3mQf1s6Cz2XbXrm6ntMTDMkOtapkUordX" crossorigin="anonymous"></script>
-    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"
+        integrity="sha384-VFQrHzqBh5qiJIU0uGU5CIW3+OWpdGGJM9LBnGbuIH2mkICcFZ7lPd/AAtI7SNf7" crossorigin="anonymous">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"
+        integrity="sha384-/RlQG9uf0M2vcTw3CX7fbqgbj/h8wKxw7C3zu9/GxcBPRKOEcESxaxufwRXqzq6n" crossorigin="anonymous">
+    </script>
+    <script
+        src="https://cdn.datatables.net/v/bs5/moment-2.29.4/jszip-3.10.1/dt-3.0.0/af-3.0.0/b-4.0.0/cr-3.0.0/cc-2.0.0/date-2.0.0/fc-6.0.0/fh-5.0.0/r-4.0.0/rr-2.0.0/sc-3.0.0/sb-2.0.0/sl-4.0.0/datatables.min.js"
+        integrity="sha384-OaKEle/U0cMG9jUTQQsGJE3gkQhgmqG3mQf1s6Cz2XbXrm6ntMTDMkOtapkUordX" crossorigin="anonymous">
+    </script>
+
     {{-- ============================================= --}}
     {{-- 7. CUSTOM SCRIPTS --}}
     {{-- ============================================= --}}
-    
+
     {{-- 2. Core.js (HARUS PERTAMA) --}}
     <script src="{{ asset('assets/js/core.js') }}?v={{ time() }}"></script>
 
@@ -107,10 +120,10 @@
     <script src="{{ asset('assets/js/dashboard.js') }}"></script>
     <script src="{{ asset('assets/js/modal.js') }}"></script>
 
-        
+
     {{-- AlpineJS (lebih baik di awal, bukan defer) --}}
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
-    
+
     {{-- ============================================= --}}
     {{-- 8. INLINE SCRIPTS (Initialization) --}}
     {{-- ============================================= --}}
@@ -133,9 +146,9 @@
                         }
                     });
                 }, duration);
-            } 
+            }
             // Debug info (only in development)
-            @if(app()->environment('local'))
+            @if (app()->environment('local'))
                 console.log('✅ App initialized in', '{{ app()->environment() }}', 'mode');
                 console.log('📦 Dependencies:', {
                     jQuery: typeof $ !== 'undefined',
@@ -146,27 +159,31 @@
                 });
             @endif
         });
-        
-        $(document).on('click', '.delete-btn', function(e) {
-            e.preventDefault();
-            if (confirm('Apakah Anda yakin ingin menghapus data ini?')) {
-                let url = $(this).attr('href');
-                let token = $('meta[name="csrf-token"]').attr('content');
-                
-                $.ajax({
-                    url: url,
-                    type: 'DELETE',
-                    data: { _token: token },
-                    success: function(response) {
-                        if (response.success) {
-                            window.LaravelDataTables["{{modelTableId}}-table"].ajax.reload();
+        @if (isset($modelTableId))
+            $(document).on('click', '.delete-btn', function(e) {
+                e.preventDefault();
+                if (confirm('Apakah Anda yakin ingin menghapus data ini?')) {
+                    let url = $(this).attr('href');
+                    let token = $('meta[name="csrf-token"]').attr('content');
+
+                    $.ajax({
+                        url: url,
+                        type: 'DELETE',
+                        data: {
+                            _token: token
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                window.LaravelDataTables["{{ modelTableId }}-table"].ajax.reload();
+                            }
                         }
-                    }
-                });
-            }
-        });
+                    });
+                }
+            });
+        @endif
     </script>
-    
+
     @stack('scripts')
 </body>
+
 </html>
