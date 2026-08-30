@@ -28,7 +28,7 @@ class AccountController extends MainController
             return $dataTable->ajax();
         }
 
-        return $dataTable->render('Finance::account.index');
+        return $dataTable->render('Account::index');
     }
 
     /**
@@ -47,7 +47,7 @@ class AccountController extends MainController
         $groupedForms = $result['grouped'];
 
         return view(
-            'Finance::account.edit',
+            'Account::edit',
             compact('account', 'forms', 'groupedForms', 'categories', 'parents')
         );
     }
@@ -113,7 +113,7 @@ class AccountController extends MainController
         $groupedForms = $result['grouped'];
 
         return view(
-            'Finance::account.edit',
+            'Account::edit',
             compact('account', 'forms', 'groupedForms', 'categories', 'parents')
         );
     }

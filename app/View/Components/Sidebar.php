@@ -9,10 +9,13 @@ class Sidebar extends Component
 {
     public $menu;
     public $topnavMenu;
+    protected MenuService $menuService;
 
-    public function __construct()
+    public function __construct(MenuService $menuService)
     {
-        $split = (new MenuService())->getSplitMenu(request()->url());
+        $this->menuService = $menuService;
+        
+        $split = $this->menuService->getSplitMenu(request()->url(), auth()->user());
         $this->menu = $split['menu'];
         $this->topnavMenu = $split['topnavMenu'];
     }

@@ -1,7 +1,11 @@
 {{-- resources/views/components/menu/nav-items.blade.php --}}
+
 @foreach ($items as $item)
-    <div class="bnsp-nav-item {{ $item->children->isNotEmpty() ? 'open' : '' }}">
-        
+    @php
+        $item->children = collect($item->children);
+    @endphp
+    <div class="bnsp-nav-item {{ $item->open ? 'open active' : '' }}">
+
         @if ($item->children->isNotEmpty())
             <a href="#" class="bnsp-nav-link bnsp-nav-parent">
                 {{-- Sesuaikan parameter ikon sesuai kolom baru --}}
@@ -9,7 +13,8 @@
                 <span class="nav-label flex-grow-1">{{ $item->title }}</span>
                 <span class="material-symbols-outlined chevron">chevron_right</span>
             </a>
-            <ul class="bnsp-submenu" data-flyout-text="{{ $item->flyoutTitle }}" data-flyout-title="{{ $item->title }}" data-flyout-url="{{ $item->route ?? '#' }}">
+            <ul class="bnsp-submenu" data-flyout-text="{{ $item->flyoutTitle }}" data-flyout-title="{{ $item->title }}"
+                data-flyout-url="{{ $item->route ?? '#' }}">
                 @foreach ($item->children as $child)
                     <li><x-menu.nav-items :items="[$child]" /></li>
                 @endforeach

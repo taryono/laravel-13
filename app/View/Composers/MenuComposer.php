@@ -8,15 +8,20 @@ use Illuminate\View\View;
 
 class MenuComposer
 {
+    protected MenuService $menuService;
+
+    public function __construct(MenuService $menuService)
+    {
+        $this->menuService = $menuService;
+    }
+
     public function compose(View $view): void
     {
-        $menuService = new MenuService();
-        
-        // Kirim user yang sedang login ke service untuk filter izin
-        $split = $menuService->getSplitMenu(
+        $split = $this->menuService->getSplitMenu(
             request()->url(),
             Auth::user()
-        ); 
+        );
+        
         $view->with('menu', $split['menu'] ?? collect());
         $view->with('topnavMenu', $split['topnavMenu'] ?? collect());
     }

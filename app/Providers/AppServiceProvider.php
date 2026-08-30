@@ -8,14 +8,19 @@ use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
+use App\Core\Menu\MenuService;
+use App\Core\Menu\MenuTreeBuilder;
+
 class AppServiceProvider extends ServiceProvider
 {
     /**
      * Register any application services.
      */
-    public function register(): void
+    // app/Providers/AppServiceProvider.php
+    public function register()
     {
-        //
+        $this->app->singleton(MenuTreeBuilder::class);
+        $this->app->singleton(MenuService::class);
     }
 
     /**

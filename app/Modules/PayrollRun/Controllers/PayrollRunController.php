@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 use Throwable; 
+use App\Services\PayrollCalculationService;
 
 class PayrollRunController extends MainController
 {
@@ -32,7 +33,7 @@ class PayrollRunController extends MainController
             return $dataTable->ajax();
         }
 
-        return $dataTable->render('Payroll::payroll_run.index');
+        return $dataTable->render('PayrollRun::index');
     }
 
     /**
@@ -50,7 +51,7 @@ class PayrollRunController extends MainController
         $groupedForms = $result['grouped'];
 
         return view(
-            'Payroll::payroll_run.edit',
+            'PayrollRun::edit',
             compact('payrollRun', 'forms', 'groupedForms', 'periods')
         );
     }
@@ -140,7 +141,7 @@ class PayrollRunController extends MainController
             'payrollPeriod'
         ])->findOrFail($id);
 
-        return view('Payroll::payroll_run.show', compact('payrollRun'));
+        return view('PayrollRun::show', compact('payrollRun'));
     }
 
     /**
@@ -157,7 +158,7 @@ class PayrollRunController extends MainController
         $groupedForms = $result['grouped'];
 
         return view(
-            'Payroll::payroll_run.edit',
+            'PayrollRun::edit',
             compact('payrollRun', 'forms', 'groupedForms', 'periods')
         );
     }

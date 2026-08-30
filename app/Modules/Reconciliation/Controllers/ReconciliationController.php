@@ -28,7 +28,7 @@ class ReconciliationController extends MainController
             return $dataTable->ajax();
         }
 
-        return $dataTable->render('Finance::reconciliation.index');
+        return $dataTable->render('Reconciliation::index');
     }
 
     public function create(): View
@@ -40,7 +40,7 @@ class ReconciliationController extends MainController
         $forms = $result['forms'];
         $groupedForms = $result['grouped'];
 
-        return view('Finance::reconciliation.edit', compact('reconciliation', 'forms', 'groupedForms', 'bankAccounts'));
+        return view('Reconciliation::edit', compact('reconciliation', 'forms', 'groupedForms', 'bankAccounts'));
     }
 
     public function store(Request $request)
@@ -75,7 +75,7 @@ class ReconciliationController extends MainController
         $forms = $result['forms'];
         $groupedForms = $result['grouped'];
 
-        return view('Finance::reconciliation.edit', compact('reconciliation', 'forms', 'groupedForms', 'bankAccounts'));
+        return view('Reconciliation::edit', compact('reconciliation', 'forms', 'groupedForms', 'bankAccounts'));
     }
 
     public function update(Request $request, $id)
@@ -110,7 +110,7 @@ class ReconciliationController extends MainController
     public function show($id): View
     {
         $reconciliation = $this->model->with(['bankAccount', 'details'])->findOrFail($id);
-        return view('Finance::reconciliation.show', compact('reconciliation'));
+        return view('Reconciliation::show', compact('reconciliation'));
     }
 
     public function destroy(Request $request, $id): JsonResponse|RedirectResponse

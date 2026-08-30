@@ -14,7 +14,7 @@ class MenuPermissionResolver
             ->where('actions.is_active', 1)
             ->where('action_roles.is_allowed', 1)
             ->distinct()
-            ->pluck('actions.module_id')
+            // ->pluck('actions.module_id')
             ->all();
     }
 }

@@ -5,8 +5,7 @@ namespace App\Core\Menu;
 class MenuItem
 {
     public int $id;
-    public ?int $parent_id = null;
-    public ?int $module_id = null;
+    public ?int $parent_id = null; // ✅ Tambah sesuai tabel
     public ?string $text = null; // ✅ Tambah sesuai tabel
     public ?string $action = null; // ✅ Tambah sesuai tabel
     public ?string $permission = null; // ✅ Tambah jika pakai kolom `can`
@@ -26,8 +25,7 @@ class MenuItem
     {
         $item = new self();
         $item->id = $menu->id;
-        $item->parent_id = $menu->parent_id ?: null;
-        $item->module_id = $menu->module_id;
+        $item->parent_id = $menu->parent_id ?: null; 
         $item->text = ucwords(strtolower(str_replace('_', ' ', $menu->text)));
         $item->title = ucwords(strtolower(str_replace('_', ' ', $menu->title)));
         $item->icon = $menu->icon;

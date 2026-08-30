@@ -90,19 +90,34 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     // Atau pakai cache dengan tag (Redis/Memcached)
-    public function hasRole($role)
+     public function hasRole($role)
     {
-        return Cache::tags(['user_roles', "user_{$this->id}"])
-            ->remember("user_{$this->id}_role_{$role}", 3600, fn() =>
-                $this->roles()->where('name', $role)->exists()
-            );
+        $cacheKey = "user_{$this->id}_role_{$role}";
+        
+        return Cache::remember($cacheKey, 3600, function() use ($role) {
+            return $this->roles()->where('name', $role)->exists();
+        });
     }
 
     // Panggil saat role berubah
     public function syncRoles(...$roles)
     {
         parent::syncRoles($roles);
-        Cache::tags(['user_roles', "user_{$this->id}"])->flush();
+        
+        // Hapus semua cache yang berkaitan dengan user ini
+        $cacheKeys = [
+            "user_{$this->id}_role_admin",
+            "user_{$this->id}_role_manager",
+            "user_{$this->id}_role_special_role",
+            // Tambahkan semua role yang mungkin
+        ];
+        
+        foreach ($cacheKeys as $key) {
+            Cache::forget($key);
+        }
+        
+        // Atau lebih simple: flush semua cache user
+        // Cache::forget("user_{$this->id}_role_*"); // Tidak support wildcard
     }
 
     // --- Session & Lainnya ---
