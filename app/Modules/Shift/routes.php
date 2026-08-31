@@ -23,5 +23,5 @@ Route::group(['prefix' => 'shift', 'namespace' => 'App\Modules\Shift\Controllers
     Route::get('/edit/{id}', ['as' => 'shift.edit', 'uses' => 'ShiftController@edit']);
     Route::put('/update/{id}', ['as' => 'shift.update', 'uses' => 'ShiftController@update']);
     Route::delete('/delete/{id}', ['as' => 'shift.destroy', 'uses' => 'ShiftController@destroy']);
-    
-});
+    Route::get('/options', ['as' => 'shift.options', 'uses' => 'ShiftController@options']); 
+}); 

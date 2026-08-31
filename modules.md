@@ -290,3 +290,12 @@ Route::prefix('attendance-process')->group(function () {
     Route::post('/run', [AttendanceProcessController::class, 'process'])->name('attendance-process.run');
     Route::get('/status', [AttendanceProcessController::class, 'status'])->name('attendance-process.status');
 });
+
+app/Modules/
+├── Shift/
+│   ├── Controllers/
+│   │   |── ShiftController.php
+│   └── views/ 
+│   │     ├── index.blade.php
+│   │     └── edit.blade.php
+│   └── routes.php
