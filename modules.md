@@ -190,3 +190,103 @@ app/Modules/
     ├── FinancialRatioController.php
     ├── DataImportController.php
     └── DashboardController.php
+
+app/Modules/
+├── Shift/
+│   ├── Controllers/
+│   │   ├── ShiftController.php
+│   │   └── EmployeeShiftController.php
+│   ├── Models/
+│   │   ├── Shift.php
+│   │   └── EmployeeShift.php
+│   └── views/
+│       ├── shift/
+│       │   ├── index.blade.php
+│       │   └── edit.blade.php
+│       └── employee-shift/
+│           ├── index.blade.php
+│           └── edit.blade.php
+├── Attendance/
+│   ├── Controllers/
+│   │   ├── AttendanceLogController.php
+│   │   ├── AttendanceDailyController.php
+│   │   ├── AttendanceImportController.php
+│   │   └── AttendanceProcessController.php
+│   ├── Models/
+│   │   ├── AttendanceLog.php
+│   │   ├── AttendanceDaily.php
+│   │   └── AttendanceImportBatch.php
+│   ├── Services/
+│   │   ├── AttendanceProcessor.php
+│   │   ├── ShiftDetector.php
+│   │   ├── OvertimeCalculator.php
+│   │   └── FingerprintImporter.php
+│   └── views/
+│       ├── attendance/
+│       │   ├── index.blade.php
+│       │   ├── logs.blade.php
+│       │   └── import.blade.php
+│       └── daily/
+│           ├── index.blade.php
+│           └── detail.blade.php
+└── Payroll/
+    └── (existing)
+
+    <?php
+// routes/modules.php or routes/web.php
+
+use App\Modules\Shift\Controllers\ShiftController;
+use App\Modules\Shift\Controllers\EmployeeShiftController;
+use App\Modules\Attendance\Controllers\AttendanceLogController;
+use App\Modules\Attendance\Controllers\AttendanceDailyController;
+use App\Modules\Attendance\Controllers\AttendanceProcessController;
+
+// ===================== SHIFT MANAGEMENT =====================
+Route::prefix('shifts')->group(function () {
+    Route::get('/', [ShiftController::class, 'index'])->name('shifts.index');
+    Route::get('/create', [ShiftController::class, 'create'])->name('shifts.create');
+    Route::post('/', [ShiftController::class, 'store'])->name('shifts.store');
+    Route::get('/{id}/edit', [ShiftController::class, 'edit'])->name('shifts.edit');
+    Route::put('/{id}', [ShiftController::class, 'update'])->name('shifts.update');
+    Route::delete('/{id}', [ShiftController::class, 'destroy'])->name('shifts.destroy');
+    Route::get('/options', [ShiftController::class, 'options'])->name('shifts.options');
+});
+
+// ===================== EMPLOYEE SHIFT SCHEDULE =====================
+Route::prefix('employee-shifts')->group(function () {
+    Route::get('/', [EmployeeShiftController::class, 'index'])->name('employee-shifts.index');
+    Route::get('/create', [EmployeeShiftController::class, 'create'])->name('employee-shifts.create');
+    Route::post('/', [EmployeeShiftController::class, 'store'])->name('employee-shifts.store');
+    Route::get('/{id}/edit', [EmployeeShiftController::class, 'edit'])->name('employee-shifts.edit');
+    Route::put('/{id}', [EmployeeShiftController::class, 'update'])->name('employee-shifts.update');
+    Route::delete('/{id}', [EmployeeShiftController::class, 'destroy'])->name('employee-shifts.destroy');
+    Route::post('/bulk-assign', [EmployeeShiftController::class, 'bulkAssign'])->name('employee-shifts.bulk-assign');
+    Route::get('/get-shift', [EmployeeShiftController::class, 'getShiftForDate'])->name('employee-shifts.get-shift');
+});
+
+// ===================== ATTENDANCE LOGS =====================
+Route::prefix('attendance-logs')->group(function () {
+    Route::get('/', [AttendanceLogController::class, 'index'])->name('attendance-logs.index');
+    Route::get('/import', [AttendanceLogController::class, 'importForm'])->name('attendance-logs.import-form');
+    Route::post('/import', [AttendanceLogController::class, 'import'])->name('attendance-logs.import');
+    Route::post('/preview', [AttendanceLogController::class, 'previewImport'])->name('attendance-logs.preview');
+    Route::post('/process', [AttendanceLogController::class, 'processUnprocessed'])->name('attendance-logs.process');
+    Route::delete('/{id}', [AttendanceLogController::class, 'destroy'])->name('attendance-logs.destroy');
+    Route::get('/employee/{employeeId}', [AttendanceLogController::class, 'getByEmployee'])->name('attendance-logs.by-employee');
+});
+
+// ===================== DAILY ATTENDANCE =====================
+Route::prefix('attendance-daily')->group(function () {
+    Route::get('/', [AttendanceDailyController::class, 'index'])->name('attendance-daily.index');
+    Route::get('/{id}', [AttendanceDailyController::class, 'show'])->name('attendance-daily.show');
+    Route::get('/{id}/edit', [AttendanceDailyController::class, 'edit'])->name('attendance-daily.edit');
+    Route::put('/{id}', [AttendanceDailyController::class, 'update'])->name('attendance-daily.update');
+    Route::post('/bulk-update', [AttendanceDailyController::class, 'bulkUpdate'])->name('attendance-daily.bulk-update');
+    Route::get('/export', [AttendanceDailyController::class, 'export'])->name('attendance-daily.export');
+});
+
+// ===================== PROCESS ATTENDANCE =====================
+Route::prefix('attendance-process')->group(function () {
+    Route::post('/run', [AttendanceProcessController::class, 'process'])->name('attendance-process.run');
+    Route::get('/status', [AttendanceProcessController::class, 'status'])->name('attendance-process.status');
+});
