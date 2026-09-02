@@ -312,3 +312,280 @@ app/Modules/
 app/Models/
 ├── User.php -> namespace App\Models;
 ├── Shift.php -> namespace Models;
+
+
+ERP
+│
+├── Organization / Multi Entity
+│
+├── HRIS
+│   ├── employees
+│   ├── departments
+│   ├── positions
+│   ├── employee_contracts
+│   ├── attendance_logs
+│   ├── attendance_dailies
+│   ├── overtimes
+│   ├── leave_types
+│   ├── leave_balances
+│   └── employee_leaves
+│
+├── PAYROLL
+│   ├── salary_components
+│   ├── salary_structures
+│   ├── salary_structure_components
+│   ├── employee_salary_components
+│   ├── payroll_periods
+│   ├── payroll_runs
+│   ├── payroll_details
+│   ├── payroll_detail_components
+│   ├── payslips
+│   ├── loans
+│   ├── loan_installments
+│   ├── employee_bonuses
+│   └── employee_deductions
+│
+└── ACCOUNTING
+    ├── account_categories
+    ├── accounts
+    ├── cost_centers
+    ├── fiscal_years
+    ├── accounting_periods
+    ├── journal_entries
+    ├── journal_details
+    ├── account_mappings
+    │
+    ├── customers
+    ├── vendors
+    ├── invoices
+    ├── invoice_items
+    ├── invoice_payments
+    ├── expenses
+    ├── expense_items
+    ├── expense_payments
+    │
+    ├── bank_accounts
+    ├── bank_transactions
+    ├── reconciliations
+    ├── reconciliation_details
+    │
+    ├── payroll_integrations
+    ├── payroll_payment_batches
+    ├── payroll_payments
+    │
+    ├── tax_settings
+    ├── tax_liabilities
+    ├── tax_payments
+    │
+    ├── fixed_assets
+    ├── asset_depreciations
+    │
+    ├── budgets
+    ├── budget_details
+    │
+    ├── opening_balances
+    └── finance_audit_logs
+
+✓ Chart of Accounts
+✓ General Journal
+✓ General Ledger foundation
+✓ Payroll integration
+✓ Account mapping
+✓ Sales invoice
+✓ Expense
+✓ Bank account
+✓ Bank transaction
+✓ Bank reconciliation
+✓ Fiscal year
+✓ Tax
+✓ Audit log
+
+❌ Customer master
+❌ Vendor/Supplier master
+❌ Invoice payment
+❌ Vendor payable
+❌ Expense payment
+❌ Accounts Receivable
+❌ Accounts Payable
+❌ Payment batch
+❌ Cash management
+❌ Cost center
+❌ Accounting period
+❌ Financial statement engine
+❌ Opening balance mechanism
+❌ Journal reversal
+❌ Year-end closing
+❌ Budget
+
+Arsitektur yang saya rekomendasikan
+                         ┌──────────────┐
+                         │     HRIS     │
+                         └──────┬───────┘
+                                │
+                                ▼
+                         ┌──────────────┐
+                         │    PAYROLL   │
+                         └──────┬───────┘
+                                │
+                                ▼
+                       ┌──────────────────┐
+                       │ Payroll Posting  │
+                       └────────┬─────────┘
+                                │
+                                ▼
+┌────────────┐           ┌──────────────┐
+│   SALES    │──────────►│              │
+└────────────┘           │              │
+                         │   ACCOUNTING  │
+┌────────────┐           │              │
+│  PURCHASE  │──────────►│              │
+└────────────┘           │              │
+                         │              │
+┌────────────┐           │              │
+│  EXPENSE   │──────────►│              │
+└────────────┘           │              │
+                         │              │
+┌────────────┐           │              │
+│    BANK    │──────────►│              │
+└────────────┘           └──────┬───────┘
+                                │
+                                ▼
+                         ┌──────────────┐
+                         │    GENERAL   │
+                         │    LEDGER    │
+                         └──────┬───────┘
+                                │
+               ┌────────────────┼────────────────┐
+               ▼                ▼                ▼
+          Balance Sheet     P&L Report      Cash Flow
+
+
+HRIS
+  ↓
+Payroll Calculation
+  ↓
+Payroll Approval
+  ↓
+Payroll Posting
+  ↓
+Accounting Journal
+  ↓
+Liability
+  ↓
+Payment
+  ↓
+Bank
+  ↓
+Bank Reconciliation
+  ↓
+Financial Report
+
+Payroll Calculation
+       ↓
+Payroll Approval
+       ↓
+Payroll Posting
+       ↓
+Journal
+       ↓
+Hutang Gaji
+       ↓
+Payroll Payment Batch
+       ↓
+Individual Payroll Payment
+       ↓
+Bank
+       ↓
+Bank Reconciliation
+
+Accounting sekarang mempunyai lifecycle
+
+DRAFT
+  ↓
+APPROVED
+  ↓
+POSTED
+
+dan apabila salah:
+
+POSTED
+  ↓
+REVERSAL / VOID
+  ↓
+CORRECTION JOURNAL
+
+STEP 1
+Review final database architecture
+        ↓
+STEP 2
+Tetapkan mana tabel existing yang dipertahankan
+        ↓
+STEP 3
+Rename / alter tabel yang perlu
+        ↓
+STEP 4
+Tambah tabel baru
+        ↓
+STEP 5
+Tambah FK + index + unique constraint
+        ↓
+STEP 6
+Buat Laravel migrations
+        ↓
+STEP 7
+Buat Models + Relationships
+        ↓
+STEP 8
+Buat Services
+        ↓
+STEP 9
+Payroll Calculation Engine
+        ↓
+STEP 10
+Payroll → Accounting Posting
+        ↓
+STEP 11
+Payment & Bank Reconciliation
+        ↓
+STEP 12
+Financial Reports
+
+app/
+├── Domain/
+│   ├── HRIS/
+│   ├── Payroll/
+│   ├── Accounting/
+│   ├── Finance/
+│   └── Shared/
+│
+├── Models/
+│
+├── Services/
+│   ├── Payroll/
+│   ├── Accounting/
+│   ├── Finance/
+│   └── HRIS/
+│
+└── ...
+
+PayrollCalculationService
+PayrollApprovalService
+PayrollPostingService
+
+JournalEntryService
+JournalPostingService
+JournalReversalService
+
+InvoiceService
+InvoicePaymentService
+
+ExpenseService
+ExpensePaymentService
+
+BankReconciliationService
+
+TaxLiabilityService
+TaxPaymentService
+
+FixedAssetService
+DepreciationService

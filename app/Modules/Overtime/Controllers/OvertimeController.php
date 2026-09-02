@@ -147,10 +147,8 @@ class OvertimeController extends MainController
         $overtime = $this->model->findOrFail($id);
         $employees = Employee::where('is_active', 1)->pluck('full_name', 'id');
         $periods = PayrollPeriod::where('is_closed', 0)->pluck('code', 'id');
-        $result = $this->getForm($overtime);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
-        return view('Overtime::edit', compact('overtime', 'forms', 'groupedForms', 'employees', 'periods'));
+        
+        return view('Overtime::edit', compact('overtime', 'employees', 'periods'));
     }
 
     public function update(Request $request, $id)
