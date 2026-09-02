@@ -5,14 +5,15 @@ namespace App\Modules\Employee\Controllers;
 use App\DataTables\EmployeeDataTable;
 use App\Http\Controllers\MainController;
 use Models\Employee;
+use Models\Department;
+use Models\Position;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
-use Throwable; 
-
+use Throwable;
 class EmployeeController extends MainController
 {
     public function __construct()
@@ -29,7 +30,7 @@ class EmployeeController extends MainController
             return $dataTable->ajax();
         }
 
-        return $dataTable->render('Payroll::employee.index');
+        return $dataTable->render('Employee::index');
     }
 
     /**
@@ -38,18 +39,33 @@ class EmployeeController extends MainController
     public function create(): View
     {
         $employee = new Employee();
-        $departments = Department::where('is_active', 1)->pluck('name', 'id');
-        $positions = Position::where('is_active', 1)->pluck('name', 'id');
-        $supervisors = Employee::where('is_active', 1)->pluck('full_name', 'id');
+        
+        // Get dropdown data
+        $departments = Department::where('is_active', 1)
+            ->orderBy('name')
+            ->pluck('name', 'id');
+        
+        $positions = Position::where('is_active', 1)
+            ->orderBy('name')
+            ->pluck('name', 'id');
+        
+        $supervisors = Employee::where('is_active', 1)
+            ->orderBy('name')
+            ->pluck('name', 'id');
 
+        // Get form builder from MainController
         $result = $this->getForm($employee);
         $forms = $result['forms'];
         $groupedForms = $result['grouped'];
 
-        return view(
-            'Payroll::employee.edit',
-            compact('employee', 'forms', 'groupedForms', 'departments', 'positions', 'supervisors')
-        );
+        return view('Employee::edit', compact(
+            'employee', 
+            'forms', 
+            'groupedForms',
+            'departments',
+            'positions',
+            'supervisors'
+        ));
     }
 
     /**
@@ -57,33 +73,14 @@ class EmployeeController extends MainController
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'employee_id' => 'required|string|max:255|unique:employees,employee_id',
-            'full_name' => 'required|string|max:255',
-            'nick_name' => 'nullable|string|max:255',
-            'department_id' => 'nullable|exists:departments,id',
-            'position_id' => 'nullable|exists:positions,id',
-            'supervisor_id' => 'nullable|exists:employees,id',
-            'gender' => 'nullable|in:L,P',
-            'birth_place' => 'nullable|string|max:255',
-            'birth_date' => 'nullable|date',
-            'address' => 'nullable|string',
-            'phone' => 'nullable|string|max:20',
-            'email' => 'nullable|email|max:255|unique:employees,email',
-            'join_date' => 'required|date',
-            'resign_date' => 'nullable|date|after:join_date',
-            'employment_status' => 'required|in:tetap,kontrak,probation,freelance',
-            'bank_name' => 'nullable|string|max:100',
-            'bank_account_number' => 'nullable|string|max:50',
-            'bank_account_name' => 'nullable|string|max:255',
-            'npwp' => 'nullable|string|max:50',
-            'bpjs_ketenagakerjaan' => 'nullable|string|max:50',
-            'bpjs_kesehatan' => 'nullable|string|max:50',
-            'is_active' => 'boolean',
-        ]);
+        $validated = $this->validateEmployee($request);
 
         try {
             $employee = DB::transaction(function () use ($validated) {
+                // Set default values
+                $validated['is_active'] = $validated['is_active'] ?? true;
+                $validated['employment_status'] = $validated['employment_status'] ?? 'probation';
+                
                 return Employee::create($validated);
             });
 
@@ -102,7 +99,7 @@ class EmployeeController extends MainController
 
             return $this->errorResponse(
                 $request,
-                'Data karyawan gagal ditambahkan.'
+                'Data karyawan gagal ditambahkan: ' . $e->getMessage()
             );
         }
     }
@@ -113,20 +110,34 @@ class EmployeeController extends MainController
     public function edit($id): View
     {
         $employee = $this->model->findOrFail($id);
-        $departments = Department::where('is_active', 1)->pluck('name', 'id');
-        $positions = Position::where('is_active', 1)->pluck('name', 'id');
+        
+        // Get dropdown data
+        $departments = Department::where('is_active', 1)
+            ->orderBy('name')
+            ->pluck('name', 'id');
+        
+        $positions = Position::where('is_active', 1)
+            ->orderBy('name')
+            ->pluck('name', 'id');
+        
         $supervisors = Employee::where('is_active', 1)
             ->where('id', '!=', $id)
-            ->pluck('full_name', 'id');
+            ->orderBy('name')
+            ->pluck('name', 'id');
 
+        // Get form builder from MainController
         $result = $this->getForm($employee);
         $forms = $result['forms'];
         $groupedForms = $result['grouped'];
 
-        return view(
-            'Payroll::employee.edit',
-            compact('employee', 'forms', 'groupedForms', 'departments', 'positions', 'supervisors')
-        );
+        return view('Employee::edit', compact(
+            'employee', 
+            'forms', 
+            'groupedForms',
+            'departments',
+            'positions',
+            'supervisors'
+        ));
     }
 
     /**
@@ -135,31 +146,7 @@ class EmployeeController extends MainController
     public function update(Request $request, $id)
     {
         $employee = $this->model->findOrFail($id);
-
-        $validated = $request->validate([
-            'employee_id' => 'required|string|max:255|unique:employees,employee_id,' . $id,
-            'full_name' => 'required|string|max:255',
-            'nick_name' => 'nullable|string|max:255',
-            'department_id' => 'nullable|exists:departments,id',
-            'position_id' => 'nullable|exists:positions,id',
-            'supervisor_id' => 'nullable|exists:employees,id',
-            'gender' => 'nullable|in:L,P',
-            'birth_place' => 'nullable|string|max:255',
-            'birth_date' => 'nullable|date',
-            'address' => 'nullable|string',
-            'phone' => 'nullable|string|max:20',
-            'email' => 'nullable|email|max:255|unique:employees,email,' . $id,
-            'join_date' => 'required|date',
-            'resign_date' => 'nullable|date|after:join_date',
-            'employment_status' => 'required|in:tetap,kontrak,probation,freelance',
-            'bank_name' => 'nullable|string|max:100',
-            'bank_account_number' => 'nullable|string|max:50',
-            'bank_account_name' => 'nullable|string|max:255',
-            'npwp' => 'nullable|string|max:50',
-            'bpjs_ketenagakerjaan' => 'nullable|string|max:50',
-            'bpjs_kesehatan' => 'nullable|string|max:50',
-            'is_active' => 'boolean',
-        ]);
+        $validated = $this->validateEmployee($request, $id);
 
         try {
             DB::transaction(function () use ($employee, $validated) {
@@ -175,16 +162,31 @@ class EmployeeController extends MainController
         } catch (Throwable $e) {
             Log::error('Gagal memperbarui karyawan.', [
                 'exception' => $e,
-                'employee_id' => $id,
+                'nik' => $id,
                 'data' => $validated,
                 'user_id' => auth()->id(),
             ]);
 
             return $this->errorResponse(
                 $request,
-                'Data karyawan gagal diperbarui.'
+                'Data karyawan gagal diperbarui: ' . $e->getMessage()
             );
         }
+    }
+
+    /**
+     * Show employee details.
+     */
+    public function show($id): View
+    {
+        $employee = $this->model->with([
+            'department', 
+            'position', 
+            'supervisor',
+            'subordinates'
+        ])->findOrFail($id);
+
+        return view('Employee::show', compact('employee'));
     }
 
     /**
@@ -203,6 +205,22 @@ class EmployeeController extends MainController
                 );
             }
 
+            // Check if employee has attendance records
+            if ($employee->attendanceLogs()->exists() || $employee->attendanceDaily()->exists()) {
+                return $this->errorResponse(
+                    $request,
+                    'Karyawan tidak dapat dihapus karena sudah memiliki data absensi.'
+                );
+            }
+
+            // Check if employee has subordinates
+            if ($employee->subordinates()->exists()) {
+                return $this->errorResponse(
+                    $request,
+                    'Karyawan tidak dapat dihapus karena masih memiliki bawahan.'
+                );
+            }
+
             DB::transaction(function () use ($employee) {
                 $employee->delete();
             });
@@ -215,14 +233,84 @@ class EmployeeController extends MainController
         } catch (Throwable $e) {
             Log::error('Gagal menghapus karyawan.', [
                 'exception' => $e,
-                'employee_id' => $id,
+                'nik' => $id,
                 'user_id' => auth()->id(),
             ]);
 
             return $this->errorResponse(
                 $request,
-                'Data karyawan gagal dihapus.'
+                'Data karyawan gagal dihapus: ' . $e->getMessage()
             );
         }
+    }
+
+    /**
+     * Get employee options for dropdown (AJAX)
+     */
+    public function options(Request $request): JsonResponse
+    {
+        $search = $request->get('q');
+        $employees = Employee::when($search, function ($query, $search) {
+            return $query->where('name', 'LIKE', "%{$search}%")
+                ->orWhere('nik', 'LIKE', "%{$search}%");
+        })
+        ->where('is_active', true)
+        ->limit(20)
+        ->get(['id', 'nik', 'name']);
+
+        return response()->json($employees);
+    }
+
+    /**
+     * Get employees by department (AJAX)
+     */
+    public function getByDepartment(Request $request): JsonResponse
+    {
+        $request->validate([
+            'department_id' => 'required|exists:departments,id',
+        ]);
+
+        $employees = Employee::where('department_id', $request->department_id)
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get(['id', 'nik', 'name']);
+
+        return response()->json([
+            'success' => true,
+            'data' => $employees,
+        ]);
+    }
+
+    /**
+     * Validate employee data.
+     */
+    private function validateEmployee(Request $request, $id = null): array
+    {
+        $rules = [
+            'nik' => 'required|string|max:255|unique:employees,nik' . ($id ? ',' . $id : ''),
+            'name' => 'required|string|max:255',
+            'nick_name' => 'nullable|string|max:255',
+            'department_id' => 'nullable|exists:departments,id',
+            'position_id' => 'nullable|exists:positions,id',
+            'supervisor_id' => 'nullable|exists:employees,id' . ($id ? '|not_in:' . $id : ''),
+            'gender' => 'nullable|in:L,P',
+            'birth_place' => 'nullable|string|max:255',
+            'birth_date' => 'nullable|date|before:today',
+            'address' => 'nullable|string',
+            'phone' => 'nullable|string|max:20',
+            'email' => 'nullable|email|max:255|unique:employees,email' . ($id ? ',' . $id : ''),
+            'join_date' => 'required|date|before_or_equal:today',
+            'resign_date' => 'nullable|date|after:join_date|before_or_equal:today',
+            'employment_status' => 'required|in:tetap,kontrak,probation,freelance',
+            'bank_name' => 'nullable|string|max:100',
+            'bank_account_number' => 'nullable|string|max:50',
+            'bank_account_name' => 'nullable|string|max:255',
+            'npwp' => 'nullable|string|max:50',
+            'bpjs_ketenagakerjaan' => 'nullable|string|max:50',
+            'bpjs_kesehatan' => 'nullable|string|max:50',
+            'is_active' => 'boolean',
+        ];
+
+        return $request->validate($rules);
     }
 }

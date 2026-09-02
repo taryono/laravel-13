@@ -58,4 +58,6 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
 
+# php artisan sentry:publish --dsn=https://80a81a78f6f40f2831900b3247e37f61@o4512014542831616.ingest.us.sentry.io/4512014549909504
+# SENTRY_LARAVEL_DSN=https://80a81a78f6f40f2831900b3247e37f61@o4512014542831616.ingest.us.sentry.io/4512014549909504
 

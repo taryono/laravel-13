@@ -1,12 +1,9 @@
 <?php
-
-namespace Models; 
-use App\Traits\HasUniqueCode;
+ namespace Models; 
+// use App\Traits\HasUniqueCode;
 
 class Department extends BasedModel
-{
-    use SoftDeletes, HasUniqueCode;
-
+{ 
     protected $table = 'departments';
     
     protected $fillable = [

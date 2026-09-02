@@ -15,13 +15,13 @@ Route::group(['prefix' => 'module', 'namespace' => 'App\Modules\Module\Controlle
     Route::get('/', ['as' => 'module.index', 'uses' => 'ModuleController@index']);
     Route::any('/search', ['as' => 'module.search', 'uses' => 'ModuleController@search']);
     Route::get('/create', ['as' => 'module.create', 'uses' => 'ModuleController@create']);
-    Route::get('/show/{module}', ['as' => 'module.show', 'uses' => 'ModuleController@show']);
-    Route::get('/preview/{module}', ['as' => 'module.preview', 'uses' => 'ModuleController@preview']);
-    Route::get('/print/{module}', ['as' => 'module.print', 'uses' => 'ModuleController@print']);
+    Route::get('/show/{id}', ['as' => 'module.show', 'uses' => 'ModuleController@show']);
+    Route::get('/preview/{id}', ['as' => 'module.preview', 'uses' => 'ModuleController@preview']);
+    Route::get('/print/{id}', ['as' => 'module.print', 'uses' => 'ModuleController@print']);
 
     Route::post('/store', ['as' => 'module.store', 'uses' => 'ModuleController@store']);
-    Route::get('/edit/{module}', ['as' => 'module.edit', 'uses' => 'ModuleController@edit']);
-    Route::put('/update/{module}', ['as' => 'module.update', 'uses' => 'ModuleController@update']);
-    Route::delete('/delete/{module}', ['as' => 'module.destroy', 'uses' => 'ModuleController@destroy']);
+    Route::get('/edit/{id}', ['as' => 'module.edit', 'uses' => 'ModuleController@edit']);
+    Route::put('/update/{id}', ['as' => 'module.update', 'uses' => 'ModuleController@update']);
+    Route::delete('/delete/{id}', ['as' => 'module.destroy', 'uses' => 'ModuleController@destroy']);
     
 });

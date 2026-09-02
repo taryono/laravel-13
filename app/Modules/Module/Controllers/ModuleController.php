@@ -57,7 +57,7 @@ class ModuleController extends MainController
         $groupedForms = $result['grouped'];
 
         return view(
-            'Module::edit',
+            'Module::create',
             compact('module', 'forms', 'groupedForms')
         );
     }

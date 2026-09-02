@@ -6,7 +6,7 @@ use App\DataTables\AttendanceLogDataTable;
 use App\Http\Controllers\MainController;
 use Models\AttendanceLog;
 use Models\AttendanceImportBatch;
-use App\Modules\Attendance\Services\FingerprintImporter;
+use App\Services\FingerprintImporter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;

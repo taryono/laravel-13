@@ -19,3 +19,19 @@
     </div>
 </div>
 @endsection 
+
+@push('scripts')
+    {!! $dataTable->scripts() !!}
+    
+    <script>
+        // Auto-reload after modal close
+        $(document).on('hidden.bs.modal', '.modal', function () {
+            if ($(this).find('.modal-submit').data('is_execute_drawer')) {
+                var tableId = $(this).find('.modal-submit').data('datatable-id');
+                if (tableId) {
+                    $('#' + tableId).DataTable().ajax.reload(null, false);
+                }
+            }
+        });
+    </script>
+@endpush

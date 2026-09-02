@@ -23,5 +23,6 @@ Route::group(['prefix' => 'employee', 'namespace' => 'App\Modules\Employee\Contr
     Route::get('/edit/{id}', ['as' => 'employee.edit', 'uses' => 'EmployeeController@edit']);
     Route::put('/update/{id}', ['as' => 'employee.update', 'uses' => 'EmployeeController@update']);
     Route::delete('/delete/{id}', ['as' => 'employee.destroy', 'uses' => 'EmployeeController@destroy']);
-    
+    Route::get('/options', ['as' => 'employee.options', 'uses' => 'EmployeeController@options']);
+    Route::get('/by-department', ['as' => 'employee.by-department', 'uses' => 'EmployeeController@getByDepartment']);
 });

@@ -8,20 +8,20 @@ use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
-use Yajra\DataTables\Services\DataTable;
+use Yajra\DataTables\Services\DataTable; 
 
 class EmployeeDataTable extends DataTable
 {
-    /**
-     * Kolom yang ditampilkan di tabel (selain DT_RowIndex & action).
-     * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
-     * opsi --columns.
-     */
-    protected array $columns = ['name'];
+    protected array $columns = [
+        'employee_id',
+        'full_name',
+        'department_id',
+        'position_id',
+        'employment_status',
+        'join_date',
+        'is_active'
+    ];
 
-    /**
-     * Build DataTable response.
-     */
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
@@ -29,26 +29,46 @@ class EmployeeDataTable extends DataTable
                 return $this->renderActionButtons($row);
             })
             ->addIndexColumn()
-            ->rawColumns(['action']) // ✅ Tetap wajib ada!
+            ->editColumn('full_name', function ($row) {
+                return '<strong>' . e($row->full_name) . '</strong>' . 
+                       ($row->nick_name ? ' (' . e($row->nick_name) . ')' : '');
+            })
+            ->editColumn('department_id', function ($row) {
+                return $row->department ? e($row->department->name) : '-';
+            })
+            ->editColumn('position_id', function ($row) {
+                return $row->position ? e($row->position->name) : '-';
+            })
+            ->editColumn('employment_status', function ($row) {
+                $badges = [
+                    'tetap' => 'primary',
+                    'kontrak' => 'warning',
+                    'probation' => 'info',
+                    'freelance' => 'secondary',
+                ];
+                $label = $row->employment_status_label;
+                $badge = $badges[$row->employment_status] ?? 'secondary';
+                return '<span class="badge bg-' . $badge . '">' . $label . '</span>';
+            })
+            ->editColumn('join_date', function ($row) {
+                return $row->join_date ? $row->join_date->format('d/m/Y') : '-';
+            })
+            ->editColumn('is_active', function ($row) {
+                if ($row->is_active && (!$row->resign_date || $row->resign_date > now())) {
+                    return '<span class="badge bg-success">Aktif</span>';
+                }
+                return '<span class="badge bg-danger">Nonaktif</span>';
+            })
+            ->addColumn('years_of_service', function ($row) {
+                return $row->years_of_service ? number_format($row->years_of_service, 1) . ' thn' : '-';
+            })
+            ->rawColumns(['action', 'full_name', 'employment_status', 'is_active'])
             ->setRowId('id');
     }
 
-    /**
-     * Render tombol aksi (edit & delete) untuk satu baris.
-     *
-     * - $row->name di-escape dengan e() untuk mencegah XSS/attribute
-     *   breakout jika nilainya mengandung karakter " atau <script>.
-     * - Payload data-datatable-context dibangun via json_encode() lalu
-     *   di-escape dengan htmlspecialchars() supaya valid ditaruh di
-     *   dalam attribute HTML (bukan concat string manual yang rawan
-     *   attribute-nya terpotong).
-     * - Class tombol delete WAJIB "delete-button" (bukan "delete") supaya
-     *   cocok dengan selector di public/assets/js/button.js:
-     *   .on('click', '.delete-button', this.handleDeleteButton)
-     */
     protected function renderActionButtons($row): string
     {
-        $title = e('Detail Employee ' . $row->name);
+        $title = e('Edit Karyawan ' . $row->full_name);
 
         $context = htmlspecialchars(
             json_encode([
@@ -60,11 +80,23 @@ class EmployeeDataTable extends DataTable
             'UTF-8'
         );
 
-        $editUrl   = e(route('employee.edit', $row));
-        $deleteUrl = e(route('employee.destroy', $row));
+        $editUrl   = e(route('employee.edit', $row->id));
+        $deleteUrl = e(route('employee.destroy', $row->id));
+        $detailUrl = e(route('employee.show', $row->id));
 
         return <<<HTML
             <div class="d-flex justify-content-center gap-1">
+                <button
+                    type="button"
+                    class="btn btn-sm btn-info"
+                    data-toggle="ajax-modal"
+                    data-size="lg"
+                    data-method="GET"
+                    data-title="Detail Karyawan"
+                    data-url="{$detailUrl}"
+                    title="Detail">
+                    <span class="material-symbols-outlined">visibility</span>
+                </button>
 
                 <button
                     type="button"
@@ -76,7 +108,8 @@ class EmployeeDataTable extends DataTable
                     data-url="{$editUrl}"
                     data-datatable-context='{$context}'
                     data-submit='<button class="btn btn-primary modal-submit" type="button" data-is_execute_drawer="true" data-datatable-id="employee-table">Simpan</button>'
-                    data-cancel='<button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Batal</button>'>
+                    data-cancel='<button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Batal</button>'
+                    title="Edit">
                     <span class="material-symbols-outlined">edit</span>
                 </button>
 
@@ -86,120 +119,69 @@ class EmployeeDataTable extends DataTable
                     data-confirm-delete="true"
                     data-is_execute_drawer="true"
                     data-url="{$deleteUrl}"
-                    title="Hapus"
-                >
+                    title="Hapus">
                     <span class="material-symbols-outlined">delete</span>
                 </button>
-
             </div>
         HTML;
     }
 
-    /**
-     * Get query source of DataTable.
-     */
     public function query(Employee $model): QueryBuilder
     {
-        return $model->newQuery();
+        return $model->newQuery()
+            ->with(['department', 'position']);
     }
 
-    /**
-     * Configure DataTable HTML builder.
-     */
     public function html(): HtmlBuilder
     {
         return $this->builder()
-
-            /*
-             * Example:
-             * Asesi -> asesi-table
-             * Asesor -> asesor-table
-             */
             ->setTableId('employee-table')
-
             ->columns($this->getColumns())
-
-            /*
-             * Server-side AJAX endpoint.
-             */
             ->minifiedAjax(route('employee.index'))
-
-            /*
-             * Default sorting:
-             * column index 1 = name
-             */
-            ->orderBy(1)
-
+            ->orderBy(2)
             ->selectStyleSingle()
-
             ->parameters([
-
-                /*
-                 * Custom Bootstrap 5 layout.
-                 */
+                // 'dom' =>
+                //     '<"row mb-3"' .
+                //         '<"col-md-4 d-flex align-items-center"B>' .
+                //         '<"col-md-4"l>' .
+                //         '<"col-md-4"f>' .
+                //     '>' .
+                //     'rt' .
+                //     '<"row mt-3"' .
+                //         '<"col-md-6"i>' .
+                //         '<"col-md-6 d-flex justify-content-md-end"p>' .
+                //     '>',
                 'dom' =>
                     '<"row mb-3"' .
-                        '<"col-md-6 d-flex align-items-center"B>' .
-                        '<"col-md-6"f>' .
+                        '<"col-md-5 d-flex align-items-center"B>' .
+                        '<"col-md-2"l>' .
+                        '<"col-md-5"f>' .
                     '>' .
                     'rt' .
                     '<"row mt-3"' .
                         '<"col-md-6"i>' .
                         '<"col-md-6 d-flex justify-content-md-end"p>' .
                     '>',
-
-                /*
-                 * Let CSS / column configuration
-                 * control widths.
-                 */
+                    
                 'autoWidth' => false,
-
-                /*
-                 * Responsive DataTable.
-                 */
                 'responsive' => true,
-
-                /*
-                 * Processing indicator.
-                 */
                 'processing' => true,
-
-                /*
-                 * Server-side processing.
-                 */
                 'serverSide' => true,
-
-                /*
-                 * Save DataTable state.
-                 */
                 'stateSave' => false,
-
-                /*
-                 * Language.
-                 */
                 'language' => [
                     'processing' => '
                         <div class="d-flex align-items-center gap-2">
-                            <div
-                                class="spinner-border spinner-border-sm text-primary"
-                                role="status"
-                            ></div>
+                            <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
                             <span>Memuat data...</span>
                         </div>
                     ',
-
                     'search' => 'Cari:',
-
-                    'lengthMenu' => 'Tampilkan _MENU_ data',
-
+                    'lengthMenu' => '_MENU_',
                     'info' => 'Menampilkan _START_ sampai _END_ dari _TOTAL_ data',
-
                     'infoEmpty' => 'Tidak ada data',
-
                     'zeroRecords' => 'Data tidak ditemukan',
-
                     'emptyTable' => 'Belum ada data',
-
                     'paginate' => [
                         'first' => 'Awal',
                         'last' => 'Akhir',
@@ -208,44 +190,19 @@ class EmployeeDataTable extends DataTable
                     ],
                 ],
             ])
-
-            /*
-             * DataTable buttons.
-             */
             ->buttons([
-
                 Button::make('excel')
-                    ->text(
-                        '<span class="material-symbols-outlined align-middle me-1">
-                            download
-                        </span> Excel'
-                    )
+                    ->text('<span class="material-symbols-outlined align-middle me-1">download</span> Excel')
                     ->className('btn btn-success btn-sm'),
-
                 Button::make('csv')
-                    ->text(
-                        '<span class="material-symbols-outlined align-middle me-1">
-                            description
-                        </span> CSV'
-                    )
+                    ->text('<span class="material-symbols-outlined align-middle me-1">description</span> CSV')
                     ->className('btn btn-primary btn-sm'),
-
                 Button::make('pdf')
-                    ->text(
-                        '<span class="material-symbols-outlined align-middle me-1">
-                            picture_as_pdf
-                        </span> PDF'
-                    )
+                    ->text('<span class="material-symbols-outlined align-middle me-1">picture_as_pdf</span> PDF')
                     ->className('btn btn-danger btn-sm'),
-
                 Button::make('print')
-                    ->text(
-                        '<span class="material-symbols-outlined align-middle me-1">
-                            print
-                        </span> Print'
-                    )
+                    ->text('<span class="material-symbols-outlined align-middle me-1">print</span> Print')
                     ->className('btn btn-primary btn-sm'),
-
                 Button::make([
                     'text' => '<span class="material-symbols-outlined align-middle">refresh</span>',
                     'className' => 'btn btn-secondary',
@@ -256,44 +213,38 @@ class EmployeeDataTable extends DataTable
             ]);
     }
 
-    /**
-     * Get DataTable columns.
-     *
-     * Dibangun langsung dari property $columns (array literal yang sudah
-     * digenerate di atas oleh make:crud-yajra) -- tidak lagi pakai
-     * explode() dari string literal seperti versi lama, yang rapuh
-     * terhadap karakter khusus pada nama kolom.
-     */
     protected function getColumns(): array
     {
-        $daftarKolom = collect($this->columns)
-            ->map(fn (string $kolom) => Column::make($kolom)
-                ->title(ucwords(str_replace('_', ' ', $kolom))))
-            ->all();
+        $columns = [
+            Column::make('employee_id')->title('NIK')->width(120),
+            Column::make('full_name')->title('Nama Lengkap')->width(200),
+            Column::make('department_id')->title('Departemen')->width(150),
+            Column::make('position_id')->title('Jabatan')->width(150),
+            Column::make('employment_status')->title('Status')->width(120),
+            Column::make('join_date')->title('Tgl Bergabung')->width(120),
+            Column::make('years_of_service')->title('Masa Kerja')->width(100),
+            Column::make('is_active')->title('Status Aktif')->width(100),
+        ];
 
-        $daftarKolom[] = Column::make('DT_RowIndex')
+        $columns[] = Column::make('DT_RowIndex')
             ->title('No')
             ->orderable(false)
             ->searchable(false)
-            ->width(80)
+            ->width(50)
             ->addClass('text-center');
 
-        // Tambah kolom Aksi di paling akhir
-        $daftarKolom[] = Column::computed('action')
+        $columns[] = Column::computed('action')
             ->exportable(false)
             ->printable(false)
-            ->width(120)
+            ->width(150)
             ->addClass('text-center')
             ->title('Aksi');
 
-        return $daftarKolom;
+        return $columns;
     }
 
-    /**
-     * Get filename for export.
-     */
     protected function filename(): string
     {
-        return 'Employee_' . date('YmdHis');
+        return 'Employees_' . date('YmdHis');
     }
 }

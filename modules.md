@@ -299,3 +299,12 @@ app/Modules/
 │   │     ├── index.blade.php
 │   │     └── edit.blade.php
 │   └── routes.php
+
+app/Modules/
+├── Shift/
+│   ├── Controllers/
+│   │   |── EmployeeController.php
+│   └── views/ 
+│   │     ├── index.blade.php
+│   │     └── edit.blade.php
+│   └── routes.php
