@@ -1,4 +1,4 @@
-{{ Form::model($employee-shift, ['method' => 'PUT', 'route' => ['employee-shift.update', $employee-shift->id], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($employee-shift, ['method' => 'PUT', 'route' => ['employee_shift.update', $employee-shift->id], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
     <div class="row">
         <div class="col-md-6 mb-3">
             @forelse ($forms as $key => $form)

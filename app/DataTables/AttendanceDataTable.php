@@ -17,7 +17,15 @@ class AttendanceDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['name'];
+    protected array $columns = [
+        'attendance_date',
+        'attendance_daily.actual_check_in',   // ✅ Dari relasi
+        'attendance_daily.actual_check_out',  // ✅ Dari relasi
+        'attendance_daily.overtime_hours',    // ✅ Dari relasi
+        'status',                              // Dari attendances sendiri
+        'notes',
+        'payroll_period.code',
+    ];
 
     /**
      * Build DataTable response.
@@ -100,7 +108,7 @@ class AttendanceDataTable extends DataTable
      */
     public function query(Attendance $model): QueryBuilder
     {
-        return $model->newQuery();
+        return $model->newQuery()->with('attendanceDaily', 'payrollPeriod');
     }
 
     /**
@@ -266,27 +274,33 @@ class AttendanceDataTable extends DataTable
      */
     protected function getColumns(): array
     {
-        $daftarKolom = collect($this->columns)
-            ->map(fn (string $kolom) => Column::make($kolom)
-                ->title(ucwords(str_replace('_', ' ', $kolom))))
-            ->all();
-
-        $daftarKolom[] = Column::make('DT_RowIndex')
-            ->title('No')
-            ->orderable(false)
-            ->searchable(false)
-            ->width(80)
-            ->addClass('text-center');
-
-        // Tambah kolom Aksi di paling akhir
-        $daftarKolom[] = Column::computed('action')
-            ->exportable(false)
-            ->printable(false)
-            ->width(120)
-            ->addClass('text-center')
-            ->title('Aksi');
-
-        return $daftarKolom;
+        return collect($this->columns)
+            ->map(fn (string $kolom) => match(true) {
+                    $kolom === 'attendance_daily.actual_check_in' => Column::make($kolom)->title('Jam Masuk'),
+                    $kolom === 'attendance_daily.actual_check_out' => Column::make($kolom)->title('Jam Pulang'),
+                    $kolom === 'attendance_daily.overtime_hours' => Column::make($kolom)->title('Jam Lembur'),
+                    $kolom === 'payroll_period.code' => Column::make($kolom)->title('Payrol Code'),
+                    default => Column::make($kolom)->title(ucwords(str_replace('_', ' ', $kolom)))
+                })
+            // 1. PREPEND: Masukkan kolom No di posisi PALING AWAL (indeks 0)
+            ->prepend(
+                Column::make('DT_RowIndex')
+                    ->title('No')
+                    ->orderable(false)
+                    ->searchable(false)
+                    ->width(80)
+                    ->addClass('text-center')
+            )
+            // 2. PUSH: Masukkan kolom Aksi di posisi PALING AKHIR
+            ->push(
+                Column::computed('action')
+                    ->exportable(false)
+                    ->printable(false)
+                    ->width(120)
+                    ->addClass('text-center')
+                    ->title('Aksi')
+            )
+            ->all(); // Konversi collection kembali menjadi array di akhir
     }
 
     /**

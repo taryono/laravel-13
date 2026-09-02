@@ -2,7 +2,7 @@
 
 namespace App\DataTables;
 
-use App\Models\Bonus;
+use Models\Bonus;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;

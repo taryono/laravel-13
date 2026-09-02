@@ -68,7 +68,7 @@ class {{modelName}}Controller extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-{{validationRules}}
+                {{validationRules}}
         ]);
 
         try {
@@ -122,12 +122,11 @@ class {{modelName}}Controller extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-{{validationRules}}
+            {{validationRules}}
         ]);
 
         try {
             ${{modelVariable}} = $this->model->findOrFail($id);
-
             DB::transaction(function () use (
                 ${{modelVariable}},
                 $validated
@@ -141,13 +140,7 @@ class {{modelName}}Controller extends MainController
                 ${{modelVariable}}
             );
 
-        } catch (Throwable $e) {
-
-            // FIX: pakai $id mentah untuk logging, BUKAN
-            // ${{modelVariable}}->getKey(), karena kalau findOrFail() di atas
-            // yang melempar exception, variabel ${{modelVariable}} belum
-            // ter-assign -- referensi ke ->getKey() di sini akan memicu
-            // error baru di dalam blok catch.
+        } catch (Throwable $e) { 
             Log::error(
                 'Gagal memperbarui {{modelName}}.',
                 [
@@ -182,9 +175,7 @@ class {{modelName}}Controller extends MainController
                 'Data {{modelName}} berhasil dihapus.'
             );
 
-        } catch (Throwable $e) {
-
-            // FIX: sama seperti update(), pakai $id mentah, bukan
+        } catch (Throwable $e) { 
             // ${{modelVariable}}->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus {{modelName}}.',

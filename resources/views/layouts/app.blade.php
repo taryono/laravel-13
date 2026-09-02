@@ -109,7 +109,7 @@
     {{-- ============================================= --}}
     {{-- 7. CUSTOM SCRIPTS --}}
     {{-- ============================================= --}}
-
+    <script src="{{ asset('assets/js/modal.js') }}"></script>
     {{-- 2. Core.js (HARUS PERTAMA) --}}
     <script src="{{ asset('assets/js/core.js') }}?v={{ time() }}"></script>
 
@@ -118,7 +118,7 @@
 
     {{-- 4. Script Lainnya --}}
     <script src="{{ asset('assets/js/dashboard.js') }}"></script>
-    <script src="{{ asset('assets/js/modal.js') }}"></script>
+
 
 
     {{-- AlpineJS (lebih baik di awal, bukan defer) --}}

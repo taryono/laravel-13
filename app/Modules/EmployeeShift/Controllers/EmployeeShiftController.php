@@ -29,7 +29,7 @@ class EmployeeShiftController extends MainController
             return $dataTable->ajax();
         }
 
-        return $dataTable->render('Shift::employee-shift.index');
+        return $dataTable->render('Shift::index');
     }
 
     /**
@@ -45,7 +45,7 @@ class EmployeeShiftController extends MainController
             4 => 'Kamis', 5 => 'Jumat', 6 => 'Sabtu', 7 => 'Minggu'
         ];
 
-        return view('Shift::employee-shift.edit', compact('employeeShift', 'employees', 'shifts', 'days'));
+        return view('Shift::edit', compact('employeeShift', 'employees', 'shifts', 'days'));
     }
 
     /**
@@ -99,7 +99,7 @@ class EmployeeShiftController extends MainController
             4 => 'Kamis', 5 => 'Jumat', 6 => 'Sabtu', 7 => 'Minggu'
         ];
 
-        return view('Shift::employee-shift.edit', compact('employeeShift', 'employees', 'shifts', 'days'));
+        return view('Shift::edit', compact('employeeShift', 'employees', 'shifts', 'days'));
     }
 
     /**

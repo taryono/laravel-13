@@ -2,7 +2,7 @@
 
 namespace App\DataTables;
 
-use App\Models\PaymentRequest;
+use Models\PaymentRequest;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;

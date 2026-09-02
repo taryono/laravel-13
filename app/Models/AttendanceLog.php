@@ -4,15 +4,37 @@ namespace Models;
 
 class AttendanceLog extends BasedModel
 { 
-    // Relasi
-    // public function user()
-    // {
-    //     return $this->belongsTo(User::class);
-    // }
+    protected $fillable = [
+        'employee_id',
+        'attendance_date',
+        'scan_time',
+        'scan_type',
+        'machine_id',
+        'import_batch',
+        'raw_data',
+        'is_processed',
+        'processed_at',
+        'processed_by',
+        'validation_status',
+        'validation_notes',
+    ];
 
-    // Scope
-    public function scopeActive($query)
+    protected $casts = [
+        'attendance_date' => 'date:Y-m-d',
+        'scan_time'        => 'datetime',
+        'raw_data'         => 'array',
+        'is_processed'     => 'boolean',
+        'processed_at'     => 'datetime',
+    ];
+
+    // Relasi
+    public function employee()
     {
-        return $query->where('is_active', true);
+        return $this->belongsTo(Employee::class);
+    }
+
+    public function importBatch()
+    {
+        return $this->belongsTo(AttendanceImportBatch::class, 'import_batch', 'batch_code');
     }
 }

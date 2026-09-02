@@ -308,3 +308,7 @@ app/Modules/
 │   │     ├── index.blade.php
 │   │     └── edit.blade.php
 │   └── routes.php
+
+app/Models/
+├── User.php -> namespace App\Models;
+├── Shift.php -> namespace Models;

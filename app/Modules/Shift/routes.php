@@ -18,7 +18,6 @@ Route::group(['prefix' => 'shift', 'namespace' => 'App\Modules\Shift\Controllers
     Route::get('/show/{id}', ['as' => 'shift.show', 'uses' => 'ShiftController@show']);
     Route::get('/preview/{id}', ['as' => 'shift.preview', 'uses' => 'ShiftController@preview']);
     Route::get('/print/{id}', ['as' => 'shift.print', 'uses' => 'ShiftController@print']);
-
     Route::post('/store', ['as' => 'shift.store', 'uses' => 'ShiftController@store']);
     Route::get('/edit/{id}', ['as' => 'shift.edit', 'uses' => 'ShiftController@edit']);
     Route::put('/update/{id}', ['as' => 'shift.update', 'uses' => 'ShiftController@update']);

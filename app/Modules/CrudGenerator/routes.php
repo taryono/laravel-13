@@ -12,9 +12,9 @@ use Illuminate\Support\Facades\Route;
 |
  */
 Route::group(['prefix' => 'crud-generator', 'namespace' => 'App\Modules\CrudGenerator\Controllers', 'middleware' => ['web']], function () {
-    Route::get('/', ['as' => 'crud-generator.index', 'uses' => 'CrudGeneratorController@index']);
-    Route::post('/generate', ['as' => 'crud-generator.generate', 'uses' => 'CrudGeneratorController@index']);
-    Route::get('/generate-async', ['as' => 'crud-generator.generateAsync', 'uses' => 'CrudGeneratorController@generateAsync']);
-    Route::get('/status/{processId}', ['as' => 'crud-generator.status', 'uses' => 'CrudGeneratorController@status']);
-    Route::get('/history', ['as' => 'crud-generator.history', 'uses' => 'CrudGeneratorController@history']); 
+    Route::get('/', ['as' => 'crud_generator.index', 'uses' => 'CrudGeneratorController@index']);
+    Route::post('/generate', ['as' => 'crud_generator.generate', 'uses' => 'CrudGeneratorController@generate']);
+    Route::post('/generate-async', ['as' => 'crud_generator.generateAsync', 'uses' => 'CrudGeneratorController@generateAsync']);
+    Route::get('/status/{processId}', ['as' => 'crud_generator.status', 'uses' => 'CrudGeneratorController@status']);
+    Route::get('/history', ['as' => 'crud_generator.history', 'uses' => 'CrudGeneratorController@history']); 
 });

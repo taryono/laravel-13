@@ -10,8 +10,10 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\View\View;
 use Throwable;
+use Illuminate\Support\Str;
 
 class CrudGeneratorController extends Controller
 {
@@ -36,8 +38,26 @@ class CrudGeneratorController extends Controller
             'groups' => 'Employee',
             'list_alt' => 'Default',
         ];
+        $database = DB::getDatabaseName();
 
-        return view('CrudGenerator::index', compact('icons'));
+        $columns = DB::select("
+            SELECT TABLE_NAME, COLUMN_NAME
+            FROM information_schema.COLUMNS
+            WHERE TABLE_SCHEMA = ?
+            ORDER BY TABLE_NAME, ORDINAL_POSITION
+        ", [$database]);
+
+        $tables = collect($columns)
+            ->groupBy('TABLE_NAME')
+            ->map(function ($columns, $tableName) {
+                return [
+                    'name' => $tableName,
+                    'label' => Str::studly(Str::singular($tableName)),
+                    'columns' => $columns->pluck('COLUMN_NAME')->values()->toArray(),
+                ];
+            });
+         
+        return view('CrudGenerator::index', compact('icons', 'tables'));
     }
 
     /**
@@ -45,6 +65,7 @@ class CrudGeneratorController extends Controller
      */
     public function generate(Request $request)
     {
+        
         $request->validate([
             'model_name' => 'required|string|max:100|regex:/^[a-zA-Z]+$/',
             'columns' => 'required|string|max:500',
@@ -63,16 +84,15 @@ class CrudGeneratorController extends Controller
         if (!$request->boolean('create_menu')) {
             $command .= " --no-menu";
         }
-
-        // Simpan ke session untuk tracking
-        $processId = uniqid('crud_', true);
-        session()->put("crud_process_{$processId}", [
-            'command' => $command,
-            'status' => 'running',
-            'started_at' => now(),
-        ]);
-
-        try {
+        try { 
+    
+            // Simpan ke session untuk tracking
+            $processId = uniqid('crud_', true);
+            session()->put("crud_process_{$processId}", [
+                'command' => $command,
+                'status' => 'running',
+                'started_at' => now(),
+            ]);
             // Eksekusi command dengan output capture
             $output = new \Symfony\Component\Console\Output\BufferedOutput();
             

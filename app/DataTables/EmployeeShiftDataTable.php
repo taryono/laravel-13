@@ -2,7 +2,7 @@
 
 namespace App\DataTables;
 
-use App\Models\EmployeeShift;
+use Models\EmployeeShift;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
@@ -60,8 +60,8 @@ class EmployeeShiftDataTable extends DataTable
             'UTF-8'
         );
 
-        $editUrl   = e(route('employee-shift.edit', $row));
-        $deleteUrl = e(route('employee-shift.destroy', $row));
+        $editUrl   = e(route('employee_shift.edit', $row));
+        $deleteUrl = e(route('employee_shift.destroy', $row));
 
         return <<<HTML
             <div class="d-flex justify-content-center gap-1">
@@ -122,7 +122,7 @@ class EmployeeShiftDataTable extends DataTable
             /*
              * Server-side AJAX endpoint.
              */
-            ->minifiedAjax(route('employee-shift.index'))
+            ->minifiedAjax(route('employee_shift.index'))
 
             /*
              * Default sorting:

@@ -23,5 +23,5 @@ Route::group(['prefix' => 'overtime', 'namespace' => 'App\Modules\Overtime\Contr
     Route::get('/edit/{id}', ['as' => 'overtime.edit', 'uses' => 'OvertimeController@edit']);
     Route::put('/update/{id}', ['as' => 'overtime.update', 'uses' => 'OvertimeController@update']);
     Route::delete('/delete/{id}', ['as' => 'overtime.destroy', 'uses' => 'OvertimeController@destroy']);
-    
+    Route::post('/store-from-proposal', ['as' => 'overtime.storeFromProposal', 'uses' => 'OvertimeController@storeFromProposal']);
 });

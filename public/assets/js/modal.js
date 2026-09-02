@@ -1,4 +1,5 @@
 /**
+ * public/assets/js/modal.js
  * modal.js
  * Modal Bootstrap 5 terpusat — full vanilla JS (tanpa jQuery)
  *

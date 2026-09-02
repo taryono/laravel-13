@@ -17,7 +17,7 @@ class OvertimeDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['name'];
+    protected array $columns = ['employee.full_name', 'overtime_date', 'start_time', 'end_time', 'total_hours', 'overtime_rate', 'total_amount', 'notes','approved_by', 'approved_at', 'is_paid', 'payroll_period.name'];
 
     /**
      * Build DataTable response.
@@ -100,7 +100,7 @@ class OvertimeDataTable extends DataTable
      */
     public function query(Overtime $model): QueryBuilder
     {
-        return $model->newQuery();
+        return $model->newQuery()->with('employee', 'payrollPeriod');
     }
 
     /**

@@ -89,6 +89,10 @@ class Employee extends BasedModel
         return $this->belongsTo(\App\Models\User::class, 'user_id');
     }
 
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class);
+    }
     /**
      * Relationship: Employee has attendance logs
      */
@@ -100,7 +104,7 @@ class Employee extends BasedModel
     /**
      * Relationship: Employee has daily attendance
      */
-    public function attendanceDaily(): HasMany
+    public function attendanceDailies()
     {
         return $this->hasMany(AttendanceDaily::class);
     }

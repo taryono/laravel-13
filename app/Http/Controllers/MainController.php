@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Lib\FormLib;
 use Illuminate\Support\Str;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 
 class MainController extends Controller implements HasMiddleware
 {

@@ -4,7 +4,7 @@ namespace App\Modules\Shift\Controllers;
 
 use App\DataTables\ShiftDataTable;
 use App\Http\Controllers\MainController;
-use App\Models\Shift;
+use Models\Shift;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -35,13 +35,14 @@ class ShiftController extends MainController
      * Show the form for creating a new shift.
      */
     public function create(): View
-    {
-        $shift = new Shift();
-        $result = $this->getForm($shift);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
+    { 
+        $params = [
+            'action' => route('shift.store'),
+            'method' => 'POST',
+            'shift' => new Shift(),
+        ];
 
-        return view('Shift::edit', compact('shift', 'forms', 'groupedForms'));
+        return view('Shift::create', $params);
     }
 
     /**
@@ -69,13 +70,16 @@ class ShiftController extends MainController
      * Show the form for editing the specified shift.
      */
     public function edit($id): View
-    {
-        $shift = $this->model->findOrFail($id);
-        $result = $this->getForm($shift);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
+    { 
+         $params = [
+            'action' => route('shift.update', $id),
+            'method' => 'POST',
+            'shift' => $this->model->findOrFail($id),
+        ];
 
-        return view('Shift::edit', compact('shift', 'forms', 'groupedForms'));
+        return view('Shift::create', $params);
+
+        return view('Shift::edit', $params);
     }
 
     /**
