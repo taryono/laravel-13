@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Modules\Finance\Services;
+namespace App\Services;
 
 use Models\JournalEntry;
 use Models\JournalDetail;

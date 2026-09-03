@@ -28,7 +28,7 @@ class DeductionController extends MainController
             return $dataTable->ajax();
         }
 
-        return $dataTable->render('Payroll::deduction.index');
+        return $dataTable->render('Deduction::index');
     }
 
     public function create(): View
@@ -41,7 +41,7 @@ class DeductionController extends MainController
         $forms = $result['forms'];
         $groupedForms = $result['grouped'];
 
-        return view('Payroll::deduction.edit', compact('deduction', 'forms', 'groupedForms', 'employees', 'periods'));
+        return view('Deduction::create', compact('deduction', 'forms', 'groupedForms', 'employees', 'periods'));
     }
 
     public function store(Request $request)
@@ -80,7 +80,7 @@ class DeductionController extends MainController
         $forms = $result['forms'];
         $groupedForms = $result['grouped'];
 
-        return view('Payroll::deduction.edit', compact('deduction', 'forms', 'groupedForms', 'employees', 'periods'));
+        return view('Deduction::edit', compact('deduction', 'forms', 'groupedForms', 'employees', 'periods'));
     }
 
     public function update(Request $request, $id)

@@ -589,3 +589,12 @@ TaxPaymentService
 
 FixedAssetService
 DepreciationService
+
+Original (Indonesian)	English Enum Value
+aset	asset
+kewajiban	liability
+ekuitas	equity
+pendapatan	revenue
+beban	expense
+debit	debit (unchanged)
+kredit	credit (unchanged)

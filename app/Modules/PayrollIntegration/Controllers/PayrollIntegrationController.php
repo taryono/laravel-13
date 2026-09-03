@@ -226,7 +226,7 @@ class PayrollIntegrationController extends MainController
         }
 
         return redirect()
-            ->route('payroll-integration.index')
+            ->route('payroll_integration.index')
             ->with('success', $message);
     }
 

@@ -13,48 +13,48 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 use Throwable;
 
-class AccountController extends MainController
+class PayslipController extends MainController
 {
     public function __construct()
     {
-        parent::__construct(new Account());
+        parent::__construct(new Payslip());
     }
 
     /**
      * Display a listing of accounts.
      */
-    public function index(Request $request, AccountDataTable $dataTable)
+    public function index(Request $request, PayslipDataTable $dataTable)
     {
         if ($request->filled('draw')) {
             return $dataTable->ajax();
         }
 
-        return $dataTable->render('Finance::account.index');
+        return $dataTable->render('Payslip::index');
     }
 
     /**
-     * Show form to create new account.
+     * Show form to create new payslip.
      */
     public function create(): View
     {
-        $account = new Account();
-        $categories = AccountCategory::where('is_active', 1)->pluck('name', 'id');
-        $parents = Account::where('is_active', 1)
+        $payslip = new Payslip();
+        $categories = PayslipCategory::where('is_active', 1)->pluck('name', 'id');
+        $parents = Payslip::where('is_active', 1)
             ->where('account_type', 'header')
             ->pluck('name', 'id');
 
-        $result = $this->getForm($account);
+        $result = $this->getForm($payslip);
         $forms = $result['forms'];
         $groupedForms = $result['grouped'];
 
         return view(
-            'Finance::account.edit',
-            compact('account', 'forms', 'groupedForms', 'categories', 'parents')
+            'Payslip::edit',
+            compact('payslip', 'forms', 'groupedForms', 'categories', 'parents')
         );
     }
 
     /**
-     * Store a newly created account.
+     * Store a newly created payslip.
      */
     public function store(Request $request)
     {
@@ -73,14 +73,14 @@ class AccountController extends MainController
         ]);
 
         try {
-            $account = DB::transaction(function () use ($validated) {
-                return Account::create($validated);
+            $payslip = DB::transaction(function () use ($validated) {
+                return Payslip::create($validated);
             });
 
             return $this->successResponse(
                 $request,
                 'Akun berhasil ditambahkan.',
-                $account
+                $payslip
             );
 
         } catch (Throwable $e) {
@@ -98,35 +98,35 @@ class AccountController extends MainController
     }
 
     /**
-     * Edit account.
+     * Edit payslip.
      */
     public function edit($id): View
     {
-        $account = $this->model->findOrFail($id);
-        $categories = AccountCategory::where('is_active', 1)->pluck('name', 'id');
-        $parents = Account::where('is_active', 1)
+        $payslip = $this->model->findOrFail($id);
+        $categories = PayslipCategory::where('is_active', 1)->pluck('name', 'id');
+        $parents = Payslip::where('is_active', 1)
             ->where('account_type', 'header')
             ->where('id', '!=', $id)
             ->pluck('name', 'id');
 
-        $result = $this->getForm($account);
+        $result = $this->getForm($payslip);
         $forms = $result['forms'];
         $groupedForms = $result['grouped'];
 
         return view(
-            'Finance::account.edit',
-            compact('account', 'forms', 'groupedForms', 'categories', 'parents')
+            'Payslip::edit',
+            compact('payslip', 'forms', 'groupedForms', 'categories', 'parents')
         );
     }
 
     /**
-     * Update account.
+     * Update payslip.
      */
     public function update(Request $request, $id)
     {
-        $account = $this->model->findOrFail($id);
+        $payslip = $this->model->findOrFail($id);
 
-        if ($account->is_system) {
+        if ($payslip->is_system) {
             return $this->errorResponse(
                 $request,
                 'Akun sistem tidak dapat diubah.'
@@ -146,14 +146,14 @@ class AccountController extends MainController
         ]);
 
         try {
-            DB::transaction(function () use ($account, $validated) {
-                $account->update($validated);
+            DB::transaction(function () use ($payslip, $validated) {
+                $payslip->update($validated);
             });
 
             return $this->successResponse(
                 $request,
                 'Akun berhasil diperbarui.',
-                $account
+                $payslip
             );
 
         } catch (Throwable $e) {
@@ -172,30 +172,30 @@ class AccountController extends MainController
     }
 
     /**
-     * Delete account.
+     * Delete payslip.
      */
     public function destroy(Request $request, $id): JsonResponse|RedirectResponse
     {
         try {
-            $account = $this->model->findOrFail($id);
+            $payslip = $this->model->findOrFail($id);
 
-            if ($account->is_system) {
+            if ($payslip->is_system) {
                 return $this->errorResponse(
                     $request,
                     'Akun sistem tidak dapat dihapus.'
                 );
             }
 
-            // Check if account has transactions
-            if ($account->journalDetails()->exists()) {
+            // Check if payslip has transactions
+            if ($payslip->journalDetails()->exists()) {
                 return $this->errorResponse(
                     $request,
                     'Akun tidak dapat dihapus karena sudah memiliki transaksi.'
                 );
             }
 
-            DB::transaction(function () use ($account) {
-                $account->delete();
+            DB::transaction(function () use ($payslip) {
+                $payslip->delete();
             });
 
             return $this->successResponse(
@@ -218,21 +218,21 @@ class AccountController extends MainController
     }
 
     /**
-     * Get account balance.
+     * Get payslip balance.
      */
     public function getBalance(Request $request, $id): JsonResponse
     {
         try {
-            $account = $this->model->findOrFail($id);
-            $balance = $account->getBalance();
+            $payslip = $this->model->findOrFail($id);
+            $balance = $payslip->getBalance();
 
             return response()->json([
                 'success' => true,
                 'data' => [
-                    'account_code' => $account->code,
-                    'account_name' => $account->name,
+                    'account_code' => $payslip->code,
+                    'account_name' => $payslip->name,
                     'balance' => $balance,
-                    'normal_balance' => $account->normal_balance,
+                    'normal_balance' => $payslip->normal_balance,
                 ]
             ]);
 

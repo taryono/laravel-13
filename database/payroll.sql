@@ -35,15 +35,15 @@ CREATE TABLE
         SET
             utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
             `type` enum (
-                'aset',
-                'kewajiban',
-                'ekuitas',
-                'pendapatan',
-                'beban'
+                'asset',
+                'liability',
+                'equity',
+                'revenue',
+                'expense'
             ) CHARACTER
         SET
             utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-            `normal_balance` enum ('debit', 'kredit') CHARACTER
+            `normal_balance` enum ('debit', 'credit') CHARACTER
         SET
             utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
             `description` text CHARACTER
@@ -139,9 +139,6 @@ CREATE TABLE
 SET
     = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
--- ----------------------------
--- Table structure for accounts
--- ----------------------------
 DROP TABLE IF EXISTS `accounts`;
 
 CREATE TABLE
@@ -159,7 +156,7 @@ CREATE TABLE
             `account_type` enum ('header', 'detail') CHARACTER
         SET
             utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'detail',
-            `normal_balance` enum ('debit', 'kredit') CHARACTER
+            `normal_balance` enum ('debit', 'credit') CHARACTER
         SET
             utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
             `currency_code` varchar(10) CHARACTER

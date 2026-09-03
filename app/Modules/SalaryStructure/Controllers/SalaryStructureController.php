@@ -26,7 +26,7 @@ class SalaryStructureController extends MainController
             return $dataTable->ajax();
         }
 
-        return $dataTable->render('Payroll::salary_structure.index');
+        return $dataTable->render('SalaryStructure::index');
     }
 
     public function create(): View
@@ -39,7 +39,7 @@ class SalaryStructureController extends MainController
         $forms = $result['forms'];
         $groupedForms = $result['grouped'];
 
-        return view('Payroll::salary_structure.edit', compact('structure', 'forms', 'groupedForms', 'positions', 'components'));
+        return view('SalaryStructure::edit', compact('structure', 'forms', 'groupedForms', 'positions', 'components'));
     }
 
     public function store(Request $request)
@@ -91,7 +91,7 @@ class SalaryStructureController extends MainController
         $forms = $result['forms'];
         $groupedForms = $result['grouped'];
 
-        return view('Payroll::salary_structure.edit', compact('structure', 'forms', 'groupedForms', 'positions', 'components'));
+        return view('SalaryStructure::edit', compact('structure', 'forms', 'groupedForms', 'positions', 'components'));
     }
 
     public function update(Request $request, $id)

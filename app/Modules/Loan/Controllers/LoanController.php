@@ -28,7 +28,7 @@ class LoanController extends MainController
             return $dataTable->ajax();
         }
 
-        return $dataTable->render('Payroll::loan.index');
+        return $dataTable->render('Loan::index');
     }
 
     public function create(): View
@@ -40,7 +40,7 @@ class LoanController extends MainController
         $forms = $result['forms'];
         $groupedForms = $result['grouped'];
 
-        return view('Payroll::loan.edit', compact('loan', 'forms', 'groupedForms', 'employees'));
+        return view('Loan::create', compact('loan', 'forms', 'groupedForms', 'employees'));
     }
 
     public function store(Request $request)
@@ -103,7 +103,7 @@ class LoanController extends MainController
         $forms = $result['forms'];
         $groupedForms = $result['grouped'];
 
-        return view('Payroll::loan.edit', compact('loan', 'forms', 'groupedForms', 'employees'));
+        return view('Loan::edit', compact('loan', 'forms', 'groupedForms', 'employees'));
     }
 
     public function update(Request $request, $id)
@@ -162,7 +162,7 @@ class LoanController extends MainController
     public function show($id): View
     {
         $loan = $this->model->with(['employee', 'installments'])->findOrFail($id);
-        return view('Payroll::loan.show', compact('loan'));
+        return view('Loan::show', compact('loan'));
     }
 
     public function getByEmployee($employeeId): JsonResponse

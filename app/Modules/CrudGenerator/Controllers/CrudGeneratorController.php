@@ -120,7 +120,7 @@ class CrudGeneratorController extends Controller
                 'command' => $command,
             ]);
 
-            return redirect()->route('CrudGenerator::index')
+            return redirect()->route('crud-generator.index')
                 ->with('success', $result['message'])
                 ->with('output', $result['output']);
 
@@ -138,7 +138,7 @@ class CrudGeneratorController extends Controller
                 'completed_at' => now(),
             ]);
 
-            return redirect()->route('CrudGenerator::index')
+            return redirect()->route('crud-generator.index')
                 ->with('error', "Gagal generate CRUD: " . $e->getMessage());
         }
     }
@@ -166,7 +166,7 @@ class CrudGeneratorController extends Controller
         // Gunakan queue untuk async processing
         dispatch(new \App\Jobs\GenerateCrudJob($command, auth()->id()));
 
-        return redirect()->route('CrudGenerator::index')
+        return redirect()->route('crud-generator.index')
             ->with('info', "CRUD {$modelName} sedang diproses di background. Anda akan diberitahu saat selesai.");
     }
 

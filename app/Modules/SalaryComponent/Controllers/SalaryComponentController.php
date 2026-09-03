@@ -25,7 +25,7 @@ class SalaryComponentController extends MainController
             return $dataTable->ajax();
         }
 
-        return $dataTable->render('Payroll::salary_component.index');
+        return $dataTable->render('SalaryComponent::index');
     }
 
     public function create(): View
@@ -35,7 +35,7 @@ class SalaryComponentController extends MainController
         $forms = $result['forms'];
         $groupedForms = $result['grouped'];
 
-        return view('Payroll::salary_component.edit', compact('component', 'forms', 'groupedForms'));
+        return view('SalaryComponent::edit', compact('component', 'forms', 'groupedForms'));
     }
 
     public function store(Request $request)
@@ -71,7 +71,7 @@ class SalaryComponentController extends MainController
         $forms = $result['forms'];
         $groupedForms = $result['grouped'];
 
-        return view('Payroll::salary_component.edit', compact('component', 'forms', 'groupedForms'));
+        return view('SalaryComponent::edit', compact('component', 'forms', 'groupedForms'));
     }
 
     public function update(Request $request, $id)

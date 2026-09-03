@@ -28,6 +28,30 @@ class Account extends BasedModel
         'is_system' => 'boolean',
     ];
 
+    // ─── Account Type Constants ───
+    public const TYPE_HEADER = 'header';
+    public const TYPE_DETAIL = 'detail';
+
+    public const ACCOUNT_TYPES = [
+        self::TYPE_HEADER,
+        self::TYPE_DETAIL,
+    ];
+
+    // ─── Normal Balance Constants ───
+    public const BALANCE_DEBIT  = 'debit';
+    public const BALANCE_CREDIT = 'credit';
+
+    public const NORMAL_BALANCES = [
+        self::BALANCE_DEBIT,
+        self::BALANCE_CREDIT,
+    ];
+
+    // ─── Relationships ───
+    public function organization()
+    {
+        return $this->belongsTo(Organization::class);
+    }
+
     // Override generate code for COA
     public function generateUniqueCode(): string
     {

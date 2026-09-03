@@ -122,7 +122,7 @@ class PayrollPeriodDataTable extends DataTable
             /*
              * Server-side AJAX endpoint.
              */
-            ->minifiedAjax(route('payroll-period.index'))
+            ->minifiedAjax(route('payroll_period.index'))
 
             /*
              * Default sorting:

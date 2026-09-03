@@ -60,8 +60,8 @@ class BankTransactionDataTable extends DataTable
             'UTF-8'
         );
 
-        $editUrl   = e(route('bank-transaction.edit', $row));
-        $deleteUrl = e(route('bank-transaction.destroy', $row));
+        $editUrl   = e(route('bank_transaction.edit', $row));
+        $deleteUrl = e(route('bank_transaction.destroy', $row));
 
         return <<<HTML
             <div class="d-flex justify-content-center gap-1">
@@ -122,7 +122,7 @@ class BankTransactionDataTable extends DataTable
             /*
              * Server-side AJAX endpoint.
              */
-            ->minifiedAjax(route('bank-transaction.index'))
+            ->minifiedAjax(route('bank_transaction.index'))
 
             /*
              * Default sorting:

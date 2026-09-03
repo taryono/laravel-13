@@ -26,7 +26,7 @@ class PayrollPeriodController extends MainController
             return $dataTable->ajax();
         }
 
-        return $dataTable->render('Payroll::payroll_period.index');
+        return $dataTable->render('PayrollPeriod::index');
     }
 
     public function create(): View
@@ -36,7 +36,7 @@ class PayrollPeriodController extends MainController
         $forms = $result['forms'];
         $groupedForms = $result['grouped'];
 
-        return view('Payroll::payroll_period.edit', compact('period', 'forms', 'groupedForms'));
+        return view('PayrollPeriod::create', compact('period', 'forms', 'groupedForms'));
     }
 
     public function store(Request $request)
@@ -72,7 +72,7 @@ class PayrollPeriodController extends MainController
         $forms = $result['forms'];
         $groupedForms = $result['grouped'];
 
-        return view('Payroll::payroll_period.edit', compact('period', 'forms', 'groupedForms'));
+        return view('PayrollPeriod::edit', compact('period', 'forms', 'groupedForms'));
     }
 
     public function update(Request $request, $id)

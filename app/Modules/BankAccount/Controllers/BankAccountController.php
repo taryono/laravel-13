@@ -27,7 +27,7 @@ class BankAccountController extends MainController
             return $dataTable->ajax();
         }
 
-        return $dataTable->render('Finance::bank_account.index');
+        return $dataTable->render('BankAccount::index');
     }
 
     public function create(): View
@@ -45,7 +45,7 @@ class BankAccountController extends MainController
         $forms = $result['forms'];
         $groupedForms = $result['grouped'];
 
-        return view('Finance::bank_account.edit', compact('bankAccount', 'forms', 'groupedForms', 'accounts'));
+        return view('BankAccount::edit', compact('bankAccount', 'forms', 'groupedForms', 'accounts'));
     }
 
     public function store(Request $request)
@@ -91,7 +91,7 @@ class BankAccountController extends MainController
         $forms = $result['forms'];
         $groupedForms = $result['grouped'];
 
-        return view('Finance::bank_account.edit', compact('bankAccount', 'forms', 'groupedForms', 'accounts'));
+        return view('BankAccount::edit', compact('bankAccount', 'forms', 'groupedForms', 'accounts'));
     }
 
     public function update(Request $request, $id)

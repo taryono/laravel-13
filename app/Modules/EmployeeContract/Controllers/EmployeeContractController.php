@@ -27,7 +27,7 @@ class EmployeeContractController extends MainController
             return $dataTable->ajax();
         }
 
-        return $dataTable->render('Payroll::employee_contract.index');
+        return $dataTable->render('EmployeeContract::index');
     }
 
     public function create(): View
@@ -39,7 +39,7 @@ class EmployeeContractController extends MainController
         $forms = $result['forms'];
         $groupedForms = $result['grouped'];
 
-        return view('Payroll::employee_contract.edit', compact('contract', 'forms', 'groupedForms', 'employees'));
+        return view('EmployeeContract::edit', compact('contract', 'forms', 'groupedForms', 'employees'));
     }
 
     public function store(Request $request)
@@ -79,7 +79,7 @@ class EmployeeContractController extends MainController
         $forms = $result['forms'];
         $groupedForms = $result['grouped'];
 
-        return view('Payroll::employee_contract.edit', compact('contract', 'forms', 'groupedForms', 'employees'));
+        return view('EmployeeContract::edit', compact('contract', 'forms', 'groupedForms', 'employees'));
     }
 
     public function update(Request $request, $id)

@@ -60,8 +60,8 @@ class EmployeeContractDataTable extends DataTable
             'UTF-8'
         );
 
-        $editUrl   = e(route('employee-contract.edit', $row));
-        $deleteUrl = e(route('employee-contract.destroy', $row));
+        $editUrl   = e(route('employee_contract.edit', $row));
+        $deleteUrl = e(route('employee_contract.destroy', $row));
 
         return <<<HTML
             <div class="d-flex justify-content-center gap-1">
@@ -122,7 +122,7 @@ class EmployeeContractDataTable extends DataTable
             /*
              * Server-side AJAX endpoint.
              */
-            ->minifiedAjax(route('employee-contract.index'))
+            ->minifiedAjax(route('employee_contract.index'))
 
             /*
              * Default sorting:

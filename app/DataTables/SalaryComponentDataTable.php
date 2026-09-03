@@ -60,8 +60,8 @@ class SalaryComponentDataTable extends DataTable
             'UTF-8'
         );
 
-        $editUrl   = e(route('salary-component.edit', $row));
-        $deleteUrl = e(route('salary-component.destroy', $row));
+        $editUrl   = e(route('salary_component.edit', $row));
+        $deleteUrl = e(route('salary_component.destroy', $row));
 
         return <<<HTML
             <div class="d-flex justify-content-center gap-1">
@@ -122,7 +122,7 @@ class SalaryComponentDataTable extends DataTable
             /*
              * Server-side AJAX endpoint.
              */
-            ->minifiedAjax(route('salary-component.index'))
+            ->minifiedAjax(route('salary_component.index'))
 
             /*
              * Default sorting:

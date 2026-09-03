@@ -60,8 +60,8 @@ class PayrollIntegrationDataTable extends DataTable
             'UTF-8'
         );
 
-        $editUrl   = e(route('payroll-integration.edit', $row));
-        $deleteUrl = e(route('payroll-integration.destroy', $row));
+        $editUrl   = e(route('payroll_integration.edit', $row));
+        $deleteUrl = e(route('payroll_integration.destroy', $row));
 
         return <<<HTML
             <div class="d-flex justify-content-center gap-1">
@@ -122,7 +122,7 @@ class PayrollIntegrationDataTable extends DataTable
             /*
              * Server-side AJAX endpoint.
              */
-            ->minifiedAjax(route('payroll-integration.index'))
+            ->minifiedAjax(route('payroll_integration.index'))
 
             /*
              * Default sorting:

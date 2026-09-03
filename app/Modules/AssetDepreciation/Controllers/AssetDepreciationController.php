@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Modules\AttendanceImport\Controllers;
+namespace App\Modules\AssetDepreciation\Controllers;
 
-use App\DataTables\AttendanceImportDataTable;
+use App\DataTables\AssetDepreciationDataTable;
 use App\Http\Controllers\MainController;
-use Models\AttendanceImport;
+use Models\AssetDepreciation;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -13,11 +13,11 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 use Throwable;
 
-class AttendanceImportController extends MainController
+class AssetDepreciationController extends MainController
 {
     public function __construct()
     {
-        parent::__construct(new AttendanceImport());
+        parent::__construct(new AssetDepreciation());
     }
 
     /**
@@ -29,20 +29,20 @@ class AttendanceImportController extends MainController
      */
     public function index(
         Request $request,
-        AttendanceImportDataTable $dataTable
+        AssetDepreciationDataTable $dataTable
     ) {
         /*
          * Yajra DataTables request contains "draw".
          *
          * Example:
-         * /attendance-import?draw=1&start=0&length=10
+         * /asset-depreciation?draw=1&start=0&length=10
          */
         if ($request->filled('draw')) {
             return $dataTable->ajax();
         }
 
         return $dataTable->render(
-            'AttendanceImport::index'
+            'AssetDepreciation::index'
         );
     }
 
@@ -51,14 +51,14 @@ class AttendanceImportController extends MainController
      */
     public function create(): View
     {
-        $attendanceImport = new AttendanceImport();
-        $result = $this->getForm($attendanceImport);
+        $assetDepreciation = new AssetDepreciation();
+        $result = $this->getForm($assetDepreciation);
         $forms = $result['forms'];
         $groupedForms = $result['grouped'];
 
         return view(
-            'AttendanceImport::create',
-            compact('attendanceImport', 'forms', 'groupedForms')
+            'AssetDepreciation::create',
+            compact('assetDepreciation', 'forms', 'groupedForms')
         );
     }
 
@@ -68,24 +68,26 @@ class AttendanceImportController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'date' => ['required', 'date'],
+                            'organizationname' => ['required', 'string', 'max:255'],
+            'accounting_periodperiod' => ['required', 'string', 'max:255'],
+            'amount' => ['required', 'string', 'max:255'],
         ]);
 
         try {
             $model = DB::transaction(function () use ($validated) {
-                return AttendanceImport::create($validated);
+                return AssetDepreciation::create($validated);
             });
 
             return $this->successResponse(
                 $request,
-                'Data AttendanceImport berhasil ditambahkan.',
+                'Data AssetDepreciation berhasil ditambahkan.',
                 $model
             );
 
         } catch (Throwable $e) {
 
             Log::error(
-                'Gagal menambahkan AttendanceImport.',
+                'Gagal menambahkan AssetDepreciation.',
                 [
                     'exception' => $e,
                     'data' => $validated,
@@ -95,7 +97,7 @@ class AttendanceImportController extends MainController
 
             return $this->errorResponse(
                 $request,
-                'Data AttendanceImport gagal ditambahkan.'
+                'Data AssetDepreciation gagal ditambahkan.'
             );
         }
     }
@@ -105,14 +107,14 @@ class AttendanceImportController extends MainController
      */
     public function edit($id): View
     {
-        $attendanceImport = $this->model->findOrFail($id);
-        $result = $this->getForm($attendanceImport);
+        $assetDepreciation = $this->model->findOrFail($id);
+        $result = $this->getForm($assetDepreciation);
         $forms = $result['forms'];
         $groupedForms = $result['grouped'];
 
         return view(
-            'AttendanceImport::edit',
-            compact('attendanceImport', 'forms', 'groupedForms')
+            'AssetDepreciation::edit',
+            compact('assetDepreciation', 'forms', 'groupedForms')
         );
     }
 
@@ -122,37 +124,32 @@ class AttendanceImportController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-            'date' => ['required', 'date'],
+                        'organizationname' => ['required', 'string', 'max:255'],
+            'accounting_periodperiod' => ['required', 'string', 'max:255'],
+            'amount' => ['required', 'string', 'max:255'],
         ]);
 
         try {
-            $attendanceImport = $this->model->findOrFail($id);
-
+            $assetDepreciation = $this->model->findOrFail($id);
             DB::transaction(function () use (
-                $attendanceImport,
+                $assetDepreciation,
                 $validated
             ) {
-                $attendanceImport->update($validated);
+                $assetDepreciation->update($validated);
             });
 
             return $this->successResponse(
                 $request,
-                'Data AttendanceImport berhasil diperbarui.',
-                $attendanceImport
+                'Data AssetDepreciation berhasil diperbarui.',
+                $assetDepreciation
             );
 
-        } catch (Throwable $e) {
-
-            // FIX: pakai $id mentah untuk logging, BUKAN
-            // $attendanceImport->getKey(), karena kalau findOrFail() di atas
-            // yang melempar exception, variabel $attendanceImport belum
-            // ter-assign -- referensi ke ->getKey() di sini akan memicu
-            // error baru di dalam blok catch.
+        } catch (Throwable $e) { 
             Log::error(
-                'Gagal memperbarui AttendanceImport.',
+                'Gagal memperbarui AssetDepreciation.',
                 [
                     'exception' => $e,
-                    'AttendanceImport_id' => $id,
+                    'AssetDepreciation_id' => $id,
                     'data' => $validated,
                     'user_id' => auth()->id(),
                 ]
@@ -160,7 +157,7 @@ class AttendanceImportController extends MainController
 
             return $this->errorResponse(
                 $request,
-                'Data AttendanceImport gagal diperbarui.'
+                'Data AssetDepreciation gagal diperbarui.'
             );
         }
     }
@@ -171,33 +168,31 @@ class AttendanceImportController extends MainController
     public function destroy(Request $request, $id): JsonResponse|RedirectResponse
     {
         try {
-            $attendanceImport = $this->model->findOrFail($id);
+            $assetDepreciation = $this->model->findOrFail($id);
 
-            DB::transaction(function () use ($attendanceImport) {
-                $attendanceImport->delete();
+            DB::transaction(function () use ($assetDepreciation) {
+                $assetDepreciation->delete();
             });
 
             return $this->successResponse(
                 $request,
-                'Data AttendanceImport berhasil dihapus.'
+                'Data AssetDepreciation berhasil dihapus.'
             );
 
-        } catch (Throwable $e) {
-
-            // FIX: sama seperti update(), pakai $id mentah, bukan
-            // $attendanceImport->getKey() yang bisa undefined.
+        } catch (Throwable $e) { 
+            // $assetDepreciation->getKey() yang bisa undefined.
             Log::error(
-                'Gagal menghapus AttendanceImport.',
+                'Gagal menghapus AssetDepreciation.',
                 [
                     'exception' => $e,
-                    'AttendanceImport_id' => $id,
+                    'AssetDepreciation_id' => $id,
                     'user_id' => auth()->id(),
                 ]
             );
 
             return $this->errorResponse(
                 $request,
-                'Data AttendanceImport gagal dihapus.'
+                'Data AssetDepreciation gagal dihapus.'
             );
         }
     } 
