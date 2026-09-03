@@ -49,10 +49,10 @@ class Account extends BasedModel
     }
 
     // Relasi
-    public function category()
-    {
-        return $this->belongsTo(AccountCategory::class);
-    }
+    public function accountCategory(): BelongsTo
+{
+    return $this->belongsTo(AccountCategory::class);
+}
 
     public function parent()
     {
