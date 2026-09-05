@@ -33,4 +33,30 @@ class Department extends BasedModel
     {
         return $this->hasMany(Employee::class);
     }
+
+     // 🔥 Scope untuk menu dengan parent
+    public function scopeHasParent($query)
+    {
+        return $query->whereNotNull('parent_id');
+    }
+    
+    // 🔥 Scope untuk menu root (tanpa parent)
+    public function scopeIsRoot($query)
+    {
+        return $query->whereNull('parent_id');
+    }
+    
+    // 🔥 Scope untuk sorting hierarchical
+    public function scopeOrderHierarchical($query, $direction = 'asc')
+    {
+        return $query->leftJoin('departments as parent_department', 'departments.parent_id', '=', 'parent_department.id')
+            ->orderByRaw("
+                CASE 
+                    WHEN departments.parent_id IS NULL THEN 0 
+                    ELSE 1 
+                END {$direction},
+                parent_department.name {$direction},
+                departments.name {$direction}
+            ");
+    }
 }

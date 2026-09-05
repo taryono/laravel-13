@@ -69,4 +69,30 @@ class Menu extends BasedModel
         return $this->actions->firstWhere('name', $this->slug)
             ?? $this->actions->first();
     }
+
+     // 🔥 Scope untuk menu dengan parent
+    public function scopeHasParent($query)
+    {
+        return $query->whereNotNull('parent_id');
+    }
+    
+    // 🔥 Scope untuk menu root (tanpa parent)
+    public function scopeIsRoot($query)
+    {
+        return $query->whereNull('parent_id');
+    }
+    
+    // 🔥 Scope untuk sorting hierarchical
+    public function scopeOrderHierarchical($query, $direction = 'asc')
+    {
+        return $query->leftJoin('menus as parent_menu', 'menus.parent_id', '=', 'parent_menu.id')
+            ->orderByRaw("
+                CASE 
+                    WHEN menus.parent_id IS NULL THEN 0 
+                    ELSE 1 
+                END {$direction},
+                parent_menu.name {$direction},
+                menus.name {$direction}
+            ");
+    }
 }

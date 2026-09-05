@@ -8,9 +8,7 @@
    didefinisikan di :root pada general-ui.css. Pastikan kedua
    file di-load bersamaan di halaman yang sama.
    ============================================================ */
-* {
-    font-size: 12px;
-}
+
 
 /* Tambahan dark-mode khusus teks sidebar */
 body.dark-mode {
@@ -813,4 +811,9 @@ body.bnsp-layout-topbar .bnsp-sidebar-brand {
 
 .bnsp-nav-item.has-children.active>.bnsp-nav-link {
     color: #ffffff;
+}
+
+/* Berlaku untuk SEMUA mode (termasuk sidebar terbuka & mobile) */
+.bnsp-submenu .bnsp-nav-item {
+    position: relative;
 }

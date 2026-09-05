@@ -298,7 +298,7 @@ app/Modules/
 │   └── views/ 
 │   │     ├── index.blade.php
 │   │     └── edit.blade.php
-│   └── routes.php
+│── └── routes.php
 
 app/Modules/
 ├── Shift/

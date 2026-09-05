@@ -11,10 +11,16 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 // use App\Traits\HasUniqueCode;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use ReflectionClass;
+use ReflectionMethod;
+use Illuminate\Support\Facades\Cache;
+
 
 class BasedModel extends Model
 {
     use HasFactory, SoftDeletes;
+    protected static array $relationsCache = [];
     // use HasUniqueCode;
    
     protected $guarded = ['id'];
@@ -135,7 +141,7 @@ class BasedModel extends Model
     /**
      * Get table columns excluding timestamps
      */
-    protected function getTableColumns()
+    public function getTableColumns()
     {
         return array_diff(
             $this->getConnection()->getSchemaBuilder()->getColumnListing($this->getTable()),
@@ -159,6 +165,77 @@ class BasedModel extends Model
     {
         $this->ignored[] = $field;
         return $this;
+    }
+
+    public static function getModelRelations(): array
+    {
+        $class = static::class;
+
+        // 1. Cek L1 cache (static property, per-request)
+        if (isset(static::$relationsCache[$class])) {
+            return static::$relationsCache[$class];
+        }
+
+        // 2. Cek L2 cache (persisten, lintas-request)
+        $cacheKey = 'model_relations:' . $class;
+
+        $relations = Cache::rememberForever($cacheKey, function () use ($class) {
+            return static::resolveModelRelations();
+        });
+
+        // Simpan ke L1 cache supaya panggilan berikutnya di request yang sama super cepat
+        static::$relationsCache[$class] = $relations;
+
+        return $relations;
+    }
+
+    /**
+     * Logika reflection yang sebenarnya, dipisah supaya rapi.
+     */
+    protected static function resolveModelRelations(): array
+    {
+        $relations = [];
+        $instance = new static();
+
+        $reflection = new ReflectionClass($instance);
+
+        foreach ($reflection->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
+            // Lewati method bawaan base Eloquent Model
+            if ($method->getDeclaringClass()->getName() === Model::class) {
+                continue;
+            }
+
+            if ($method->getNumberOfParameters() > 0) {
+                continue;
+            }
+
+            if ($method->isStatic() || $method->isAbstract()) {
+                continue;
+            }
+
+            try {
+                $return = $method->invoke($instance);
+
+                if ($return instanceof Relation) {
+                    $relations[$method->getName()] = get_class($return);
+                }
+            } catch (\Throwable $e) {
+                continue;
+            }
+        }
+
+        return $relations;
+    }
+
+    /**
+     * Opsional: helper untuk hapus cache relasi (dipanggil manual, misal via artisan command
+     * setelah deploy, atau otomatis lewat deploy script).
+     */
+    public static function forgetRelationsCache(): void
+    {
+        $class = static::class;
+        unset(static::$relationsCache[$class]);
+        Cache::forget('model_relations:' . $class);
     }
 
 }

@@ -6,7 +6,7 @@
         <h1 class="h5 fw-bold text-white mb-1">BNSP Portal</h1>
         <p class="text-white-50 small text-uppercase mb-0" style="font-size:.7rem;">National Agency</p>
     </div>
-    <nav class="d-flex flex-column gap-2 flex-grow-1 mb-3">
+    <nav class="d-flex flex-column gap-2 flex-grow-1 mb-3  style-dotted">
         <x-menu.nav-items :items="$menu" />
     </nav>
     <div class="mt-auto pt-4 border-top border-white border-opacity-10">

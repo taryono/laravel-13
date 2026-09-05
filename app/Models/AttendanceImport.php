@@ -2,8 +2,9 @@
 
 namespace Models; 
 
-class AttendanceImportBatch extends BasedModel
+class AttendanceImport extends BasedModel
 { 
+    protected $table = 'attendance_import_batches';
     protected $fillable = [
         'batch_code',
         'file_name',

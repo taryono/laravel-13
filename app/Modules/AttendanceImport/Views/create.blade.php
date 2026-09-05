@@ -1,4 +1,4 @@
-{{ Form::open(['method' => 'POST', 'route' => ['attendance_import_batch.store'], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
+{{ Form::open(['method' => 'POST', 'route' => ['attendance_import.store'], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     <div class="col-md-6 mb-3">
         @forelse ($forms as $key => $form)

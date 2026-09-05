@@ -5,7 +5,7 @@
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">Daftar AttendanceImportBatch</h5>
-                <a href="{{ route('attendance_import_batch.create') }}" class="btn btn-primary btn-sm">Tambah Baru</a>
+                <a href="{{ route('attendance_import.create') }}" class="btn btn-primary btn-sm">Tambah Baru</a>
             </div>
             <div class="card-body">
                 @if (session('success'))

@@ -2,7 +2,7 @@
 
 namespace App\DataTables;
 
-use AppModels\Deduction;
+use Models\Deduction;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;

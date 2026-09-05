@@ -40,6 +40,70 @@
         actionSyncAccess: @json(route('menu_management.actions.syncAccess', ['action' => '__ACTION_ID__'])),
     };
 </script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const iconType = document.getElementById('menu_icon_type');
+    const iconSelect = document.getElementById('menu_icon');
+    const iconPreview = document.getElementById('icon_preview');
+    const iconNameDisplay = document.getElementById('icon_name_display');
+    
+    function updateIconPreview() {
+        const selectedIcon = iconSelect.value;
+        const selectedText = iconSelect.options[iconSelect.selectedIndex]?.text || '';
+        const type = iconType.value;
+        
+        if (selectedIcon) {
+            if (type === 'fa') {
+                iconPreview.innerHTML = `<i class="${selectedIcon}"></i>`;
+                iconNameDisplay.textContent = selectedText;
+            } else {
+                iconPreview.innerHTML = `<span class="material-symbols-outlined">${selectedIcon}</span>`;
+                iconNameDisplay.textContent = selectedText;
+            }
+        } else {
+            iconPreview.innerHTML = '<i class="fas fa-th-large"></i>';
+            iconNameDisplay.textContent = 'Pilih icon';
+        }
+    }
+    
+    iconType.addEventListener('change', function() {
+        // Filter options based on type
+        const options = iconSelect.querySelectorAll('optgroup option');
+        let hasVisible = false;
+        
+        options.forEach(opt => {
+            const parentLabel = opt.closest('optgroup')?.label || '';
+            if (this.value === 'fa') {
+                // Show only FA icons (check if value starts with 'fas' or 'far' or 'fab')
+                if (opt.value.startsWith('fas ') || opt.value.startsWith('far ') || opt.value.startsWith('fab ')) {
+                    opt.style.display = '';
+                    hasVisible = true;
+                } else {
+                    opt.style.display = 'none';
+                }
+            } else {
+                // Show only Material icons (value doesn't start with 'fa')
+                if (!opt.value.startsWith('fas ') && !opt.value.startsWith('far ') && !opt.value.startsWith('fab ')) {
+                    opt.style.display = '';
+                    hasVisible = true;
+                } else {
+                    opt.style.display = 'none';
+                }
+            }
+        });
+        
+        // Reset selection
+        iconSelect.value = '';
+        updateIconPreview();
+    });
+    
+    iconSelect.addEventListener('change', updateIconPreview);
+    
+    // Initial update
+    updateIconPreview();
+    iconType.dispatchEvent(new Event('change'));
+});
+</script>
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
 <script src="{{ asset('assets/js/menu-management.js') }}"></script>
 @endpush

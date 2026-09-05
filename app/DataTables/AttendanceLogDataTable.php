@@ -60,8 +60,8 @@ class AttendanceLogDataTable extends DataTable
             'UTF-8'
         );
 
-        $editUrl   = e(route('attendance-log.edit', $row));
-        $deleteUrl = e(route('attendance-log.destroy', $row));
+        $editUrl   = e(route('attendance_log.edit', $row));
+        $deleteUrl = e(route('attendance_log.destroy', $row));
 
         return <<<HTML
             <div class="d-flex justify-content-center gap-1">
@@ -122,7 +122,7 @@ class AttendanceLogDataTable extends DataTable
             /*
              * Server-side AJAX endpoint.
              */
-            ->minifiedAjax(route('attendance-log.index'))
+            ->minifiedAjax(route('attendance_log.index'))
 
             /*
              * Default sorting:

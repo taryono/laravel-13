@@ -32,6 +32,10 @@
     --bnsp-topnav-h: 4rem;
 }
 
+* {
+    font-size: 11px;
+}
+
 body {
     font-family: 'Manrope', sans-serif;
     background-color: var(--bnsp-bg);

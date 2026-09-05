@@ -1,4 +1,22 @@
 body {
     font-family: 'Inter', 'Poppins', sans-serif;
+}
 
+/* Table header */
+table.dataTable thead th {
+    background-color: var(--bs-light);
+    color: var(--bs-dark);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Hover row */
+table.dataTable tbody tr:hover {
+    background-color: rgba(var(--bs-primary-rgb), 0.05);
+}
+
+/* Pagination */
+.dataTables_wrapper .page-link {
+    border-radius: 0.5rem;
 }

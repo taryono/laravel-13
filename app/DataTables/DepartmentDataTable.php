@@ -17,7 +17,8 @@ class DepartmentDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['name'];
+    protected array $columns = ['code', 'name', 'parent_id', 'description', 'is_active'];
+
 
     /**
      * Build DataTable response.
@@ -29,7 +30,17 @@ class DepartmentDataTable extends DataTable
                 return $this->renderActionButtons($row);
             })
             ->addIndexColumn()
-            ->rawColumns(['action']) // ✅ Tetap wajib ada!
+            
+            ->addColumn('parent_name', function ($row) {
+                return $row->parent ? $row->parent->name : '-';
+            })
+            
+            // 🔥 Gunakan scope dari model
+            ->orderColumn('parent_name', function ($query, $order) {
+                $query->orderHierarchical($order);
+            })
+            
+            ->rawColumns(['action'])
             ->setRowId('id');
     }
 
@@ -58,10 +69,9 @@ class DepartmentDataTable extends DataTable
             ]),
             ENT_QUOTES,
             'UTF-8'
-        );
-
-        $editUrl   = e(route('department.edit', $row));
-        $deleteUrl = e(route('department.destroy', $row));
+        ); 
+        $editUrl   = e(url('department/edit/'.$row->id));
+        $deleteUrl = e(url('department/destroy/'.$row->id));
 
         return <<<HTML
             <div class="d-flex justify-content-center gap-1">
@@ -100,8 +110,16 @@ class DepartmentDataTable extends DataTable
      */
     public function query(Department $model): QueryBuilder
     {
-        return $model->newQuery();
+        return $model->newQuery()
+            // 🔥 Subquery untuk mendapatkan parent name
+            ->addSelect([
+                'parent_name' => Department::select('name')
+                    ->whereColumn('id', 'departments.parent_id')
+                    ->limit(1)
+            ])
+            ->with(['parent']);
     }
+
 
     /**
      * Configure DataTable HTML builder.
@@ -264,29 +282,75 @@ class DepartmentDataTable extends DataTable
      * explode() dari string literal seperti versi lama, yang rapuh
      * terhadap karakter khusus pada nama kolom.
      */
-    protected function getColumns(): array
+    // protected function getColumns(): array
+    // {
+    //     return collect($this->columns)
+    //         ->map(fn (string $kolom) => Column::make($kolom)
+    //             ->title(ucwords(str_replace('_', ' ', $kolom))))
+    //         // 1. PREPEND: Masukkan kolom No di posisi PALING AWAL (indeks 0)
+    //         ->prepend(
+    //             Column::make('DT_RowIndex')
+    //                 ->title('No')
+    //                 ->orderable(false)
+    //                 ->searchable(false)
+    //                 ->width(80)
+    //                 ->addClass('text-center')
+    //         )
+    //         // 2. PUSH: Masukkan kolom Aksi di posisi PALING AKHIR
+    //         ->push(
+    //             Column::computed('action')
+    //                 ->exportable(false)
+    //                 ->printable(false)
+    //                 ->width(120)
+    //                 ->addClass('text-center')
+    //                 ->title('Aksi')
+    //         )
+    //         ->all(); // Konversi collection kembali menjadi array di akhir
+    // }
+
+     protected function getColumns(): array
     {
-        $daftarKolom = collect($this->columns)
-            ->map(fn (string $kolom) => Column::make($kolom)
-                ->title(ucwords(str_replace('_', ' ', $kolom))))
-            ->all();
-
-        $daftarKolom[] = Column::make('DT_RowIndex')
-            ->title('No')
-            ->orderable(false)
-            ->searchable(false)
-            ->width(80)
-            ->addClass('text-center');
-
-        // Tambah kolom Aksi di paling akhir
-        $daftarKolom[] = Column::computed('action')
-            ->exportable(false)
-            ->printable(false)
-            ->width(120)
-            ->addClass('text-center')
-            ->title('Aksi');
-
-        return $daftarKolom;
+        return [
+            Column::make('DT_RowIndex')
+                ->title('No')
+                ->orderable(false)
+                ->searchable(false)
+                ->width(50)
+                ->addClass('text-center'),
+            
+            Column::make('code')
+                ->title('Kode Department')
+                ->width(120),
+            
+            Column::make('name')
+                ->title('Nama Department')
+                ->width(200),
+            
+            // 🔥 Kolom parent_name (tambahan)
+            Column::make('parent_name')
+                ->title('Parent Department')
+                ->width(150)
+                ->searchable(true), // Bisa di-search
+                // orderColumn sudah di handle di dataTable()
+            
+            // 🔥 Atau gunakan parent_id dengan editColumn
+            Column::make('parent_id')
+                ->title('Parent')
+                ->width(150)
+                ->searchable(true), 
+            
+            Column::make('is_active')
+                ->title('Status')
+                ->width(100)
+                ->addClass('text-center'),
+            
+            Column::computed('action')
+                ->exportable(false)
+                ->printable(false)
+                ->width(150)
+                ->addClass('text-center')
+                ->title('Aksi'),
+        ];
     }
 
     /**

@@ -5,8 +5,8 @@ namespace App\Modules\AttendanceLog\Controllers;
 use App\DataTables\AttendanceLogDataTable;
 use App\Http\Controllers\MainController;
 use Models\AttendanceLog;
-use Models\AttendanceImportBatch;
-use App\Services\FingerprintImporter;
+use Models\AttendanceImport;
+use App\Services\Attendance\FingerprintImporter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -33,9 +33,9 @@ class AttendanceLogController extends MainController
         }
 
         $totalUnprocessed = AttendanceLog::where('is_processed', false)->count();
-        $batches = AttendanceImportBatch::orderBy('created_at', 'desc')->limit(10)->get();
+        $batches = AttendanceImport::orderBy('created_at', 'desc')->limit(10)->get();
 
-        return $dataTable->render('Attendance::logs.index', compact('totalUnprocessed', 'batches'));
+        return $dataTable->render('AttendanceImport::index', compact('totalUnprocessed', 'batches'));
     }
 
     /**
@@ -43,7 +43,7 @@ class AttendanceLogController extends MainController
      */
     public function importForm(): View
     {
-        return view('Attendance::logs.import');
+        return view('AttendanceImport::import');
     }
 
     /**
@@ -61,7 +61,7 @@ class AttendanceLogController extends MainController
                 $file = $request->file('file');
                 $path = $file->store('attendance-imports', 'public');
 
-                $batch = AttendanceImportBatch::create([
+                $batch = AttendanceImport::create([
                     'batch_code' => 'BATCH-' . date('YmdHis'),
                     'file_name' => $file->getClientOriginalName(),
                     'file_size' => $file->getSize(),

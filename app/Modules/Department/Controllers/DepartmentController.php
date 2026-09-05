@@ -37,7 +37,7 @@ class DepartmentController extends MainController
         $forms = $result['forms'];
         $groupedForms = $result['grouped'];
 
-        return view('Department::edit', compact('department', 'forms', 'groupedForms', 'parents'));
+        return view('Department::create', compact('department', 'forms', 'groupedForms', 'parents'));
     }
 
     public function store(Request $request)
