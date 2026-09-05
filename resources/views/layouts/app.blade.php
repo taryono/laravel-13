@@ -38,7 +38,8 @@
         crossorigin="anonymous">
 
     {{-- Custom Styles --}}
-    <link rel="stylesheet" href="{{ asset('assets/css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/general.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/menu.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/custom-datatable.css') }}">
 
     @stack('styles')
@@ -117,7 +118,7 @@
     <script src="{{ asset('assets/js/button.js') }}?v={{ time() }}"></script>
 
     {{-- 4. Script Lainnya --}}
-    <script src="{{ asset('assets/js/dashboard.js') }}"></script>
+    <script src="{{ asset('assets/js/sidebar.js') }}"></script>
 
 
 

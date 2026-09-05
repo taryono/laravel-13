@@ -1,0 +1,363 @@
+/* ============================================================
+   GENERAL UI
+   Variabel tema, body, isi topbar (search/notifikasi/avatar),
+   cards, badge, tombol, dan promo banner.
+   Tidak ada kaitan dengan pengelolaan sidebar/topnav — untuk itu
+   lihat sidebar-topnav.css.
+
+   Catatan: :root di sini juga dipakai oleh sidebar-topnav.css
+   (mis. --bnsp-sidebar-w, --bnsp-flyout-gap, --bnsp-topnav-h).
+   Pastikan file ini tetap di-load di halaman yang sama.
+   ============================================================ */
+
+:root {
+    --bnsp-primary: #003644;
+    --bnsp-primary-container: #134e5e;
+    --bnsp-secondary: #b3272d;
+    --bnsp-success: #005413;
+    --bnsp-success-soft: #68cb68;
+    --bnsp-bg: #f8fafb;
+    --bnsp-surface: #ffffff;
+    --bnsp-text: #191c1d;
+    --bnsp-sidebar-text: #1a1a1a;
+    --bnsp-text-muted: #40484b;
+    --bnsp-border: #c0c8cb;
+    --bnsp-sidebar-w: 20rem;
+    --bnsp-sidebar-w-collapsed: 4.5rem;
+    /* jarak antara ikon dan flyout/tooltip — SATU sumber angka,
+          dipakai ulang oleh submenu, tooltip, dan jembatan masing-masing
+          supaya tidak ada lagi nilai yang bentrok */
+    --bnsp-flyout-gap: .5rem;
+    /* tinggi nav bar horizontal untuk mode layout topbar */
+    --bnsp-topnav-h: 4rem;
+}
+
+body {
+    font-family: 'Manrope', sans-serif;
+    background-color: var(--bnsp-bg);
+    color: var(--bnsp-text);
+    overflow-x: hidden;
+}
+
+body.dark-mode {
+    /* Bootstrap variables (sudah ada) */
+    --bs-body-bg: #121212;
+    --bs-body-color: #f1f1f1;
+    --bs-emphasis-color: #f1f1f1;
+    --bs-border-color: rgba(255, 255, 255, 0.15);
+    --bs-border-color-translucent: rgba(255, 255, 255, 0.15);
+
+    /* tambahan variable Bootstrap penting lainnya */
+    --bs-secondary-bg: #1e1e1e;
+    --bs-tertiary-bg: #262626;
+    --bs-secondary-color: rgba(241, 241, 241, 0.75);
+    --bs-link-color: #8ab4f8;
+    --bs-link-hover-color: #aecbfa;
+
+    /* variable custom kamu — INI YANG KURANG */
+    --bnsp-bg: #121212;
+    --bnsp-surface: #1e1e1e;
+    --bnsp-text: #f1f1f1;
+    --bnsp-text-muted: #a0a8ab;
+    --bnsp-border: #333333;
+}
+
+.material-symbols-outlined {
+    font-variation-settings: 'FILL'0, 'wght'400, 'GRAD'0, 'opsz'24;
+    vertical-align: middle;
+}
+
+/* ===== Topbar (header atas: search, notifikasi, avatar) ===== */
+.bnsp-topbar {
+    position: sticky;
+    top: 0;
+    z-index: 1020;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 4px 20px rgba(19, 78, 94, .05);
+    height: 4rem;
+}
+
+.bnsp-search .material-symbols-outlined {
+    position: absolute;
+    left: .75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--bnsp-text-muted);
+}
+
+.bnsp-search input {
+    padding-left: 2.5rem;
+    background-color: #eceeef;
+    border: none;
+    border-radius: .75rem;
+}
+
+.bnsp-search input:focus {
+    box-shadow: 0 0 0 .2rem rgba(19, 78, 94, .15);
+}
+
+.bnsp-icon-btn {
+    position: relative;
+    width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    color: var(--bnsp-text-muted);
+    border: none;
+    background: transparent;
+    transition: background .15s ease;
+}
+
+.bnsp-icon-btn:hover {
+    background-color: #e6e8e9;
+}
+
+/* Lencana jumlah notifikasi */
+.notification-badge {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    background-color: var(--bnsp-secondary);
+    color: white;
+    font-size: .65rem;
+    font-weight: 700;
+    min-width: 1rem;
+    height: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.bnsp-avatar {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--bnsp-primary-container);
+    cursor: pointer;
+    transition: transform .2s ease;
+}
+
+.bnsp-avatar:hover {
+    transform: scale(1.05);
+}
+
+/* ===== Dropdown Notifikasi & Profil ===== */
+.dropdown-menu {
+    border: none;
+    border-radius: .75rem;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, .1);
+    padding: .5rem 0;
+    margin-top: .5rem;
+}
+
+.dropdown-header {
+    font-weight: 700;
+    color: var(--bnsp-primary);
+    padding: .75rem 1rem;
+    border-bottom: 1px solid var(--bnsp-border);
+}
+
+.notification-item {
+    padding: .75rem 1rem;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+    transition: background .1s ease;
+}
+
+.notification-item:last-child {
+    border-bottom: none;
+}
+
+.notification-item:hover {
+    background-color: var(--bnsp-bg);
+}
+
+.notification-item.unread {
+    background-color: rgba(19, 78, 94, .05);
+    border-left: 3px solid var(--bnsp-primary);
+}
+
+.notification-title {
+    font-weight: 600;
+    font-size: .85rem;
+    margin-bottom: .1rem;
+}
+
+.notification-desc {
+    font-size: .75rem;
+    color: var(--bnsp-text-muted);
+    margin-bottom: .1rem;
+}
+
+.notification-time {
+    font-size: .7rem;
+    color: var(--bnsp-text-muted);
+}
+
+.profile-dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    padding: .5rem 1rem;
+    font-size: .85rem;
+    color: var(--bnsp-text);
+    text-decoration: none;
+    transition: all .15s ease;
+}
+
+.profile-dropdown-item:hover {
+    background-color: var(--bnsp-bg);
+    color: var(--bnsp-primary);
+}
+
+.profile-dropdown-item .material-symbols-outlined {
+    font-size: 18px;
+    color: var(--bnsp-text-muted);
+}
+
+/* ===== Cards ===== */
+.bnsp-card {
+    background-color: var(--bnsp-surface);
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(19, 78, 94, .05);
+    transition: box-shadow .2s ease;
+    height: 100%;
+}
+
+.bnsp-card:hover {
+    box-shadow: 0 10px 30px rgba(19, 78, 94, .10);
+}
+
+.bnsp-stat-card {
+    border-left: 4px solid var(--bnsp-primary);
+}
+
+.bnsp-stat-card.accent-success {
+    border-left-color: var(--bnsp-success);
+}
+
+.bnsp-stat-card.accent-secondary {
+    border-left-color: var(--bnsp-secondary);
+}
+
+.bnsp-stat-card.accent-muted {
+    border-left-color: #9acee1;
+}
+
+.bnsp-cert-media {
+    position: relative;
+    height: 12rem;
+    overflow: hidden;
+}
+
+.bnsp-cert-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform .5s ease;
+}
+
+.bnsp-card:hover .bnsp-cert-media img {
+    transform: scale(1.05);
+}
+
+.bnsp-cert-media::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, .6), transparent 60%);
+}
+
+.bnsp-cert-badge {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 2;
+    background-color: rgba(255, 255, 255, .2);
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(255, 255, 255, .3);
+    color: #fff;
+    font-size: .75rem;
+    font-weight: 600;
+    padding: .25rem .75rem;
+    border-radius: 50rem;
+}
+
+.bnsp-cert-title {
+    color: var(--bnsp-primary);
+    font-weight: 700;
+    font-size: 1.05rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.badge-status-active {
+    background-color: rgba(0, 84, 19, .1);
+    color: var(--bnsp-success);
+    font-size: .65rem;
+    font-weight: 700;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    padding: .25rem .5rem;
+    border-radius: .35rem;
+}
+
+.btn-bnsp-secondary {
+    background-color: var(--bnsp-secondary);
+    color: #fff;
+    font-weight: 700;
+    border: none;
+    border-radius: .75rem;
+}
+
+.btn-bnsp-secondary:hover {
+    background-color: var(--bnsp-secondary);
+    opacity: .9;
+    color: #fff;
+}
+
+.btn-bnsp-success {
+    background-color: var(--bnsp-success);
+    color: #fff;
+    font-weight: 700;
+    border: none;
+    border-radius: .75rem;
+}
+
+.btn-bnsp-success:hover {
+    background-color: var(--bnsp-success);
+    opacity: .9;
+    color: #fff;
+}
+
+/* ===== Promo banner ===== */
+.bnsp-promo {
+    background-color: var(--bnsp-primary-container);
+    color: #fff;
+    border-radius: 1.5rem;
+    box-shadow: 0 1rem 3rem rgba(0, 0, 0, .1);
+    overflow: hidden;
+}
+
+.bnsp-promo-btn {
+    background-color: var(--bnsp-surface);
+    color: var(--bnsp-primary);
+    font-weight: 700;
+    border: none;
+    border-radius: 50rem;
+    padding: .75rem 2rem;
+    box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
+}
+
+.bnsp-promo-btn:hover {
+    color: var(--bnsp-primary);
+    transform: scale(1.03);
+}

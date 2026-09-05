@@ -19,6 +19,7 @@
                     <li><x-menu.nav-items :items="[$child]" /></li>
                 @endforeach
             </ul>
+            <div class="pre-browser"></div>
         @else
             <a href="/{{ $item->url ?? '#' }}" class="bnsp-nav-link {{ request()->is($item->route) ? 'active' : '' }}"
                 data-ajax-url="{{ $item->route ?? '#' }}" data-tooltip="{{ $item->title }}">
