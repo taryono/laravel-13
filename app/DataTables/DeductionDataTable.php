@@ -17,7 +17,7 @@ class DeductionDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['name'];
+    protected array $columns = ['employee.full_name','payroll_period.name', 'deduction_category.name', 'is_recurring', 'amount', 'description'];
 
     /**
      * Build DataTable response.
@@ -100,7 +100,7 @@ class DeductionDataTable extends DataTable
      */
     public function query(Deduction $model): QueryBuilder
     {
-        return $model->newQuery();
+        return $model->newQuery()->with('employee', 'payroll_period', 'deduction_category');
     }
 
     /**
@@ -266,27 +266,28 @@ class DeductionDataTable extends DataTable
      */
     protected function getColumns(): array
     {
-        $daftarKolom = collect($this->columns)
+        return collect($this->columns)
             ->map(fn (string $kolom) => Column::make($kolom)
                 ->title(ucwords(str_replace('_', ' ', $kolom))))
-            ->all();
-
-        $daftarKolom[] = Column::make('DT_RowIndex')
-            ->title('No')
-            ->orderable(false)
-            ->searchable(false)
-            ->width(80)
-            ->addClass('text-center');
-
-        // Tambah kolom Aksi di paling akhir
-        $daftarKolom[] = Column::computed('action')
-            ->exportable(false)
-            ->printable(false)
-            ->width(120)
-            ->addClass('text-center')
-            ->title('Aksi');
-
-        return $daftarKolom;
+            // 1. PREPEND: Masukkan kolom No di posisi PALING AWAL (indeks 0)
+            ->prepend(
+                Column::make('DT_RowIndex')
+                    ->title('No')
+                    ->orderable(false)
+                    ->searchable(false)
+                    ->width(80)
+                    ->addClass('text-center')
+            )
+            // 2. PUSH: Masukkan kolom Aksi di posisi PALING AKHIR
+            ->push(
+                Column::computed('action')
+                    ->exportable(false)
+                    ->printable(false)
+                    ->width(120)
+                    ->addClass('text-center')
+                    ->title('Aksi')
+            )
+            ->all(); // Konversi collection kembali menjadi array di akhir
     }
 
     /**

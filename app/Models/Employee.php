@@ -222,4 +222,26 @@ class Employee extends BasedModel
         ];
         return $labels[$this->gender] ?? '-';
     }
+
+     /**
+     * Relasi ke SalaryStructure
+     * Satu karyawan memiliki satu struktur gaji
+     */
+    public function salaryStructure()
+    {
+        return $this->belongsTo(SalaryStructure::class, 'salary_structure_id');
+    }
+
+    /**
+     * Hitung gaji karyawan berdasarkan struktur yang digunakan
+     */
+    public function calculateSalary()
+    {
+        if (!$this->salaryStructure) {
+            return null;
+        }
+
+        $baseSalary = $this->base_salary ?? 0;
+        return $this->salaryStructure->calculateNetSalary($baseSalary);
+    }
 }

@@ -17,7 +17,7 @@ class AccountMappingController extends MainController
 {
     public function __construct()
     {
-        parent::__construct(new AccountMapping());
+        parent::__construct(new AccountMapping(), 'account_mapping');
     }
 
     public function index(Request $request, AccountMappingDataTable $dataTable)

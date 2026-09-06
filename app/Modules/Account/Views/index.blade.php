@@ -7,6 +7,7 @@
             <h5 class="mb-0 d-flex align-items-center gap-2">
                 <i class="bi bi-building"></i> Daftar Account
             </h5>
+             <a href="{{ route('account.getDataTree') }}" class="btn btn-primary btn-sm">Tambah Baru</a>
             <button type="button" 
                 class="btn btn-light btn-sm d-flex align-items-center gap-1"
                 data-toggle="ajax-modal" data-size="lg" data-method="GET"

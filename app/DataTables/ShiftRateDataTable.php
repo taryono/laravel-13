@@ -2,7 +2,7 @@
 
 namespace App\DataTables;
 
-use App\Models\ShiftRate;
+use Models\ShiftRate;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
@@ -60,8 +60,8 @@ class ShiftRateDataTable extends DataTable
             'UTF-8'
         );
 
-        $editUrl   = e(route('shift-rate.edit', $row));
-        $deleteUrl = e(route('shift-rate.destroy', $row));
+        $editUrl   = e(route('shift_rate.edit', $row));
+        $deleteUrl = e(route('shift_rate.destroy', $row));
 
         return <<<HTML
             <div class="d-flex justify-content-center gap-1">
@@ -122,7 +122,7 @@ class ShiftRateDataTable extends DataTable
             /*
              * Server-side AJAX endpoint.
              */
-            ->minifiedAjax(route('shift-rate.index'))
+            ->minifiedAjax(route('shift_rate.index'))
 
             /*
              * Default sorting:

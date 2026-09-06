@@ -14,14 +14,7 @@ class AccountMapping extends BasedModel
         'credit_account_id',
         'description',
         'is_active',
-    ];
-
-    protected $casts = [
-        'is_active' => 'boolean',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
-        'deleted_at' => 'datetime',
-    ];
+    ]; 
 
     // ─── Source Type Constants ───
     public const SOURCE_PAYROLL_COMPONENT = 'payroll_component';
@@ -50,12 +43,12 @@ class AccountMapping extends BasedModel
         return $this->belongsTo(Organization::class);
     }
 
-    public function debitAccount()
+    public function debit_account()
     {
         return $this->belongsTo(Account::class, 'debit_account_id');
     }
 
-    public function creditAccount()
+    public function credit_account()
     {
         return $this->belongsTo(Account::class, 'credit_account_id');
     }

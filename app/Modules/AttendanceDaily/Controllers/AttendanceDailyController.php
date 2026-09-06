@@ -31,7 +31,7 @@ class AttendanceDailyController extends MainController
         // Filter summary
         $summary = $this->getSummary($request);
         
-        return $dataTable->render('Attendance::daily.index', compact('summary'));
+        return $dataTable->render('Attendance::index', compact('summary'));
     }
 
     /**
@@ -47,7 +47,7 @@ class AttendanceDailyController extends MainController
             ->orderBy('scan_time')
             ->get();
 
-        return view('Attendance::daily.detail', compact('attendance', 'logs'));
+        return view('Attendance::detail', compact('attendance', 'logs'));
     }
 
     /**
@@ -58,7 +58,7 @@ class AttendanceDailyController extends MainController
         $attendance = $this->model->findOrFail($id);
         $employees = Employee::where('is_active', true)->orderBy('full_name')->get();
         
-        return view('Attendance::daily.edit', compact('attendance', 'employees'));
+        return view('Attendance::edit', compact('attendance', 'employees'));
     }
 
     /**

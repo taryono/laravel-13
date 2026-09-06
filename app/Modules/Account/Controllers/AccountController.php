@@ -249,4 +249,98 @@ class AccountController extends MainController
             ], 500);
         }
     }
+
+    public function getTreeData(Request $request)
+{
+    $accounts = Account::with(['children' => function($query) {
+        $query->where('is_active', true)->orderBy('code');
+    }, 'account_category'])
+    ->whereNull('parent_id')
+    ->orderBy('code')
+    ->get();
+
+    return response()->json($this->buildJsTreeData($accounts));
+}
+
+private function buildJsTreeData($accounts)
+{
+    $result = [];
+    foreach ($accounts as $account) {
+        $node = [
+            'id' => (string) $account->id, // ✅ Wajib string!
+            'text' => $account->code . ' - ' . $account->name,
+            'code' => $account->code,
+            'name' => $account->name,
+            'type' => $account->account_type, // header atau detail
+            'state' => [
+                'opened' => false, // Default: collapsed
+                'selected' => false
+            ],
+            'li_attr' => [
+                'data-id' => $account->id
+            ],
+            'a_attr' => [
+                'data-code' => $account->code,
+                'data-type' => $account->account_type
+            ],
+            'icon' => $account->account_type == 'header' 
+                ? 'fas fa-folder-open text-warning' 
+                : 'fas fa-file-invoice text-primary'
+        ];
+
+        if ($account->children->isNotEmpty()) {
+            $node['children'] = $this->buildJsTreeData($account->children);
+        }
+
+        $result[] = $node;
+    }
+    return $result;
+}
+
+public function getDataWithRecursive(Request $request)
+{
+    $query = "
+        WITH RECURSIVE account_tree AS (
+            SELECT 
+                id, code, name, category_id, parent_id, account_type,
+                normal_balance, opening_balance, current_balance,
+                is_active, is_system, 0 AS level,
+                CAST(code AS CHAR(1000)) AS path
+            FROM accounts
+            WHERE parent_id IS NULL
+            
+            UNION ALL
+            
+            SELECT 
+                a.id, a.code, a.name, a.category_id, a.parent_id,
+                a.account_type, a.normal_balance, a.opening_balance,
+                a.current_balance, a.is_active, a.is_system,
+                at.level + 1,
+                CONCAT(at.path, ' > ', a.code)
+            FROM accounts a
+            INNER JOIN account_tree at ON a.parent_id = at.id
+        )
+        SELECT * FROM account_tree
+        ORDER BY path;
+    ";
+
+    $accounts = DB::select($query);
+
+    return DataTables::of($accounts)
+        ->addColumn('name_display', function ($account) {
+            $prefix = str_repeat('&nbsp;&nbsp;&nbsp;', $account->level);
+            if ($account->level > 0) {
+                $prefix .= '└─ ';
+            }
+            return $prefix . $account->name;
+        })
+        ->make(true);
+}
+
+public function getDataTree(Request $request): View
+    { 
+        return view(
+            'Account::tree'
+        );
+    }
 }

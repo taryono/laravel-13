@@ -23,5 +23,8 @@ Route::group(['prefix' => 'account', 'namespace' => 'App\Modules\Account\Control
     Route::get('/edit/{id}', ['as' => 'account.edit', 'uses' => 'AccountController@edit']);
     Route::put('/update/{id}', ['as' => 'account.update', 'uses' => 'AccountController@update']);
     Route::delete('/delete/{id}', ['as' => 'account.destroy', 'uses' => 'AccountController@destroy']);
-    
+    Route::get('/getDataTree', ['as' => 'account.getDataTree', 'uses' => 'AccountController@getDataTree']);
+    Route::get('/getData', ['as' => 'account.getData', 'uses' => 'AccountController@getData']);
+    Route::get('/tree', ['as' => 'account.getTreeData', 'uses' => 'AccountController@getTreeData']); 
+    Route::get('/getDataWithRecursive', ['as' => 'account.Tree', 'uses' => 'AccountController@getDataWithRecursive']);
 });

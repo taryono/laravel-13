@@ -17,7 +17,7 @@ class AccountMappingDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['name'];
+    protected array $columns = ['organization.name','source_type', 'source_code', 'debit_account.name', 'credit_account.name', 'description', 'is_active'];
 
     /**
      * Build DataTable response.
@@ -100,7 +100,7 @@ class AccountMappingDataTable extends DataTable
      */
     public function query(AccountMapping $model): QueryBuilder
     {
-        return $model->newQuery();
+        return $model->newQuery()->with(['debit_account', 'credit_account', 'organization']);
     }
 
     /**

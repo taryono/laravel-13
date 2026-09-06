@@ -60,8 +60,8 @@ class AttendanceDailyDataTable extends DataTable
             'UTF-8'
         );
 
-        $editUrl   = e(route('attendance-daily.edit', $row));
-        $deleteUrl = e(route('attendance-daily.destroy', $row));
+        $editUrl   = e(route('attendance_daily.edit', $row));
+        $deleteUrl = e(route('attendance_daily.destroy', $row));
 
         return <<<HTML
             <div class="d-flex justify-content-center gap-1">
@@ -122,7 +122,7 @@ class AttendanceDailyDataTable extends DataTable
             /*
              * Server-side AJAX endpoint.
              */
-            ->minifiedAjax(route('attendance-daily.index'))
+            ->minifiedAjax(route('attendance_daily.index'))
 
             /*
              * Default sorting:
