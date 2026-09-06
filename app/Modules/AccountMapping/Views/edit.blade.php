@@ -1,4 +1,4 @@
-{{ Form::model($account-mapping, ['method' => 'PUT', 'route' => ['account-mapping.update', $account-mapping->id], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($account_mapping., ['method' => 'PUT', 'route' => ['account_mapping.update', $account_mapping.->id], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
     <div class="row">
         <div class="col-md-6 mb-3">
             @forelse ($forms as $key => $form)

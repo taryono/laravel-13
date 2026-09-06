@@ -60,8 +60,8 @@ class AccountCategoryDataTable extends DataTable
             'UTF-8'
         );
 
-        $editUrl   = e(route('account-category.edit', $row));
-        $deleteUrl = e(route('account-category.destroy', $row));
+        $editUrl   = e(route('account_category.edit', $row));
+        $deleteUrl = e(route('account_category.destroy', $row));
 
         return <<<HTML
             <div class="d-flex justify-content-center gap-1">
@@ -122,7 +122,7 @@ class AccountCategoryDataTable extends DataTable
             /*
              * Server-side AJAX endpoint.
              */
-            ->minifiedAjax(route('account-category.index'))
+            ->minifiedAjax(route('account_category.index'))
 
             /*
              * Default sorting:

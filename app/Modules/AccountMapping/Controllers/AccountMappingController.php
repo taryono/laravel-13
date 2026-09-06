@@ -26,7 +26,7 @@ class AccountMappingController extends MainController
             return $dataTable->ajax();
         }
 
-        return $dataTable->render('Integration::account_mapping.index');
+        return $dataTable->render('AccountMapping::index');
     }
 
     public function create(): View
@@ -41,7 +41,7 @@ class AccountMappingController extends MainController
         $forms = $result['forms'];
         $groupedForms = $result['grouped'];
 
-        return view('Integration::account_mapping.edit', compact('mapping', 'forms', 'groupedForms', 'accounts'));
+        return view('AccountMapping::edit', compact('mapping', 'forms', 'groupedForms', 'accounts'));
     }
 
     public function store(Request $request)
@@ -79,7 +79,7 @@ class AccountMappingController extends MainController
         $forms = $result['forms'];
         $groupedForms = $result['grouped'];
 
-        return view('Integration::account_mapping.edit', compact('mapping', 'forms', 'groupedForms', 'accounts'));
+        return view('AccountMapping::edit', compact('mapping', 'forms', 'groupedForms', 'accounts'));
     }
 
     public function update(Request $request, $id)

@@ -9,6 +9,7 @@ use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
 use Yajra\DataTables\Services\DataTable;
+use Yajra\DataTables\CollectionDataTable; // ✅ Tambahkan ini
 
 class AccountDataTable extends DataTable
 {
@@ -17,19 +18,49 @@ class AccountDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['name'];
+    protected array $columns = ['code','name','account_type','normal_balance', 'account_category.name', 'parent.name','status_badge'];
 
     /**
      * Build DataTable response.
      */
-    public function dataTable(QueryBuilder $query): EloquentDataTable
+    public function dataTable(QueryBuilder $query): CollectionDataTable // ✅ Ubah return type
     {
-        return (new EloquentDataTable($query))
+        // Ambil semua data
+        $accounts = $query->with(['account_category', 'parent', 'children'])
+            ->orderBy('code')
+            ->get();
+
+        // Build hierarki dengan indentasi
+        $hierarchicalAccounts = $this->buildHierarchy($accounts);
+
+        // ✅ Gunakan CollectionDataTable, bukan EloquentDataTable
+        return (new CollectionDataTable(collect($hierarchicalAccounts)))
             ->addColumn('action', function ($row) {
                 return $this->renderActionButtons($row);
             })
+            ->addColumn('category_name', function ($row) {
+                return $row->account_category->name ?? '-';
+            })
+            ->addColumn('name_display', function ($row) {
+                return $row->name_display ?? $row->name;
+            })
+            ->addColumn('account_type_badge', function ($row) {
+                return $row->account_type == 'header' 
+                    ? '<span class="badge bg-primary">Header</span>' 
+                    : '<span class="badge bg-secondary">Detail</span>';
+            })
+            ->addColumn('normal_balance_badge', function ($row) {
+                return $row->normal_balance == 'debit' 
+                    ? '<span class="badge bg-success">Debit</span>' 
+                    : '<span class="badge bg-danger">Kredit</span>';
+            })
+            ->addColumn('status_badge', function ($row) {
+                return $row->is_active 
+                    ? '<span class="badge bg-success">Aktif</span>' 
+                    : '<span class="badge bg-danger">Non-Aktif</span>';
+            })
             ->addIndexColumn()
-            ->rawColumns(['action']) // ✅ Tetap wajib ada!
+            ->rawColumns(['action', 'account_type_badge', 'normal_balance_badge', 'status_badge', 'name_display'])
             ->setRowId('id');
     }
 
@@ -266,27 +297,27 @@ class AccountDataTable extends DataTable
      */
     protected function getColumns(): array
     {
-        $daftarKolom = collect($this->columns)
-            ->map(fn (string $kolom) => Column::make($kolom)
-                ->title(ucwords(str_replace('_', ' ', $kolom))))
-            ->all();
-
-        $daftarKolom[] = Column::make('DT_RowIndex')
-            ->title('No')
-            ->orderable(false)
-            ->searchable(false)
-            ->width(80)
-            ->addClass('text-center');
-
-        // Tambah kolom Aksi di paling akhir
-        $daftarKolom[] = Column::computed('action')
-            ->exportable(false)
-            ->printable(false)
-            ->width(120)
-            ->addClass('text-center')
-            ->title('Aksi');
-
-        return $daftarKolom;
+        return collect($this->columns)
+            ->map(fn (string $kolom) =>  Column::make($kolom)->title(ucwords(str_replace('_', ' ', $kolom))))
+            // 1. PREPEND: Masukkan kolom No di posisi PALING AWAL (indeks 0)
+            ->prepend(
+                Column::make('DT_RowIndex')
+                    ->title('No')
+                    ->orderable(false)
+                    ->searchable(false)
+                    ->width(80)
+                    ->addClass('text-center')
+            )
+            // 2. PUSH: Masukkan kolom Aksi di posisi PALING AKHIR
+            ->push(
+                Column::computed('action')
+                    ->exportable(false)
+                    ->printable(false)
+                    ->width(120)
+                    ->addClass('text-center')
+                    ->title('Aksi')
+            )
+            ->all(); // Konversi collection kembali menjadi array di akhir
     }
 
     /**
@@ -295,5 +326,28 @@ class AccountDataTable extends DataTable
     protected function filename(): string
     {
         return 'Account_' . date('YmdHis');
+    }
+
+    private function buildHierarchy($accounts, $parentId = null, $level = 0, &$result = [])
+    {
+        $children = $accounts->filter(function ($account) use ($parentId) {
+            return $account->parent_id == $parentId;
+        });
+
+        foreach ($children as $account) {
+            $prefix = str_repeat('&nbsp;&nbsp;&nbsp;&nbsp;', $level);
+            if ($level > 0) {
+                $prefix .= '└─ ';
+            }
+
+            $clone = clone $account;
+            $clone->name_display = $prefix . $account->name;
+            $clone->level = $level;
+            $result[] = $clone;
+
+            $this->buildHierarchy($accounts, $account->id, $level + 1, $result);
+        }
+
+        return $result;
     }
 }

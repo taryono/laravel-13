@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Route;
 | and give it the controller to call when that URI is requested.
 |
  */
-Route::group(['prefix' => 'account-mapping', 'namespace' => 'App\Modules\AccountMapping\Controllers', 'middleware' => ['web']], function () {
+Route::group(['prefix' => 'account-mapping.', 'namespace' => 'App\Modules\AccountMapping\Controllers', 'middleware' => ['web']], function () {
     Route::get('/', ['as' => 'account_mapping.index', 'uses' => 'AccountMappingController@index']);
     Route::any('/search', ['as' => 'account_mapping.search', 'uses' => 'AccountMappingController@search']);
     Route::get('/create', ['as' => 'account_mapping.create', 'uses' => 'AccountMappingController@create']);

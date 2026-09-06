@@ -5,6 +5,7 @@ namespace App\Modules\Account\Controllers;
 use App\DataTables\AccountDataTable;
 use App\Http\Controllers\MainController;
 use Models\Account;
+use Models\AccountCategory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -47,7 +48,7 @@ class AccountController extends MainController
         $groupedForms = $result['grouped'];
 
         return view(
-            'Account::edit',
+            'Account::create',
             compact('account', 'forms', 'groupedForms', 'categories', 'parents')
         );
     }

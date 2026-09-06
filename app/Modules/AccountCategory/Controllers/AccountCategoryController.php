@@ -25,7 +25,7 @@ class AccountCategoryController extends MainController
             return $dataTable->ajax();
         }
 
-        return $dataTable->render('Finance::account_category.index');
+        return $dataTable->render('AccountCategory::index');
     }
 
     public function create(): View
@@ -35,7 +35,7 @@ class AccountCategoryController extends MainController
         $forms = $result['forms'];
         $groupedForms = $result['grouped'];
 
-        return view('Finance::account_category.edit', compact('category', 'forms', 'groupedForms'));
+        return view('AccountCategory::create', compact('category', 'forms', 'groupedForms'));
     }
 
     public function store(Request $request)
@@ -68,7 +68,7 @@ class AccountCategoryController extends MainController
         $forms = $result['forms'];
         $groupedForms = $result['grouped'];
 
-        return view('Finance::account_category.edit', compact('category', 'forms', 'groupedForms'));
+        return view('AccountCategory::edit', compact('category', 'forms', 'groupedForms'));
     }
 
     public function update(Request $request, $id)

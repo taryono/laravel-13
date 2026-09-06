@@ -9,7 +9,7 @@ class Account extends BasedModel
     protected $fillable = [
         'code',
         'name',
-        'category_id',
+        'account_category_id',
         'parent_id',
         'account_type',
         'normal_balance',
@@ -45,6 +45,35 @@ class Account extends BasedModel
         self::BALANCE_DEBIT,
         self::BALANCE_CREDIT,
     ];
+    // Relasi ke parent (induk)
+    public function parent()
+    {
+        return $this->belongsTo(Account::class, 'parent_id');
+    }
+
+    // Relasi ke children (anak-anak)
+    public function children()
+    {
+        return $this->hasMany(Account::class, 'parent_id');
+    } 
+
+    // Scope untuk hanya akun detail (bukan header)
+    public function scopeDetails($query)
+    {
+        return $query->where('account_type', 'detail');
+    }
+
+    // Scope untuk hanya akun aktif
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
+
+    // Scope untuk root (parent_id null)
+    public function scopeRoots($query)
+    {
+        return $query->whereNull('parent_id');
+    }
 
     // ─── Relationships ───
     public function organization()
@@ -55,7 +84,7 @@ class Account extends BasedModel
     // Override generate code for COA
     public function generateUniqueCode(): string
     {
-        $category = AccountCategory::find($this->category_id);
+        $category = AccountCategory::find($this->account_category_id);
         $prefix = $category ? $category->code : 'ACC';
         
         $last = $this->where('code', 'LIKE', $prefix . '-%')
@@ -73,20 +102,10 @@ class Account extends BasedModel
     }
 
     // Relasi
-    public function accountCategory(): BelongsTo
-{
-    return $this->belongsTo(AccountCategory::class);
-}
-
-    public function parent()
+    public function account_category()
     {
-        return $this->belongsTo(Account::class, 'parent_id');
-    }
-
-    public function children()
-    {
-        return $this->hasMany(Account::class, 'parent_id');
-    }
+        return $this->belongsTo(AccountCategory::class);
+    } 
 
     public function journalDetails()
     {
@@ -104,11 +123,5 @@ class Account extends BasedModel
         } else {
             return $this->opening_balance + $credit - $debit;
         }
-    }
-
-    // Scope
-    public function scopeActive($query)
-    {
-        return $query->where('is_active', true);
-    }
+    } 
 }
