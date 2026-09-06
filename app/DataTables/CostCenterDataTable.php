@@ -60,8 +60,8 @@ class CostCenterDataTable extends DataTable
             'UTF-8'
         );
 
-        $editUrl   = e(route('cost-center.edit', $row));
-        $deleteUrl = e(route('cost-center.destroy', $row));
+        $editUrl   = e(route('cost_center.edit', $row));
+        $deleteUrl = e(route('cost_center.destroy', $row));
 
         return <<<HTML
             <div class="d-flex justify-content-center gap-1">
@@ -122,7 +122,7 @@ class CostCenterDataTable extends DataTable
             /*
              * Server-side AJAX endpoint.
              */
-            ->minifiedAjax(route('cost-center.index'))
+            ->minifiedAjax(route('cost_center.index'))
 
             /*
              * Default sorting:
