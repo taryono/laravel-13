@@ -60,8 +60,8 @@ class JournalEntryDataTable extends DataTable
             'UTF-8'
         );
 
-        $editUrl   = e(route('journal-entry.edit', $row));
-        $deleteUrl = e(route('journal-entry.destroy', $row));
+        $editUrl   = e(route('journal_entry.edit', $row));
+        $deleteUrl = e(route('journal_entry.destroy', $row));
 
         return <<<HTML
             <div class="d-flex justify-content-center gap-1">
@@ -122,7 +122,7 @@ class JournalEntryDataTable extends DataTable
             /*
              * Server-side AJAX endpoint.
              */
-            ->minifiedAjax(route('journal-entry.index'))
+            ->minifiedAjax(route('journal_entry.index'))
 
             /*
              * Default sorting:

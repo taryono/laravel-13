@@ -57,7 +57,7 @@ class TrialRegistrationController extends MainController
         $groupedForms = $result['grouped'];
 
         return view(
-            'TrialRegistration::edit',
+            'TrialRegistration::create',
             compact('trialRegistration', 'forms', 'groupedForms')
         );
     }

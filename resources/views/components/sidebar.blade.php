@@ -2,7 +2,7 @@
 {{-- resources/views/components/sidebar.blade.php --}}
 
 <aside class="bnsp-sidebar d-flex flex-column" id="bnspSidebar">
-    <div class="bnsp-sidebar-brand mb-5 px-2">
+    <div class="bnsp-sidebar-brand mb-3 px-2">
         <h1 class="h5 fw-bold text-white mb-1">BNSP Portal</h1>
         <p class="text-white-50 small text-uppercase mb-0" style="font-size:.7rem;">National Agency</p>
     </div>

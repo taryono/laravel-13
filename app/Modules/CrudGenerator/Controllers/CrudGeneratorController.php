@@ -38,25 +38,7 @@ class CrudGeneratorController extends Controller
             'groups' => 'Employee',
             'list_alt' => 'Default',
         ];
-        $database = DB::getDatabaseName();
-
-        $columns = DB::select("
-            SELECT TABLE_NAME, COLUMN_NAME
-            FROM information_schema.COLUMNS
-            WHERE TABLE_SCHEMA = ?
-            ORDER BY TABLE_NAME, ORDINAL_POSITION
-        ", [$database]);
-
-        $tables = collect($columns)
-            ->groupBy('TABLE_NAME')
-            ->map(function ($columns, $tableName) {
-                return [
-                    'name' => $tableName,
-                    'label' => Str::studly(Str::singular($tableName)),
-                    'columns' => $columns->pluck('COLUMN_NAME')->values()->toArray(),
-                ];
-            });
-         
+        $tables = $this->listModulesToGenerate(); 
         return view('CrudGenerator::index', compact('icons', 'tables'));
     }
 
@@ -82,7 +64,7 @@ class CrudGeneratorController extends Controller
         
         // Tambahkan opsi no-menu jika tidak ingin membuat menu
         if (!$request->boolean('create_menu')) {
-            $command .= " --no-menu";
+            $command .= " --no-menu --model=\App\{$modelName}";
         }
         try { 
     
@@ -145,6 +127,8 @@ class CrudGeneratorController extends Controller
 
     /**
      * Jalankan command secara async (background)
+     * # Jalankan worker untuk queue spesifik
+     * php artisan queue:work --queue=default 
      */
     public function generateAsync(Request $request)
     {
@@ -156,17 +140,19 @@ class CrudGeneratorController extends Controller
 
         $modelName = Str::studly($request->model_name);
         $columns = $request->columns;
+        $createMenu = $request->boolean('create_menu');
         
+        // Gunakan Artisan::queue() untuk menjalankan di background
         $command = "make:crud-yajra {$modelName} --columns={$columns}";
         
-        if (!$request->boolean('create_menu')) {
+        if (!$createMenu) {
             $command .= " --no-menu";
         }
-
-        // Gunakan queue untuk async processing
-        dispatch(new \App\Jobs\GenerateCrudJob($command, auth()->id()));
-
-        return redirect()->route('crud-generator.index')
+        Artisan::call('queue:work --queue=default --stop-when-empty');
+        // Artisan::queue akan otomatis mendispatch ke queue
+        Artisan::queue($command, [], 'module-processing');
+        
+        return redirect()->route('crud_generator.index')
             ->with('info', "CRUD {$modelName} sedang diproses di background. Anda akan diberitahu saat selesai.");
     }
 
@@ -193,5 +179,63 @@ class CrudGeneratorController extends Controller
         $logs = Log::getLogger();
         
         return view('CrudGenerator::history');
+    }
+
+    protected function listModulesToGenerate(){
+        $database = DB::getDatabaseName();
+
+        $columns = DB::select("
+            SELECT TABLE_NAME, COLUMN_NAME
+            FROM information_schema.COLUMNS
+            WHERE TABLE_SCHEMA = ?
+            ORDER BY TABLE_NAME, ORDINAL_POSITION
+        ", [$database]);
+        $excluded = ['CrudGenerator', 'Controllers', 'VIews', 'Module','partials', 'JobBatch','Job','MenuRole','Migration','Module','CacheLock','Cache',"RoleUser","Session","FailedJob", "ActionUser","PasswordResetToken"]; // nama yang mau di-exclude
+        $excluded_to_snake = array_map(function($item) {
+            return Str::plural(Str::snake($item));
+        }, $excluded);
+        
+        $tables = collect($columns)
+            ->groupBy('TABLE_NAME')
+            ->map(function ($columns, $tableName) {
+                return [
+                    'name' => $tableName,
+                    'label' => Str::studly(Str::singular($tableName)),
+                    'columns' => $columns->pluck('COLUMN_NAME')->values()->toArray(),
+                ];
+            });
+        $modules = (new \Lib\Directories(app_path('Modules')))->getModules();
+        // Atau lebih simpel
+        $names = $modules->map('basename');
+        $filtered = $names->reject(function($name) use ($excluded) {
+            return in_array($name, $excluded);
+        })->toArray(); 
+        $rejected = explode(",","action_user,cache,cache_locks,failed_jobs,job_batches,jobs,menu_role,migrations,modules,password_reset_tokens,role_user,sessions");
+        $tables = $tables->filter(function ($table) use ($filtered, $rejected) { 
+            return !in_array(Str::singular(Str::studly($table['name'])) , $filtered) && !in_array($table['name'] , $rejected);
+        }); 
+        return $tables;
+    }
+
+    // Di Controller
+    public function checkQueueStatus()
+    {
+        $isRunning = $this->isQueueWorkerRunning();
+        
+        return response()->json([
+            'running' => $isRunning,
+            'message' => $isRunning ? 'Queue worker is running' : 'Queue worker is not running'
+        ]);
+    }
+
+    private function isQueueWorkerRunning()
+    {
+        // Cek di Linux
+        $output = shell_exec("pgrep -f 'queue:work'");
+        return !empty(trim($output));
+        
+        // Atau cek via Supervisor
+        // $output = shell_exec("supervisorctl status laravel-worker:* | grep RUNNING");
+        // return str_contains($output, 'RUNNING');
     }
 }

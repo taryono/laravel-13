@@ -10,6 +10,7 @@ class TrialRegistration extends BasedModel {
     public function education_level() { return $this->belongsToMany(EducationLevel::class, 'trial_registration_education_level'); }
     public function roles()    { return $this->belongsToMany(Role::class, 'trial_registration_roles'); }
     public function school()   { return $this->belongsTo(School::class); }
-    public function user()     { return $this->belongsTo(App\Models\User::class); }
+    public function user()     { return $this->belongsTo(\App\Models\User::class); }
+    public function position()     { return $this->belongsTo(Position::class); }
  
 }

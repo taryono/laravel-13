@@ -20,14 +20,14 @@ class Room extends Model
     ];
 
     // Relasi
-    // public function user()
-    // {
-    //     return $this->belongsTo(User::class);
-    // }
+    public function floor()
+    {
+        return $this->belongsTo(Floor::class);
+    }
 
     // Scope
-    // public function scopeActive($query)
-    // {
-    //     return $query->where('is_active', true);
-    // }
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
 }

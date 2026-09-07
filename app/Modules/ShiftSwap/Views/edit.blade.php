@@ -3,10 +3,6 @@
 @if(($swap->id ?? 0) > 0) @method('PUT') @endif
 
 <div class="row g-3">
-    <div class="col-12">
-        <h5 class="border-bottom pb-2 mb-3">Pertukaran Jadwal Shift</h5>
-    </div>
-
     {{-- Tanggal Pertukaran --}}
     <div class="col-md-6">
         <label class="form-label">Tanggal Pertukaran <span class="text-danger">*</span></label>
@@ -40,7 +36,7 @@
                     <option value="{{ $emp->id }}"
                         data-shift="{{ $emp->current_shift_id ?? '' }}"
                         {{ old('employee_id_a', $swap->employee_id_a ?? '') == $emp->id ? 'selected' : '' }}>
-                        {{ $emp->name }}
+                        {{ $emp->full_name }}
                     </option>
                     @endforeach
                 </select>
@@ -75,7 +71,7 @@
                     <option value="{{ $emp->id }}"
                         data-shift="{{ $emp->current_shift_id ?? '' }}"
                         {{ old('employee_id_b', $swap->employee_id_b ?? '') == $emp->id ? 'selected' : '' }}>
-                        {{ $emp->name }}
+                        {{ $emp->full_name }}
                     </option>
                     @endforeach
                 </select>
@@ -102,12 +98,6 @@
     <div class="col-12">
         <label class="form-label">Catatan / Alasan</label>
         <textarea name="notes" class="form-control" rows="3">{{ old('notes', $swap->notes ?? '') }}</textarea>
-    </div>
-
-    <div class="col-12 text-end mt-2">
-        <button type="submit" class="btn btn-primary px-4">
-            <i class="bi bi-save"></i> {{ ($swap->id ?? 0) > 0 ? 'Perbarui' : 'Ajukan Pertukaran' }}
-        </button>
     </div>
 </div>
 {{ Form::close() }}

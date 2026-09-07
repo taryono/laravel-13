@@ -1,24 +1,43 @@
 @extends('layouts.app')
 
-@section('content')
-    <div class="container">
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Daftar AccountMapping</h5>
-                <a href="{{ route('account_mapping.create') }}" class="btn btn-primary btn-sm">Tambah Baru</a>
+@section('content') 
+<div class="container">
+    <div class="card dt-card shadow-sm rounded-3">
+        <div class="card-header text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 d-flex align-items-center gap-2">
+                <i class="bi bi-building"></i> Daftar Mapping COA
+            </h5>
+            <div class="d-flex justify-content-between align-items-center"> 
+               <button type="button" 
+                   class="btn btn-light btn-sm d-flex align-items-center gap-1"
+                   data-toggle="ajax-modal" data-size="lg" data-method="GET"
+                   data-title="Tambah Data Mapping COA Baru" 
+                   data-url="{{ route('account_mapping.create') }}"
+                   data-submit='<button class="btn btn-primary" type="submit" form="formAccountMapping">Simpan</button>'
+                   data-cancel='<button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Batal</button>'>
+                   <i class="bi bi-plus-circle"></i> Tambah Baru
+               </button>
             </div>
-            <div class="card-body">
-                @if (session('success'))
-                    <div class="alert alert-success">{{ session('success') }}</div>
-                @endif
-
-                <div class="table-responsive">
-                    {!! $dataTable->table(['class' => 'table table-bordered table-striped w-100']) !!}
+        </div>
+        <div class="card-body">
+            @if (session('success'))
+                <div class="alert alert-success alert-dismissible fade show d-flex align-items-center gap-2" role="alert">
+                    <i class="bi bi-check-circle-fill"></i>
+                    <div>{{ session('success') }}</div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
+            @endif
+
+            <div class="table-responsive">
+                {!! $dataTable->table([
+                    'class' => 'table table-striped table-hover align-middle w-100'
+                ]) !!}
             </div>
         </div>
     </div>
+</div>
 @endsection
+
 @push('scripts')
     {!! $dataTable->scripts() !!}
 @endpush

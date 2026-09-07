@@ -54,18 +54,18 @@
     <div class="col-md-4 mb-3">
         <label for="status" class="form-label">Status <span class="text-danger">*</span></label>
         <select name="status" id="status" class="form-select @error('status') is-invalid @enderror" required>
-            <option value="hadir" {{ old('status', $attendance->status ?? '') == 'hadir' ? 'selected' : '' }}>Hadir
+            <option value="present" {{ old('status', $attendance->status ?? '') == 'present' ? 'selected' : '' }}>Hadir
             </option>
-            <option value="sakit" {{ old('status', $attendance->status ?? '') == 'sakit' ? 'selected' : '' }}>Sakit
+            <option value="sick" {{ old('status', $attendance->status ?? '') == 'sick' ? 'selected' : '' }}>Sakit
             </option>
-            <option value="izin" {{ old('status', $attendance->status ?? '') == 'izin' ? 'selected' : '' }}>Izin
+            <option value="excused" {{ old('status', $attendance->status ?? '') == 'excused' ? 'selected' : '' }}>Izin
             </option>
-            <option value="alpha" {{ old('status', $attendance->status ?? '') == 'alpha' ? 'selected' : '' }}>Alpha
+            <option value="absent_unexcused" {{ old('status', $attendance->status ?? '') == 'absent_unexcused' ? 'selected' : '' }}>Alpha
             </option>
             <option value="cuti" {{ old('status', $attendance->status ?? '') == 'cuti' ? 'selected' : '' }}>Cuti
             </option>
-            <option value="dinas_luar"
-                {{ old('status', $attendance->status ?? '') == 'dinas_luar' ? 'selected' : '' }}>Dinas Luar</option>
+            <option value="business_trip"
+                {{ old('status', $attendance->status ?? '') == 'business_trip' ? 'selected' : '' }}>Dinas Luar</option>
         </select>
         @error('status')
             <div class="invalid-feedback">{{ $message }}</div>
@@ -167,7 +167,7 @@
     <div class="col-12 mb-3">
         <label for="notes" class="form-label">Catatan / Alasan Penyesuaian</label>
         <textarea name="notes" id="notes" rows="3" class="form-control @error('notes') is-invalid @enderror"
-            placeholder="Contoh: Lupa scan pulang, izin terlambat, penyesuaian jam kerja...">{{ old('notes', $attendance->notes ?? '') }}</textarea>
+            placeholder="Contoh: Lupa scan pulang, excused terlambat, penyesuaian jam kerja...">{{ old('notes', $attendance->notes ?? '') }}</textarea>
         @error('notes')
             <div class="invalid-feedback">{{ $message }}</div>
         @enderror

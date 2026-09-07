@@ -1,5 +1,5 @@
 {{-- app/Modules/MenuManagement/VIews/partials/modal.blade.php --}}
-<div class="modal fade" id="menuModal" tabindex="-1">
+<div class="modal fade modal-custom" id="menuModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <form id="menuForm">
@@ -17,7 +17,7 @@
                     <div class="col-md-6">
                         <label class="form-label">Flyout Title</label>
                         <input type="text" class="form-control" name="flyout_title" id="menu_flyout_title"
-                               placeholder="Judul saat menu ini ditampilkan sebagai flyout (opsional)">
+                            placeholder="Judul saat menu ini ditampilkan sebagai flyout (opsional)">
                     </div>
 
                     <div class="col-md-6">
@@ -26,7 +26,7 @@
                             <small class="text-muted">(kosongkan untuk auto-generate dari title)</small>
                         </label>
                         <input type="text" class="form-control" name="slug" id="menu_slug"
-                               placeholder="mis. master-produk">
+                            placeholder="mis. master-produk">
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Route name</label>
@@ -44,172 +44,43 @@
                         </select>
                     </div>
 
-                   <div class="col-md-4">
-                    <label class="form-label">Icon Type</label>
-                    <select class="form-select" name="icon_type" id="menu_icon_type">
-                        <option value="fa">Font Awesome</option>
-                        <option value="material">Material Symbols</option>
-                    </select>
-                </div>
+                    <div class="col-md-12">
+                        <!-- ===== ICON PICKER ===== -->
+                        <div class="form-icon-group mb-3">
+                            <label class="form-label">
+                                <i class="fas fa-icons me-1"></i> Icon Menu <span class="text-danger">*</span>
+                            </label>
 
-                <div class="col-md-8">
-                    <label class="form-label">Icon</label>
-                    <div class="input-group">
-                        <span class="input-group-text" id="icon_preview">
-                            <i class="fas fa-th-large"></i>
-                        </span>
-                        <select class="form-select" name="icon" id="menu_icon">
-                            <!-- Font Awesome Icons -->
-                            <optgroup label="📊 Dashboard & Analytics">
-                                <option value="fas fa-th-large">📊 Dashboard</option>
-                                <option value="fas fa-chart-line">📈 Chart Line</option>
-                                <option value="fas fa-chart-bar">📊 Chart Bar</option>
-                                <option value="fas fa-chart-pie">📊 Chart Pie</option>
-                                <option value="fas fa-analytics">📊 Analytics</option>
-                            </optgroup>
-                            
-                            <optgroup label="🛒 E-commerce & Orders">
-                                <option value="fas fa-shopping-cart">🛒 Shopping Cart</option>
-                                <option value="fas fa-shopping-bag">🛍️ Shopping Bag</option>
-                                <option value="fas fa-shopping-basket">🧺 Shopping Basket</option>
-                                <option value="fas fa-store">🏪 Store</option>
-                                <option value="fas fa-tags">🏷️ Tags</option>
-                                <option value="fas fa-tag">🏷️ Tag</option>
-                                <option value="fas fa-box">📦 Box</option>
-                                <option value="fas fa-boxes">📦 Boxes</option>
-                                <option value="fas fa-archive">📚 Archive</option>
-                                <option value="fas fa-cube">🧊 Cube</option>
-                                <option value="fas fa-cubes">🧊 Cubes</option>
-                            </optgroup>
-                            
-                            <optgroup label="🚚 Shipping & Logistics">
-                                <option value="fas fa-truck">🚚 Truck</option>
-                                <option value="fas fa-shipping-fast">🚚 Shipping Fast</option>
-                                <option value="fas fa-route">🗺️ Route</option>
-                                <option value="fas fa-map-marker-alt">📍 Map Marker</option>
-                                <option value="fas fa-location-dot">📍 Location Dot</option>
-                                <option value="fas fa-dolly">🛒 Dolly</option>
-                                <option value="fas fa-warehouse">🏭 Warehouse</option>
-                            </optgroup>
-                            
-                            <optgroup label="👥 Users & Management">
-                                <option value="fas fa-users">👥 Users</option>
-                                <option value="fas fa-user">👤 User</option>
-                                <option value="fas fa-user-plus">👤 User Plus</option>
-                                <option value="fas fa-user-cog">⚙️ User Settings</option>
-                                <option value="fas fa-user-shield">🛡️ User Shield</option>
-                                <option value="fas fa-user-tie">💼 User Tie</option>
-                                <option value="fas fa-id-card">🪪 ID Card</option>
-                                <option value="fas fa-id-badge">🪪 ID Badge</option>
-                            </optgroup>
-                            
-                            <optgroup label="⚙️ Settings & Tools">
-                                <option value="fas fa-cog">⚙️ Settings</option>
-                                <option value="fas fa-sliders-h">🎚️ Sliders</option>
-                                <option value="fas fa-tools">🔧 Tools</option>
-                                <option value="fas fa-wrench">🔧 Wrench</option>
-                                <option value="fas fa-edit">✏️ Edit</option>
-                                <option value="fas fa-pen">🖊️ Pen</option>
-                                <option value="fas fa-pencil-alt">✏️ Pencil</option>
-                                <option value="fas fa-plus">➕ Plus</option>
-                                <option value="fas fa-minus">➖ Minus</option>
-                                <option value="fas fa-times">✖️ Times</option>
-                                <option value="fas fa-check">✅ Check</option>
-                                <option value="fas fa-search">🔍 Search</option>
-                                <option value="fas fa-filter">🔽 Filter</option>
-                                <option value="fas fa-sync">🔄 Sync</option>
-                                <option value="fas fa-sync-alt">🔄 Sync Alt</option>
-                                <option value="fas fa-clock">🕐 Clock</option>
-                                <option value="fas fa-calendar">📅 Calendar</option>
-                                <option value="fas fa-calendar-alt">📅 Calendar Alt</option>
-                                <option value="fas fa-bell">🔔 Bell</option>
-                                <option value="fas fa-envelope">✉️ Envelope</option>
-                                <option value="fas fa-inbox">📥 Inbox</option>
-                                <option value="fas fa-file">📄 File</option>
-                                <option value="fas fa-file-alt">📄 File Alt</option>
-                                <option value="fas fa-file-pdf">📄 PDF</option>
-                            </optgroup>
-                            
-                            <optgroup label="📱 General">
-                                <option value="fas fa-home">🏠 Home</option>
-                                <option value="fas fa-info-circle">ℹ️ Info</option>
-                                <option value="fas fa-question-circle">❓ Help</option>
-                                <option value="fas fa-exclamation-triangle">⚠️ Warning</option>
-                                <option value="fas fa-check-circle">✅ Check Circle</option>
-                                <option value="fas fa-times-circle">❌ Times Circle</option>
-                                <option value="fas fa-eye">👁️ Eye</option>
-                                <option value="fas fa-eye-slash">🚫 Eye Slash</option>
-                                <option value="fas fa-download">⬇️ Download</option>
-                                <option value="fas fa-upload">⬆️ Upload</option>
-                                <option value="fas fa-print">🖨️ Print</option>
-                                <option value="fas fa-share">↗️ Share</option>
-                                <option value="fas fa-link">🔗 Link</option>
-                                <option value="fas fa-external-link-alt">🔗 External Link</option>
-                            </optgroup>
-                            
-                            <optgroup label="💳 Payments">
-                                <option value="fas fa-credit-card">💳 Credit Card</option>
-                                <option value="fas fa-money-bill-wave">💰 Money Bill</option>
-                                <option value="fas fa-money-bill">💰 Money Bill</option>
-                                <option value="fas fa-coins">🪙 Coins</option>
-                                <option value="fas fa-wallet">👛 Wallet</option>
-                                <option value="fas fa-hand-holding-usd">🤝 Holding USD</option>
-                            </optgroup>
-                            
-                            <!-- Material Icons -->
-                            <optgroup label="🔄 Material Symbols (Switch to Material type)">
-                                <option value="dashboard">dashboard</option>
-                                <option value="shopping_cart">shopping_cart</option>
-                                <option value="shopping_bag">shopping_bag</option>
-                                <option value="store">store</option>
-                                <option value="inventory">inventory</option>
-                                <option value="warehouse">warehouse</option>
-                                <option value="people">people</option>
-                                <option value="person">person</option>
-                                <option value="settings">settings</option>
-                                <option value="analytics">analytics</option>
-                                <option value="trending_up">trending_up</option>
-                                <option value="trending_down">trending_down</option>
-                                <option value="assessment">assessment</option>
-                                <option value="receipt">receipt</option>
-                                <option value="local_shipping">local_shipping</option>
-                                <option value="delivery_dining">delivery_dining</option>
-                                <option value="category">category</option>
-                                <option value="inventory_2">inventory_2</option>
-                                <option value="sell">sell</option>
-                                <option value="payments">payments</option>
-                                <option value="account_balance">account_balance</option>
-                                <option value="assignment">assignment</option>
-                                <option value="notifications">notifications</option>
-                                <option value="email">email</option>
-                                <option value="search">search</option>
-                                <option value="filter_alt">filter_alt</option>
-                                <option value="more_vert">more_vert</option>
-                                <option value="more_horiz">more_horiz</option>
-                                <option value="add">add</option>
-                                <option value="remove">remove</option>
-                                <option value="delete">delete</option>
-                                <option value="edit">edit</option>
-                                <option value="save">save</option>
-                                <option value="download">download</option>
-                                <option value="upload">upload</option>
-                                <option value="print">print</option>
-                                <option value="share">share</option>
-                                <option value="link">link</option>
-                                <option value="help">help</option>
-                                <option value="info">info</option>
-                                <option value="warning">warning</option>
-                                <option value="check_circle">check_circle</option>
-                                <option value="cancel">cancel</option>
-                                <option value="lock">lock</option>
-                                <option value="lock_open">lock_open</option>
-                            </optgroup>
-                        </select>
+                            <input type="hidden" name="icon_type" id="menu_icon_type" value="fa">
+                            <input type="hidden" name="icon" id="menu_icon" value="fas fa-th-large">
+
+                            <div class="icon-picker-wrapper">
+                                <div class="icon-preview-box" id="iconPreviewBox">
+                                    <div class="preview-icon" id="previewIconDisplay">
+                                        <i class="fas fa-th-large"></i>
+                                    </div>
+                                    <div class="preview-info">
+                                        <div class="icon-name" id="previewIconName">Pilih Icon</div>
+                                        <div class="icon-class" id="previewIconClass">fas fa-th-large</div>
+                                        <span class="icon-type-badge" id="previewIconType">Font Awesome</span>
+                                    </div>
+                                    <div style="margin-left: auto; color: #b0b8d0;">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </div>
+                                </div>
+
+                                <div class="form-preview-result">
+                                    <div class="result-icon" id="resultIconDisplay">
+                                        <i class="fas fa-th-large"></i>
+                                    </div>
+                                    <div>
+                                        <small class="text-muted d-block">Akan dikirim:</small>
+                                        <code id="resultIconCode">icon_type: fa | icon: fas fa-th-large</code>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <small class="text-muted">
-                        <span id="icon_name_display">Pilih icon</span>
-                    </small>
-                </div>
                     <div class="col-md-4">
                         <label class="form-label">Tampilkan di</label>
                         <select class="form-select" name="type" id="menu_type">
@@ -220,11 +91,13 @@
 
                     <div class="col-md-4">
                         <label class="form-label">Urutan (sort order)</label>
-                        <input type="number" class="form-control" name="sort_order" id="menu_sort_order" min="0">
+                        <input type="number" class="form-control" name="sort_order" id="menu_sort_order"
+                            min="0">
                     </div>
                     <div class="col-md-4">
                         <div class="form-check form-switch mt-4">
-                            <input class="form-check-input" type="checkbox" name="is_active" id="menu_is_active" checked>
+                            <input class="form-check-input" type="checkbox" name="is_active" id="menu_is_active"
+                                checked>
                             <label class="form-check-label">Aktif</label>
                         </div>
                     </div>
@@ -245,3 +118,807 @@
         </div>
     </div>
 </div>
+
+<!-- ===== MODAL ICON PICKER (Nested) ===== -->
+<div class="modal fade icon-picker-modal" id="iconPickerModal" tabindex="-1" aria-hidden="true"
+    data-bs-backdrop="static" data-bs-keyboard="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-icons"></i> Pilih Icon Menu
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+
+                <div class="icon-search-box">
+                    <input type="text" class="search-input" id="iconSearchInput" placeholder="🔍 Cari icon...">
+
+                    <div class="type-selector">
+                        <button class="btn-type active" data-type="fa">
+                            <i class="fas fa-font-awesome"></i> Font Awesome
+                        </button>
+                        <button class="btn-type" data-type="material">
+                            <span class="material-symbols-outlined" style="font-size: 1rem;">search</span> Material
+                        </button>
+                    </div>
+                </div>
+
+                <div class="icon-counter" id="iconCounter">Menampilkan <span id="iconCount">0</span> icon</div>
+
+                <div class="icon-grid" id="iconGrid">
+                </div>
+
+                <div class="icon-empty" id="iconEmpty" style="display: none;">
+                    <i class="fas fa-search"></i>
+                    <p>Tidak ada icon yang ditemukan</p>
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal" id="cancelIconBtn">Batal</button>
+                <button class="btn btn-primary" id="confirmIconBtn">
+                    <i class="fas fa-check me-2"></i> Pilih Icon
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    // ===== DATA ICON =====
+    const ICON_DATA = {
+        fa: [{
+                value: 'fas fa-th-large',
+                label: 'Dashboard',
+                group: 'Dashboard'
+            },
+            {
+                value: 'fas fa-chart-line',
+                label: 'Chart Line',
+                group: 'Dashboard'
+            },
+            {
+                value: 'fas fa-chart-bar',
+                label: 'Chart Bar',
+                group: 'Dashboard'
+            },
+            {
+                value: 'fas fa-chart-pie',
+                label: 'Chart Pie',
+                group: 'Dashboard'
+            },
+            {
+                value: 'fas fa-shopping-cart',
+                label: 'Cart',
+                group: 'E-commerce'
+            },
+            {
+                value: 'fas fa-shopping-bag',
+                label: 'Bag',
+                group: 'E-commerce'
+            },
+            {
+                value: 'fas fa-store',
+                label: 'Store',
+                group: 'E-commerce'
+            },
+            {
+                value: 'fas fa-tags',
+                label: 'Tags',
+                group: 'E-commerce'
+            },
+            {
+                value: 'fas fa-box',
+                label: 'Box',
+                group: 'E-commerce'
+            },
+            {
+                value: 'fas fa-cube',
+                label: 'Cube',
+                group: 'E-commerce'
+            },
+            {
+                value: 'fas fa-users',
+                label: 'Users',
+                group: 'Users'
+            },
+            {
+                value: 'fas fa-user',
+                label: 'User',
+                group: 'Users'
+            },
+            {
+                value: 'fas fa-user-plus',
+                label: 'Add User',
+                group: 'Users'
+            },
+            {
+                value: 'fas fa-user-cog',
+                label: 'User Settings',
+                group: 'Users'
+            },
+            {
+                value: 'fas fa-user-shield',
+                label: 'User Shield',
+                group: 'Users'
+            },
+            {
+                value: 'fas fa-id-card',
+                label: 'ID Card',
+                group: 'Users'
+            },
+            {
+                value: 'fas fa-cog',
+                label: 'Settings',
+                group: 'Settings'
+            },
+            {
+                value: 'fas fa-sliders-h',
+                label: 'Sliders',
+                group: 'Settings'
+            },
+            {
+                value: 'fas fa-tools',
+                label: 'Tools',
+                group: 'Settings'
+            },
+            {
+                value: 'fas fa-edit',
+                label: 'Edit',
+                group: 'Settings'
+            },
+            {
+                value: 'fas fa-plus',
+                label: 'Plus',
+                group: 'Settings'
+            },
+            {
+                value: 'fas fa-minus',
+                label: 'Minus',
+                group: 'Settings'
+            },
+            {
+                value: 'fas fa-times',
+                label: 'Close',
+                group: 'Settings'
+            },
+            {
+                value: 'fas fa-check',
+                label: 'Check',
+                group: 'Settings'
+            },
+            {
+                value: 'fas fa-search',
+                label: 'Search',
+                group: 'Settings'
+            },
+            {
+                value: 'fas fa-filter',
+                label: 'Filter',
+                group: 'Settings'
+            },
+            {
+                value: 'fas fa-sync',
+                label: 'Sync',
+                group: 'Settings'
+            },
+            {
+                value: 'fas fa-clock',
+                label: 'Clock',
+                group: 'Settings'
+            },
+            {
+                value: 'fas fa-calendar',
+                label: 'Calendar',
+                group: 'Settings'
+            },
+            {
+                value: 'fas fa-bell',
+                label: 'Bell',
+                group: 'Settings'
+            },
+            {
+                value: 'fas fa-envelope',
+                label: 'Mail',
+                group: 'Settings'
+            },
+            {
+                value: 'fas fa-file',
+                label: 'File',
+                group: 'Settings'
+            },
+            {
+                value: 'fas fa-truck',
+                label: 'Truck',
+                group: 'Shipping'
+            },
+            {
+                value: 'fas fa-shipping-fast',
+                label: 'Fast Shipping',
+                group: 'Shipping'
+            },
+            {
+                value: 'fas fa-route',
+                label: 'Route',
+                group: 'Shipping'
+            },
+            {
+                value: 'fas fa-map-marker-alt',
+                label: 'Location',
+                group: 'Shipping'
+            },
+            {
+                value: 'fas fa-warehouse',
+                label: 'Warehouse',
+                group: 'Shipping'
+            },
+            {
+                value: 'fas fa-home',
+                label: 'Home',
+                group: 'General'
+            },
+            {
+                value: 'fas fa-info-circle',
+                label: 'Info',
+                group: 'General'
+            },
+            {
+                value: 'fas fa-question-circle',
+                label: 'Help',
+                group: 'General'
+            },
+            {
+                value: 'fas fa-exclamation-triangle',
+                label: 'Warning',
+                group: 'General'
+            },
+            {
+                value: 'fas fa-eye',
+                label: 'Eye',
+                group: 'General'
+            },
+            {
+                value: 'fas fa-download',
+                label: 'Download',
+                group: 'General'
+            },
+            {
+                value: 'fas fa-upload',
+                label: 'Upload',
+                group: 'General'
+            },
+            {
+                value: 'fas fa-print',
+                label: 'Print',
+                group: 'General'
+            },
+            {
+                value: 'fas fa-share',
+                label: 'Share',
+                group: 'General'
+            },
+            {
+                value: 'fas fa-link',
+                label: 'Link',
+                group: 'General'
+            },
+            {
+                value: 'fas fa-credit-card',
+                label: 'Credit Card',
+                group: 'Payments'
+            },
+            {
+                value: 'fas fa-money-bill-wave',
+                label: 'Money',
+                group: 'Payments'
+            },
+            {
+                value: 'fas fa-coins',
+                label: 'Coins',
+                group: 'Payments'
+            },
+            {
+                value: 'fas fa-wallet',
+                label: 'Wallet',
+                group: 'Payments'
+            },
+        ],
+        material: [{
+                value: 'dashboard',
+                label: 'Dashboard',
+                group: 'Dashboard'
+            },
+            {
+                value: 'analytics',
+                label: 'Analytics',
+                group: 'Dashboard'
+            },
+            {
+                value: 'trending_up',
+                label: 'Trending Up',
+                group: 'Dashboard'
+            },
+            {
+                value: 'assessment',
+                label: 'Assessment',
+                group: 'Dashboard'
+            },
+            {
+                value: 'shopping_cart',
+                label: 'Cart',
+                group: 'E-commerce'
+            },
+            {
+                value: 'shopping_bag',
+                label: 'Bag',
+                group: 'E-commerce'
+            },
+            {
+                value: 'store',
+                label: 'Store',
+                group: 'E-commerce'
+            },
+            {
+                value: 'inventory',
+                label: 'Inventory',
+                group: 'E-commerce'
+            },
+            {
+                value: 'category',
+                label: 'Category',
+                group: 'E-commerce'
+            },
+            {
+                value: 'sell',
+                label: 'Sell',
+                group: 'E-commerce'
+            },
+            {
+                value: 'people',
+                label: 'People',
+                group: 'Users'
+            },
+            {
+                value: 'person',
+                label: 'Person',
+                group: 'Users'
+            },
+            {
+                value: 'person_add',
+                label: 'Add Person',
+                group: 'Users'
+            },
+            {
+                value: 'manage_accounts',
+                label: 'Manage Accounts',
+                group: 'Users'
+            },
+            {
+                value: 'badge',
+                label: 'Badge',
+                group: 'Users'
+            },
+            {
+                value: 'settings',
+                label: 'Settings',
+                group: 'Settings'
+            },
+            {
+                value: 'build',
+                label: 'Tools',
+                group: 'Settings'
+            },
+            {
+                value: 'edit',
+                label: 'Edit',
+                group: 'Settings'
+            },
+            {
+                value: 'add',
+                label: 'Add',
+                group: 'Settings'
+            },
+            {
+                value: 'remove',
+                label: 'Remove',
+                group: 'Settings'
+            },
+            {
+                value: 'close',
+                label: 'Close',
+                group: 'Settings'
+            },
+            {
+                value: 'check',
+                label: 'Check',
+                group: 'Settings'
+            },
+            {
+                value: 'search',
+                label: 'Search',
+                group: 'Settings'
+            },
+            {
+                value: 'filter_alt',
+                label: 'Filter',
+                group: 'Settings'
+            },
+            {
+                value: 'sync',
+                label: 'Sync',
+                group: 'Settings'
+            },
+            {
+                value: 'schedule',
+                label: 'Schedule',
+                group: 'Settings'
+            },
+            {
+                value: 'calendar_today',
+                label: 'Calendar',
+                group: 'Settings'
+            },
+            {
+                value: 'notifications',
+                label: 'Notifications',
+                group: 'Settings'
+            },
+            {
+                value: 'email',
+                label: 'Email',
+                group: 'Settings'
+            },
+            {
+                value: 'description',
+                label: 'Description',
+                group: 'Settings'
+            },
+            {
+                value: 'local_shipping',
+                label: 'Shipping',
+                group: 'Shipping'
+            },
+            {
+                value: 'delivery_dining',
+                label: 'Delivery',
+                group: 'Shipping'
+            },
+            {
+                value: 'route',
+                label: 'Route',
+                group: 'Shipping'
+            },
+            {
+                value: 'location_on',
+                label: 'Location',
+                group: 'Shipping'
+            },
+            {
+                value: 'warehouse',
+                label: 'Warehouse',
+                group: 'Shipping'
+            },
+            {
+                value: 'home',
+                label: 'Home',
+                group: 'General'
+            },
+            {
+                value: 'info',
+                label: 'Info',
+                group: 'General'
+            },
+            {
+                value: 'help',
+                label: 'Help',
+                group: 'General'
+            },
+            {
+                value: 'warning',
+                label: 'Warning',
+                group: 'General'
+            },
+            {
+                value: 'visibility',
+                label: 'View',
+                group: 'General'
+            },
+            {
+                value: 'download',
+                label: 'Download',
+                group: 'General'
+            },
+            {
+                value: 'upload',
+                label: 'Upload',
+                group: 'General'
+            },
+            {
+                value: 'print',
+                label: 'Print',
+                group: 'General'
+            },
+            {
+                value: 'share',
+                label: 'Share',
+                group: 'General'
+            },
+            {
+                value: 'link',
+                label: 'Link',
+                group: 'General'
+            },
+            {
+                value: 'credit_card',
+                label: 'Credit Card',
+                group: 'Payments'
+            },
+            {
+                value: 'payments',
+                label: 'Payments',
+                group: 'Payments'
+            },
+            {
+                value: 'account_balance',
+                label: 'Account Balance',
+                group: 'Payments'
+            },
+            {
+                value: 'wallet',
+                label: 'Wallet',
+                group: 'Payments'
+            },
+        ]
+    };
+
+    // ===== STATE ICON PICKER =====
+    let currentType = 'fa';
+    let selectedIcon = {
+        value: 'fas fa-th-large',
+        label: 'Dashboard',
+        type: 'fa'
+    };
+    let searchQuery = '';
+    let iconPickerInstance = null;
+
+    // ===== DOM REFS ICON PICKER =====
+    const grid = document.getElementById('iconGrid');
+    const searchInput = document.getElementById('iconSearchInput');
+    const emptyState = document.getElementById('iconEmpty');
+    const counter = document.getElementById('iconCount');
+
+    // ===== RENDER ICONS =====
+    function renderIcons() {
+        const icons = ICON_DATA[currentType] || [];
+        const query = searchQuery.toLowerCase().trim();
+
+        let filtered = icons;
+        if (query) {
+            filtered = icons.filter(icon =>
+                icon.label.toLowerCase().includes(query) ||
+                icon.value.toLowerCase().includes(query) ||
+                (icon.group && icon.group.toLowerCase().includes(query))
+            );
+        }
+
+        counter.textContent = filtered.length;
+
+        if (filtered.length === 0) {
+            grid.innerHTML = '';
+            emptyState.style.display = 'block';
+            return;
+        }
+        emptyState.style.display = 'none';
+
+        let html = '';
+        filtered.forEach(icon => {
+            const isSelected = selectedIcon.value === icon.value && currentType === selectedIcon.type;
+            const iconHtml = currentType === 'fa' ?
+                `<i class="${icon.value}"></i>` :
+                `<span class="material-symbols-outlined">${icon.value}</span>`;
+
+            html += `
+                <div class="icon-item ${isSelected ? 'selected' : ''}" 
+                     data-value="${icon.value}" 
+                     data-label="${icon.label}"
+                     data-type="${currentType}">
+                    ${iconHtml}
+                    <span class="icon-label">${icon.label}</span>
+                    <span class="check-mark"><i class="fas fa-check"></i></span>
+                </div>
+            `;
+        });
+
+        grid.innerHTML = html;
+
+        document.querySelectorAll('.icon-item').forEach(el => {
+            el.addEventListener('click', function() {
+                const value = this.dataset.value;
+                const label = this.dataset.label;
+                const type = this.dataset.type;
+
+                document.querySelectorAll('.icon-item').forEach(i => i.classList.remove('selected'));
+                this.classList.add('selected');
+
+                selectedIcon = {
+                    value,
+                    label,
+                    type
+                };
+            });
+        });
+    }
+
+    // ===== UPDATE FORM PREVIEW ===== 
+    function updateFormPreview(icon) {
+        if (!icon) return;
+
+        const {
+            value,
+            label,
+            type
+        } = icon;
+
+        // 🔥 Perbaikan: langsung akses elemen di document (bukan di dalam form)
+        const previewDisplay = document.getElementById('previewIconDisplay');
+        const previewName = document.getElementById('previewIconName');
+        const previewClass = document.getElementById('previewIconClass');
+        const previewType = document.getElementById('previewIconType');
+        const resultDisplay = document.getElementById('resultIconDisplay');
+        const resultCode = document.getElementById('resultIconCode');
+        const iconTypeInput = document.getElementById('menu_icon_type');
+        const iconInput = document.getElementById('menu_icon');
+
+        if (previewDisplay) {
+            if (type === 'fa') {
+                previewDisplay.innerHTML = `<i class="${value}"></i>`;
+                if (previewClass) previewClass.textContent = value;
+                if (previewType) previewType.textContent = 'Font Awesome';
+            } else {
+                previewDisplay.innerHTML = `<span class="material-symbols-outlined">${value}</span>`;
+                if (previewClass) previewClass.textContent = value;
+                if (previewType) previewType.textContent = 'Material Symbols';
+            }
+        }
+
+        if (previewName) previewName.textContent = label || value;
+
+        if (iconTypeInput) iconTypeInput.value = type;
+        if (iconInput) iconInput.value = value;
+
+        if (resultDisplay) {
+            if (type === 'fa') {
+                resultDisplay.innerHTML = `<i class="${value}"></i>`;
+            } else {
+                resultDisplay.innerHTML = `<span class="material-symbols-outlined">${value}</span>`;
+            }
+        }
+        if (resultCode) {
+            resultCode.textContent = `icon_type: ${type} | icon: ${value}`;
+        }
+    }
+
+    // ===== FUNGSI UNTUK BUKA ICON PICKER =====
+    function openIconPicker() {
+        // 🔥 Perbaikan: langsung akses elemen dari document
+        const iconTypeInput = document.getElementById('menu_icon_type');
+        const iconInput = document.getElementById('menu_icon');
+
+        if (iconTypeInput && iconTypeInput.value) {
+            currentType = iconTypeInput.value;
+            selectedIcon.type = currentType;
+        }
+        if (iconInput && iconInput.value) {
+            selectedIcon.value = iconInput.value;
+            const icons = ICON_DATA[currentType] || [];
+            const found = icons.find(i => i.value === iconInput.value);
+            if (found) {
+                selectedIcon.label = found.label;
+            }
+        }
+
+        document.querySelectorAll('.btn-type').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.type === currentType);
+        });
+
+        renderIcons();
+
+        if (!iconPickerInstance) {
+            iconPickerInstance = new bootstrap.Modal(document.getElementById('iconPickerModal'), {
+                backdrop: 'static',
+                keyboard: true
+            });
+        }
+        iconPickerInstance.show();
+    }
+    // ===== EVENT LISTENERS ICON PICKER =====
+
+    // Type selector
+    document.querySelectorAll('.btn-type').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.btn-type').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            currentType = this.dataset.type;
+            renderIcons();
+        });
+    });
+
+    // Search
+    searchInput.addEventListener('input', function() {
+        searchQuery = this.value;
+        renderIcons();
+    });
+
+    // Confirm button
+    document.getElementById('confirmIconBtn').addEventListener('click', function() {
+        if (selectedIcon) {
+            updateFormPreview(selectedIcon);
+            if (iconPickerInstance) {
+                iconPickerInstance.hide();
+                // Cleanup backdrop
+                setTimeout(() => {
+                    const backdrops = document.querySelectorAll('.modal-backdrop');
+                    if (backdrops.length > 1) {
+                        // Hapus backdrop icon picker, simpan backdrop modal utama
+                        backdrops.forEach((backdrop, index) => {
+                            if (index > 0) backdrop.remove();
+                        });
+                    }
+                }, 150);
+            }
+        }
+    });
+
+    // Cancel button
+    document.getElementById('cancelIconBtn').addEventListener('click', function() {
+        if (iconPickerInstance) {
+            iconPickerInstance.hide();
+        }
+    });
+    // ===== CLEANUP =====
+    window.addEventListener('beforeunload', function() {
+        const backdrops = document.querySelectorAll('.modal-backdrop');
+        backdrops.forEach(backdrop => backdrop.remove());
+        document.body.classList.remove('modal-open');
+    });
+
+    // ===== INIT =====
+    renderIcons();
+
+    // ===== ATTACH EVENT UNTUK ICON PREVIEW BOX =====
+    document.addEventListener('DOMContentLoaded', function() {
+        const previewBox = document.getElementById('iconPreviewBox');
+        if (previewBox) {
+            previewBox.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                openIconPicker();
+            });
+        }
+
+        // ===== HANDLE FORM SUBMIT =====
+        const form = document.getElementById('menuForm');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const iconType = document.getElementById('menu_icon_type');
+                const icon = document.getElementById('menu_icon');
+
+                if (!icon.value || icon.value === '') {
+                    alert('Silakan pilih icon terlebih dahulu!');
+                    return false;
+                }
+
+                console.log('📤 Data yang akan dikirim:');
+                console.log('icon_type:', iconType.value);
+                console.log('icon:', icon.value);
+            });
+        }
+    });
+</script>

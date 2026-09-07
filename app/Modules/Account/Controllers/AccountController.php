@@ -35,140 +35,100 @@ class AccountController extends MainController
     /**
      * Show form to create new account.
      */
-    public function create(): View
+     public function create()
     {
-        $account = new Account();
-        $categories = AccountCategory::where('is_active', 1)->pluck('name', 'id');
-        $parents = Account::where('is_active', 1)
-            ->where('account_type', 'header')
-            ->pluck('name', 'id');
-
-        $result = $this->getForm($account);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
-
-        return view(
-            'Account::create',
-            compact('account', 'forms', 'groupedForms', 'categories', 'parents')
-        );
+        return view('accounts.create', [
+            'action'         => route('account.store'),
+            'method'         => 'POST',
+            'account'        => new Account(),
+            'categories'     => AccountCategory::orderBy('name')->get(),
+            'parentAccounts' => Account::where('account_type', 'header')
+                ->orWhere('account_type', 'detail')
+                ->orderBy('code')
+                ->get(['id','code','name']),
+            'currencies'     => ['IDR', 'USD', 'SGD', 'EUR'],
+        ]);
     }
 
-    /**
-     * Store a newly created account.
-     */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'code' => 'required|string|max:50|unique:accounts,code',
-            'name' => 'required|string|max:255',
-            'category_id' => 'required|exists:account_categories,id',
-            'parent_id' => 'nullable|exists:accounts,id',
-            'account_type' => 'required|in:header,detail',
-            'normal_balance' => 'required|in:debit,kredit',
-            'currency_code' => 'nullable|string|max:10',
-            'description' => 'nullable|string',
-            'opening_balance' => 'nullable|numeric|min:0',
-            'is_active' => 'boolean',
-            'is_system' => 'boolean',
-        ]);
+        $validated = $this->validateAccount($request);
 
         try {
-            $account = DB::transaction(function () use ($validated) {
+            $coa =  DB::transaction(function () use ($validated) {
+                // Saldo terkini = saldo awal saat pembuatan
+                $validated['current_balance'] = $validated['opening_balance'];
                 return Account::create($validated);
             });
-
-            return $this->successResponse(
-                $request,
-                'Akun berhasil ditambahkan.',
-                $account
-            );
-
+           return response()->json(['success' => true, 'data' => $coa]);
         } catch (Throwable $e) {
-            Log::error('Gagal menambahkan akun.', [
-                'exception' => $e,
-                'data' => $validated,
-                'user_id' => auth()->id(),
-            ]);
-
-            return $this->errorResponse(
-                $request,
-                'Akun gagal ditambahkan.'
-            );
+            Log::error('Gagal mengambil COA.', ['exception' => $e]);
+            return response()->json(['success' => false, 'message' => 'Gagal mengambil data.'], 500);
         }
     }
 
-    /**
-     * Edit account.
-     */
-    public function edit($id): View
+    public function edit(Account $account)
     {
-        $account = $this->model->findOrFail($id);
-        $categories = AccountCategory::where('is_active', 1)->pluck('name', 'id');
-        $parents = Account::where('is_active', 1)
-            ->where('account_type', 'header')
-            ->where('id', '!=', $id)
-            ->pluck('name', 'id');
-
-        $result = $this->getForm($account);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
-
-        return view(
-            'Account::edit',
-            compact('account', 'forms', 'groupedForms', 'categories', 'parents')
-        );
-    }
-
-    /**
-     * Update account.
-     */
-    public function update(Request $request, $id)
-    {
-        $account = $this->model->findOrFail($id);
-
-        if ($account->is_system) {
-            return $this->errorResponse(
-                $request,
-                'Akun sistem tidak dapat diubah.'
-            );
-        }
-
-        $validated = $request->validate([
-            'code' => 'required|string|max:50|unique:accounts,code,' . $id,
-            'name' => 'required|string|max:255',
-            'category_id' => 'required|exists:account_categories,id',
-            'parent_id' => 'nullable|exists:accounts,id',
-            'account_type' => 'required|in:header,detail',
-            'normal_balance' => 'required|in:debit,kredit',
-            'currency_code' => 'nullable|string|max:10',
-            'description' => 'nullable|string',
-            'is_active' => 'boolean',
+        return view('accounts.edit', [
+            'action'         => route('account.update', $account),
+            'method'         => 'PUT',
+            'account'        => $account,
+            'categories'     => AccountCategory::orderBy('name')->get(),
+            'parentAccounts' => Account::where('id', '!=', $account->id)
+                ->orderBy('code')
+                ->get(['id','code','name']),
+            'currencies'     => ['IDR', 'USD', 'SGD', 'EUR'],
         ]);
+    }
+
+    public function update(Request $request, Account $account)
+    {
+        // Lindungi akun sistem dari perubahan tertentu
+        if ($account->is_system) {
+            return back()->withErrors(['error' => 'Akun Sistem tidak boleh diubah.']);
+        }
+
+        $validated = $this->validateAccount($request, $account->id);
 
         try {
-            DB::transaction(function () use ($account, $validated) {
-                $account->update($validated);
+            $account = DB::transaction(function () use ($validated, $account) {
+                // Jangan ubah saldo terkini dari form — dihitung dari transaksi
+                unset($validated['opening_balance']);
+                return $account->update($validated);
             });
-
-            return $this->successResponse(
-                $request,
-                'Akun berhasil diperbarui.',
-                $account
-            );
-
+            return response()->json(['success' => true, 'data' => $account]);
         } catch (Throwable $e) {
-            Log::error('Gagal memperbarui akun.', [
-                'exception' => $e,
-                'account_id' => $id,
-                'data' => $validated,
-                'user_id' => auth()->id(),
-            ]);
-
-            return $this->errorResponse(
-                $request,
-                'Akun gagal diperbarui.'
-            );
+            Log::error('Gagal mengambil COA.', ['exception' => $e]);
+            return response()->json(['success' => false, 'message' => 'Gagal mengambil data.'], 500);
         }
+    }
+
+    protected function validateAccount(Request $request, $ignoreId = null): array
+    {
+        $rules = [
+            'code'                  => 'required|string|max:50|unique:accounts,code,' . $ignoreId,
+            'name'                  => 'required|string|max:255',
+            'account_category_id'   => 'required|exists:account_categories,id',
+            'parent_id'             => 'nullable|exists:accounts,id',
+            'account_type'          => 'required|in:header,detail',
+            'normal_balance'        => 'required|in:debit,kredit',
+            'currency_code'         => 'nullable|string|max:10',
+            'description'           => 'nullable|string',
+            'is_active'             => 'boolean',
+        ];
+
+        // Saldo awal hanya wajib saat create
+        if ($ignoreId === null) {
+            $rules['opening_balance'] = 'required|numeric|min:0';
+        } else {
+            $rules['opening_balance'] = 'nullable|numeric|min:0';
+        }
+
+        return $request->validate($rules, [
+            'code.unique' => 'Kode akun sudah digunakan, gunakan kode lain.',
+            'normal_balance.in' => 'Saldo normal harus Debit atau Kredit.',
+            'account_type.in' => 'Jenis akun tidak valid.',
+        ]);
     }
 
     /**

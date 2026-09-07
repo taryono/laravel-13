@@ -2,7 +2,7 @@
 
 namespace App\DataTables;
 
-use App\Models\ShiftSwap;
+use Models\ShiftSwap;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
@@ -60,8 +60,8 @@ class ShiftSwapDataTable extends DataTable
             'UTF-8'
         );
 
-        $editUrl   = e(route('shift-swap.edit', $row));
-        $deleteUrl = e(route('shift-swap.destroy', $row));
+        $editUrl   = e(route('shift_swap.edit', $row));
+        $deleteUrl = e(route('shift_swap.destroy', $row));
 
         return <<<HTML
             <div class="d-flex justify-content-center gap-1">
@@ -122,7 +122,7 @@ class ShiftSwapDataTable extends DataTable
             /*
              * Server-side AJAX endpoint.
              */
-            ->minifiedAjax(route('shift-swap.index'))
+            ->minifiedAjax(route('shift_swap.index'))
 
             /*
              * Default sorting:

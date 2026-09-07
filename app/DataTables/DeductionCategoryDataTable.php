@@ -17,7 +17,7 @@ class DeductionCategoryDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['code', 'name', 'category_type', 'deduction_group', 'calculation_type', 'default_amount', 'default_percentage', 'min_amount', 'max_amount', 'is_base_on_salary', 'is_taxable', 'tax_code', 'is_active', 'is_system', 'description'];
+    protected array $columns = ['code', 'name', 'category_type', 'deduction_group', 'calculation_type', 'default_amount', 'default_percentage', 'min_amount', 'max_amount', 'is_based_on_salary', 'is_taxable', 'tax_code', 'is_active', 'is_system', 'description'];
 
     /**
      * Build DataTable response.

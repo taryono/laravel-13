@@ -11,6 +11,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
+use Models\Account;
+use App\Services\JournalService; 
 use Throwable;   
 
 class JournalEntryController extends MainController
@@ -32,7 +34,7 @@ class JournalEntryController extends MainController
             return $dataTable->ajax();
         }
 
-        return $dataTable->render('Finance::journal_entry.index');
+        return $dataTable->render('JournalEntry::index');
     }
 
     /**
@@ -51,7 +53,7 @@ class JournalEntryController extends MainController
         $groupedForms = $result['grouped'];
 
         return view(
-            'Finance::journal_entry.edit',
+            'JournalEntry::edit',
             compact('journalEntry', 'forms', 'groupedForms', 'accounts')
         );
     }
@@ -119,7 +121,7 @@ class JournalEntryController extends MainController
             'details.account.category'
         ])->findOrFail($id);
 
-        return view('Finance::journal_entry.show', compact('journalEntry'));
+        return view('JournalEntry::show', compact('journalEntry'));
     }
 
     /**
@@ -143,7 +145,7 @@ class JournalEntryController extends MainController
         $groupedForms = $result['grouped'];
 
         return view(
-            'Finance::journal_entry.edit',
+            'JournalEntry::edit',
             compact('journalEntry', 'forms', 'groupedForms', 'accounts')
         );
     }

@@ -47,7 +47,7 @@ class AttendanceController extends MainController
         $validated = $request->validate([
             'employee_id'        => 'required|exists:employees,id',
             'attendance_date'    => 'required|date',
-            'status'             => 'required|in:hadir,sakit,izin,alpha,cuti,dinas_luar',
+            'status'             => 'required|in:present,sick,excused,absent_unexcused,on_leave,business_trip',
             'notes'              => 'nullable|string',
             'payroll_period_id'  => 'nullable|exists:payroll_periods,id',
             // ✅ Validasi jam masuk/pulang
@@ -68,6 +68,21 @@ class AttendanceController extends MainController
 
          try {
             $attendance =  DB::transaction(function () use ($validated) {
+
+            // ✅ === TAMBAHKAN BARIS INI ===
+            $analysis = $this->calculateAttendance(
+                $validated['employee_id'],
+                $validated['attendance_date'],
+                $validated['actual_check_in'] ?? null,
+                $validated['actual_check_out'] ?? null
+            );
+
+            // Opsional: Jika ingin menolak simpan jika tidak ada jadwal
+            // if (!$analysis['success']) {
+            //     throw new \Exception($analysis['message']);
+            // }
+            // ✅ === AKHIR PENAMBAHAN ===
+            
             // =============================================
             // LANGKAH 1: Simpan/Update ke attendance_daily
             // =============================================
@@ -119,7 +134,9 @@ class AttendanceController extends MainController
 
             return $this->successResponse(
                 $request,
-                'Catatan absensi berhasil ditambahkan & terhubung dengan data mesin.',
+                'Catatan absensi berhasil ditambahkan. ' . 
+                ($analysis['is_swap'] ? ' ⚠️ Menggunakan shift hasil pertukaran.' : '') .
+                ($analysis['is_late'] ? ' Karyawan terlambat ' . $analysis['minutes_late'] . ' menit.' : ''),
                 $attendance
             );
         } catch (Throwable $e) {
@@ -149,7 +166,7 @@ class AttendanceController extends MainController
         $validated = $request->validate([
             'employee_id'        => 'required|exists:employees,id',
             'attendance_date'    => 'required|date',
-            'status'             => 'required|in:hadir,sakit,izin,alpha,cuti,dinas_luar',
+            'status'             => 'required|in:present,sick,excused,absent_unexcused,on_leave,business_trip',
             'notes'              => 'nullable|string',
             'payroll_period_id'  => 'nullable|exists:payroll_periods,id',
             'actual_check_in'    => 'nullable|date_format:Y-m-d\TH:i',
@@ -171,6 +188,15 @@ class AttendanceController extends MainController
 
         try {
             $attendance =  DB::transaction(function () use ($attendance, $validated) {
+
+            // ✅ === TAMBAHKAN BARIS INI ===
+            $analysis = $this->calculateAttendance(
+                $validated['employee_id'],
+                $validated['attendance_date'],
+                $validated['actual_check_in'] ?? null,
+                $validated['actual_check_out'] ?? null
+            );
+            // ✅ === AKHIR PENAMBAHAN ===
             // =============================================
             // ✅ LANGKAH 1: Cari/buat data attendance_daily
             // =============================================
@@ -227,7 +253,13 @@ class AttendanceController extends MainController
             return $attendance;
         });
 
-            return $this->successResponse($request, 'Data absensi berhasil diperbarui.', $attendance);
+            return $this->successResponse(
+                $request,
+                'Catatan absensi berhasil diperbarui.. ' . 
+                ($analysis['is_swap'] ? ' ⚠️ Menggunakan shift hasil pertukaran.' : '') .
+                ($analysis['is_late'] ? ' Karyawan terlambat ' . $analysis['minutes_late'] . ' menit.' : ''),
+                $attendance
+            );
         } catch (Throwable $e) {
             Log::error('Gagal memperbarui absensi.', ['exception' => $e]);
             return $this->errorResponse($request, 'Gagal memperbarui data.');
@@ -255,7 +287,7 @@ class AttendanceController extends MainController
             'employee_id' => 'required|exists:employees,id',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after:start_date',
-            'status' => 'required|in:hadir,sakit,izin,alpha,cuti,dinas_luar',
+            'status' => 'required|in:present,sick,excused,absent_unexcused,on_leave,business_trip',
             'check_in' => 'nullable|date_format:H:i:s',
             'check_out' => 'nullable|date_format:H:i:s|after:check_in',
         ]);
@@ -326,12 +358,12 @@ class AttendanceController extends MainController
                 ->get();
 
             $summary = [
-                'hadir' => $attendance->where('status', 'hadir')->count(),
-                'sakit' => $attendance->where('status', 'sakit')->count(),
-                'izin' => $attendance->where('status', 'izin')->count(),
-                'alpha' => $attendance->where('status', 'alpha')->count(),
-                'cuti' => $attendance->where('status', 'cuti')->count(),
-                'dinas_luar' => $attendance->where('status', 'dinas_luar')->count(),
+                'present' => $attendance->where('status', 'present')->count(),
+                'sick' => $attendance->where('status', 'sick')->count(),
+                'excused' => $attendance->where('status', 'excused')->count(),
+                'absent_unexcused' => $attendance->where('status', 'absent_unexcused')->count(),
+                'on_leave' => $attendance->where('status', 'on_leave')->count(),
+                'business_trip' => $attendance->where('status', 'business_trip')->count(),
                 'total_overtime' => $attendance->sum('overtime_hours'),
             ];
 
@@ -343,23 +375,97 @@ class AttendanceController extends MainController
     }
 
     public function report($periodId)
-{
-    $period = PayrollPeriod::findOrFail($periodId);
-    $attendances = Attendance::with('employee')
-                             ->where('payroll_period_id', $periodId)
-                             ->get();
-    
-    // Hitung rekap
-    $summary = [
-        'total_hadir' => $attendances->where('status', 'hadir')->count(),
-        'total_sakit' => $attendances->where('status', 'sakit')->count(),
-        'total_izin' => $attendances->where('status', 'izin')->count(),
-        'total_alpha' => $attendances->where('status', 'alpha')->count(),
-        'total_cuti' => $attendances->where('status', 'cuti')->count(),
-        'total_dinas_luar' => $attendances->where('status', 'dinas_luar')->count(),
-        'total_overtime' => $attendances->sum('overtime_hours'),
-    ];
-    
-    return view('Attendance::report', compact('period', 'attendances', 'summary'));
-}
+    {
+        $period = PayrollPeriod::findOrFail($periodId);
+        $attendances = Attendance::with('employee')
+                                ->where('payroll_period_id', $periodId)
+                                ->get();
+        
+        // Hitung rekap
+        $summary = [
+            'total_hadir' => $attendances->where('status', 'present')->count(),
+            'total_sakit' => $attendances->where('status', 'sick')->count(),
+            'total_izin' => $attendances->where('status', 'excused')->count(),
+            'total_alpha' => $attendances->where('status', 'absent_unexcused')->count(),
+            'total_cuti' => $attendances->where('status', 'on_leave')->count(),
+            'total_dinas_luar' => $attendances->where('status', 'business_trip')->count(),
+            'total_overtime' => $attendances->sum('overtime_hours'),
+        ];
+        
+        return view('Attendance::report', compact('period', 'attendances', 'summary'));
+    }  
+
+
+    /**
+     * Hitung kehadiran berdasarkan jam masuk/keluar DAN jadwal shift yang berlaku
+     * (Termasuk pengecekan pertukaran shift yang sudah disetujui)
+     */
+    protected function calculateAttendance($employeeId, $attendanceDate, $actualCheckIn, $actualCheckOut)
+    {
+        // 🔑 LANGKAH UTAMA: Ambil shift yang berlaku (cek pertukaran dulu!)
+        $shift = \Models\EmployeeShift::getEffectiveShift($employeeId, $attendanceDate);
+
+        if (!$shift) {
+            return [
+                'success' => false,
+                'message' => 'Tidak ada jadwal shift untuk tanggal ini',
+                'data' => null
+            ];
+        }
+
+        // Konversi waktu
+        $dateStr = $attendanceDate;
+        $startTime = strtotime($dateStr . ' ' . $shift->start_time);
+        $endTime   = strtotime($dateStr . ' ' . $shift->end_time);
+
+        // Tangani shift melewati tengah malam
+        if ($shift->crosses_midnight) {
+            $endTime = strtotime($dateStr . ' +1 day ' . $shift->end_time);
+        }
+
+        // Toleransi telat
+        $lateThreshold = $startTime + ($shift->grace_period_start * 60);
+
+        // Analisis jam masuk
+        $isLate = false;
+        $minutesLate = 0;
+        $isEarlyLeave = false;
+        $minutesEarly = 0;
+
+        if ($actualCheckIn) {
+            $clockInTime = strtotime($actualCheckIn);
+            $isLate = $clockInTime > $lateThreshold;
+            $minutesLate = $isLate ? round(($clockInTime - $lateThreshold) / 60) : 0;
+        }
+
+        // Analisis jam pulang
+        if ($actualCheckOut) {
+            $clockOutTime = strtotime($actualCheckOut);
+            $earlyThreshold = $endTime - ($shift->grace_period_end * 60);
+            $isEarlyLeave = $clockOutTime < $earlyThreshold;
+            $minutesEarly = $isEarlyLeave ? round(($earlyThreshold - $clockOutTime) / 60) : 0;
+        }
+
+        // ⚠️ Deteksi apakah ini hasil pertukaran shift
+        $swapCheck = \Models\ShiftSwap::where('date', $attendanceDate)
+            ->where('status', 'approved')
+            ->where(function ($q) use ($employeeId) {
+                $q->where('employee_id_a', $employeeId)
+                ->orWhere('employee_id_b', $employeeId);
+            })
+            ->exists();
+
+        return [
+            'success' => true,
+            'shift_code' => $shift->code,
+            'shift_name' => $shift->name,
+            'shift_start' => $shift->start_time,
+            'shift_end' => $shift->end_time,
+            'is_late' => $isLate,
+            'minutes_late' => $minutesLate,
+            'is_early_leave' => $isEarlyLeave,
+            'minutes_early' => $minutesEarly,
+            'is_swap' => $swapCheck, // ⬅️ Tandai jika hasil tukar shift
+        ];
+    }
 }

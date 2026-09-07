@@ -47,6 +47,41 @@ class AttendanceDaily extends BasedModel
         'approved_at'           => 'datetime',
     ];
 
+    public const STATUS_PRESENT          = 'present';
+    public const STATUS_SICK             = 'sick';
+    public const STATUS_EXCUSED           = 'excused';
+    public const STATUS_ABSENT_UNEXCUSED = 'absent_unexcused';
+    public const STATUS_ON_LEAVE          = 'on_leave';
+    public const STATUS_BUSINESS_TRIP     = 'business_trip';
+    public const STATUS_LATE              = 'late';
+    public const STATUS_HALF_DAY          = 'half_day'; // ✅ Ditambahkan
+
+    public const ATTENDANCE_STATUSES = [
+        self::STATUS_PRESENT, // ✅ Hadir
+        self::STATUS_SICK, // ✅ Sakit
+        self::STATUS_EXCUSED, // ✅ Izin
+        self::STATUS_ABSENT_UNEXCUSED, // ✅ Alpha
+        self::STATUS_ON_LEAVE, // ✅ Cuti 
+        self::STATUS_BUSINESS_TRIP, // ✅ Dinas Luar
+        self::STATUS_LATE,      // ✅ Terlambat
+        self::STATUS_HALF_DAY,  // ✅ Setengah Hari
+    ];
+
+    // Label tampilan Indonesia
+    public static function statusLabels(): array
+    {
+        return [
+            self::STATUS_PRESENT          => 'Hadir',
+            self::STATUS_SICK             => 'Sakit',
+            self::STATUS_EXCUSED           => 'Izin',
+            self::STATUS_ABSENT_UNEXCUSED => 'Alpha',
+            self::STATUS_ON_LEAVE          => 'Cuti',
+            self::STATUS_BUSINESS_TRIP     => 'Dinas Luar',
+            self::STATUS_LATE              => 'Terlambat',
+            self::STATUS_HALF_DAY          => 'Setengah Hari',
+        ];
+    }
+
     // Relasi
     public function employee()
     {
@@ -58,7 +93,7 @@ class AttendanceDaily extends BasedModel
         return $this->belongsTo(Shift::class);
     }
 
-    public function payrollPeriod()
+    public function payroll_period()
     {
         return $this->belongsTo(PayrollPeriod::class);
     }

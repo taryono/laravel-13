@@ -245,11 +245,6 @@ body.dark-mode .bnsp-sidebar-cta:hover {
         visibility: visible !important;
     }
 
-    /* ===== PASTIKAN TOOLTIP MUNCUL UNTUK ROOT MENU TANPA SUBMENU ===== */
-    .bnsp-sidebar.collapsed .bnsp-nav-link[data-tooltip]:not(.bnsp-nav-parent) {
-        /* Tidak perlu position:relative, tooltip portal sudah fixed */
-    }
-
     /* ===== ROOT MENU TANPA SUBMENU - STYLING ===== */
     .bnsp-sidebar.collapsed .bnsp-nav-link[data-tooltip]:not(.bnsp-nav-parent) {
         /* Pastikan elemen ini bisa di-hover */
@@ -271,7 +266,7 @@ body.dark-mode .bnsp-sidebar-cta:hover {
         margin-left: var(--bnsp-flyout-gap);
         background: var(--bnsp-primary);
         color: rgba(255, 255, 255, .9);
-        padding: .5rem .85rem;
+        /* padding: .5rem .85rem; */
         border-radius: .5rem;
         white-space: nowrap;
         box-shadow: 0 8px 25px rgba(0, 0, 0, .15);
@@ -843,7 +838,7 @@ body.bnsp-layout-topbar .bnsp-sidebar-brand {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 10px 16px;
+    /* padding: 10px 16px; */
     color: rgba(255, 255, 255, 0.7);
     text-decoration: none;
     border-radius: 8px;
@@ -924,7 +919,7 @@ body.bnsp-layout-topbar .bnsp-sidebar-brand {
 }
 
 /* --- Tooltip Styling (Opsional) --- */
-[data-tooltip] {
+/* [data-tooltip] {
     position: relative;
 }
 
@@ -942,7 +937,7 @@ body.bnsp-layout-topbar .bnsp-sidebar-brand {
     margin-left: 12px;
     z-index: 1000;
     pointer-events: none;
-}
+} */
 
 /* ========================================
   PARENT MENU dengan SUBMENU (Tanda panah)

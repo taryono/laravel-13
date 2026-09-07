@@ -5,6 +5,8 @@ namespace App\Modules\ShiftSwap\Controllers;
 use App\DataTables\ShiftSwapDataTable;
 use App\Http\Controllers\MainController;
 use Models\ShiftSwap;
+use Models\Shift;
+use Models\Employee;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -49,10 +51,10 @@ class ShiftSwapController extends MainController
     public function create(): View
     {
         $params = [
-            'action' => route('shift_swap.store'),
+            'action' => 'shift_swap.store',
             'method' => 'POST',
             'swap'   => new ShiftSwap(),
-            'employees' => Employee::orderBy('name')->get(['id','name']),
+            'employees' => Employee::orderBy('full_name')->get(['id','full_name']),
             'shifts'    => Shift::where('is_active', 1)->get(),
         ];
         return view('ShiftSwap::create', $params);
@@ -78,13 +80,14 @@ class ShiftSwapController extends MainController
         }
     }
 
-    public function edit(ShiftSwap $shiftSwap): View
+    public function edit($id): View
     {
+        $shiftSwap = $this->model->findOrFail($id);
         $params = [
-            'action' => route('shift_swap.update', $shiftSwap),
+            'action' => ['shift_swap.update', $shiftSwap->id],
             'method' => 'PUT',
             'swap'   => $shiftSwap,
-            'employees' => Employee::orderBy('name')->get(['id','name']),
+            'employees' => Employee::orderBy('full_name')->get(['id','full_name']),
             'shifts'    => Shift::where('is_active', 1)->get(),
         ];
         return view('ShiftSwap::edit', $params);

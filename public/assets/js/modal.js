@@ -32,7 +32,7 @@
 
         const wrapper = document.createElement('div');
         wrapper.innerHTML = `
-            <div class="modal fade" id="${MODAL_ID}" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
+            <div class="modal fade modal-custom" id="${MODAL_ID}" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
                 <div class="modal-dialog" id="modalSize">
                     <div class="modal-content">
                         <div class="modal-header">

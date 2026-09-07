@@ -60,8 +60,8 @@ class PayrollPeriodDataTable extends DataTable
             'UTF-8'
         );
 
-        $editUrl   = e(route('payroll-period.edit', $row));
-        $deleteUrl = e(route('payroll-period.destroy', $row));
+        $editUrl   = e(route('payroll_period.edit', $row));
+        $deleteUrl = e(route('payroll_period.destroy', $row));
 
         return <<<HTML
             <div class="d-flex justify-content-center gap-1">
@@ -266,27 +266,28 @@ class PayrollPeriodDataTable extends DataTable
      */
     protected function getColumns(): array
     {
-        $daftarKolom = collect($this->columns)
+        return collect($this->columns)
             ->map(fn (string $kolom) => Column::make($kolom)
                 ->title(ucwords(str_replace('_', ' ', $kolom))))
-            ->all();
-
-        $daftarKolom[] = Column::make('DT_RowIndex')
-            ->title('No')
-            ->orderable(false)
-            ->searchable(false)
-            ->width(80)
-            ->addClass('text-center');
-
-        // Tambah kolom Aksi di paling akhir
-        $daftarKolom[] = Column::computed('action')
-            ->exportable(false)
-            ->printable(false)
-            ->width(120)
-            ->addClass('text-center')
-            ->title('Aksi');
-
-        return $daftarKolom;
+            // 1. PREPEND: Masukkan kolom No di posisi PALING AWAL (indeks 0)
+            ->prepend(
+                Column::make('DT_RowIndex')
+                    ->title('No')
+                    ->orderable(false)
+                    ->searchable(false)
+                    ->width(80)
+                    ->addClass('text-center')
+            )
+            // 2. PUSH: Masukkan kolom Aksi di posisi PALING AKHIR
+            ->push(
+                Column::computed('action')
+                    ->exportable(false)
+                    ->printable(false)
+                    ->width(120)
+                    ->addClass('text-center')
+                    ->title('Aksi')
+            )
+            ->all(); // Konversi collection kembali menjadi array di akhir
     }
 
     /**

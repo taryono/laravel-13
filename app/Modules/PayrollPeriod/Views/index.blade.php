@@ -4,7 +4,7 @@
     <div class="container">
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Daftar PayrollPeriod</h5>
+                <h5 class="mb-0">Daftar Payroll Period</h5>
                 <a href="{{ route('payroll_period.create') }}" class="btn btn-primary btn-sm">Tambah Baru</a>
             </div>
             <div class="card-body">

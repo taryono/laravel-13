@@ -1,110 +1,443 @@
 @extends('layouts.app')
 {{-- app/Modules/MenuManagement/VIews/index.blade.php --}}
 @section('content')
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h4 class="mb-0">Manajemen Menu</h4>
-    <button class="btn btn-primary" onclick="openMenuModal('create')">
-        <span class="material-symbols-outlined align-middle">add</span> Tambah Menu
-    </button>
-</div>
+    <!-- Google Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined" rel="stylesheet">
 
-<div class="card">
-    <div class="card-body">
-        <ul id="menu-tree" class="menu-tree list-unstyled mb-0">
-            @include('MenuManagement::partials.tree-item', ['items' => $tree])
-        </ul>
-    </div>
-</div>
-
-@include('MenuManagement::partials.modal')
-@include('MenuManagement::partials.modal-roles')
-@include('MenuManagement::partials.modal-actions')
-
-@push('scripts')
-<script>
-    window.MENU_PARENT_OPTIONS = @json($parentOptions);
-    window.MENU_ROLES = @json($roles);
-    window.MENU_USERS = @json($users);
-
-    // Token __MENU_ID__ / __ACTION_ID__ diganti manual di JS sebelum request dikirim.
-    window.MENU_ROUTES = {
-        store           : @json(route('menu_management.store')),
-        show            : @json(route('menu_management.show', ['menu' => '__MENU_ID__'])),
-        update          : @json(route('menu_management.update', ['menu' => '__MENU_ID__'])),
-        reorder         : @json(route('menu_management.reorder')),
-        rolesSync       : @json(route('menu_management.roles.sync', ['menu' => '__MENU_ID__'])),
-        actionsIndex    : @json(route('menu_management.actions.index', ['menu' => '__MENU_ID__'])),
-        actionsStore    : @json(route('menu_management.actions.store', ['menu' => '__MENU_ID__'])),
-        actionUpdate    : @json(route('menu_management.actions.update', ['action' => '__ACTION_ID__'])),
-        actionDestroy   : @json(route('menu_management.actions.destroy', ['action' => '__ACTION_ID__'])),
-        actionSyncAccess: @json(route('menu_management.actions.syncAccess', ['action' => '__ACTION_ID__'])),
-    };
-</script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const iconType = document.getElementById('menu_icon_type');
-    const iconSelect = document.getElementById('menu_icon');
-    const iconPreview = document.getElementById('icon_preview');
-    const iconNameDisplay = document.getElementById('icon_name_display');
-    
-    function updateIconPreview() {
-        const selectedIcon = iconSelect.value;
-        const selectedText = iconSelect.options[iconSelect.selectedIndex]?.text || '';
-        const type = iconType.value;
-        
-        if (selectedIcon) {
-            if (type === 'fa') {
-                iconPreview.innerHTML = `<i class="${selectedIcon}"></i>`;
-                iconNameDisplay.textContent = selectedText;
-            } else {
-                iconPreview.innerHTML = `<span class="material-symbols-outlined">${selectedIcon}</span>`;
-                iconNameDisplay.textContent = selectedText;
-            }
-        } else {
-            iconPreview.innerHTML = '<i class="fas fa-th-large"></i>';
-            iconNameDisplay.textContent = 'Pilih icon';
+    <style>
+        /* ===== CUSTOM ICON PICKER ===== */
+        .icon-picker-wrapper {
+            position: relative;
         }
-    }
-    
-    iconType.addEventListener('change', function() {
-        // Filter options based on type
-        const options = iconSelect.querySelectorAll('optgroup option');
-        let hasVisible = false;
-        
-        options.forEach(opt => {
-            const parentLabel = opt.closest('optgroup')?.label || '';
-            if (this.value === 'fa') {
-                // Show only FA icons (check if value starts with 'fas' or 'far' or 'fab')
-                if (opt.value.startsWith('fas ') || opt.value.startsWith('far ') || opt.value.startsWith('fab ')) {
-                    opt.style.display = '';
-                    hasVisible = true;
-                } else {
-                    opt.style.display = 'none';
-                }
-            } else {
-                // Show only Material icons (value doesn't start with 'fa')
-                if (!opt.value.startsWith('fas ') && !opt.value.startsWith('far ') && !opt.value.startsWith('fab ')) {
-                    opt.style.display = '';
-                    hasVisible = true;
-                } else {
-                    opt.style.display = 'none';
-                }
+
+        .icon-preview-box {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            background: #f8f9ff;
+            border: 2px dashed #d0d7e6;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-height: 80px;
+            margin-bottom: 12px;
+        }
+
+        .icon-preview-box:hover {
+            border-color: #667eea;
+            background: #f0f3ff;
+        }
+
+        .icon-preview-box .preview-icon {
+            font-size: 2.2rem;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 14px;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+        }
+
+        .icon-preview-box .preview-icon .material-symbols-outlined {
+            font-size: 2rem;
+        }
+
+        .icon-preview-box .preview-info {
+            flex: 1;
+        }
+
+        .icon-preview-box .preview-info .icon-name {
+            font-weight: 600;
+            color: #2d2d5c;
+            font-size: 1rem;
+        }
+
+        .icon-preview-box .preview-info .icon-class {
+            color: #8888aa;
+            font-size: 0.8rem;
+            font-family: 'Courier New', monospace;
+        }
+
+        .icon-preview-box .preview-info .icon-type-badge {
+            display: inline-block;
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            background: #667eea20;
+            color: #667eea;
+            margin-top: 4px;
+        }
+
+        /* Modal Icon Picker - akan muncul di atas modal utama */
+        .icon-picker-modal {
+            z-index: 1060 !important;
+            /* Lebih tinggi dari modal utama (1050) */
+        }
+
+        .icon-picker-modal .modal-content {
+            border-radius: 24px;
+            border: none;
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .icon-picker-modal .modal-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            padding: 20px 28px;
+            border: none;
+        }
+
+        .icon-picker-modal .modal-title {
+            color: white;
+            font-weight: 700;
+        }
+
+        .icon-picker-modal .modal-title i {
+            margin-right: 10px;
+        }
+
+        .icon-picker-modal .btn-close {
+            filter: brightness(0) invert(1);
+        }
+
+        .icon-picker-modal .modal-body {
+            padding: 24px 28px;
+            background: #fafbff;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        /* Search & Filter */
+        .icon-search-box {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .icon-search-box .search-input {
+            flex: 1;
+            min-width: 200px;
+            border-radius: 12px;
+            border: 2px solid #e2e6ee;
+            padding: 10px 16px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .icon-search-box .search-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.12);
+            outline: none;
+        }
+
+        .icon-search-box .type-selector {
+            display: flex;
+            gap: 8px;
+        }
+
+        .icon-search-box .type-selector .btn-type {
+            padding: 8px 18px;
+            border-radius: 12px;
+            border: 2px solid #e2e6ee;
+            background: white;
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: #6a6a8a;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .icon-search-box .type-selector .btn-type:hover {
+            border-color: #b3c2f0;
+            background: #f0f3ff;
+        }
+
+        .icon-search-box .type-selector .btn-type.active {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+
+        /* Icon Grid */
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 10px;
+        }
+
+        .icon-grid .icon-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 14px 8px;
+            background: white;
+            border: 2px solid transparent;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-height: 80px;
+            text-align: center;
+            position: relative;
+        }
+
+        .icon-grid .icon-item:hover {
+            border-color: #c4d0f0;
+            background: #f5f7ff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.1);
+        }
+
+        .icon-grid .icon-item.selected {
+            border-color: #667eea;
+            background: #eef2ff;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+
+        .icon-grid .icon-item i,
+        .icon-grid .icon-item .material-symbols-outlined {
+            font-size: 1.8rem;
+            color: #3d3d5c;
+            transition: all 0.2s ease;
+        }
+
+        .icon-grid .icon-item .material-symbols-outlined {
+            font-size: 2rem;
+        }
+
+        .icon-grid .icon-item:hover i,
+        .icon-grid .icon-item:hover .material-symbols-outlined {
+            color: #667eea;
+            transform: scale(1.1);
+        }
+
+        .icon-grid .icon-item .icon-label {
+            font-size: 0.6rem;
+            color: #8888aa;
+            margin-top: 6px;
+            line-height: 1.2;
+            max-width: 70px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .icon-grid .icon-item .check-mark {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.6rem;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon-grid .icon-item.selected .check-mark {
+            display: flex;
+        }
+
+        .icon-empty {
+            text-align: center;
+            padding: 40px 20px;
+            color: #8888aa;
+        }
+
+        .icon-empty i {
+            font-size: 3rem;
+            color: #d0d7e6;
+            margin-bottom: 16px;
+        }
+
+        /* Modal Footer */
+        .icon-picker-modal .modal-footer {
+            border-top: 1px solid #eef0f5;
+            padding: 16px 28px;
+            background: white;
+        }
+
+        .icon-picker-modal .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: none;
+            border-radius: 12px;
+            padding: 10px 28px;
+            font-weight: 600;
+        }
+
+        .icon-picker-modal .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.35);
+        }
+
+        .icon-picker-modal .btn-secondary {
+            border-radius: 12px;
+            padding: 10px 28px;
+            font-weight: 600;
+            border: 2px solid #e2e6ee;
+        }
+
+        .icon-counter {
+            font-size: 0.8rem;
+            color: #8888aa;
+            padding: 8px 0;
+        }
+
+        /* Fix backdrop untuk nested modal */
+        .modal-backdrop {
+            transition: opacity 0.15s linear;
+        }
+
+        .modal-backdrop.fade {
+            opacity: 0;
+        }
+
+        .modal-backdrop.fade.show {
+            opacity: 0.5;
+        }
+
+        /* Backdrop untuk modal utama */
+        .modal-backdrop:first-of-type {
+            opacity: 0.5 !important;
+        }
+
+        /* Backdrop untuk modal icon picker (lebih gelap) */
+        .modal-backdrop:nth-of-type(2) {
+            opacity: 0.7 !important;
+        }
+
+        @media (max-width: 576px) {
+            .icon-grid {
+                grid-template-columns: repeat(auto-fill, minmax(65px, 1fr));
+                gap: 6px;
             }
-        });
-        
-        // Reset selection
-        iconSelect.value = '';
-        updateIconPreview();
-    });
-    
-    iconSelect.addEventListener('change', updateIconPreview);
-    
-    // Initial update
-    updateIconPreview();
-    iconType.dispatchEvent(new Event('change'));
-});
-</script>
-<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
-<script src="{{ asset('assets/js/menu-management.js') }}"></script>
-@endpush
+
+            .icon-grid .icon-item {
+                min-height: 70px;
+                padding: 10px 4px;
+            }
+
+            .icon-grid .icon-item i,
+            .icon-grid .icon-item .material-symbols-outlined {
+                font-size: 1.4rem;
+            }
+
+            .icon-picker-modal .modal-body {
+                padding: 16px;
+            }
+
+            .icon-search-box {
+                flex-direction: column;
+            }
+        }
+
+        .icon-picker-modal .modal-body::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .icon-picker-modal .modal-body::-webkit-scrollbar-track {
+            background: #f0f2f5;
+            border-radius: 10px;
+        }
+
+        .icon-picker-modal .modal-body::-webkit-scrollbar-thumb {
+            background: #c4cce0;
+            border-radius: 10px;
+        }
+
+        /* Form styling */
+        .form-icon-group {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #e9ecef;
+        }
+
+        .form-preview-result {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: white;
+            border-radius: 10px;
+            border: 1px solid #e9ecef;
+            margin-top: 8px;
+        }
+
+        .form-preview-result .result-icon {
+            font-size: 1.5rem;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 10px;
+        }
+
+        /* Loading state */
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .loading-spinner.show {
+            display: block;
+        }
+    </style>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0">Manajemen Menu</h4>
+        <button class="btn btn-primary" onclick="openMenuModal('create')">
+            <span class="material-symbols-outlined align-middle">add</span> Tambah Menu
+        </button>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <ul id="menu-tree" class="menu-tree list-unstyled mb-0">
+                @include('MenuManagement::partials.tree-item', ['items' => $tree])
+            </ul>
+        </div>
+    </div>
+
+    @include('MenuManagement::partials.modal')
+    @include('MenuManagement::partials.modal-roles')
+    @include('MenuManagement::partials.modal-actions')
+    @push('scripts')
+        <script>
+            window.MENU_PARENT_OPTIONS = @json($parentOptions);
+            window.MENU_ROLES = @json($roles);
+            window.MENU_USERS = @json($users);
+
+            // Token __MENU_ID__ / __ACTION_ID__ diganti manual di JS sebelum request dikirim.
+            window.MENU_ROUTES = {
+                store: @json(route('menu_management.store')),
+                show: @json(route('menu_management.show', ['menu' => '__MENU_ID__'])),
+                update: @json(route('menu_management.update', ['menu' => '__MENU_ID__'])),
+                reorder: @json(route('menu_management.reorder')),
+                rolesSync: @json(route('menu_management.roles.sync', ['menu' => '__MENU_ID__'])),
+                actionsIndex: @json(route('menu_management.actions.index', ['menu' => '__MENU_ID__'])),
+                actionsStore: @json(route('menu_management.actions.store', ['menu' => '__MENU_ID__'])),
+                actionUpdate: @json(route('menu_management.actions.update', ['action' => '__ACTION_ID__'])),
+                actionDestroy: @json(route('menu_management.actions.destroy', ['action' => '__ACTION_ID__'])),
+                actionSyncAccess: @json(route('menu_management.actions.syncAccess', ['action' => '__ACTION_ID__'])),
+            };
+        </script>
+
+        <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+        <script src="{{ asset('assets/js/menu-management.js') }}"></script>
+    @endpush
 @endsection
