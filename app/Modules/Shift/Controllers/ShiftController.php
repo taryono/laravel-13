@@ -5,6 +5,7 @@ namespace App\Modules\Shift\Controllers;
 use App\DataTables\ShiftDataTable;
 use App\Http\Controllers\MainController;
 use Models\Shift;
+use Models\ShiftRate;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -37,7 +38,7 @@ class ShiftController extends MainController
     public function create(): View
     { 
         $params = [
-            'action' => route('shift.store'),
+            'action' => 'shift.store',
             'method' => 'POST',
             'shift' => new Shift(),
         ];
@@ -54,9 +55,19 @@ class ShiftController extends MainController
 
         try {
             $shift = DB::transaction(function () use ($validated) {
-                $validated['is_active'] = $validated['is_active'] ?? true;
-                $validated['night_shift'] = $validated['night_shift'] ?? false;
-                return Shift::create($validated);
+                // Deteksi otomatis melewati tengah malam
+                $validated['crosses_midnight'] = $this->detectCrossMidnight(
+                    $validated['start_time'],
+                    $validated['end_time']
+                );
+
+                // Buat Shift
+                $shift = Shift::create($validated);
+
+                // Simpan semua tarif per jenis hari
+                $this->saveRates($shift, $validated['rates'] ?? []);
+
+                return $shift;
             });
 
             return $this->successResponse($request, 'Data shift berhasil ditambahkan.', $shift);
@@ -67,37 +78,47 @@ class ShiftController extends MainController
     }
 
     /**
-     * Show the form for editing the specified shift.
+     * Tampilkan Form Ubah Shift
      */
     public function edit($id): View
-    { 
-         $params = [
-            'action' => route('shift.update', $id),
-            'method' => 'POST',
-            'shift' => $this->model->findOrFail($id),
+    {
+        $shift = $this->model->findOrFail($id);
+        $shift->load('shiftRates'); // muat tarif sekaligus
+        $params = [
+            'action' => ['shift.update', $shift->id],
+            'method' => 'PUT',
+            'shift'  => $shift,
         ];
-
-        return view('Shift::create', $params);
-
-        return view('Shift::edit', $params);
+        return view('Shift::edit', $params); // atau pakai file create.blade.php yang sama
     }
 
     /**
-     * Update the specified shift.
+     * Perbarui Shift & Tarifnya
      */
     public function update(Request $request, $id)
     {
         $shift = $this->model->findOrFail($id);
-        $validated = $this->validateShift($request, $id);
+        $validated = $this->validateShift($request);
 
         try {
-            DB::transaction(function () use ($shift, $validated) {
+            DB::transaction(function () use ($validated, $shift) {
+                // Deteksi otomatis melewati tengah malam
+                $validated['crosses_midnight'] = $this->detectCrossMidnight(
+                    $validated['start_time'],
+                    $validated['end_time']
+                );
+
+                // Perbarui Shift
                 $shift->update($validated);
+
+                // Hapus tarif lama & simpan yang baru
+                $shift->shiftRates()->delete();
+                $this->saveRates($shift, $validated['rates'] ?? []);
             });
 
             return $this->successResponse($request, 'Data shift berhasil diperbarui.', $shift);
         } catch (Throwable $e) {
-            Log::error('Gagal memperbarui shift.', ['exception' => $e, 'shift_id' => $id]);
+            Log::error('Gagal memperbarui shift.', ['exception' => $e, 'data' => $validated]);
             return $this->errorResponse($request, 'Data shift gagal diperbarui: ' . $e->getMessage());
         }
     }
@@ -111,7 +132,7 @@ class ShiftController extends MainController
             $shift = $this->model->findOrFail($id);
 
             // Cek apakah shift sedang digunakan
-            if ($shift->employeeShifts()->exists()) {
+            if ($shift->employee_shifts()->exists()) {
                 return $this->errorResponse($request, 'Shift tidak dapat dihapus karena masih digunakan oleh karyawan.');
             }
 
@@ -129,11 +150,11 @@ class ShiftController extends MainController
     /**
      * Show shift details (employees using this shift)
      */
-    public function detail($id): View
+    public function show($id): View
     {
-        $shift = $this->model->with(['employeeShifts.employee'])->findOrFail($id);
+        $shift = $this->model->with(['employee_shifts.employee'])->findOrFail($id);
         
-        return view('Shift::detail', compact('shift'));
+        return view('Shift::show', compact('shift'));
     }
 
     /**
@@ -156,32 +177,62 @@ class ShiftController extends MainController
     /**
      * Validate shift data
      */
-    private function validateShift(Request $request, $id = null): array
+    /**
+     * Validasi Input Shift + Tarif
+     */
+    protected function validateShift(Request $request): array
     {
-        $rules = [
-            'code' => 'required|string|max:50|unique:shifts,code' . ($id ? ',' . $id : ''),
-            'name' => 'required|string|max:100',
-            'start_time' => 'required|date_format:H:i',
-            'end_time' => 'required|date_format:H:i|different:start_time',
-            'grace_period_start' => 'nullable|integer|min:0|max:120',
-            'grace_period_end' => 'nullable|integer|min:0|max:120',
-            'break_start' => 'nullable|date_format:H:i',
-            'break_end' => 'nullable|date_format:H:i|after:break_start',
-            'break_duration' => 'nullable|integer|min:0',
-            'overtime_threshold' => 'nullable|integer|min:0',
-            'overtime_rate' => 'nullable|numeric|min:0|max:10',
-            'night_shift' => 'boolean',
-            'night_shift_start' => 'nullable|date_format:H:i',
-            'is_active' => 'boolean',
-        ];
+        return $request->validate([
+            'code'                  => 'required|string|max:50|unique:shifts,code,' . $request->route('shift')?->id,
+            'name'                  => 'required|string|max:100',
+            'start_time'            => 'required|date_format:H:i',
+            'end_time'              => 'required|date_format:H:i',
+            'grace_period_start'    => 'nullable|integer|min:0',
+            'grace_period_end'      => 'nullable|integer|min:0',
+            'break_start'           => 'nullable|date_format:H:i',
+            'break_end'             => 'nullable|date_format:H:i',
+            'break_duration'        => 'nullable|integer|min:0',
+            'overtime_min_threshold'=> 'nullable|integer|min:0',
+            'night_shift_start'     => 'nullable|date_format:H:i',
+            'is_active'             => 'nullable|boolean',
 
-        $validated = $request->validate($rules);
+            // Validasi tarif per hari
+            'rates'                             => 'required|array',
+            'rates.*.day_type'                  => 'required|in:weekday,saturday,sunday,national_holiday,special_holiday',
+            'rates.*.base_rate_per_shift'       => 'required|numeric|min:0',
+            'rates.*.overtime_multiplier'       => 'required|numeric|min:0',
+            'rates.*.overtime_rate_per_hour'    => 'required|numeric|min:0',
+            'rates.*.night_allowance_per_shift' => 'required|numeric|min:0',
+            'rates.*.meal_allowance_per_shift'  => 'required|numeric|min:0',
+            'rates.*.transport_allowance_per_shift' => 'required|numeric|min:0',
+        ]);
+    }
 
-        // Jika night_shift aktif, night_shift_start wajib diisi
-        if (($request->boolean('night_shift') || $validated['night_shift']) && empty($validated['night_shift_start'])) {
-            $validated['night_shift_start'] = '22:00'; // Default
+    /**
+     * Deteksi apakah shift melewati tengah malam
+     */
+    protected function detectCrossMidnight(string $start, string $end): bool
+    {
+        return strtotime($end) < strtotime($start);
+    }
+
+    /**
+     * Simpan Tarif Shift
+     */
+    protected function saveRates(Shift $shift, array $rates): void
+    {
+        foreach ($rates as $rate) {
+            ShiftRate::create([
+                'shift_id'                 => $shift->id,
+                'day_type'                 => $rate['day_type'],
+                'base_rate_per_shift'      => $rate['base_rate_per_shift'],
+                'overtime_multiplier'      => $rate['overtime_multiplier'],
+                'overtime_rate_per_hour'   => $rate['overtime_rate_per_hour'],
+                'night_allowance_per_shift'=> $rate['night_allowance_per_shift'],
+                'meal_allowance_per_shift' => $rate['meal_allowance_per_shift'],
+                'transport_allowance_per_shift' => $rate['transport_allowance_per_shift'],
+                'is_active'                => true,
+            ]);
         }
-
-        return $validated;
     }
 }

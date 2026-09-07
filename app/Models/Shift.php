@@ -7,42 +7,28 @@ class Shift extends BasedModel
    protected $table = 'shifts';
 
     protected $fillable = [
-        'code',
-        'name',
-        'start_time',
-        'end_time',
-        'grace_period_start',
-        'grace_period_end',
-        'break_start',
-        'break_end',
-        'break_duration',
-        'overtime_threshold',
-        'is_active',
+        'code', 'name', 'start_time', 'end_time', 'crosses_midnight',
+        'grace_period_start', 'grace_period_end',
+        'break_start', 'break_end', 'break_duration',
+        'overtime_min_threshold', 'night_shift_start', 'is_active',
     ];
 
     protected $casts = [
-        'start_time'         => 'datetime:H:i',
-        'end_time'           => 'datetime:H:i',
-        'break_start'        => 'datetime:H:i',
-        'break_end'          => 'datetime:H:i',
-        'grace_period_start' => 'integer',
-        'grace_period_end'   => 'integer',
-        'break_duration'     => 'integer',
-        'overtime_threshold' => 'integer',
-        'is_active'          => 'boolean',
+        'crosses_midnight' => 'boolean',
+        'is_active'        => 'boolean',
     ];
 
-   public function shiftRates()
+   public function shift_rates()
     {
         return $this->hasMany(ShiftRate::class);
     }
 
-    public function employeeShifts()
+    public function employee_shifts()
     {
         return $this->hasMany(EmployeeShift::class);
     }
 
-    public function attendanceDailies()
+    public function attendance_dailies()
     {
         return $this->hasMany(AttendanceDaily::class);
     }

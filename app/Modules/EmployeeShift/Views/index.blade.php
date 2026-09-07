@@ -4,7 +4,7 @@
     <div class="container">
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Daftar EmployeeShift</h5>
+                <h5 class="mb-0">Daftar Employee Shift</h5>
                 <a href="{{ route('employee_shift.create') }}" class="btn btn-primary btn-sm">Tambah Baru</a>
             </div>
             <div class="card-body">

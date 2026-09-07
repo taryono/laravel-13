@@ -22,8 +22,11 @@ class ShiftDataTable extends DataTable
         'end_time', 
         'grace_period_start',
         'grace_period_end',
-        'overtime_rate',
-        'night_shift',
+        'overtime_min_threshold',
+        'break_start',
+        'break_end',
+        'break_duration',
+        'crosses_midnight',
         'is_active'
     ];
 
@@ -89,7 +92,7 @@ class ShiftDataTable extends DataTable
         $deleteUrl = e(route('shift.destroy', $row->id));
 
         // Detail URL untuk melihat employee yang menggunakan shift ini
-        $detailUrl = e(route('shift.detail', $row->id));
+        $detailUrl = e(route('shift.show', $row->id));
 
         return <<<HTML
             <div class="d-flex justify-content-center gap-1">
@@ -218,33 +221,28 @@ class ShiftDataTable extends DataTable
      */
     protected function getColumns(): array
     {
-        $columns = [
-            Column::make('code')->title('Kode')->width(100),
-            Column::make('name')->title('Nama Shift')->width(150),
-            Column::make('start_time')->title('Jam Mulai')->width(100),
-            Column::make('end_time')->title('Jam Selesai')->width(100),
-            Column::make('grace_period_start')->title('Toleransi Telat')->width(120),
-            Column::make('grace_period_end')->title('Toleransi Pulang')->width(120),
-            Column::make('overtime_rate')->title('Rate Lembur')->width(100),
-            Column::make('night_shift')->title('Shift Malam')->width(150),
-            Column::make('is_active')->title('Status')->width(100),
-        ];
-
-        $columns[] = Column::make('DT_RowIndex')
-            ->title('No')
-            ->orderable(false)
-            ->searchable(false)
-            ->width(50)
-            ->addClass('text-center');
-
-        $columns[] = Column::computed('action')
-            ->exportable(false)
-            ->printable(false)
-            ->width(150)
-            ->addClass('text-center')
-            ->title('Aksi');
-
-        return $columns;
+        return collect($this->columns)
+            ->map(fn (string $kolom) => Column::make($kolom)
+                ->title(ucwords(str_replace('_', ' ', $kolom))))
+            // 1. PREPEND: Masukkan kolom No di posisi PALING AWAL (indeks 0)
+            ->prepend(
+                Column::make('DT_RowIndex')
+                    ->title('No')
+                    ->orderable(false)
+                    ->searchable(false)
+                    ->width(80)
+                    ->addClass('text-center')
+            )
+            // 2. PUSH: Masukkan kolom Aksi di posisi PALING AKHIR
+            ->push(
+                Column::computed('action')
+                    ->exportable(false)
+                    ->printable(false)
+                    ->width(120)
+                    ->addClass('text-center')
+                    ->title('Aksi')
+            )
+            ->all(); // Konversi collection kembali menjadi array di akhir
     }
 
     /**

@@ -29,7 +29,7 @@ class EmployeeShiftController extends MainController
             return $dataTable->ajax();
         }
 
-        return $dataTable->render('Shift::index');
+        return $dataTable->render('EmployeeShift::index');
     }
 
     /**
@@ -37,7 +37,7 @@ class EmployeeShiftController extends MainController
      */
     public function create(): View
     {
-        $employeeShift = new EmployeeShift();
+        $employee_shift = new EmployeeShift();
         $employees = Employee::where('is_active', true)->orderBy('full_name')->get();
         $shifts = Shift::where('is_active', true)->orderBy('code')->get();
         $days = [
@@ -45,7 +45,7 @@ class EmployeeShiftController extends MainController
             4 => 'Kamis', 5 => 'Jumat', 6 => 'Sabtu', 7 => 'Minggu'
         ];
 
-        return view('Shift::edit', compact('employeeShift', 'employees', 'shifts', 'days'));
+        return view('EmployeeShift::create', compact('employee_shift', 'employees', 'shifts', 'days'));
     }
 
     /**
@@ -75,11 +75,11 @@ class EmployeeShiftController extends MainController
         }
 
         try {
-            $employeeShift = DB::transaction(function () use ($validated) {
+            $employee_shift = DB::transaction(function () use ($validated) {
                 return EmployeeShift::create($validated);
             });
 
-            return $this->successResponse($request, 'Jadwal shift karyawan berhasil ditambahkan.', $employeeShift);
+            return $this->successResponse($request, 'Jadwal shift karyawan berhasil ditambahkan.', $employee_shift);
         } catch (Throwable $e) {
             Log::error('Gagal menambahkan jadwal shift.', ['exception' => $e, 'data' => $validated]);
             return $this->errorResponse($request, 'Jadwal shift karyawan gagal ditambahkan.');
@@ -91,7 +91,7 @@ class EmployeeShiftController extends MainController
      */
     public function edit($id): View
     {
-        $employeeShift = $this->model->findOrFail($id);
+        $employee_shift = $this->model->findOrFail($id);
         $employees = Employee::where('is_active', true)->orderBy('full_name')->get();
         $shifts = Shift::where('is_active', true)->orderBy('code')->get();
         $days = [
@@ -99,7 +99,7 @@ class EmployeeShiftController extends MainController
             4 => 'Kamis', 5 => 'Jumat', 6 => 'Sabtu', 7 => 'Minggu'
         ];
 
-        return view('Shift::edit', compact('employeeShift', 'employees', 'shifts', 'days'));
+        return view('EmployeeShift::edit', compact('employee_shift', 'employees', 'shifts', 'days'));
     }
 
     /**
@@ -107,7 +107,7 @@ class EmployeeShiftController extends MainController
      */
     public function update(Request $request, $id)
     {
-        $employeeShift = $this->model->findOrFail($id);
+        $employee_shift = $this->model->findOrFail($id);
 
         $validated = $request->validate([
             'employee_id' => 'required|exists:employees,id',
@@ -121,11 +121,11 @@ class EmployeeShiftController extends MainController
         ]);
 
         try {
-            DB::transaction(function () use ($employeeShift, $validated) {
-                $employeeShift->update($validated);
+            DB::transaction(function () use ($employee_shift, $validated) {
+                $employee_shift->update($validated);
             });
 
-            return $this->successResponse($request, 'Jadwal shift karyawan berhasil diperbarui.', $employeeShift);
+            return $this->successResponse($request, 'Jadwal shift karyawan berhasil diperbarui.', $employee_shift);
         } catch (Throwable $e) {
             Log::error('Gagal memperbarui jadwal shift.', ['exception' => $e, 'shift_id' => $id]);
             return $this->errorResponse($request, 'Jadwal shift karyawan gagal diperbarui.');
@@ -138,10 +138,10 @@ class EmployeeShiftController extends MainController
     public function destroy(Request $request, $id)
     {
         try {
-            $employeeShift = $this->model->findOrFail($id);
+            $employee_shift = $this->model->findOrFail($id);
 
-            DB::transaction(function () use ($employeeShift) {
-                $employeeShift->delete();
+            DB::transaction(function () use ($employee_shift) {
+                $employee_shift->delete();
             });
 
             return $this->successResponse($request, 'Jadwal shift karyawan berhasil dihapus.');
@@ -229,7 +229,7 @@ class EmployeeShiftController extends MainController
         $dayOfWeek = $dateObj->format('N'); // 1-7
 
         // Cari jadwal shift yang berlaku untuk tanggal tersebut
-        $employeeShift = EmployeeShift::where('employee_id', $employeeId)
+        $employee_shift = EmployeeShift::where('employee_id', $employeeId)
             ->where('effective_date', '<=', $date)
             ->where(function ($query) use ($date) {
                 $query->whereNull('end_date')
@@ -242,8 +242,8 @@ class EmployeeShiftController extends MainController
             ->orderBy('effective_date', 'desc')
             ->first();
 
-        if ($employeeShift) {
-            return Shift::find($employeeShift->shift_id);
+        if ($employee_shift) {
+            return Shift::find($employee_shift->shift_id);
         }
 
         return null;

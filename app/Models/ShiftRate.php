@@ -5,27 +5,15 @@ namespace Models;
 class ShiftRate extends BasedModel
 { 
     protected $fillable = [
-        'shift_id',
-        'day_type',
-        'base_rate',
-        'overtime_rate_per_hour',
-        'overtime_multiplier',
-        'night_allowance',
-        'meal_allowance',
-        'transport_allowance',
-        'effective_date',
-        'is_active',
+        'shift_id', 'day_type',
+        'base_rate_per_shift', 'overtime_multiplier', 'overtime_rate_per_hour',
+        'night_allowance_per_shift', 'meal_allowance_per_shift',
+        'transport_allowance_per_shift', 'is_active',
     ];
 
     protected $casts = [
-        'effective_date'         => 'date:Y-m-d',
-        'base_rate'              => 'decimal:2',
-        'overtime_rate_per_hour' => 'decimal:2',
-        'overtime_multiplier'    => 'decimal:2',
-        'night_allowance'        => 'decimal:2',
-        'meal_allowance'         => 'decimal:2',
-        'transport_allowance'    => 'decimal:2',
-        'is_active'              => 'boolean',
+        'day_type'   => 'string',
+        'is_active'  => 'boolean',
     ];
 
     // Scope
@@ -35,7 +23,7 @@ class ShiftRate extends BasedModel
     }
 
     public function shift(): BelongsTo
-{
-    return $this->belongsTo(Shift::class);
-}
+    {
+        return $this->belongsTo(Shift::class);
+    }
 }

@@ -47,7 +47,7 @@
         </tr>
     </table>
 
-    @if($shift->employeeShifts->count() > 0)
+    @if($shift->employee_shifts->count() > 0)
         <h6 class="mt-3">Karyawan dengan Shift Ini</h6>
         <table class="table table-sm table-bordered">
             <thead>
@@ -59,7 +59,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach($shift->employeeShifts as $es)
+                @foreach($shift->employee_hifts as $es)
                     <tr>
                         <td>{{ $es->employee->employee_id ?? '-' }}</td>
                         <td>{{ $es->employee->full_name ?? '-' }}</td>

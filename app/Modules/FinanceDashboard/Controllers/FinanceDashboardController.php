@@ -18,7 +18,7 @@ use Models\JournalEntry;
 use Models\Invoice; 
 use Throwable; 
 
-class FinanceDashboardController extends Controller
+class FinanceDashboardController extends MainController
 {
     public function index(): View
     {
