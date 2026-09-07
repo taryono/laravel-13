@@ -17,7 +17,7 @@ class ExpenseDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['name'];
+    protected array $columns = ['expense_number', 'expense_date', 'description', 'amount','tax', 'total_amount', 'payment_method', 'payment_status', 'approved_by', 'approved_at', 'created_at', 'updated_at','created_by', 'updated_at'];
 
     /**
      * Build DataTable response.
@@ -48,7 +48,7 @@ class ExpenseDataTable extends DataTable
      */
     protected function renderActionButtons($row): string
     {
-        $title = e('Detail Expense ' . $row->name);
+        $title = e('Detail Expense ' . $row->expense_number);
 
         $context = htmlspecialchars(
             json_encode([

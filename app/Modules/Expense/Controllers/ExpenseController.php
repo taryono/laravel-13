@@ -31,59 +31,103 @@ class ExpenseController extends MainController
             return $dataTable->ajax();
         }
 
-        return $dataTable->render('Finance::expense.index');
+        return $dataTable->render('Expense::index');
     }
 
-    public function create(): View
+    /**
+     * Show the form for creating a new expense.
+     */
+    public function create()
     {
-        $expense = new Expense();
-        $accounts = Account::where('is_active', 1)
-            ->where('account_type', 'detail')
-            ->orderBy('code')
-            ->pluck('name', 'id');
+        $expense = null;
+        $categories = ExpenseCategory::active()->orderBy('sort_order')->get();
+        $journalEntries = JournalEntry::orderBy('journal_number')->get();
+        $approvers = User::where('is_active', true)->get();
 
-        $result = $this->getForm($expense);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
-
-        return view('Finance::expense.edit', compact('expense', 'forms', 'groupedForms', 'accounts'));
+        return view('expense.form', compact(
+            'expense', 
+            'categories', 
+            'journalEntries', 
+            'approvers'
+        ));
     }
 
+    /**
+     * Store a newly created expense.
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'expense_number' => 'required|string|max:255|unique:expenses,expense_number',
+            'expense_number' => 'required|string|max:255|unique:expenses',
             'expense_date' => 'required|date',
             'vendor_name' => 'nullable|string|max:255',
-            'expense_category' => 'required|string|max:100',
+            'expense_category_id' => 'required|exists:expense_categories,id',
             'description' => 'required|string',
             'amount' => 'required|numeric|min:0',
             'tax' => 'nullable|numeric|min:0',
-            'total_amount' => 'required|numeric|min:0',
+            'total_amount' => 'nullable|numeric|min:0',
             'payment_method' => 'nullable|in:cash,bank_transfer,check',
             'payment_status' => 'required|in:unpaid,paid,partial',
-            'attachment_path' => 'nullable|string|max:500',
-            'notes' => 'nullable|string',
+            'journal_entry_id' => 'nullable|exists:journal_entries,id',
+            'attachment' => 'nullable|file|mimes:pdf,jpg,jpeg,png,doc,docx|max:5120',
+            'approved_by' => 'nullable|exists:users,id',
         ]);
 
         try {
-            $expense = DB::transaction(function () use ($validated) {
-                $expense = Expense::create($validated);
+            DB::beginTransaction();
 
-                // Create journal entry if paid
-                if ($validated['payment_status'] === 'paid') {
-                    $this->createExpenseJournal($expense);
-                }
+            // Generate total jika tidak diisi
+            $validated['total_amount'] = $validated['total_amount'] ?? 
+                ($validated['amount'] + ($validated['tax'] ?? 0));
 
-                return $expense;
-            });
+            // Upload attachment
+            if ($request->hasFile('attachment')) {
+                $path = $request->file('attachment')->store('expenses', 'public');
+                $validated['attachment_path'] = $path;
+            }
 
-            return $this->successResponse($request, 'Data pengeluaran berhasil ditambahkan.', $expense);
-        } catch (Throwable $e) {
-            Log::error('Gagal menambahkan pengeluaran.', ['exception' => $e, 'data' => $validated]);
-            return $this->errorResponse($request, 'Data pengeluaran gagal ditambahkan.');
+            // Set created_by
+            $validated['created_by'] = auth()->id();
+
+            // Set approved_at jika approved_by diisi
+            if (!empty($validated['approved_by'])) {
+                $validated['approved_at'] = now();
+            }
+
+            $expense = Expense::create($validated);
+
+            DB::commit();
+
+            return redirect()
+                ->route('expense.index')
+                ->with('success', 'Pengeluaran berhasil ditambahkan!');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()
+                ->withInput()
+                ->with('error', 'Gagal menyimpan: ' . $e->getMessage());
         }
     }
+
+    /**
+     * Show the form for editing the specified expense.
+     */
+    public function edit(Expense $expense)
+    {
+        
+        $categories = 
+        ExpenseCategory::active()->orderBy('sort_order')->get();
+        $journalEntries = JournalEntry::orderBy('journal_number')->get();
+        $approvers = User::where('is_active', true)->get();
+
+        return view('expense.form', compact(
+            'expense', 
+            'categories', 
+            'journalEntries', 
+            'approvers'
+        ));
+    } 
 
     private function createExpenseJournal(Expense $expense): void
     {
@@ -117,22 +161,7 @@ class ExpenseController extends MainController
         ], $expense->total_amount, $expense->total_amount);
 
         $expense->update(['journal_entry_id' => $journal->id]);
-    }
-
-    public function edit($id): View
-    {
-        $expense = $this->model->findOrFail($id);
-        $accounts = Account::where('is_active', 1)
-            ->where('account_type', 'detail')
-            ->orderBy('code')
-            ->pluck('name', 'id');
-
-        $result = $this->getForm($expense);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
-
-        return view('Finance::expense.edit', compact('expense', 'forms', 'groupedForms', 'accounts'));
-    }
+    } 
 
     public function update(Request $request, $id)
     {
@@ -173,7 +202,7 @@ class ExpenseController extends MainController
     public function show($id): View
     {
         $expense = $this->model->with('journalEntry.details.account')->findOrFail($id);
-        return view('Finance::expense.show', compact('expense'));
+        return view('Expense::show', compact('expense'));
     }
 
     public function destroy(Request $request, $id): JsonResponse|RedirectResponse

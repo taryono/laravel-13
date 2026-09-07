@@ -5,7 +5,13 @@
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">Daftar Expense</h5>
-                <a href="{{ route('expense.create') }}" class="btn btn-primary btn-sm">Tambah Baru</a>
+                <button type="button" class="btn btn-light btn-sm d-flex align-items-center gap-1" data-toggle="ajax-modal"
+                    data-size="lg" data-method="GET" data-title="Tambah Data Expense Baru"
+                    data-url="{{ route('expense.create') }}"
+                    data-submit='<button class="btn btn-primary" type="submit" form="expenseForm">Simpan</button>'
+                    data-cancel='<button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Batal</button>'>
+                    <i class="bi bi-plus-circle"></i> Tambah Baru
+                </button>
             </div>
             <div class="card-body">
                 @if (session('success'))

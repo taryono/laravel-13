@@ -73,3 +73,28 @@ if (!function_exists('cancel')) {
         return '<button type="button" class="' . e($class) . '" data-bs-dismiss="modal" ' . $attrString . '>' . e($label) . '</button>';
     }
 }
+
+<?php
+// app/Helpers/helpers.php
+
+if (!function_exists('generateExpenseNumber')) {
+    function generateExpenseNumber()
+    {
+        $year = date('Y');
+        $month = date('m');
+        
+        $lastExpense = \App\Models\Expense::whereYear('created_at', $year)
+            ->whereMonth('created_at', $month)
+            ->orderBy('id', 'desc')
+            ->first();
+            
+        if ($lastExpense) {
+            $lastNumber = intval(substr($lastExpense->expense_number, -4));
+            $sequence = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
+        } else {
+            $sequence = '0001';
+        }
+        
+        return "EXP-{$year}{$month}-{$sequence}";
+    }
+}
