@@ -53,7 +53,7 @@ class AccountMappingDataTable extends DataTable
         $context = htmlspecialchars(
             json_encode([
                 'executeDraw' => true,
-                'tableId'     => 'account_mapping.-table',
+                'tableId'     => 'account_mapping-table',
                 'reloadDelay' => 500,
             ]),
             ENT_QUOTES,
@@ -75,7 +75,7 @@ class AccountMappingDataTable extends DataTable
                     data-title="{$title}"
                     data-url="{$editUrl}"
                     data-datatable-context='{$context}'
-                    data-submit='<button class="btn btn-primary modal-submit" type="button" data-is_execute_drawer="true" data-datatable-id="account_mapping.-table">Simpan</button>'
+                    data-submit='<button class="btn btn-primary modal-submit" type="button" data-is_execute_drawer="true" data-datatable-id="account_mapping-table">Simpan</button>'
                     data-cancel='<button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Batal</button>'>
                     <span class="material-symbols-outlined">edit</span>
                 </button>
@@ -115,7 +115,7 @@ class AccountMappingDataTable extends DataTable
              * Asesi -> asesi-table
              * Asesor -> asesor-table
              */
-            ->setTableId('account_mapping.-table')
+            ->setTableId('account_mapping-table')
 
             ->columns($this->getColumns())
 
@@ -268,7 +268,7 @@ class AccountMappingDataTable extends DataTable
     {
         $daftarKolom = collect($this->columns)
             ->map(fn (string $kolom) => Column::make($kolom)
-                ->title(ucwords(str_replace('_', ' ', $kolom))))
+                ->title(ucwords(str_replace(['_',"."], [' ',' '], $kolom))))
             ->all();
 
         $daftarKolom[] = Column::make('DT_RowIndex')

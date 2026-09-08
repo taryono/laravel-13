@@ -282,32 +282,6 @@ class DepartmentDataTable extends DataTable
      * explode() dari string literal seperti versi lama, yang rapuh
      * terhadap karakter khusus pada nama kolom.
      */
-    // protected function getColumns(): array
-    // {
-    //     return collect($this->columns)
-    //         ->map(fn (string $kolom) => Column::make($kolom)
-    //             ->title(ucwords(str_replace('_', ' ', $kolom))))
-    //         // 1. PREPEND: Masukkan kolom No di posisi PALING AWAL (indeks 0)
-    //         ->prepend(
-    //             Column::make('DT_RowIndex')
-    //                 ->title('No')
-    //                 ->orderable(false)
-    //                 ->searchable(false)
-    //                 ->width(80)
-    //                 ->addClass('text-center')
-    //         )
-    //         // 2. PUSH: Masukkan kolom Aksi di posisi PALING AKHIR
-    //         ->push(
-    //             Column::computed('action')
-    //                 ->exportable(false)
-    //                 ->printable(false)
-    //                 ->width(120)
-    //                 ->addClass('text-center')
-    //                 ->title('Aksi')
-    //         )
-    //         ->all(); // Konversi collection kembali menjadi array di akhir
-    // }
-
      protected function getColumns(): array
     {
         return [

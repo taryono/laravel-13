@@ -298,7 +298,8 @@ class AccountDataTable extends DataTable
     protected function getColumns(): array
     {
         return collect($this->columns)
-            ->map(fn (string $kolom) =>  Column::make($kolom)->title(ucwords(str_replace('_', ' ', $kolom))))
+            ->map(fn (string $kolom) => Column::make($kolom)
+                ->title(ucwords(str_replace(['_',"."], [' ',' '], $kolom))))
             // 1. PREPEND: Masukkan kolom No di posisi PALING AWAL (indeks 0)
             ->prepend(
                 Column::make('DT_RowIndex')

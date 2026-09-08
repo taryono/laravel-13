@@ -275,13 +275,8 @@ class AttendanceDataTable extends DataTable
     protected function getColumns(): array
     {
         return collect($this->columns)
-            ->map(fn (string $kolom) => match(true) {
-                    $kolom === 'attendance_daily.actual_check_in' => Column::make($kolom)->title('Jam Masuk'),
-                    $kolom === 'attendance_daily.actual_check_out' => Column::make($kolom)->title('Jam Pulang'),
-                    $kolom === 'attendance_daily.overtime_hours' => Column::make($kolom)->title('Jam Lembur'),
-                    $kolom === 'payroll_period.code' => Column::make($kolom)->title('Payrol Code'),
-                    default => Column::make($kolom)->title(ucwords(str_replace('_', ' ', $kolom)))
-                })
+            ->map(fn (string $kolom) => Column::make($kolom)
+                ->title(ucwords(str_replace(['_',"."], [' ',' '], $kolom))))
             // 1. PREPEND: Masukkan kolom No di posisi PALING AWAL (indeks 0)
             ->prepend(
                 Column::make('DT_RowIndex')
