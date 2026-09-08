@@ -45,7 +45,21 @@ class EmployeeShiftController extends MainController
             4 => 'Kamis', 5 => 'Jumat', 6 => 'Sabtu', 7 => 'Minggu'
         ];
 
-        return view('EmployeeShift::create', compact('employee_shift', 'employees', 'shifts', 'days'));
+        // ✅ Ambil DAFTAR NAMA GRUP yang SUDAH ADA di database
+        // Pengguna bisa PILIH yang sudah ada, atau ketik yang BARU
+        $existingGroups = EmployeeShift::select('rotation_group')
+            ->whereNotNull('rotation_group')
+            ->distinct()
+            ->orderBy('rotation_group')
+            ->pluck('rotation_group', 'rotation_group');
+
+        return view('EmployeeShift::edit', compact(
+            'employee_shift', 
+            'employees', 
+            'shifts', 
+            'days',
+            'existingGroups'
+        ));
     }
 
     /**
@@ -54,15 +68,23 @@ class EmployeeShiftController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'employee_id' => 'required|exists:employees,id',
-            'shift_id' => 'required|exists:shifts,id',
-            'effective_date' => 'required|date',
-            'end_date' => 'nullable|date|after_or_equal:effective_date',
-            'day_of_week' => 'nullable|integer|min:1|max:7',
-            'is_rotational' => 'boolean',
-            'rotation_group' => 'nullable|string|max:50',
-            'notes' => 'nullable|string',
+            'employee_id'    => 'required|exists:employees,id',
+            'shift_id'       => 'required|exists:shifts,id',
+            'effective_date' => 'required|date|unique:employee_shifts,effective_date,NULL,id,employee_id,'.$request->employee_id,
+            'end_date'       => 'nullable|date|after:effective_date',
+            'day_of_week'    => 'nullable|integer|between:1,7',
+            'is_rotational'  => 'required|boolean',
+            
+            // ⚡ Hanya WAJIB diisi jika "Ya"
+            'rotation_group' => 'required_if:is_rotational,1|nullable|string|max:50',
+            'rotation_order' => 'required_if:is_rotational,1|nullable|integer|min:1',
         ]);
+
+        // ⚡ Jika TIDAK rotasi, pastikan dikosongkan
+        if (!$request->is_rotational) {
+            $validated['rotation_group'] = null;
+            $validated['rotation_order'] = null;
+        }
 
         // Validasi duplikasi
         $exists = EmployeeShift::where('employee_id', $validated['employee_id'])
@@ -99,7 +121,25 @@ class EmployeeShiftController extends MainController
             4 => 'Kamis', 5 => 'Jumat', 6 => 'Sabtu', 7 => 'Minggu'
         ];
 
-        return view('EmployeeShift::edit', compact('employee_shift', 'employees', 'shifts', 'days'));
+        if (!$employee_shift) {
+            return $this->errorResponse($request, 'Jadwal shift karyawan tidak ditemukan.');
+        }
+
+        // ✅ Ambil DAFTAR NAMA GRUP yang SUDAH ADA di database
+        // Pengguna bisa PILIH yang sudah ada, atau ketik yang BARU
+        $existingGroups = EmployeeShift::select('rotation_group')
+            ->whereNotNull('rotation_group')
+            ->distinct()
+            ->orderBy('rotation_group')
+            ->pluck('rotation_group', 'rotation_group');
+
+        return view('EmployeeShift::edit', compact(
+            'employee_shift', 
+            'employees', 
+            'shifts', 
+            'days',
+            'existingGroups'
+        ));  
     }
 
     /**
@@ -110,15 +150,23 @@ class EmployeeShiftController extends MainController
         $employee_shift = $this->model->findOrFail($id);
 
         $validated = $request->validate([
-            'employee_id' => 'required|exists:employees,id',
-            'shift_id' => 'required|exists:shifts,id',
-            'effective_date' => 'required|date',
-            'end_date' => 'nullable|date|after_or_equal:effective_date',
-            'day_of_week' => 'nullable|integer|min:1|max:7',
-            'is_rotational' => 'boolean',
-            'rotation_group' => 'nullable|string|max:50',
-            'notes' => 'nullable|string',
+            'employee_id'    => 'required|exists:employees,id',
+            'shift_id'       => 'required|exists:shifts,id',
+            'effective_date' => 'required|date|unique:employee_shifts,effective_date,NULL,id,employee_id,'.$request->employee_id,
+            'end_date'       => 'nullable|date|after:effective_date',
+            'day_of_week'    => 'nullable|integer|between:1,7',
+            'is_rotational'  => 'required|boolean',
+            
+            // ⚡ Hanya WAJIB diisi jika "Ya"
+            'rotation_group' => 'required_if:is_rotational,1|nullable|string|max:50',
+            'rotation_order' => 'required_if:is_rotational,1|nullable|integer|min:1',
         ]);
+
+        // ⚡ Jika TIDAK rotasi, pastikan dikosongkan
+        if (!$request->is_rotational) {
+            $validated['rotation_group'] = null;
+            $validated['rotation_order'] = null;
+        }
 
         try {
             DB::transaction(function () use ($employee_shift, $validated) {

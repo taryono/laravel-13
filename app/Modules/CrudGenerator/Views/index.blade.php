@@ -4,7 +4,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-8">
-                <div class="card">
+                <div class="card modal-custom">
                     <div class="card-header">
                         <h3 class="card-title">🚀 Generate CRUD</h3>
                     </div>
@@ -203,6 +203,8 @@
 
             // Preview command
             document.getElementById('crudForm').addEventListener('submit', function(e) {
+                e.preventDefault(); // stop submit dulu, apapun yang terjadi
+
                 const model = document.getElementById('model_name').value;
                 const columns = document.getElementById('columns').value;
                 const createMenu = document.getElementById('create_menu').checked;
@@ -210,9 +212,17 @@
                 let command = `php artisan make:crud-yajra ${model} --columns=${columns}`;
                 if (!createMenu) command += ' --no-menu';
 
-                if (!confirm(`Execute command:\n\n${command}\n\nLanjutkan?`)) {
-                    e.preventDefault();
-                }
+                AppCore.ui.confirm({
+                    title: 'Lanjutkan proses?',
+                    text: `Execute command:\n\n${command}\n\nLanjutkan?`,
+                    icon: 'warning',
+                    confirmButtonText: 'Ya, lanjutkan',
+                }).then(confirmed => {
+                    if (confirmed) {
+                        e.target.submit(); // submit manual kalau user klik "Ya"
+                    }
+                    // kalau tidak confirm, ya sudah, tidak terjadi apa-apa
+                });
             });
 
             $(document).on('click', '.table-example', function() {

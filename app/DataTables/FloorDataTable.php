@@ -17,7 +17,7 @@ class FloorDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['code', 'name', 'building_id', 'floor_number', 'is_active'];
+    protected array $columns = ['code', 'name', 'building.name', 'floor_number', 'status'];
 
     /**
      * Build DataTable response.
@@ -28,8 +28,11 @@ class FloorDataTable extends DataTable
             ->addColumn('action', function ($row) {
                 return $this->renderActionButtons($row);
             })
+            ->addColumn('status', function ($row) {
+                return  $row->is_active ? '<span class="badge bg-success">Aktif</span>' : '<span class="badge bg-danger">Tidak Aktif';
+            })
             ->addIndexColumn()
-            ->rawColumns(['action']) // ✅ Tetap wajib ada!
+            ->rawColumns(['action', 'status']) // ✅ Tetap wajib ada!
             ->setRowId('id');
     }
 
@@ -100,7 +103,7 @@ class FloorDataTable extends DataTable
      */
     public function query(Floor $model): QueryBuilder
     {
-        return $model->newQuery();
+        return $model->newQuery()->with('building');
     }
 
     /**

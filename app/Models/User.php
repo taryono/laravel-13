@@ -13,6 +13,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\HasApiTokens;
+// use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -167,4 +168,16 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function sendEmailVerificationNotification() { $this->notify(new VerifyEmail); }
     public function sendPasswordResetNotification($token) { $this->notify(new ResetPasswordNotification($token)); }
+
+    public function organizations()
+    {
+        return $this->belongsToMany(\Models\Organization::class);
+        // otomatis pakai tabel pivot 'organization_user' 
+        // karena nama tabelnya sudah sesuai konvensi Laravel (alfabetis, singular, digabung underscore)
+    }
+
+    public function organizationIds(): array
+    {
+        return $this->organizations()->pluck('organizations.id')->toArray();
+    }
 }

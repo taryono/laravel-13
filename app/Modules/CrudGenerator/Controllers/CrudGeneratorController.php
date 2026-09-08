@@ -38,6 +38,7 @@ class CrudGeneratorController extends Controller
             'groups' => 'Employee',
             'list_alt' => 'Default',
         ];
+        // dump(auth()->user()->organizationIds());
         $tables = $this->listModulesToGenerate(); 
         return view('CrudGenerator::index', compact('icons', 'tables'));
     }
@@ -102,7 +103,7 @@ class CrudGeneratorController extends Controller
                 'command' => $command,
             ]);
 
-            return redirect()->route('crud-generator.index')
+            return redirect()->route('crud_generator.index')
                 ->with('success', $result['message'])
                 ->with('output', $result['output']);
 
@@ -120,7 +121,7 @@ class CrudGeneratorController extends Controller
                 'completed_at' => now(),
             ]);
 
-            return redirect()->route('crud-generator.index')
+            return redirect()->route('crud_generator.index')
                 ->with('error', "Gagal generate CRUD: " . $e->getMessage());
         }
     }
@@ -143,14 +144,14 @@ class CrudGeneratorController extends Controller
         $createMenu = $request->boolean('create_menu');
         
         // Gunakan Artisan::queue() untuk menjalankan di background
-        $command = "make:crud-yajra {$modelName} --columns={$columns}";
+        $command = "make:crud-yajra {$modelName} --model=\\App\\Models\\{$modelName} --columns={$columns}";
         
         if (!$createMenu) {
             $command .= " --no-menu";
         }
         Artisan::call('queue:work --queue=default --stop-when-empty');
         // Artisan::queue akan otomatis mendispatch ke queue
-        Artisan::queue($command, [], 'module-processing');
+        Artisan::queue($command, [], 'default');
         
         return redirect()->route('crud_generator.index')
             ->with('info', "CRUD {$modelName} sedang diproses di background. Anda akan diberitahu saat selesai.");
@@ -194,7 +195,7 @@ class CrudGeneratorController extends Controller
         $excluded_to_snake = array_map(function($item) {
             return Str::plural(Str::snake($item));
         }, $excluded);
-        
+         
         $tables = collect($columns)
             ->groupBy('TABLE_NAME')
             ->map(function ($columns, $tableName) {
@@ -204,6 +205,7 @@ class CrudGeneratorController extends Controller
                     'columns' => $columns->pluck('COLUMN_NAME')->values()->toArray(),
                 ];
             });
+        
         $modules = (new \Lib\Directories(app_path('Modules')))->getModules();
         // Atau lebih simpel
         $names = $modules->map('basename');

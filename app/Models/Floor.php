@@ -20,14 +20,14 @@ class Floor extends Model
     ];
 
     // Relasi
-    // public function user()
-    // {
-    //     return $this->belongsTo(User::class);
-    // }
+    public function building()
+    {
+        return $this->belongsTo(Building::class);
+    }
 
     // Scope
-    // public function scopeActive($query)
-    // {
-    //     return $query->where('is_active', true);
-    // }
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
 }
