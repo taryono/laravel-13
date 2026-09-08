@@ -72,10 +72,7 @@ if (!function_exists('cancel')) {
 
         return '<button type="button" class="' . e($class) . '" data-bs-dismiss="modal" ' . $attrString . '>' . e($label) . '</button>';
     }
-}
-
-<?php
-// app/Helpers/helpers.php
+} 
 
 if (!function_exists('generateExpenseNumber')) {
     function generateExpenseNumber()
