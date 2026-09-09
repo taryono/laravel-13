@@ -239,4 +239,9 @@ class SalaryStructure extends BasedModel
             ->pluck('component.name')
             ->join(', ');
     }
+
+    public function position()
+    {
+        return $this->belongsTo(Position::class);
+    }
 }

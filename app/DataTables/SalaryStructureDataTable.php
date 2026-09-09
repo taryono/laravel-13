@@ -17,7 +17,7 @@ class SalaryStructureDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['name'];
+    protected array $columns = ['name', 'code', 'position.name', 'organization.name', 'is_default', 'status'];
 
     /**
      * Build DataTable response.
@@ -27,9 +27,13 @@ class SalaryStructureDataTable extends DataTable
         return (new EloquentDataTable($query))
             ->addColumn('action', function ($row) {
                 return $this->renderActionButtons($row);
+            })->addColumn('is_default', function ($row) {
+                return $row->is_default ? '<span class="badge bg-success">Default</span>' : '-';
+            })->addColumn('status', function ($row) {
+                return $row->status ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-danger">Inactive</span>';
             })
             ->addIndexColumn()
-            ->rawColumns(['action']) // ✅ Tetap wajib ada!
+            ->rawColumns(['action', 'is_default', 'status']) // ✅ Tetap wajib ada!
             ->setRowId('id');
     }
 
@@ -100,7 +104,7 @@ class SalaryStructureDataTable extends DataTable
      */
     public function query(SalaryStructure $model): QueryBuilder
     {
-        return $model->newQuery();
+        return $model->newQuery()->with('position', 'organization');
     }
 
     /**

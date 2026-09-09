@@ -6,6 +6,7 @@ use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Log;
 
 class Handler extends ExceptionHandler
 {
@@ -14,37 +15,37 @@ class Handler extends ExceptionHandler
      */
     public function register(): void
     {
+        // Method 1: Report all exceptions with detailed log
         $this->reportable(function (Throwable $e) {
-            // 
+            Log::channel('stack')->error('EXCEPTION CAUGHT: ' . $e->getMessage(), [
+                'class' => get_class($e),
+                'code' => $e->getCode(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+                'request_url' => request()->fullUrl(),
+                'request_method' => request()->method(),
+                'request_input' => request()->all(),
+                'user_id' => auth()->id(),
+                'ip' => request()->ip(),
+            ]);
         });
 
-        // Menangani ModelNotFoundException
-        $this->renderable(function (ModelNotFoundException $e, $request) {
-            if ($request->wantsJson() || $request->is('api/*')) {
-                return response()->json([
-                    'message' => 'Resource tidak ditemukan',
-                    'error' => $e->getMessage()
-                ], 404);
-            }
-
-            // Redirect ke halaman 404 custom
-            return redirect()->route('error.404')->with('error', 'Data yang Anda cari tidak ditemukan');
+        // Method 2: Specific logging for 404
+        $this->reportable(function (NotFoundHttpException $e) {
+            Log::channel('stack')->warning('404 NOT FOUND: ' . $e->getMessage(), [
+                'url' => request()->fullUrl(),
+                'referer' => request()->header('referer'),
+                'user_agent' => request()->userAgent(),
+            ]);
         });
 
-        // Menangani NotFoundHttpException
-        $this->renderable(function (NotFoundHttpException $e, $request) {
-            
-            if ($request->wantsJson() || $request->is('api/*')) {
-                return response()->json([
-                    'message' => 'Halaman atau resource tidak ditemukan',
-                    'error' => $e->getMessage()
-                ], 404);
-            }
-
-            // Redirect ke halaman 404 custom
-            return response()->view('errors.404', [
-                'message' => 'Halaman tidak ditemukan'
-            ], 404);
+        // Method 3: Specific logging for Model Not Found
+        $this->reportable(function (ModelNotFoundException $e) {
+            Log::channel('stack')->error('MODEL NOT FOUND: ' . $e->getMessage(), [
+                'model' => $e->getModel(),
+                'ids' => $e->getIds(),
+            ]);
         });
     }
 
@@ -53,18 +54,9 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $exception)
     {
-        // Menangani ModelNotFoundException secara spesifik
-        if ($exception instanceof ModelNotFoundException) {
-            if ($request->wantsJson() || $request->is('api/*')) {
-                return response()->json([
-                    'message' => 'Data tidak ditemukan',
-                    'model' => class_basename($exception->getModel())
-                ], 404);
-            }
-
-            return redirect()->back()->with('error', 'Data yang Anda cari tidak ditemukan!');
-        }
-
+        // Optional: Log before rendering
+        Log::channel('stack')->debug('Rendering exception: ' . get_class($exception));
+        
         return parent::render($request, $exception);
     }
 }
