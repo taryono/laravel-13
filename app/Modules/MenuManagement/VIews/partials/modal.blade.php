@@ -19,6 +19,15 @@
                         <input type="text" class="form-control" name="flyout_title" id="menu_flyout_title"
                             placeholder="Judul saat menu ini ditampilkan sebagai flyout (opsional)">
                     </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Indonesia</label>
+                        <input type="text" class="form-control" name="id_text" id="id_text" placeholder="Judul indonesia">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">English</label>
+                        <input type="text" class="form-control" name="en_text" id="en_text"
+                            placeholder="Judul english">
+                    </div>
 
                     <div class="col-md-6">
                         <label class="form-label">

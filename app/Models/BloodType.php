@@ -2,7 +2,7 @@
 
 namespace Models; 
 
-class EmployeeLeave extends BasedModel
+class BloodType extends BasedModel
 { 
     // Relasi
     // public function user()

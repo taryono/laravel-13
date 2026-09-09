@@ -2,7 +2,7 @@
 
 namespace Models; 
 
-class OrganizationType extends BasedModel
+class AcademicYear extends BasedModel
 { 
     // Relasi
     // public function user()
