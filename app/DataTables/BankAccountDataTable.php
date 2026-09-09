@@ -17,7 +17,7 @@ class BankAccountDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['account.name', 'bank_name', 'account_number', 'account_name', 'current_balance', 'is_active', 'is_default'];
+    protected array $columns = ['account.name', 'bank_name', 'account_number', 'account_name', 'current_balance', 'status', 'default'];
 
     /**
      * Build DataTable response.
@@ -27,9 +27,14 @@ class BankAccountDataTable extends DataTable
         return (new EloquentDataTable($query))
             ->addColumn('action', function ($row) {
                 return $this->renderActionButtons($row);
+            })->addColumn('status', function ($row) {
+                return $row->is_active ? '<span class="badge bg-success">Aktif</span>' : '<span class="badge bg-danger">Tidak Aktif</span>';
+            })
+            ->addColumn('default', function ($row) {
+                return $row->is_default ? '<span class="badge bg-success">Default</span>' : '-';
             })
             ->addIndexColumn()
-            ->rawColumns(['action']) // ✅ Tetap wajib ada!
+            ->rawColumns(['action', 'status', 'default']) // ✅ Tetap wajib ada!
             ->setRowId('id');
     }
 

@@ -35,7 +35,7 @@ class BankAccountController extends MainController
         $bankAccount = new BankAccount();
         $accounts = Account::where('is_active', 1)
             ->where('account_type', 'detail')
-            ->whereHas('category', function($query) {
+            ->whereHas('account_category', function($query) {
                 $query->where('type', 'aset');
             })
             ->orderBy('code')
@@ -45,7 +45,7 @@ class BankAccountController extends MainController
         $forms = $result['forms'];
         $groupedForms = $result['grouped'];
 
-        return view('BankAccount::edit', compact('bankAccount', 'forms', 'groupedForms', 'accounts'));
+        return view('BankAccount::create', compact('bankAccount', 'forms', 'groupedForms', 'accounts'));
     }
 
     public function store(Request $request)
@@ -81,7 +81,7 @@ class BankAccountController extends MainController
         $bankAccount = $this->model->findOrFail($id);
         $accounts = Account::where('is_active', 1)
             ->where('account_type', 'detail')
-            ->whereHas('category', function($query) {
+            ->whereHas('account_category', function($query) {
                 $query->where('type', 'aset');
             })
             ->orderBy('code')

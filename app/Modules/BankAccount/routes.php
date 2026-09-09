@@ -18,10 +18,8 @@ Route::group(['prefix' => 'bank-account', 'namespace' => 'App\Modules\BankAccoun
     Route::get('/show/{id}', ['as' => 'bank_account.show', 'uses' => 'BankAccountController@show']);
     Route::get('/preview/{id}', ['as' => 'bank_account.preview', 'uses' => 'BankAccountController@preview']);
     Route::get('/print/{id}', ['as' => 'bank_account.print', 'uses' => 'BankAccountController@print']);
-
     Route::post('/store', ['as' => 'bank_account.store', 'uses' => 'BankAccountController@store']);
     Route::get('/edit/{id}', ['as' => 'bank_account.edit', 'uses' => 'BankAccountController@edit']);
     Route::put('/update/{id}', ['as' => 'bank_account.update', 'uses' => 'BankAccountController@update']);
     Route::delete('/delete/{id}', ['as' => 'bank_account.destroy', 'uses' => 'BankAccountController@destroy']);
-    
 });

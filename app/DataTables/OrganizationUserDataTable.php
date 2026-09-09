@@ -17,7 +17,7 @@ class OrganizationUserDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['organization_id', 'user_id', 'is_default', 'is_active', 'created_at', 'updated_at'];
+    protected array $columns = ['organization.name', 'user.name', 'is_default', 'is_active', 'created_at', 'updated_at'];
 
     /**
      * Build DataTable response.
@@ -28,8 +28,11 @@ class OrganizationUserDataTable extends DataTable
             ->addColumn('action', function ($row) {
                 return $this->renderActionButtons($row);
             })
+            ->addColumn('status', function ($row) {
+                return $row->is_active ? '<span class="badge bg-success">Aktif</span>' : '<span class="badge bg-danger">Tidak Aktif</span>';
+            })
             ->addIndexColumn()
-            ->rawColumns(['action']) // ✅ Tetap wajib ada!
+            ->rawColumns(['action', 'status']) // ✅ Tetap wajib ada!
             ->setRowId('id');
     }
 
@@ -100,7 +103,7 @@ class OrganizationUserDataTable extends DataTable
      */
     public function query(OrganizationUser $model): QueryBuilder
     {
-        return $model->newQuery();
+        return $model->newQuery()->with(['organization','user']);
     }
 
     /**
