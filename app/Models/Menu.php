@@ -95,4 +95,12 @@ class Menu extends BasedModel
                 menus.name {$direction}
             ");
     }
+
+     /**
+     * Get the role assignments for this menu
+     */
+    public function menuRoles()
+    {
+        return $this->hasMany(MenuRole::class, 'menu_id');
+    } 
 }

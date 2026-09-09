@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\View\View;
 use Throwable;
 use Illuminate\Support\Str;
+use Models\Role;
 
 class CrudGeneratorController extends Controller
 {
@@ -40,7 +41,10 @@ class CrudGeneratorController extends Controller
         ];
         // dump(auth()->user()->organizationIds());
         $tables = $this->listModulesToGenerate(); 
-        return view('CrudGenerator::index', compact('icons', 'tables'));
+        $roles = Role::where('is_active', 1)
+            ->orderBy('name')
+            ->get();
+        return view('CrudGenerator::index', compact('icons', 'tables','roles'));
     }
 
     /**
@@ -239,5 +243,102 @@ class CrudGeneratorController extends Controller
         // Atau cek via Supervisor
         // $output = shell_exec("supervisorctl status laravel-worker:* | grep RUNNING");
         // return str_contains($output, 'RUNNING');
+    } 
+
+     /**
+     * Generate menu from form
+     */
+    public function menuGenerator(Request $request)
+    {
+        try {
+            DB::beginTransaction();
+
+            // 1. Validate request
+            $validated = $request->validate([
+                'id' => 'nullable|exists:menus,id',
+                'title' => 'required|string|max:191',
+                'flyout_title' => 'nullable|string|max:255',
+                'id_text' => 'nullable|string|max:50',
+                'en_text' => 'nullable|string|max:50',
+                'slug' => 'nullable|string|max:191|unique:menus,slug,' . $request->id,
+                'route' => 'nullable|string|max:191',
+                'url' => 'nullable|string|max:255',
+                'parent_id' => 'nullable|exists:menus,id',
+                'icon_type' => 'nullable|in:fa,material',
+                'icon' => 'nullable|string|max:191',
+                'type' => 'required|in:sidebar,topbar,module',
+                'sort_order' => 'nullable|integer|min:0',
+                'is_active' => 'nullable|boolean',
+                'role_ids' => 'nullable|array',
+                'role_ids.*' => 'exists:roles,id',
+            ]);
+
+            // 2. Generate slug if empty
+            $slug = $request->slug ?: Str::slug($request->title);
+            
+            // 3. Generate name from title (lowercase, replace spaces with underscores)
+            $name = Str::slug($request->title, '_');
+
+            // 4. Prepare menu data
+            $menuData = [
+                'name' => $name,
+                'title' => $request->title,
+                'flyout_title' => $request->flyout_title,
+                'id_text' => $request->id_text,
+                'en_text' => $request->en_text,
+                'slug' => $slug,
+                'route' => $request->route,
+                'url' => $request->url,
+                'parent_id' => $request->parent_id,
+                'icon_type' => $request->icon_type ?? 'fa',
+                'icon' => $request->icon ?? 'fas fa-th-large',
+                'type' => $request->type ?? 'sidebar',
+                'sort_order' => $request->sort_order ?? 0,
+                'is_active' => $request->has('is_active') ? 1 : 0,
+                'organization_id' => auth()->user()?->organization_id ?? 1,
+            ];
+
+            // 5. Create or update menu
+            if ($request->id) {
+                $menu = Menu::findOrFail($request->id);
+                $menu->update($menuData);
+                $message = 'Menu berhasil diupdate!';
+            } else {
+                $menu = Menu::create($menuData);
+                $message = 'Menu berhasil dibuat!';
+            }
+
+            // 6. Assign roles to menu (menu_role)
+            if ($request->has('role_ids') && !empty($request->role_ids)) {
+                // Delete existing role assignments for this menu
+                MenuRole::where('menu_id', $menu->id)->delete();
+
+                // Create new role assignments
+                foreach ($request->role_ids as $roleId) {
+                    MenuRole::create([
+                        'menu_id' => $menu->id,
+                        'role_id' => $roleId,
+                        'is_view' => 1,  // Default: can view
+                        'is_create' => 0,
+                        'is_edit' => 0,
+                        'is_delete' => 0,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                }
+            }
+
+            DB::commit();
+            $this->clearMenuCache();
+            return response()->json(['message' => 'Menu berhasil ditambahkan.', 'data' => $menu]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Menu Generator Error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+                'request' => $request->all()
+            ]);
+            return response()->json(['error' => 'Gagal menyimpan menu: ' . $e->getMessage(), 'data' => null]);
+        }
     }
 }

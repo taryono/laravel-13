@@ -17,4 +17,5 @@ Route::group(['prefix' => 'crud-generator', 'namespace' => 'App\Modules\CrudGene
     Route::post('/generate-async', ['as' => 'crud_generator.generateAsync', 'uses' => 'CrudGeneratorController@generateAsync']);
     Route::get('/status/{processId}', ['as' => 'crud_generator.status', 'uses' => 'CrudGeneratorController@status']);
     Route::get('/history', ['as' => 'crud_generator.history', 'uses' => 'CrudGeneratorController@history']); 
+    Route::post('/menuGenerator', ['as' => 'crud_generator.menuGenerator', 'uses' => 'CrudGeneratorController@menuGenerator']);
 });
