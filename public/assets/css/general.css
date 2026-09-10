@@ -365,3 +365,11 @@ body.dark-mode {
     color: var(--bnsp-primary);
     transform: scale(1.03);
 }
+
+.material-symbols-outlined {
+    font-variation-settings: 'wght'400, 'FILL'0;
+    /* nilai default */
+    font-size: 20px;
+    /* ukuran dasar */
+    vertical-align: middle;
+}

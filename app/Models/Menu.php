@@ -23,6 +23,10 @@ class Menu extends BasedModel
         'sort_order' => 'integer',
     ];
  
+    public function organization()
+    {
+        return $this->belongsTo(Organization::class,'parent_id');
+    }
 
     public function parent()
     {

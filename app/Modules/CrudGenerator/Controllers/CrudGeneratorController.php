@@ -14,7 +14,9 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\View\View;
 use Throwable;
 use Illuminate\Support\Str;
+use Models\Menu;
 use Models\Role;
+use Models\MenuRole;
 
 class CrudGeneratorController extends Controller
 {
@@ -40,11 +42,13 @@ class CrudGeneratorController extends Controller
             'list_alt' => 'Default',
         ];
         // dump(auth()->user()->organizationIds());
-        $tables = $this->listModulesToGenerate(); 
+        $data = $this->listModulesToGenerate(); 
+        $tables = $data['tables']??[];
+        $filtered = $data['filtered']??[];
         $roles = Role::where('is_active', 1)
             ->orderBy('name')
             ->get();
-        return view('CrudGenerator::index', compact('icons', 'tables','roles'));
+        return view('CrudGenerator::index', compact('icons', 'tables','roles', 'filtered'));
     }
 
     /**
@@ -212,7 +216,7 @@ class CrudGeneratorController extends Controller
         
         $modules = (new \Lib\Directories(app_path('Modules')))->getModules();
         // Atau lebih simpel
-        $names = $modules->map('basename');
+        $names = $modules->map('basename'); 
         $filtered = $names->reject(function($name) use ($excluded) {
             return in_array($name, $excluded);
         })->toArray(); 
@@ -220,7 +224,7 @@ class CrudGeneratorController extends Controller
         $tables = $tables->filter(function ($table) use ($filtered, $rejected) { 
             return !in_array(Str::singular(Str::studly($table['name'])) , $filtered) && !in_array($table['name'] , $rejected);
         }); 
-        return $tables;
+        return ['tables'=> $tables, 'filtered'=> $names];
     }
 
     // Di Controller
@@ -268,7 +272,7 @@ class CrudGeneratorController extends Controller
                 'icon' => 'nullable|string|max:191',
                 'type' => 'required|in:sidebar,topbar,module',
                 'sort_order' => 'nullable|integer|min:0',
-                'is_active' => 'nullable|boolean',
+                'is_active' => 'nullable|in:on,Off',
                 'role_ids' => 'nullable|array',
                 'role_ids.*' => 'exists:roles,id',
             ]);

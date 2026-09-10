@@ -49,10 +49,10 @@ class MenuController extends MainController
      */
     public function create(): View
     {   $model = new Menu();
-        $forms = $this->getForm($model);
+        
         return view(
             'Menu::create',
-            compact('module', 'forms')
+            compact('model')
         );
     }
 
