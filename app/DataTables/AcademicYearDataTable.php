@@ -17,7 +17,7 @@ class AcademicYearDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['school_id', 'name', 'code', 'start_date', 'end_date', 'semester_start_date', 'semester_end_date', 'is_registration_open', 'registration_start_date', 'registration_end_date', 'is_active', 'is_current', 'created_at', 'updated_at', 'created_by', 'updated_by'];
+    protected array $columns = ['school.name', 'name', 'code', 'start_date', 'end_date', 'semester_start_date', 'semester_end_date', 'is_registration_open', 'registration_start_date', 'registration_end_date', 'is_active', 'is_current', 'created_at', 'updated_at', 'created_by', 'updated_by'];
 
     /**
      * Build DataTable response.
@@ -100,7 +100,7 @@ class AcademicYearDataTable extends DataTable
      */
     public function query(AcademicYear $model): QueryBuilder
     {
-        return $model->newQuery();
+        return $model->newQuery()->with('school');
     }
 
     /**

@@ -32,7 +32,7 @@
                 let command = `php artisan make:crud-yajra ${model} --columns=${columns}`;
                 if (!createMenu) command += ' --no-menu';
 
-                if (confirm(`Execute command:\n\n${command}\n\nLanjutkan?`)) {
+                if (AppCore.ui.confirm(`Execute command:\n\n${command}\n\nLanjutkan?`)) {
                     this.submit();
                 }
             });
@@ -830,9 +830,12 @@
                     url: form.action,
                     method: 'POST',
                     data: new FormData(form),
-                    success: function(response) {
-                        if (response.status == 'success') {
 
+                    success: function(response) {
+                        console.log(response);
+                        if ((response.status == 'success' || response.success == true) && response.message ) {
+                            UI.notify.success(response.message);
+                            window.location.reload();
                         }
                     }
                 })

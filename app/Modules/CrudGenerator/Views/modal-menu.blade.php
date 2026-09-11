@@ -100,7 +100,7 @@
                                          @foreach ($news as $role)
                                              <div class="col-4">
                                                  <input type="checkbox" name="role_ids[]" id="role_ids"
-                                                     value="{{ $role->id }}"> {{ $role->name }}
+                                                     value="{{ $role->id }}"> {{ $role->display_name }}
                                              </div>
                                          @endforeach
                                      </div>
@@ -123,7 +123,7 @@
                      </div>
                  </div>
                  <div class="modal-footer">
-                     <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
+                     <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Batal</button>
                      <button type="submit" class="btn btn-primary" id="submitMenuForm">
                          <i class="fas fa-save"></i> Simpan Menu
                      </button>

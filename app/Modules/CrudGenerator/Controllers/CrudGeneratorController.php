@@ -3,7 +3,7 @@
 namespace App\Modules\CrudGenerator\Controllers;
 
 use App\DataTables\CrudGeneratorDataTable;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\MainController;
 use Models\CrudGenerator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
 use Throwable;
 use Illuminate\Support\Str;
@@ -18,7 +19,7 @@ use Models\Menu;
 use Models\Role;
 use Models\MenuRole;
 
-class CrudGeneratorController extends Controller
+class CrudGeneratorController extends MainController
 {
      /**
      * Tampilkan form generator CRUD
@@ -255,6 +256,7 @@ class CrudGeneratorController extends Controller
     public function menuGenerator(Request $request)
     {
         try {
+            
             DB::beginTransaction();
 
             // 1. Validate request
@@ -263,8 +265,7 @@ class CrudGeneratorController extends Controller
                 'title' => 'required|string|max:191',
                 'flyout_title' => 'nullable|string|max:255',
                 'id_text' => 'nullable|string|max:50',
-                'en_text' => 'nullable|string|max:50',
-                'slug' => 'nullable|string|max:191|unique:menus,slug,' . $request->id,
+                'en_text' => 'nullable|string|max:50',                 
                 'route' => 'nullable|string|max:191',
                 'url' => 'nullable|string|max:255',
                 'parent_id' => 'nullable|exists:menus,id',
@@ -281,12 +282,12 @@ class CrudGeneratorController extends Controller
             $slug = $request->slug ?: Str::slug($request->title);
             
             // 3. Generate name from title (lowercase, replace spaces with underscores)
-            $name = Str::slug($request->title, '_');
+            $name = Str::slug($request->url, '_');
 
             // 4. Prepare menu data
             $menuData = [
-                'name' => $name,
-                'title' => $request->title,
+                'name' => $request->title,
+                'title' => Str::snake($request->title),
                 'flyout_title' => $request->flyout_title,
                 'id_text' => $request->id_text,
                 'en_text' => $request->en_text,
@@ -301,12 +302,17 @@ class CrudGeneratorController extends Controller
                 'is_active' => $request->has('is_active') ? 1 : 0,
                 'organization_id' => auth()->user()?->organization_id ?? 1,
             ];
-
+         
+             $menu = Menu::where('slug', $slug)->whereNotNull('url')->first();
+             
             // 5. Create or update menu
             if ($request->id) {
                 $menu = Menu::findOrFail($request->id);
                 $menu->update($menuData);
                 $message = 'Menu berhasil diupdate!';
+            }if ($menu) {
+                 $menu->update($menuData);
+                 $message = 'Menu berhasil diupdate!';
             } else {
                 $menu = Menu::create($menuData);
                 $message = 'Menu berhasil dibuat!';
@@ -319,30 +325,56 @@ class CrudGeneratorController extends Controller
 
                 // Create new role assignments
                 foreach ($request->role_ids as $roleId) {
-                    MenuRole::create([
-                        'menu_id' => $menu->id,
-                        'role_id' => $roleId,
-                        'is_view' => 1,  // Default: can view
-                        'is_create' => 0,
-                        'is_edit' => 0,
-                        'is_delete' => 0,
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ]);
+                    // 🔍 Cari dulu barisnya
+                    $menuRole = MenuRole::where('menu_id', (int)$menu->id)
+                        ->where('role_id', (int)$roleId)
+                        ->first(); 
+                    if ($menuRole) {
+                        // ✅ SUDAH ADA → UPDATE saja
+                        $menuRole->update([
+                            'is_view'   => 1,
+                            'is_create' => 0,
+                            'is_edit'   => 0,
+                            'is_delete' => 0,
+                        ]);
+                    } else {
+                        //✅ BELUM ADA → BUAT BARU
+                        MenuRole::create([
+                            'menu_id'   => (int)$menu->id,
+                            'role_id'   => (int)$roleId,
+                            'is_view'   => 1,
+                            'is_create' => 0,
+                            'is_edit'   => 0,
+                            'is_delete' => 0,
+                        ]); 
+                    }
                 }
             }
 
             DB::commit();
-            $this->clearMenuCache();
-            return response()->json(['message' => 'Menu berhasil ditambahkan.', 'data' => $menu]);
-
+            $this->clearMenuCache(); 
+            return $this->successResponse(
+                $request,
+                'Menu berhasil dibuat.',
+                $menu
+            );
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Menu Generator Error: ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
                 'request' => $request->all()
             ]);
-            return response()->json(['error' => 'Gagal menyimpan menu: ' . $e->getMessage(), 'data' => null]);
+            return $this->errorResponse(
+                $request,
+                'Gagal menyimpan menu: ' . $e->getMessage()
+            ); 
         }
+    }
+
+    private function clearMenuCache(): void
+    {
+        // Sesuaikan dengan strategi cache MenuService.
+        // Kalau pakai Cache::tags(), lebih baik: Cache::tags('menu')->flush();
+        Cache::flush(); // ⚠️ ganti dengan invalidation yang lebih spesifik di production
     }
 }
