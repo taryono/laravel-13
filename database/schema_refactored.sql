@@ -28,6 +28,7 @@ DROP TABLE IF EXISTS `api_rate_limits`;
 DROP TABLE IF EXISTS `payroll_audit_logs`;
 
 DROP TABLE IF EXISTS `finance_audit_logs`;
+DROP TABLE IF EXISTS `journal_details`;
 
 DROP TABLE IF EXISTS `asset_depreciations`;
 
@@ -272,6 +273,7 @@ DROP TABLE IF EXISTS `migrations`;
 DROP TABLE IF EXISTS `password_reset_tokens`;
 
 DROP TABLE IF EXISTS `sessions`;
+DROP TABLE IF EXISTS `journal_entries`;
 
 -- ============================================
 -- MASTER DATA TABLES
@@ -519,7 +521,6 @@ CREATE TABLE `employee_mutations` (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     `organization_id` BIGINT UNSIGNED NOT NULL,
     `employee_id` BIGINT UNSIGNED NOT NULL,
-    `organization_id` BIGINT UNSIGNED NOT NULL,
     `mutation_code` VARCHAR(255) NOT NULL,
     `mutation_type` ENUM(
         'promotion',
@@ -1302,7 +1303,6 @@ CREATE TABLE `employee_contracts` (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     `organization_id` BIGINT UNSIGNED NOT NULL,
     `employee_id` BIGINT UNSIGNED NOT NULL,
-    `organization_id` BIGINT UNSIGNED NOT NULL,
     `contract_number` VARCHAR(100) NOT NULL,
     `contract_type` ENUM(
         'tetap',
@@ -1348,7 +1348,6 @@ CREATE TABLE `employee_bonuses` (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     `organization_id` BIGINT UNSIGNED NOT NULL,
     `employee_id` BIGINT UNSIGNED NOT NULL,
-    `organization_id` BIGINT UNSIGNED NOT NULL,
     `bonus_number` VARCHAR(100) NOT NULL,
     `bonus_date` DATE NOT NULL,
     `bonus_type` VARCHAR(100) NOT NULL,
@@ -1382,7 +1381,6 @@ CREATE TABLE `employee_deductions` (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     `organization_id` BIGINT UNSIGNED NOT NULL,
     `employee_id` BIGINT UNSIGNED NOT NULL,
-    `organization_id` BIGINT UNSIGNED NOT NULL,
     `deduction_number` VARCHAR(100) NOT NULL,
     `deduction_date` DATE NOT NULL,
     `deduction_type` VARCHAR(100) NOT NULL,
@@ -1628,7 +1626,6 @@ CREATE TABLE `payslips` (
     `organization_id` BIGINT UNSIGNED NOT NULL,
     `payroll_detail_id` BIGINT UNSIGNED NOT NULL,
     `employee_id` BIGINT UNSIGNED NOT NULL,
-    `organization_id` BIGINT UNSIGNED NOT NULL,
     `payroll_period_id` BIGINT UNSIGNED NOT NULL,
     `payslip_number` VARCHAR(255) NOT NULL,
     `generated_at` TIMESTAMP NULL,
@@ -2447,7 +2444,6 @@ CREATE TABLE `invoice_payments` (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     `organization_id` BIGINT UNSIGNED NOT NULL,
     `invoice_id` BIGINT UNSIGNED NOT NULL,
-    `organization_id` BIGINT UNSIGNED NOT NULL,
     `payment_number` VARCHAR(100) NOT NULL,
     `payment_date` DATE NOT NULL,
     `amount` DECIMAL(15, 2) NOT NULL DEFAULT 0.00,
@@ -2550,7 +2546,6 @@ CREATE TABLE `expense_payments` (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     `organization_id` BIGINT UNSIGNED NOT NULL,
     `expense_id` BIGINT UNSIGNED NOT NULL,
-    `organization_id` BIGINT UNSIGNED NOT NULL,
     `payment_number` VARCHAR(100) NOT NULL,
     `payment_date` DATE NOT NULL,
     `amount` DECIMAL(15, 2) NOT NULL DEFAULT 0.00,
@@ -2661,7 +2656,6 @@ CREATE TABLE `tax_payments` (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     `organization_id` BIGINT UNSIGNED NOT NULL,
     `tax_liability_id` BIGINT UNSIGNED NOT NULL,
-    `organization_id` BIGINT UNSIGNED NOT NULL,
     `payment_number` VARCHAR(100) NOT NULL,
     `payment_date` DATE NOT NULL,
     `amount` DECIMAL(15, 2) NOT NULL DEFAULT 0.00,
@@ -2763,7 +2757,6 @@ CREATE TABLE `roles` (
 CREATE TABLE `menus` (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     `organization_id` BIGINT UNSIGNED NOT NULL,
-    `organization_id` BIGINT UNSIGNED NULL,
     `parent_id` BIGINT UNSIGNED NULL,
     `name` VARCHAR(255) NULL,
     `title` VARCHAR(191) NOT NULL,
@@ -2885,7 +2878,6 @@ CREATE TABLE `role_user` (
     `organization_id` BIGINT UNSIGNED NOT NULL,
     `user_id` BIGINT UNSIGNED NOT NULL,
     `role_id` BIGINT UNSIGNED NOT NULL,
-    `organization_id` BIGINT UNSIGNED NOT NULL,
     `is_default` TINYINT(1) NOT NULL DEFAULT 0,
     `created_at` TIMESTAMP NULL,
     `updated_at` TIMESTAMP NULL,
@@ -3623,7 +3615,7 @@ CREATE TABLE `dictionaries` (
     `key` VARCHAR(255) NOT NULL,
     `group` VARCHAR(255) NULL,
     `en` TEXT NULL,
-    `id` TEXT NULL,
+    `indo` TEXT NULL,
     `metadata` TEXT NULL,
     `is_active` TINYINT(1) NOT NULL DEFAULT 1,
     `created_at` TIMESTAMP NULL,
@@ -3644,8 +3636,7 @@ CREATE TABLE `dictionaries` (
 -- 111. modules
 CREATE TABLE `modules` (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `organization_id` BIGINT UNSIGNED NOT NULL,
-    `organization_id` BIGINT UNSIGNED NULL,
+    `organization_id` BIGINT UNSIGNED NOT NULL, 
     `code` VARCHAR(255) NOT NULL,
     `name` VARCHAR(255) NOT NULL,
     `description` TEXT NULL,
@@ -3667,7 +3658,6 @@ CREATE TABLE `modules` (
 CREATE TABLE `packages` (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     `organization_id` BIGINT UNSIGNED NOT NULL,
-    `organization_id` BIGINT UNSIGNED NULL,
     `code` VARCHAR(255) NOT NULL,
     `name` VARCHAR(255) NOT NULL,
     `price` INT NOT NULL DEFAULT 0,
@@ -3689,7 +3679,6 @@ CREATE TABLE `packages` (
 CREATE TABLE `trial_registrations` (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     `organization_id` BIGINT UNSIGNED NOT NULL,
-    `organization_id` BIGINT UNSIGNED NULL,
     `token` CHAR(36) NOT NULL,
     `current_step` TINYINT UNSIGNED NOT NULL DEFAULT 1,
     `status` ENUM('in_progress', 'completed', 'abandoned') NOT NULL DEFAULT 'in_progress',
@@ -3800,7 +3789,6 @@ CREATE TABLE `audit_trails` (
 CREATE TABLE `system_logs` (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     `organization_id` BIGINT UNSIGNED NOT NULL,
-    `organization_id` BIGINT UNSIGNED NULL,
     `level` ENUM('debug', 'info', 'warning', 'error', 'critical') NOT NULL,
     `message` TEXT NOT NULL,
     `context` JSON NULL,
@@ -7334,3 +7322,6 @@ CREATE TABLE `extracurriculars` (
         FOREIGN KEY (`teacher_id`) REFERENCES `teachers` (`id`)
         ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
+
+SET FOREIGN_KEY_CHECKS = 1;

@@ -210,7 +210,7 @@
                                 <button type="button" class="btn btn-sm btn-outline-primary btn-block mb-2 menu-example"
                                     data-table="{{ $module }}" data-label="{{ \Str::headline($module) }}"
                                     data-flyout_title="{{ $module }}" data-slug="{{ \Str::kebab($module) }}"
-                                    data-route="{{ \Str::snake($module) }}.index" data-url="{{ \Str::snake($module) }}">
+                                    data-route="{{ \Str::snake($module) }}.index" data-url="{{ \Str::kebab($module) }}">
                                     📋 {{ $module }}
                                 </button>
                             @endforeach

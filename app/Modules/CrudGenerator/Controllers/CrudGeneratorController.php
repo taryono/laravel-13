@@ -296,7 +296,7 @@ class CrudGeneratorController extends MainController
             // 4. Prepare menu data
             $menuData = [
                 'name' => $request->title,
-                'title' => Str::snake($request->title),
+                'title' => $request->flyout_title ?? $request->title,
                 'flyout_title' => $request->flyout_title,
                 'id_text' => $request->id_text,
                 'en_text' => $request->en_text,
