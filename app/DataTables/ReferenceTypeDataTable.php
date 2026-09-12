@@ -68,23 +68,9 @@ class ReferenceTypeDataTable extends DataTable
 
         $editUrl   = e(route('reference_type.edit', $row->id));
         $deleteUrl = e(route('reference_type.destroy', $row->id));
-        $valueUrl  = e(route('reference_type.values', $row->id));
 
         return <<<HTML
-            <div class="d-flex justify-content-center gap-1">
-                <button
-                    type="button"
-                    class="btn btn-sm btn-info"
-                    data-toggle="ajax-modal"
-                    data-size="lg"
-                    data-method="GET"
-                    data-title="{$title}"
-                    data-url="{$valueUrl}"
-                    data-datatable-context='{$context}'
-                    data-submit='<button class="btn btn-primary modal-submit" type="button" data-is_execute_drawer="true" data-datatable-id="reference-type-table">Simpan</button>'
-                    data-cancel='<button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Batal</button>'>
-                    <span class="material-symbols-outlined">visibility</span>
-                </button>
+            <div class="d-flex justify-content-center gap-1"> 
                 <button
                     type="button"
                     class="btn btn-sm btn-primary"

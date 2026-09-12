@@ -11,7 +11,7 @@ class AccountMappingSeeder extends Seeder
     {
         // Ambil ID akun berdasarkan kode
         $accounts = DB::table('accounts')->pluck('id', 'code');
-
+        $organizationId = 1;
         $mappings = [];
 
         // ================================================================
@@ -66,6 +66,7 @@ class AccountMappingSeeder extends Seeder
                 'credit_account_id' => $accounts[$mapping['credit_code']] ?? null,
                 'description' => $mapping['description'],
                 'is_active' => 1,
+                'organization_id' => $organizationId,
                 'created_at' => now(),
                 'updated_at' => now(),
             ];
@@ -113,6 +114,7 @@ class AccountMappingSeeder extends Seeder
                 'credit_account_id' => $accounts[$mapping['credit_code']] ?? null,
                 'description' => $mapping['description'],
                 'is_active' => 1,
+                'organization_id' => $organizationId,
                 'created_at' => now(),
                 'updated_at' => now(),
             ];
@@ -164,6 +166,7 @@ class AccountMappingSeeder extends Seeder
                 'credit_account_id' => $accounts[$mapping['credit_code']] ?? null,
                 'description' => $mapping['description'],
                 'is_active' => 1,
+                'organization_id' => $organizationId,
                 'created_at' => now(),
                 'updated_at' => now(),
             ];
@@ -235,6 +238,7 @@ class AccountMappingSeeder extends Seeder
                 'credit_account_id' => $accounts[$mapping['credit_code']] ?? null,
                 'description' => $mapping['description'],
                 'is_active' => 1,
+                'organization_id' => $organizationId,
                 'created_at' => now(),
                 'updated_at' => now(),
             ];
@@ -288,6 +292,7 @@ class AccountMappingSeeder extends Seeder
                 'credit_account_id' => $accounts[$mapping['credit_code']] ?? null,
                 'description' => $mapping['description'],
                 'is_active' => 1,
+                'organization_id' => $organizationId,
                 'created_at' => now(),
                 'updated_at' => now(),
             ];
@@ -362,6 +367,7 @@ class AccountMappingSeeder extends Seeder
                 'credit_account_id' => $accounts[$mapping['credit_code']] ?? null,
                 'description' => $mapping['description'],
                 'is_active' => 1,
+                'organization_id' => $organizationId,
                 'created_at' => now(),
                 'updated_at' => now(),
             ];
@@ -523,6 +529,7 @@ class AccountMappingSeeder extends Seeder
                 'credit_account_id' => $accounts[$mapping['credit_code']] ?? null,
                 'description' => $mapping['description'],
                 'is_active' => 1,
+                'organization_id' => $organizationId,
                 'created_at' => now(),
                 'updated_at' => now(),
             ];
@@ -567,6 +574,7 @@ class AccountMappingSeeder extends Seeder
                 'credit_account_id' => $accounts[$mapping['credit_code']] ?? null,
                 'description' => $mapping['description'],
                 'is_active' => 1,
+                'organization_id' => $organizationId,
                 'created_at' => now(),
                 'updated_at' => now(),
             ];
@@ -617,6 +625,7 @@ class AccountMappingSeeder extends Seeder
                 'credit_account_id' => $accounts[$mapping['credit_code']] ?? null,
                 'description' => $mapping['description'],
                 'is_active' => 1,
+                'organization_id' => $organizationId,
                 'created_at' => now(),
                 'updated_at' => now(),
             ];
@@ -625,7 +634,7 @@ class AccountMappingSeeder extends Seeder
         // ================================================================
         // INSERT SEMUA MAPPING
         // ================================================================
-      
-        DB::table('account_mappings')->insertOrIgnore($mappings);
+
+        DB::table('account_mappings')->insertOrIgnore($mappings->shift('organization_id', 1));
     }
 }

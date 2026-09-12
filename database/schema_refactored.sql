@@ -2964,6 +2964,7 @@ CREATE TABLE `education_levels` (
 CREATE TABLE `academic_years` (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     `organization_id` BIGINT UNSIGNED NOT NULL,
+    `school_id` BIGINT UNSIGNED NOT NULL,
     `name` VARCHAR(50) NOT NULL,
     `code` VARCHAR(20) NOT NULL,
     `start_date` DATE NOT NULL,

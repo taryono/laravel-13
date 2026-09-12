@@ -15,6 +15,11 @@ class AcademicYear extends BasedModel
         return $this->belongsTo(Organization::class);
     }
 
+    public function periods()
+{
+    return $this->hasMany(Period::class);
+}
+
     // Scope
     public function scopeActive($query)
     {

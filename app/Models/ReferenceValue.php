@@ -25,7 +25,7 @@ class ReferenceValue extends BasedModel
         'sort_order' => 'integer',
     ];
 
-    public function type()
+    public function reference_type()
     {
         return $this->belongsTo(ReferenceType::class, 'reference_type_id');
     }

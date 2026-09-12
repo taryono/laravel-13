@@ -17,7 +17,7 @@ class ReferenceValueDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['reference_type_id', 'code', 'name', 'description', 'badge_color', 'badge_class', 'text_color', 'sort_order', 'is_system', 'is_active'];
+    protected array $columns = ['code', 'name', 'badge_color', 'badge_class', 'text_color', 'sort_order', 'is_system', 'is_active'];
 
     /**
      * Build DataTable response.

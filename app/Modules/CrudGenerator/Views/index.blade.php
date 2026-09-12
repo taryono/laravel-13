@@ -205,20 +205,29 @@
                         <h3 class="card-title">⚡ Menu Ready</h3>
                     </div>
                     <div class="card-body">
-                        @if (!empty($filtered))
-                            @foreach ($filtered as $module)
-                                <button type="button" class="btn btn-sm btn-outline-primary btn-block mb-2 menu-example"
-                                    data-table="{{ $module }}" data-label="{{ \Str::headline($module) }}"
-                                    data-flyout_title="{{ $module }}" data-slug="{{ \Str::kebab($module) }}"
-                                    data-route="{{ \Str::snake($module) }}.index" data-url="{{ \Str::kebab($module) }}">
-                                    📋 {{ $module }}
-                                </button>
-                            @endforeach
-                        @else
-                            <div class="alert alert-info">
-                                <h5><i class="icon fas fa-info-circle"></i> Belum ada menu yang siap</h5>
-                            </div>
-                        @endif
+                        <!-- Input Pencarian -->
+                        <div class="mb-3">
+                            <input type="text" class="form-control" id="search_menu"
+                                placeholder="Cari nama tabel / modul...">
+                        </div>
+                        <div id="menu-list">
+                            @if (!empty($filtered))
+                                @foreach ($filtered as $module)
+                                    <button type="button"
+                                        class="btn btn-sm btn-outline-primary btn-block mb-2 menu-example"
+                                        data-table="{{ $module }}" data-label="{{ \Str::headline($module) }}"
+                                        data-flyout_title="{{ $module }}" data-slug="{{ \Str::kebab($module) }}"
+                                        data-route="{{ \Str::snake($module) }}.index"
+                                        data-url="{{ \Str::kebab($module) }}">
+                                        📋 {{ $module }}
+                                    </button>
+                                @endforeach
+                            @else
+                                <div class="alert alert-info">
+                                    <h5><i class="icon fas fa-info-circle"></i> Belum ada menu yang siap</h5>
+                                </div>
+                            @endif
+                        </div>
                     </div>
                 </div>
             </div>
@@ -231,5 +240,21 @@
     <x-icon-picker-modal id="icon-picker-modal" />
     @push('scripts')
         <script src="{{ asset('assets/js/crud_generator.js') }}?v={{ time() }}"></script>
+        <script>
+            // Filter untuk Menu Ready
+            $('#search_menu').on('keyup', function() {
+                let value = $(this).val().toLowerCase();
+                let $list = $('#menu-list').find('.menu-example');
+
+                $list.each(function() {
+                    let text = $(this).text().toLowerCase();
+                    if (text.includes(value)) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
+            });
+        </script>
     @endpush
 @endsection

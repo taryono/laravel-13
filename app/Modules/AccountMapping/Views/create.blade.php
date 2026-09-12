@@ -1,14 +1,11 @@
-{{ Form::open(['method' => 'POST', 'route' => ['account_mapping.store'], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
-    <div class="row">
-        <div class="col-md-6 mb-3">
-            @forelse ($forms as $key => $form)
-                <div class="form-group">
-                    <label for="name">{{ say($form['label']) }}</label>
-                    {!! $form['content'] !!}
-                </div>
-            @empty
-                <p>{{ say('Data Tidak Ditemukan') }}</p>
-            @endforelse
-        </div>
-    </div>
-{{ Form::close() }}  
+{{ Form::open(['method' => 'POST', 'route' => ['account_mapping.store'], 'class' => 'form-horizontal', 'id' => 'formAccountMapping', 'enctype' => 'multipart/form-data']) }}
+    @include('AccountMapping::_form')
+{{ Form::close() }}
+ 
+ <script src="{{asset('vendor/select2/select2.min.js')}}"></script>
+
+ <script>
+    $(document).ready(function () {
+        $('.select2').select2();
+    });
+</script>

@@ -5,6 +5,7 @@ namespace App\Modules\ReferenceValue\Controllers;
 use App\DataTables\ReferenceValueDataTable;
 use App\Http\Controllers\MainController;
 use Models\ReferenceValue;
+use Models\ReferenceType;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -59,9 +60,11 @@ class ReferenceValueController extends MainController
     public function create(): View
     {
         $referenceValue = new ReferenceValue(); 
+        $reference_types = ReferenceType::orderBy('name')->pluck('name', 'id')->prepend('Select Reference Type', '')->toArray();
+
         return view(
             'ReferenceValue::create',
-            compact('referenceValue')
+            compact('referenceValue', 'reference_types')
         );
     }
 
@@ -118,13 +121,10 @@ class ReferenceValueController extends MainController
     public function edit($id): View
     {
         $referenceValue = $this->model->findOrFail($id);
-        $result = $this->getForm($referenceValue);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
-
+        $reference_types = ReferenceType::orderBy('name')->pluck('name', 'id')->prepend('Select Reference Type', '')->toArray();
         return view(
             'ReferenceValue::edit',
-            compact('referenceValue', 'forms', 'groupedForms')
+            compact('referenceValue', 'reference_types')
         );
     }
 

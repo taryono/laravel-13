@@ -1,17 +1,10 @@
-{{ Form::model($account_mapping., ['method' => 'PUT', 'route' => ['account_mapping.update', $account_mapping.->id], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
-    <div class="row">
-        <div class="col-md-6 mb-3">
-            @forelse ($forms as $key => $form)
-                <div class="row">
-                    <div class="col-md-12 mb-3">
-                        <label>{{ say($form['label']) }}</label>
-                        {!! $form['content'] !!}
-                    </div>
-                </div>
-            @empty
-                <p>{{ say('Data Tidak Ditemukan') }}</p>
-            @endforelse
-        </div> 
-    </div> 
+{{ Form::model($account_mapping, ['method' => 'PUT', 'route' => ['account_mapping.update', $account_mapping->id], 'class' => 'form-horizontal', 'id' => 'formAccountMapping', 'enctype' => 'multipart/form-data']) }}
+    @include('AccountMapping::_form')
 {{ Form::close() }}
-<!-- /.row -->
+ <script src="{{asset('vendor/select2/select2.min.js')}}"></script>
+
+ <script>
+    $(document).ready(function () {
+        $('.select2').select2();
+    });
+</script>

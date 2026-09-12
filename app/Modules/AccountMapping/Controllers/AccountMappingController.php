@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 use Throwable; 
 use Models\Account; 
+use Models\Organization;
+
 class AccountMappingController extends MainController
 {
     public function __construct()
@@ -31,23 +33,22 @@ class AccountMappingController extends MainController
 
     public function create(): View
     {
-        $mapping = new AccountMapping();
+        $account_mapping = new AccountMapping();
+        $organizations = Organization::orderBy('name')->pluck('name', 'id');
         $accounts = Account::where('is_active', 1)
             ->where('account_type', 'detail')
             ->orderBy('code')
-            ->pluck('name', 'id');
+            ->get()
+            ->mapWithKeys(fn($acc) => [$acc->id => ($acc->code ? $acc->code . ' - ' : '') . $acc->name]);
 
-        $result = $this->getForm($mapping);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
-
-        return view('AccountMapping::edit', compact('mapping', 'forms', 'groupedForms', 'accounts'));
+        return view('AccountMapping::create', compact('account_mapping', 'accounts', 'organizations'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'source_type' => 'required|in:payroll_component,sales,purchase,expense',
+            'organization_id' => 'required|exists:organizations,id',
+            'source_type' => 'required|in:payroll_component,sales,purchase,expense,tax,loan,bank,other',
             'source_code' => 'required|string|max:255',
             'debit_account_id' => 'nullable|exists:accounts,id',
             'credit_account_id' => 'nullable|exists:accounts,id',
@@ -69,17 +70,15 @@ class AccountMappingController extends MainController
 
     public function edit($id): View
     {
-        $mapping = $this->model->findOrFail($id);
+        $account_mapping = $this->model->findOrFail($id);
+        $organizations = Organization::orderBy('name')->pluck('name', 'id');
         $accounts = Account::where('is_active', 1)
             ->where('account_type', 'detail')
             ->orderBy('code')
-            ->pluck('name', 'id');
+            ->get()
+            ->mapWithKeys(fn($acc) => [$acc->id => ($acc->code ? $acc->code . ' - ' : '') . $acc->name]);
 
-        $result = $this->getForm($mapping);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
-
-        return view('AccountMapping::edit', compact('mapping', 'forms', 'groupedForms', 'accounts'));
+        return view('AccountMapping::edit', compact('account_mapping', 'accounts', 'organizations'));
     }
 
     public function update(Request $request, $id)
@@ -87,7 +86,8 @@ class AccountMappingController extends MainController
         $mapping = $this->model->findOrFail($id);
 
         $validated = $request->validate([
-            'source_type' => 'required|in:payroll_component,sales,purchase,expense',
+            'organization_id' => 'required|exists:organizations,id',
+            'source_type' => 'required|in:payroll_component,sales,purchase,expense,tax,loan,bank,other',
             'source_code' => 'required|string|max:255',
             'debit_account_id' => 'nullable|exists:accounts,id',
             'credit_account_id' => 'nullable|exists:accounts,id',

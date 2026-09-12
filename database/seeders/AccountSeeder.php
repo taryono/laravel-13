@@ -18,6 +18,8 @@ class AccountSeeder extends Seeder
         $headers = [
             // ===== ASET =====
             [
+                'organization_id' => 1,
+
                 'code' => '1-1000',
                 'name' => 'ASET LANCAR',
                 'account_category_id' => $categories['ASSET'],
@@ -34,6 +36,8 @@ class AccountSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
+                'organization_id' => 1,
+
                 'code' => '1-2000',
                 'name' => 'ASET TETAP',
                 'account_category_id' => $categories['ASSET'],
@@ -50,6 +54,8 @@ class AccountSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
+                'organization_id' => 1,
+
                 'code' => '1-3000',
                 'name' => 'ASET LAINNYA',
                 'account_category_id' => $categories['ASSET'],
@@ -68,6 +74,8 @@ class AccountSeeder extends Seeder
 
             // ===== KEWAJIBAN =====
             [
+                'organization_id' => 1,
+
                 'code' => '2-1000',
                 'name' => 'KEWAJIBAN LANCAR',
                 'account_category_id' => $categories['LIABILITY'],
@@ -84,6 +92,8 @@ class AccountSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
+                'organization_id' => 1,
+
                 'code' => '2-2000',
                 'name' => 'KEWAJIBAN JANGKA PANJANG',
                 'account_category_id' => $categories['LIABILITY'],
@@ -102,6 +112,8 @@ class AccountSeeder extends Seeder
 
             // ===== EKUITAS / ASET BERSIH =====
             [
+                'organization_id' => 1,
+
                 'code' => '3-1000',
                 'name' => 'ASET BERSIH TIDAK TERIKAT',
                 'account_category_id' => $categories['EQUITY'],
@@ -118,6 +130,8 @@ class AccountSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
+                'organization_id' => 1,
+
                 'code' => '3-2000',
                 'name' => 'ASET BERSIH TERIKAT TEMPORER',
                 'account_category_id' => $categories['EQUITY'],
@@ -134,6 +148,8 @@ class AccountSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
+                'organization_id' => 1,
+
                 'code' => '3-3000',
                 'name' => 'ASET BERSIH TERIKAT PERMANEN',
                 'account_category_id' => $categories['EQUITY'],
@@ -152,6 +168,8 @@ class AccountSeeder extends Seeder
 
             // ===== PENDAPATAN =====
             [
+                'organization_id' => 1,
+
                 'code' => '4-1000',
                 'name' => 'PENDAPATAN SPP / UKT',
                 'account_category_id' => $categories['REVENUE'],
@@ -168,6 +186,8 @@ class AccountSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
+                'organization_id' => 1,
+
                 'code' => '4-2000',
                 'name' => 'PENDAPATAN NON-SPP',
                 'account_category_id' => $categories['REVENUE'],
@@ -184,6 +204,8 @@ class AccountSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
+                'organization_id' => 1,
+
                 'code' => '4-3000',
                 'name' => 'PENDAPATAN HIBAH & DONASI',
                 'account_category_id' => $categories['REVENUE'],
@@ -200,6 +222,8 @@ class AccountSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
+                'organization_id' => 1,
+
                 'code' => '4-4000',
                 'name' => 'PENDAPATAN LAIN-LAIN',
                 'account_category_id' => $categories['REVENUE'],
@@ -218,6 +242,8 @@ class AccountSeeder extends Seeder
 
             // ===== BEBAN =====
             [
+                'organization_id' => 1,
+
                 'code' => '5-1000',
                 'name' => 'BEBAN PROGRAM PENDIDIKAN',
                 'account_category_id' => $categories['EXPENSE'],
@@ -234,6 +260,8 @@ class AccountSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
+                'organization_id' => 1,
+
                 'code' => '5-2000',
                 'name' => 'BEBAN ADMINISTRASI & UMUM',
                 'account_category_id' => $categories['EXPENSE'],
@@ -250,6 +278,8 @@ class AccountSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
+                'organization_id' => 1,
+
                 'code' => '5-3000',
                 'name' => 'BEBAN PENYUSUTAN',
                 'account_category_id' => $categories['EXPENSE'],
@@ -266,6 +296,8 @@ class AccountSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
+                'organization_id' => 1,
+
                 'code' => '5-4000',
                 'name' => 'BEBAN PAJAK & NON-OPERASIONAL',
                 'account_category_id' => $categories['EXPENSE'],
@@ -302,6 +334,8 @@ class AccountSeeder extends Seeder
         // A. ASET LANCAR (parent: 1-1000)
         // ==========================================
         $details[] = [
+            'organization_id' => 1,
+
             'code' => '1-1100',
             'name' => 'Kas',
             'account_category_id' => $categories['ASSET'],
@@ -318,6 +352,8 @@ class AccountSeeder extends Seeder
             'updated_at' => now(),
         ];
         $details[] = [
+            'organization_id' => 1,
+
             'code' => '1-1200',
             'name' => 'Bank BCA',
             'account_category_id' => $categories['ASSET'],
@@ -334,6 +370,8 @@ class AccountSeeder extends Seeder
             'updated_at' => now(),
         ];
         $details[] = [
+            'organization_id' => 1,
+
             'code' => '1-1210',
             'name' => 'Bank Mandiri',
             'account_category_id' => $categories['ASSET'],
@@ -350,6 +388,8 @@ class AccountSeeder extends Seeder
             'updated_at' => now(),
         ];
         $details[] = [
+            'organization_id' => 1,
+
             'code' => '1-1220',
             'name' => 'Bank BRI',
             'account_category_id' => $categories['ASSET'],
@@ -376,6 +416,8 @@ class AccountSeeder extends Seeder
         ];
         foreach ($piutangData as $data) {
             $details[] = [
+                'organization_id' => 1,
+
                 'code' => $data['code'],
                 'name' => $data['name'],
                 'account_category_id' => $categories['ASSET'],
@@ -387,6 +429,7 @@ class AccountSeeder extends Seeder
                 'opening_balance' => 0,
                 'current_balance' => 0,
                 'is_active' => 1,
+                'organization_id' => 1,
                 'is_system' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -394,6 +437,8 @@ class AccountSeeder extends Seeder
         }
 
         $details[] = [
+            'organization_id' => 1,
+
             'code' => '1-1400',
             'name' => 'Piutang Hibah',
             'account_category_id' => $categories['ASSET'],
@@ -410,6 +455,8 @@ class AccountSeeder extends Seeder
             'updated_at' => now(),
         ];
         $details[] = [
+            'organization_id' => 1,
+
             'code' => '1-1500',
             'name' => 'Persediaan ATK',
             'account_category_id' => $categories['ASSET'],
@@ -426,6 +473,8 @@ class AccountSeeder extends Seeder
             'updated_at' => now(),
         ];
         $details[] = [
+            'organization_id' => 1,
+
             'code' => '1-1600',
             'name' => 'Persediaan Bahan Praktikum',
             'account_category_id' => $categories['ASSET'],
@@ -446,6 +495,8 @@ class AccountSeeder extends Seeder
         // B. ASET TETAP (parent: 1-2000)
         // ==========================================
         $details[] = [
+            'organization_id' => 1,
+
             'code' => '1-2100',
             'name' => 'Tanah',
             'account_category_id' => $categories['ASSET'],
@@ -472,6 +523,8 @@ class AccountSeeder extends Seeder
         ];
         foreach ($gedungData as $data) {
             $details[] = [
+                'organization_id' => 1,
+
                 'code' => $data['code'],
                 'name' => $data['name'],
                 'account_category_id' => $categories['ASSET'],
@@ -490,6 +543,8 @@ class AccountSeeder extends Seeder
         }
 
         $details[] = [
+            'organization_id' => 1,
+
             'code' => '1-2300',
             'name' => 'Kendaraan Operasional',
             'account_category_id' => $categories['ASSET'],
@@ -506,6 +561,8 @@ class AccountSeeder extends Seeder
             'updated_at' => now(),
         ];
         $details[] = [
+            'organization_id' => 1,
+
             'code' => '1-2400',
             'name' => 'Peralatan & Mesin',
             'account_category_id' => $categories['ASSET'],
@@ -522,6 +579,8 @@ class AccountSeeder extends Seeder
             'updated_at' => now(),
         ];
         $details[] = [
+            'organization_id' => 1,
+
             'code' => '1-2500',
             'name' => 'Komputer & IT Equipment',
             'account_category_id' => $categories['ASSET'],
@@ -538,6 +597,8 @@ class AccountSeeder extends Seeder
             'updated_at' => now(),
         ];
         $details[] = [
+            'organization_id' => 1,
+
             'code' => '1-2600',
             'name' => 'Akumulasi Penyusutan Aset Tetap',
             'account_category_id' => $categories['ASSET'],
@@ -558,6 +619,8 @@ class AccountSeeder extends Seeder
         // C. ASET LAINNYA (parent: 1-3000)
         // ==========================================
         $details[] = [
+            'organization_id' => 1,
+
             'code' => '1-3100',
             'name' => 'Dana Abadi (Endowment)',
             'account_category_id' => $categories['ASSET'],
@@ -574,6 +637,8 @@ class AccountSeeder extends Seeder
             'updated_at' => now(),
         ];
         $details[] = [
+            'organization_id' => 1,
+
             'code' => '1-3200',
             'name' => 'Investasi Jangka Panjang',
             'account_category_id' => $categories['ASSET'],
@@ -594,6 +659,8 @@ class AccountSeeder extends Seeder
         // D. KEWAJIBAN LANCAR (parent: 2-1000)
         // ==========================================
         $details[] = [
+            'organization_id' => 1,
+
             'code' => '2-1100',
             'name' => 'Utang Usaha',
             'account_category_id' => $categories['LIABILITY'],
@@ -610,6 +677,8 @@ class AccountSeeder extends Seeder
             'updated_at' => now(),
         ];
         $details[] = [
+            'organization_id' => 1,
+
             'code' => '2-1200',
             'name' => 'Utang Gaji & Tunjangan',
             'account_category_id' => $categories['LIABILITY'],
@@ -626,6 +695,8 @@ class AccountSeeder extends Seeder
             'updated_at' => now(),
         ];
         $details[] = [
+            'organization_id' => 1,
+
             'code' => '2-1300',
             'name' => 'Utang BPJS Ketenagakerjaan',
             'account_category_id' => $categories['LIABILITY'],
@@ -642,6 +713,8 @@ class AccountSeeder extends Seeder
             'updated_at' => now(),
         ];
         $details[] = [
+            'organization_id' => 1,
+
             'code' => '2-1400',
             'name' => 'Pendapatan Diterima di Muka (SPP)',
             'account_category_id' => $categories['LIABILITY'],
@@ -658,6 +731,8 @@ class AccountSeeder extends Seeder
             'updated_at' => now(),
         ];
         $details[] = [
+            'organization_id' => 1,
+
             'code' => '2-1500',
             'name' => 'Utang Pajak',
             'account_category_id' => $categories['LIABILITY'],
@@ -678,6 +753,8 @@ class AccountSeeder extends Seeder
         // E. KEWAJIBAN JANGKA PANJANG (parent: 2-2000)
         // ==========================================
         $details[] = [
+            'organization_id' => 1,
+
             'code' => '2-2100',
             'name' => 'Utang Bank Jangka Panjang',
             'account_category_id' => $categories['LIABILITY'],
@@ -698,6 +775,8 @@ class AccountSeeder extends Seeder
         // F. ASET BERSIH TIDAK TERIKAT (parent: 3-1000)
         // ==========================================
         $details[] = [
+            'organization_id' => 1,
+
             'code' => '3-1100',
             'name' => 'Saldo Aset Bersih Tidak Terikat',
             'account_category_id' => $categories['EQUITY'],
@@ -714,6 +793,8 @@ class AccountSeeder extends Seeder
             'updated_at' => now(),
         ];
         $details[] = [
+            'organization_id' => 1,
+
             'code' => '3-1200',
             'name' => 'Surplus/(Defisit) Tahun Berjalan',
             'account_category_id' => $categories['EQUITY'],
@@ -734,6 +815,8 @@ class AccountSeeder extends Seeder
         // G. ASET BERSIH TERIKAT TEMPORER (parent: 3-2000)
         // ==========================================
         $details[] = [
+            'organization_id' => 1,
+
             'code' => '3-2100',
             'name' => 'Dana BOS Terikat',
             'account_category_id' => $categories['EQUITY'],
@@ -750,6 +833,8 @@ class AccountSeeder extends Seeder
             'updated_at' => now(),
         ];
         $details[] = [
+            'organization_id' => 1,
+
             'code' => '3-2200',
             'name' => 'Dana BOPTN Terikat',
             'account_category_id' => $categories['EQUITY'],
@@ -766,6 +851,8 @@ class AccountSeeder extends Seeder
             'updated_at' => now(),
         ];
         $details[] = [
+            'organization_id' => 1,
+
             'code' => '3-2300',
             'name' => 'Dana Hibah Beasiswa Terikat',
             'account_category_id' => $categories['EQUITY'],
@@ -782,6 +869,8 @@ class AccountSeeder extends Seeder
             'updated_at' => now(),
         ];
         $details[] = [
+            'organization_id' => 1,
+
             'code' => '3-2400',
             'name' => 'Dana Pembangunan Gedung Terikat',
             'account_category_id' => $categories['EQUITY'],
@@ -802,6 +891,8 @@ class AccountSeeder extends Seeder
         // H. ASET BERSIH TERIKAT PERMANEN (parent: 3-3000)
         // ==========================================
         $details[] = [
+            'organization_id' => 1,
+
             'code' => '3-3100',
             'name' => 'Dana Abadi (Endowment Fund)',
             'account_category_id' => $categories['EQUITY'],
@@ -830,6 +921,8 @@ class AccountSeeder extends Seeder
         ];
         foreach ($sppData as $data) {
             $details[] = [
+                'organization_id' => 1,
+
                 'code' => $data['code'],
                 'name' => $data['name'],
                 'account_category_id' => $categories['REVENUE'],
@@ -859,6 +952,8 @@ class AccountSeeder extends Seeder
         ];
         foreach ($nonSppData as $data) {
             $details[] = [
+                'organization_id' => 1,
+
                 'code' => $data['code'],
                 'name' => $data['name'],
                 'account_category_id' => $categories['REVENUE'],
@@ -889,6 +984,8 @@ class AccountSeeder extends Seeder
         ];
         foreach ($hibahData as $data) {
             $details[] = [
+                'organization_id' => 1,
+
                 'code' => $data['code'],
                 'name' => $data['name'],
                 'account_category_id' => $categories['REVENUE'],
@@ -916,6 +1013,8 @@ class AccountSeeder extends Seeder
         ];
         foreach ($lainData as $data) {
             $details[] = [
+                'organization_id' => 1,
+
                 'code' => $data['code'],
                 'name' => $data['name'],
                 'account_category_id' => $categories['REVENUE'],
@@ -947,6 +1046,8 @@ class AccountSeeder extends Seeder
         ];
         foreach ($gajiData as $data) {
             $details[] = [
+                'organization_id' => 1,
+
                 'code' => $data['code'],
                 'name' => $data['name'],
                 'account_category_id' => $categories['EXPENSE'],
@@ -974,6 +1075,8 @@ class AccountSeeder extends Seeder
         ];
         foreach ($programData as $data) {
             $details[] = [
+                'organization_id' => 1,
+
                 'code' => $data['code'],
                 'name' => $data['name'],
                 'account_category_id' => $categories['EXPENSE'],
@@ -1007,6 +1110,8 @@ class AccountSeeder extends Seeder
         ];
         foreach ($adminData as $data) {
             $details[] = [
+                'organization_id' => 1,
+
                 'code' => $data['code'],
                 'name' => $data['name'],
                 'account_category_id' => $categories['EXPENSE'],
@@ -1034,6 +1139,8 @@ class AccountSeeder extends Seeder
         ];
         foreach ($depresiasiData as $data) {
             $details[] = [
+                'organization_id' => 1,
+
                 'code' => $data['code'],
                 'name' => $data['name'],
                 'account_category_id' => $categories['EXPENSE'],
@@ -1063,6 +1170,8 @@ class AccountSeeder extends Seeder
         ];
         foreach ($nonOpData as $data) {
             $details[] = [
+                'organization_id' => 1,
+
                 'code' => $data['code'],
                 'name' => $data['name'],
                 'account_category_id' => $categories['EXPENSE'],
@@ -1079,7 +1188,7 @@ class AccountSeeder extends Seeder
                 'updated_at' => now(),
             ];
         }
-
+       
         // ================================================================
         // TAHAP 3: INSERT SEMUA DETAIL
         // ================================================================
