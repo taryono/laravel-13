@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d0a3769d7a12ff71a013d260f72eb0d6",
+    "content-hash": "00b4972d6c0aff9f1df79cbd28191053",
     "packages": [
         {
             "name": "brick/math",
@@ -588,6 +588,73 @@
                 }
             ],
             "time": "2025-03-06T22:45:56+00:00"
+        },
+        {
+            "name": "fajarsulaksono/laravel-collective-html",
+            "version": "v8.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/fajarsulaksono/laravel-collective-html.git",
+                "reference": "7d3d0adcca19af71514dabefbd9e51e2654e48db"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/fajarsulaksono/laravel-collective-html/zipball/7d3d0adcca19af71514dabefbd9e51e2654e48db",
+                "reference": "7d3d0adcca19af71514dabefbd9e51e2654e48db",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/http": "^9.0|^10.0|^11.0|^12.0|^13.0",
+                "illuminate/routing": "^9.0|^10.0|^11.0|^12.0|^13.0",
+                "illuminate/session": "^9.0|^10.0|^11.0|^12.0|^13.0",
+                "illuminate/support": "^9.0|^10.0|^11.0|^12.0|^13.0",
+                "illuminate/view": "^9.0|^10.0|^11.0|^12.0|^13.0",
+                "php": "^8.1"
+            },
+            "require-dev": {
+                "illuminate/database": "^9.0|^10.0|^11.0|^12.0|^13.0",
+                "mockery/mockery": "^1.6",
+                "phpunit/phpunit": "^10.5|^11.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "Form": "Collective\\Html\\FormFacade",
+                        "Html": "Collective\\Html\\HtmlFacade"
+                    },
+                    "providers": [
+                        "Collective\\Html\\HtmlServiceProvider"
+                    ]
+                },
+                "branch-alias": {
+                    "dev-master": "7.x-dev"
+                }
+            },
+            "autoload": {
+                "files": [
+                    "src/helpers.php"
+                ],
+                "psr-4": {
+                    "Collective\\Html\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fajar Sulaksono",
+                    "email": "fajar.sulaksono@gmail.com"
+                }
+            ],
+            "description": "HTML and Form Builders for the Laravel Framework",
+            "support": {
+                "issues": "https://github.com/fajarsulaksono/laravel-collective-html/issues",
+                "source": "https://github.com/fajarsulaksono/laravel-collective-html"
+            },
+            "time": "2026-07-27T07:27:12+00:00"
         },
         {
             "name": "fruitcake/php-cors",

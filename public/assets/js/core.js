@@ -145,7 +145,7 @@ const AppCore = (() => {
                 }
                 Swal.fire({
                     icon: 'error',
-                    title: 'Terjadi Kesalahan core',
+                    title: 'Terjadi Kesalahan',
                     text: message
                 });
             },
@@ -569,7 +569,6 @@ Object.assign(window, AppCore.Legacy);
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = AppCore;
 } 
-
 // 🚀 Cara Penggunaan
 // Cara modern (recommended)
 // AppCore.ajax.request({

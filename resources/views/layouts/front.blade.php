@@ -480,6 +480,7 @@
                         <i id="themeIcon" class="fa-regular fa-moon text-secondary"></i>
                     </button>
                     <a href="{{ route('trial.form') }}" class="btn btn-brand">Get Started</a>
+                    <a href="{{ url('/login') }}" class="btn btn-brand">Login</a>
                 </div>
             </div>
         </div>

@@ -1,4 +1,4 @@
-// assets/js/menu-management.js
+// assets/js/menu.js
 let menuModal;
 let menuRolesModal;
 let menuActionsModal;

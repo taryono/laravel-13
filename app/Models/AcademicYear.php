@@ -10,6 +10,11 @@ class AcademicYear extends BasedModel
         return $this->belongsTo(School::class);
     }
 
+    public function organization()
+    {
+        return $this->belongsTo(Organization::class);
+    }
+
     // Scope
     public function scopeActive($query)
     {
