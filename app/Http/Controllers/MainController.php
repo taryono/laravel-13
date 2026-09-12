@@ -121,4 +121,22 @@ class MainController extends Controller implements HasMiddleware
     {
         return $request->ajax() || $request->expectsJson();
     }
+
+    protected function flattenForSelect($tree, int $depth = 0): array
+    {
+        $result = [];
+        foreach ($tree as $item) {
+            $result[] = [
+                'id'    => $item->id,
+                'label' => str_repeat('— ', $depth) . $item->title,
+                'icon' => $item->icon,
+                'icon_type' => $item->iconType,
+                'depth'     => $depth, 
+            ];
+            if (!empty($item->children)) {
+                $result = array_merge($result, $this->flattenForSelect($item->children, $depth + 1));
+            }
+        }
+        return $result;
+    }
 }

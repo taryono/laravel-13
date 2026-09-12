@@ -8,7 +8,7 @@
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css"
         rel="stylesheet" />
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
     <link href="{{ asset('assets/css/crud_generator.css') }}" rel="stylesheet">
 @endpush
 @section('content')
@@ -208,7 +208,9 @@
                         @if (!empty($filtered))
                             @foreach ($filtered as $module)
                                 <button type="button" class="btn btn-sm btn-outline-primary btn-block mb-2 menu-example"
-                                    data-table="{{ $module }}" data-label="{{ $module }}">
+                                    data-table="{{ $module }}" data-label="{{ \Str::headline($module) }}"
+                                    data-flyout_title="{{ $module }}" data-slug="{{ \Str::kebab($module) }}"
+                                    data-route="{{ \Str::snake($module) }}.index" data-url="{{ \Str::snake($module) }}">
                                     📋 {{ $module }}
                                 </button>
                             @endforeach
@@ -228,7 +230,6 @@
     <!-- ===== ICON PICKER MODAL ===== -->
     <x-icon-picker-modal id="icon-picker-modal" />
     @push('scripts')
-        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
         <script src="{{ asset('assets/js/crud_generator.js') }}?v={{ time() }}"></script>
     @endpush
 @endsection

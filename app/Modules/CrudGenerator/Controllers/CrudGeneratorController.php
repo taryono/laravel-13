@@ -18,6 +18,8 @@ use Illuminate\Support\Str;
 use Models\Menu;
 use Models\Role;
 use Models\MenuRole;
+use App\Core\Menu\MenuRepository;
+use App\Core\Menu\MenuTreeBuilder;
 
 class CrudGeneratorController extends MainController
 {
@@ -49,7 +51,14 @@ class CrudGeneratorController extends MainController
         $roles = Role::where('is_active', 1)
             ->orderBy('name')
             ->get();
-        return view('CrudGenerator::index', compact('icons', 'tables','roles', 'filtered'));
+
+        $items = (new MenuRepository())->allForAdmin();
+        $tree  = (new MenuTreeBuilder())->build($items);
+
+        $roles = Role::orderBy('name')->get(['id', 'name', 'display_name']);
+        $parentOptions = $this->flattenForSelect($tree);
+        
+        return view('CrudGenerator::index', compact('icons', 'tables','roles', 'filtered', 'parentOptions'));
     }
 
     /**

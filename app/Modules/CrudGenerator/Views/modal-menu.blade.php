@@ -1,4 +1,5 @@
  <!-- ===== MODAL MENU GENERATOR ===== -->
+ <link href="{{ asset('vendor/select2/select2.min.css') }}" rel="stylesheet" />
  <div class="modal fade modal-custom" id="menuModal" tabindex="-1" aria-hidden="true">
      <div class="modal-dialog modal-lg modal-dialog-centered">
          <div class="modal-content">
@@ -52,8 +53,8 @@
                          <label class="form-label">Parent Menu</label>
                          <select class="form-select" name="parent_id" id="menu_parent_id">
                              <option value="">— Tidak ada (root) —</option>
-                             @foreach ($existingMenus ?? [] as $menu)
-                                 <option value="{{ $menu->id }}">{{ $menu->title }}</option>
+                             @foreach ($parentOptions ?? [] as $menu)
+                                 <option value="{{ $menu['id'] }}">{{ $menu['label'] }}</option>
                              @endforeach
                          </select>
                      </div>

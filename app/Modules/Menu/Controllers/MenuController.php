@@ -5,6 +5,7 @@ namespace App\Modules\Menu\Controllers;
 use App\DataTables\MenuDataTable;
 use App\Http\Controllers\MainController;
 use Models\Menu;
+use Models\Role;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -12,6 +13,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 use Throwable;
+use App\Core\Menu\MenuRepository;
+use App\Core\Menu\MenuTreeBuilder;
 
 class MenuController extends MainController
 {
@@ -49,10 +52,14 @@ class MenuController extends MainController
      */
     public function create(): View
     {   $model = new Menu();
-        
+        $items = (new MenuRepository())->allForAdmin();
+        $tree  = (new MenuTreeBuilder())->build($items);
+        $roles = Role::orderBy('name')->get(['id', 'name', 'display_name']); 
+       
+        $parentOptions = $this->flattenForSelect($tree); 
         return view(
             'Menu::create',
-            compact('model')
+            compact('model', 'parentOptions')
         );
     }
 
@@ -104,10 +111,15 @@ class MenuController extends MainController
     public function edit($id): View
     {
         $menu = Menu::find($id);
-        $forms = $this->getForm($menu);
+        $items = (new MenuRepository())->allForAdmin();
+        $tree  = (new MenuTreeBuilder())->build($items);
+        $roles = Role::orderBy('name')->get(['id', 'name', 'display_name']); 
+
+        $parentOptions = $this->flattenForSelect($tree);
+       
         return view(
             'Menu::edit',
-            compact('menu', 'forms')
+            compact('menu', 'parentOptions')
         );
     }
 
