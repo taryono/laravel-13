@@ -16,6 +16,7 @@ class Menu extends BasedModel
         'type',
         'sort_order',
         'is_active',
+        'name'
     ];
 
     protected $casts = [

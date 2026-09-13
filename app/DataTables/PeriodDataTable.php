@@ -17,7 +17,7 @@ class PeriodDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['academic_year_id', 'name', 'code', 'type', 'semester', 'start_date', 'end_date', 'grading_start', 'grading_end', 'is_active'];
+    protected array $columns = ['name', 'code', 'assessment_type', 'semester', 'start_date', 'end_date', 'grading_start', 'grading_end', 'status'];
 
     /**
      * Build DataTable response.
@@ -27,9 +27,11 @@ class PeriodDataTable extends DataTable
         return (new EloquentDataTable($query))
             ->addColumn('action', function ($row) {
                 return $this->renderActionButtons($row);
+            })->addColumn('status', function ($row) {
+                return $row->is_active ? '<span class="badge bg-success">Aktif</span>':'<span class="badge bg-danger">TIdak Aktif</span>';
             })
             ->addIndexColumn()
-            ->rawColumns(['action']) // ✅ Tetap wajib ada!
+            ->rawColumns(['action', 'status']) // ✅ Tetap wajib ada!
             ->setRowId('id');
     }
 
@@ -100,7 +102,7 @@ class PeriodDataTable extends DataTable
      */
     public function query(Period $model): QueryBuilder
     {
-        return $model->newQuery();
+        return $model->newQuery()->with('academic_year');
     }
 
     /**

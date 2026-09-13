@@ -16,11 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
-            $table->foreignId('school_id')->nullable()->after('id')->constrained();
-            $table->string('jabatan')->nullable()->after('school_id');
-            $table->string('no_hp')->nullable()->after('email');
-            $table->boolean('is_trial')->default(false)->after('no_hp');
+            $table->string('password'); 
             $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();

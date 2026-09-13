@@ -620,6 +620,7 @@ class AccountMappingSeeder extends Seeder
         foreach ($cashMappings as $mapping) {
             $mappings[] = [
                 'source_type' => 'expense',
+                'organization_id' => $organizationId,
                 'source_code' => $mapping['source_code'],
                 'debit_account_id' => $accounts[$mapping['debit_code']] ?? null,
                 'credit_account_id' => $accounts[$mapping['credit_code']] ?? null,
@@ -635,6 +636,6 @@ class AccountMappingSeeder extends Seeder
         // INSERT SEMUA MAPPING
         // ================================================================
 
-        DB::table('account_mappings')->insertOrIgnore($mappings->shift('organization_id', 1));
+        DB::table('account_mappings')->insertOrIgnore($mappings);
     }
 }

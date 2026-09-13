@@ -8,6 +8,12 @@
      </div>
  @else
      {{ Form::hidden('academic_year_id', $period->academic_year_id) }}
+     <div class="row mb-3">
+         <label class="col-md-3 form-label">Tahun Ajaran <span class="text-danger">*</span></label>
+         <div class="col-md-9">
+             {{ Form::select('academic_year_id', $academicYears ?? [], $period->academic_year_id, ['class' => 'form-select', 'required' => 'required', 'placeholder' => '-- Pilih Tahun Ajaran --', 'disabled']) }}
+         </div>
+     </div>
  @endif
 
  <div class="row mb-3">
@@ -25,36 +31,32 @@
  </div>
 
  <div class="row mb-3">
-     <label class="col-md-3 form-label">Jenis Periode <span class="text-danger">*</span></label>
+     <label class="col-md-3 form-label">Tipe Asesmen <span class="text-danger">*</span></label>
      <div class="col-md-9">
-         {{ Form::select(
-             'type',
-             [
-                 'SEMESTER' => 'Semester',
-                 'QUARTER' => 'Kuartal',
-                 'TERM' => 'Caturwulan',
-             ],
-             $period->type ?? null,
-             ['class' => 'form-select', 'required' => 'required', 'placeholder' => '-- Pilih Jenis --'],
-         ) }}
+         {{ Form::select('assessment_type', \Models\Period::ASSESSMENT_TYPES, $period->assessment_type ?? null, [
+             'class' => 'form-select',
+             'required' => 'required',
+             'placeholder' => '-- Pilih Jenis --',
+         ]) }}
+     </div>
+ </div>
+ <div class="row mb-3">
+     <label class="col-md-3 form-label">Tipe Semester <span class="text-danger">*</span></label>
+     <div class="col-md-9">
+         {{ Form::select('semester_type', \Models\Period::SEMESTER_TYPES, $period->semester_type ?? null, [
+             'class' => 'form-select',
+             'required' => 'required',
+             'placeholder' => '-- Pilih Jenis --',
+         ]) }}
      </div>
  </div>
 
  <div class="row mb-3">
      <label class="col-md-3 form-label">Nomor Semester</label>
      <div class="col-md-9">
-         {{ Form::select(
-             'semester',
-             [
-                 '' => '-- Tidak Ada --',
-                 '1' => 'Semester 1',
-                 '2' => 'Semester 2',
-                 '3' => 'Semester 3',
-                 '4' => 'Semester 4',
-             ],
-             $period->semester ?? null,
-             ['class' => 'form-select'],
-         ) }}
+         {{ Form::select('semester', \Models\Period::SEMESTER_NUMBERS, $period->semester ?? null, [
+             'class' => 'form-select',
+         ]) }}
      </div>
  </div>
 
@@ -99,14 +101,5 @@
          <label class="form-check-label">
              {{ Form::checkbox('is_active', 1, $period->is_active ?? true, ['class' => 'form-check-input']) }} Aktif
          </label>
-     </div>
- </div>
-
- <div class="row">
-     <div class="col-md-9 offset-md-3">
-         <button type="submit" class="btn btn-primary">
-             {{ isset($period) ? 'Perbarui' : 'Simpan' }}
-         </button>
-         <a href="{{ route('period.index') }}" class="btn btn-outline-secondary">Batal</a>
      </div>
  </div>

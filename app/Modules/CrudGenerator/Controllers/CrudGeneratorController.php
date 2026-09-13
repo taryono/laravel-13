@@ -23,6 +23,10 @@ use App\Core\Menu\MenuTreeBuilder;
 
 class CrudGeneratorController extends MainController
 {
+
+    public function __construct(){
+        parent::__construct(new CrudGenerator(), 'crud_generator');
+    }
      /**
      * Tampilkan form generator CRUD
      */

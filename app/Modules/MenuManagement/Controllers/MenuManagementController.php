@@ -87,7 +87,7 @@ class MenuManagementController extends MainController
         if (!isset($data['slug'])) {
             $data['slug'] = $menu->slug;
         }
-
+        $data['name'] = $request->title;
         $menu->update($data);
 
         $this->clearMenuCache();

@@ -1,6 +1,6 @@
 Today
 hi copilot jika saya punya aplikasi laravel dengan banyak paket layanan , untuk nama paket saya sudah buatkan table packages, jika paket sebanyak ini modul apa saya yang harus saya siapkan? abaikan untuk acl karena saya sudah membuatnya 
-
+fajarsulaksono/laravel-collective-html
 Data Siswa
 Absensi
 Jadwal

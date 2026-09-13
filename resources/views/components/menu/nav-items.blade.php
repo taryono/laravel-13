@@ -5,7 +5,6 @@
         $item->children = collect($item->children);
     @endphp
     <div class="bnsp-nav-item {{ $item->open ? 'open active' : '' }}">
-
         @if ($item->children->isNotEmpty())
             <a href="#" class="bnsp-nav-link bnsp-nav-parent">
                 {{-- Sesuaikan parameter ikon sesuai kolom baru --}}

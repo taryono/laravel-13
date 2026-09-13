@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use ReflectionClass;
 use ReflectionMethod;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Schema;
 
 
 class BasedModel extends Model
@@ -44,10 +45,35 @@ class BasedModel extends Model
         parent::boot();
 
         static::addGlobalScope('organization_id', function (Builder $builder) {
-            $table = $builder->getModel()->getTable();
+            // Pastikan user login
+            if (auth()->check()) {
+                $user = auth()->user();
+
+                // Jika bukan super admin dan tabel punya kolom organization_id
+                // if (!$user->hasRole('super-admin')) {
+                // }
+                $table = $builder->getModel()->getTable();
+                if (Schema::hasColumn($table, 'organization_id')) {
+                    $builder->where($table.'.organization_id', $user->organizations()->first()->id);
+                }
+            }
         });
-         
+
+        static::saving(function ($model) {
+            if (auth()->check()) {
+                $user = auth()->user();
+
+                // Auto set organization_id hanya jika bukan super admin
+                if (!$user->hasRole('super_admin') && Schema::hasColumn($model->getTable(), 'organization_id')) {
+                    $organization = $user->organizations()->first();
+                    if ($organization) {
+                        $model->organization_id = $organization->id;
+                    }
+                }
+            }
+        });
     }
+
 
     protected function _getFields($model)
     {

@@ -4,8 +4,8 @@ let menuRolesModal;
 let menuActionsModal;
 
 document.addEventListener('DOMContentLoaded', () => {
-    menuModal        = new bootstrap.Modal(document.getElementById('menuModal'));
-    menuRolesModal   = new bootstrap.Modal(document.getElementById('menuRolesModal'));
+    menuModal = new bootstrap.Modal(document.getElementById('menuModal'));
+    menuRolesModal = new bootstrap.Modal(document.getElementById('menuRolesModal'));
     menuActionsModal = new bootstrap.Modal(document.getElementById('menuActionsModal'));
 
     populateSelect('menu_parent_id', window.MENU_PARENT_OPTIONS, 'id', 'label', '— Tidak ada (root) —');
@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('actionCreateForm').addEventListener('submit', handleActionCreateSubmit);
 
     initSortableTree();
-     initMenuRolesCheckAll();
+    initMenuRolesCheckAll();
 });
 
 function populateSelect(elId, items, valueKey, labelKey, placeholder) {
@@ -76,20 +76,22 @@ async function handleMenuSubmit(e) {
 
     const id = document.getElementById('menu_id').value;
     const payload = {
-        title:         document.getElementById('menu_title').value,
-        flyout_title:  document.getElementById('menu_flyout_title').value || null,
-        slug:          document.getElementById('menu_slug').value || null,
-        url:           document.getElementById('menu_url').value,
-        route:         document.getElementById('menu_route').value,
-        icon:          document.getElementById('menu_icon').value,
-        icon_type:     document.getElementById('menu_icon_type').value,
-        type:          document.getElementById('menu_type').value,
-        parent_id:     document.getElementById('menu_parent_id').value || null,
-        sort_order:    document.getElementById('menu_sort_order').value || null,
-        is_active:     document.getElementById('menu_is_active').checked ? 1 : 0,
+        title: document.getElementById('menu_title').value,
+        flyout_title: document.getElementById('menu_flyout_title').value || null,
+        slug: document.getElementById('menu_slug').value || null,
+        url: document.getElementById('menu_url').value,
+        route: document.getElementById('menu_route').value,
+        icon: document.getElementById('menu_icon').value,
+        icon_type: document.getElementById('menu_icon_type').value,
+        type: document.getElementById('menu_type').value,
+        parent_id: document.getElementById('menu_parent_id').value || null,
+        sort_order: document.getElementById('menu_sort_order').value || null,
+        is_active: document.getElementById('menu_is_active').checked ? 1 : 0,
+        id_text: document.getElementById('id_text').value,
+        en_text: document.getElementById('en_text').value,
     };
 
-    const url    = id ? routeFor(window.MENU_ROUTES.update, id, '__MENU_ID__') : window.MENU_ROUTES.store;
+    const url = id ? routeFor(window.MENU_ROUTES.update, id, '__MENU_ID__') : window.MENU_ROUTES.store;
     const method = id ? 'PUT' : 'POST';
 
     try {
@@ -166,10 +168,10 @@ async function handleMenuRolesSubmit(e) {
         if (!enabled) return; // role tidak dicentang sama sekali -> tidak dikirim -> di-detach oleh backend
 
         assignments.push({
-            role_id:   tr.dataset.roleId,
-            is_view:   tr.querySelector('[data-flag="is_view"]').checked ? 1 : 0,
+            role_id: tr.dataset.roleId,
+            is_view: tr.querySelector('[data-flag="is_view"]').checked ? 1 : 0,
             is_create: tr.querySelector('[data-flag="is_create"]').checked ? 1 : 0,
-            is_edit:   tr.querySelector('[data-flag="is_edit"]').checked ? 1 : 0,
+            is_edit: tr.querySelector('[data-flag="is_edit"]').checked ? 1 : 0,
             is_delete: tr.querySelector('[data-flag="is_delete"]').checked ? 1 : 0,
         });
     });
@@ -280,10 +282,10 @@ async function handleActionCreateSubmit(e) {
     const menuId = document.getElementById('menu_actions_menu_id').value;
     const form = e.target;
     const payload = {
-        name:         form.name.value,
+        name: form.name.value,
         display_name: form.display_name.value,
-        description:  form.description.value || null,
-        is_active:    1,
+        description: form.description.value || null,
+        is_active: 1,
     };
 
     try {

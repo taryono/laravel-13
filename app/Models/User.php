@@ -45,13 +45,15 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     // --- Cek Peran ---
-    public function isSuperUser()
+    public function isSuperUser(): bool
     {
-        // Cache terpisah untuk super user (lebih cepat)
-        return Cache::remember("user_{$this->id}_is_super", 3600, fn() =>
-            $this->roles()->where('name', 'super-admin')->exists()
-        );
+        return Cache::remember("user_{$this->id}_is_super", 3600, function () {
+            return $this->roles()->withoutGlobalScopes()
+                ->where('name', 'super-admin')
+                ->exists();
+        });
     }
+
 
     public function isAdmin()     { return $this->hasRole('admin'); }
 
@@ -170,10 +172,11 @@ class User extends Authenticatable implements MustVerifyEmail
     public function sendPasswordResetNotification($token) { $this->notify(new ResetPasswordNotification($token)); }
 
     public function organizations()
-    {
-        return $this->belongsToMany(\Models\Organization::class);
-        // otomatis pakai tabel pivot 'organization_user' 
-        // karena nama tabelnya sudah sesuai konvensi Laravel (alfabetis, singular, digabung underscore)
+    { 
+        return $this->belongsToMany(\Models\Organization::class, 'organization_user')
+                    ->withPivot('is_default', 'is_active')
+                    ->wherePivot('is_active', 1)
+                    ->withTimestamps();       
     }
 
     public function organizationIds(): array

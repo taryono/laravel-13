@@ -55,8 +55,9 @@ class PeriodController extends MainController
     public function create(): View
     {
        return view('Period::create', [
-            'organizations' => Organizations::pluck('name', 'id'),
+            'Organization' => Organization::pluck('name', 'id'),
             'schools' => School::pluck('name', 'id'),
+            'academicYears' => AcademicYear::pluck('name', 'id'),
         ]);
     }
 
@@ -69,12 +70,12 @@ class PeriodController extends MainController
                             'academic_year_id' => ['required', 'integer'],
             'name' => ['required', 'string', 'max:255'],
             'code' => ['required', 'string', 'max:255'],
-            'type' => ['required', 'string', 'max:255'],
+            'assessment_type' => ['required', 'string', 'max:255'],
             'semester' => ['required', 'string', 'max:255'],
             'start_date' => ['required', 'string', 'max:255'],
             'end_date' => ['required', 'string', 'max:255'],
-            'grading_start' => ['required', 'string', 'max:255'],
-            'grading_end' => ['required', 'string', 'max:255'],
+            'grading_start_date' => ['required', 'string', 'max:255'],
+            'grading_end_date' => ['required', 'string', 'max:255'],
             'is_active' => ['required', 'string', 'max:255'],
         ]);
 
@@ -115,8 +116,9 @@ class PeriodController extends MainController
         $period = $this->model->findOrFail($id);
         return view('Period::edit', [
             'period' => $period,
-            'organizations' => Organizations::pluck('name', 'id'),
+            'Organization' => Organization::pluck('name', 'id'),
             'schools' => School::pluck('name', 'id'),
+            'academicYears' => AcademicYear::pluck('name', 'id'),
         ]);
     }
 
@@ -129,12 +131,12 @@ class PeriodController extends MainController
                         'academic_year_id' => ['required', 'integer'],
             'name' => ['required', 'string', 'max:255'],
             'code' => ['required', 'string', 'max:255'],
-            'type' => ['required', 'string', 'max:255'],
+            'assessment_type' => ['required', 'string', 'max:255'],
             'semester' => ['required', 'string', 'max:255'],
             'start_date' => ['required', 'string', 'max:255'],
             'end_date' => ['required', 'string', 'max:255'],
-            'grading_start' => ['required', 'string', 'max:255'],
-            'grading_end' => ['required', 'string', 'max:255'],
+            'grading_start_date' => ['required', 'string', 'max:255'],
+            'grading_end_date' => ['required', 'string', 'max:255'],
             'is_active' => ['required', 'string', 'max:255'],
         ]);
 

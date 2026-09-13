@@ -8,6 +8,7 @@ use Lib\FormLib;
 use Illuminate\Support\Str;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+// use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class MainController extends Controller implements HasMiddleware
 {
@@ -25,6 +26,7 @@ class MainController extends Controller implements HasMiddleware
         }else{
             $this->controller = Str::snake($model?$model->getModel()->getTable():'');
         } 
+        // $this->authorizeResource(\App\Models\User::class, 'user');
     }
 
     public static function middleware(): array

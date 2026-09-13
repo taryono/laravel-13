@@ -17,7 +17,7 @@ class AccountMappingDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['organization.name','source_type', 'source_code', 'debit_account.name', 'credit_account.name', 'description', 'is_active'];
+    protected array $columns = ['organization.name','source_type', 'source_code', 'debit_account.name', 'credit_account.name', 'description', 'status'];
 
     /**
      * Build DataTable response.
@@ -27,9 +27,11 @@ class AccountMappingDataTable extends DataTable
         return (new EloquentDataTable($query))
             ->addColumn('action', function ($row) {
                 return $this->renderActionButtons($row);
+            })->addColumn('status', function ($row) {
+                return $row->is_active ? '<span class="badge bg-success">Aktif</span>':'<span class="badge bg-danger">TIdak Aktif</span>';
             })
             ->addIndexColumn()
-            ->rawColumns(['action']) // ✅ Tetap wajib ada!
+            ->rawColumns(['action', 'status']) // ✅ Tetap wajib ada!
             ->setRowId('id');
     }
 

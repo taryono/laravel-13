@@ -21,6 +21,8 @@ class UserController extends MainController
 
     public function __construct(){
         parent::__construct(new User());
+         // Otomatis hubungkan semua method ke UserPolicy
+        // index, show, create, update, delete akan otomatis cek ke policy 
     }
 
     /**
@@ -146,7 +148,7 @@ class UserController extends MainController
         // FIX: pindahkan findOrFail() ke luar try, atau tangkap ModelNotFoundException
         // secara terpisah, supaya $user selalu terdefinisi sebelum dipakai di catch.
         $user = $this->model->findOrFail($id);
-
+        $this->authorize('update', $user);
         try {
             DB::transaction(function () use ($user, $validated) {
                 $user->update($validated);
