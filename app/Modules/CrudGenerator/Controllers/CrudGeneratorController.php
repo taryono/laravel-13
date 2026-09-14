@@ -18,6 +18,7 @@ use Illuminate\Support\Str;
 use Models\Menu;
 use Models\Role;
 use Models\MenuRole;
+use Models\Organization;
 use App\Core\Menu\MenuRepository;
 use App\Core\Menu\MenuTreeBuilder;
 
@@ -58,11 +59,10 @@ class CrudGeneratorController extends MainController
 
         $items = (new MenuRepository())->allForAdmin();
         $tree  = (new MenuTreeBuilder())->build($items);
-
-        $roles = Role::orderBy('name')->get(['id', 'name', 'display_name']);
+        $organizations = Organization::all();
         $parentOptions = $this->flattenForSelect($tree);
         
-        return view('CrudGenerator::index', compact('icons', 'tables','roles', 'filtered', 'parentOptions'));
+        return view('CrudGenerator::index', compact('icons', 'tables','roles', 'filtered', 'parentOptions','organizations'));
     }
 
     /**
@@ -300,6 +300,7 @@ class CrudGeneratorController extends MainController
             // 4. Prepare menu data
             $menuData = [
                 'name' => $request->title,
+                'organization_id' => $request->organization_id,
                 'title' => $request->flyout_title ?? $request->title,
                 'flyout_title' => $request->flyout_title,
                 'id_text' => $request->id_text,

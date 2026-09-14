@@ -11,7 +11,24 @@
                  </div>
                  <div class="modal-body row g-3">
                      <input type="hidden" name="id" id="menu_id">
-
+                     <div class="col-md-6">
+                         <label for="organization_id" class="form-label">Organisasi <span
+                                 class="text-danger">*</span></label>
+                         <select name="organization_id" id="organization_id"
+                             class="form-select @error('organization_id') is-invalid @enderror" required>
+                             <option value="">-- Pilih Organisasi --</option>
+                             {{-- Ambil dari daftar organisasi --}}
+                             @foreach ($organizations as $org)
+                                 <option value="{{ $org->id }}"
+                                     {{ old('organization_id') == $org->id ? 'selected' : '' }}>
+                                     {{ $org->name }}
+                                 </option>
+                             @endforeach
+                         </select>
+                         @error('organization_id')
+                             <div class="invalid-feedback">{{ $message }}</div>
+                         @enderror
+                     </div>
                      <div class="col-md-6">
                          <label class="form-label">Judul Menu (title) <span class="text-danger">*</span></label>
                          <input type="text" class="form-control" name="title" id="menu_title" required>

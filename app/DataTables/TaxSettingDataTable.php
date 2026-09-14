@@ -17,7 +17,7 @@ class TaxSettingDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['tax_code', 'tax_name', 'tax_rate', 'min_amount', 'max_amount', 'effective_date', 'expiry_date', 'is_active', 'description', 'created_at', 'updated_at', 'deleted_at'];
+    protected array $columns = ['tax_code', 'tax_name', 'tax_rate', 'min_amount', 'max_amount', 'effective_date', 'expiry_date', 'is_active', 'description','status'];
 
     /**
      * Build DataTable response.
@@ -28,8 +28,11 @@ class TaxSettingDataTable extends DataTable
             ->addColumn('action', function ($row) {
                 return $this->renderActionButtons($row);
             })
+            ->addColumn('status', function ($row) {
+                return $row->is_active ? '<span class="badge    bg-success">Aktif</span>' : '<span class="badge bg-danger">Tidak Aktif</span>';
+            })
             ->addIndexColumn()
-            ->rawColumns(['action']) // ✅ Tetap wajib ada!
+            ->rawColumns(['action', 'status']) // ✅ Tetap wajib ada!
             ->setRowId('id');
     }
 

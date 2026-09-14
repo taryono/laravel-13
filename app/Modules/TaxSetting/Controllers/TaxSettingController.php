@@ -5,6 +5,8 @@ namespace App\Modules\TaxSetting\Controllers;
 use App\DataTables\TaxSettingDataTable;
 use App\Http\Controllers\MainController;
 use Models\TaxSetting;
+use Models\TaxType;
+use Models\Organization;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -51,14 +53,12 @@ class TaxSettingController extends MainController
      */
     public function create(): View
     {
-        $taxSetting = new TaxSetting();
-        $result = $this->getForm($taxSetting);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
-
+        $taxSetting = new TaxSetting();  
+        $taxTypes = TaxType::all();
+        $organizations = Organization::all();
         return view(
             'TaxSetting::create',
-            compact('taxSetting', 'forms', 'groupedForms')
+            compact('taxSetting', 'taxTypes', 'organizations')
         );
     }
 
@@ -116,14 +116,12 @@ class TaxSettingController extends MainController
      */
     public function edit($id): View
     {
-        $taxSetting = $this->model->findOrFail($id);
-        $result = $this->getForm($taxSetting);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
-
+        $taxSetting = $this->model->findOrFail($id); 
+        $taxTypes = TaxType::all();
+        $organizations = Organization::all();
         return view(
             'TaxSetting::edit',
-            compact('taxSetting', 'forms', 'groupedForms')
+            compact('taxSetting', 'taxTypes', 'organizations')
         );
     }
 

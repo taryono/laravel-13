@@ -2,7 +2,7 @@
 
 namespace App\DataTables;
 
-use App\Models\ExpenseCategory;
+use Models\ExpenseCategory;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
@@ -122,7 +122,7 @@ class ExpenseCategoryDataTable extends DataTable
             /*
              * Server-side AJAX endpoint.
              */
-            ->minifiedAjax(route('expense-category.index'))
+            ->minifiedAjax(route('expense_category.index'))
 
             /*
              * Default sorting:
