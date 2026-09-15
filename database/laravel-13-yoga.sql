@@ -3,19 +3,62 @@
 
  Source Server         : localhost
  Source Server Type    : MySQL
- Source Server Version : 80200 (8.2.0)
+ Source Server Version : 80031 (8.0.31)
  Source Host           : localhost:3306
- Source Schema         : laravel-13
+ Source Schema         : laravel
 
  Target Server Type    : MySQL
- Target Server Version : 80200 (8.2.0)
+ Target Server Version : 80031 (8.0.31)
  File Encoding         : 65001
 
- Date: 14/09/2026 23:20:07
+ Date: 15/09/2026 19:28:06
 */
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
+
+-- ----------------------------
+-- Table structure for academic_calendar_events
+-- ----------------------------
+DROP TABLE IF EXISTS `academic_calendar_events`;
+CREATE TABLE `academic_calendar_events`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `school_id` bigint UNSIGNED NOT NULL,
+  `academic_year_id` bigint UNSIGNED NOT NULL,
+  `title` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `event_type` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `start_date` date NOT NULL,
+  `end_date` date NULL DEFAULT NULL,
+  `start_time` time NULL DEFAULT NULL,
+  `end_time` time NULL DEFAULT NULL,
+  `location` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `is_holiday` tinyint(1) NOT NULL DEFAULT 0,
+  `is_all_day` tinyint(1) NOT NULL DEFAULT 0,
+  `color` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `attachment_url` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `academic_calendar_events_school_index`(`school_id` ASC) USING BTREE,
+  INDEX `academic_calendar_events_academic_year_index`(`academic_year_id` ASC) USING BTREE,
+  INDEX `academic_calendar_events_type_index`(`event_type` ASC) USING BTREE,
+  INDEX `academic_calendar_events_dates_index`(`start_date` ASC, `end_date` ASC) USING BTREE,
+  INDEX `academic_calendar_events_is_holiday_index`(`is_holiday` ASC) USING BTREE,
+  INDEX `academic_calendar_events_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `academic_calendar_events_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `academic_calendar_events_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `academic_calendar_events_academic_year_id_foreign` FOREIGN KEY (`academic_year_id`) REFERENCES `academic_years` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `academic_calendar_events_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of academic_calendar_events
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for academic_years
@@ -23,8 +66,8 @@ SET FOREIGN_KEY_CHECKS = 0;
 DROP TABLE IF EXISTS `academic_years`;
 CREATE TABLE `academic_years`  (
   `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
-  `organization_id` bigint UNSIGNED NOT NULL,
   `school_id` bigint NULL DEFAULT NULL,
+  `organization_id` bigint UNSIGNED NOT NULL,
   `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `code` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `start_date` date NOT NULL,
@@ -242,7 +285,7 @@ CREATE TABLE `accounts`  (
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `account_category_id` bigint UNSIGNED NOT NULL,
   `parent_id` bigint UNSIGNED NULL DEFAULT NULL,
-  `account_type` enum('header','detail') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'detail',
+  `account_type` enum('header','detail','postable') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'detail',
   `normal_balance` enum('debit','kredit') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `currency_code` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'IDR',
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
@@ -250,6 +293,7 @@ CREATE TABLE `accounts`  (
   `current_balance` decimal(15, 2) NOT NULL DEFAULT 0.00,
   `is_active` tinyint(1) NOT NULL DEFAULT 1,
   `is_system` tinyint(1) NOT NULL DEFAULT 0,
+  `currency_id` int NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
@@ -269,106 +313,146 @@ CREATE TABLE `accounts`  (
 -- ----------------------------
 -- Records of accounts
 -- ----------------------------
-INSERT INTO `accounts` VALUES (1, 1, '1-1000', 'ASET LANCAR', 1, NULL, 'header', 'debit', 'IDR', 'Aset yang dapat dicairkan dalam waktu kurang dari 1 tahun', 0.00, 0.00, 1, 1, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (2, 1, '1-2000', 'ASET TETAP', 1, NULL, 'header', 'debit', 'IDR', 'Aset berwujud yang dimiliki untuk operasional jangka panjang', 0.00, 0.00, 1, 1, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (3, 1, '1-3000', 'ASET LAINNYA', 1, NULL, 'header', 'debit', 'IDR', 'Aset non-lancar lainnya seperti dana abadi', 0.00, 0.00, 1, 1, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (4, 1, '2-1000', 'KEWAJIBAN LANCAR', 2, NULL, 'header', 'kredit', 'IDR', 'Utang yang harus dibayar kurang dari 1 tahun', 0.00, 0.00, 1, 1, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (5, 1, '2-2000', 'KEWAJIBAN JANGKA PANJANG', 2, NULL, 'header', 'kredit', 'IDR', 'Utang dengan jatuh tempo lebih dari 1 tahun', 0.00, 0.00, 1, 1, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (6, 1, '3-1000', 'ASET BERSIH TIDAK TERIKAT', 3, NULL, 'header', 'kredit', 'IDR', 'Surplus yang bisa digunakan bebas oleh yayasan', 0.00, 0.00, 1, 1, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (7, 1, '3-2000', 'ASET BERSIH TERIKAT TEMPORER', 3, NULL, 'header', 'kredit', 'IDR', 'Dana hibah yang hanya boleh digunakan untuk tujuan tertentu dalam waktu tertentu', 0.00, 0.00, 1, 1, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (8, 1, '3-3000', 'ASET BERSIH TERIKAT PERMANEN', 3, NULL, 'header', 'kredit', 'IDR', 'Dana abadi yang pokoknya tidak boleh dipakai', 0.00, 0.00, 1, 1, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (9, 1, '4-1000', 'PENDAPATAN SPP / UKT', 4, NULL, 'header', 'kredit', 'IDR', 'Pendapatan dari SPP dan UKT semua jenjang', 0.00, 0.00, 1, 1, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (10, 1, '4-2000', 'PENDAPATAN NON-SPP', 4, NULL, 'header', 'kredit', 'IDR', 'Pendapatan selain SPP/UKT', 0.00, 0.00, 1, 1, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (11, 1, '4-3000', 'PENDAPATAN HIBAH & DONASI', 4, NULL, 'header', 'kredit', 'IDR', 'Pendapatan dari hibah pemerintah, donasi, sumbangan', 0.00, 0.00, 1, 1, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (12, 1, '4-4000', 'PENDAPATAN LAIN-LAIN', 4, NULL, 'header', 'kredit', 'IDR', 'Pendapatan investasi, sewa, dan lainnya', 0.00, 0.00, 1, 1, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (13, 1, '5-1000', 'BEBAN PROGRAM PENDIDIKAN', 5, NULL, 'header', 'debit', 'IDR', 'Biaya langsung untuk kegiatan belajar-mengajar', 0.00, 0.00, 1, 1, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (14, 1, '5-2000', 'BEBAN ADMINISTRASI & UMUM', 5, NULL, 'header', 'debit', 'IDR', 'Biaya operasional kantor dan administrasi', 0.00, 0.00, 1, 1, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (15, 1, '5-3000', 'BEBAN PENYUSUTAN', 5, NULL, 'header', 'debit', 'IDR', 'Penyusutan aset tetap', 0.00, 0.00, 1, 1, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (16, 1, '5-4000', 'BEBAN PAJAK & NON-OPERASIONAL', 5, NULL, 'header', 'debit', 'IDR', 'Beban pajak dan biaya non-operasional lainnya', 0.00, 0.00, 1, 1, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (17, 1, '1-1100', 'Kas', 1, 1, 'detail', 'debit', 'IDR', 'Uang tunai di tangan', 50000000.00, 50000000.00, 1, 1, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (18, 1, '1-1200', 'Bank BCA', 1, 1, 'detail', 'debit', 'IDR', 'Rekening Yayasan di BCA', 250000000.00, 250000000.00, 1, 1, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (19, 1, '1-1210', 'Bank Mandiri', 1, 1, 'detail', 'debit', 'IDR', 'Rekening Yayasan di Bank Mandiri', 150000000.00, 150000000.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (20, 1, '1-1220', 'Bank BRI', 1, 1, 'detail', 'debit', 'IDR', 'Rekening Yayasan di Bank BRI', 100000000.00, 100000000.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (21, 1, '1-1300', 'Piutang SPP TK', 1, 1, 'detail', 'debit', 'IDR', 'Tagihan SPP siswa TK yang belum dibayar', 0.00, 0.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (22, 1, '1-1301', 'Piutang SPP SD', 1, 1, 'detail', 'debit', 'IDR', 'Tagihan SPP siswa SD yang belum dibayar', 0.00, 0.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (23, 1, '1-1302', 'Piutang SPP SMP', 1, 1, 'detail', 'debit', 'IDR', 'Tagihan SPP siswa SMP yang belum dibayar', 0.00, 0.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (24, 1, '1-1303', 'Piutang SPP SMA', 1, 1, 'detail', 'debit', 'IDR', 'Tagihan SPP siswa SMA yang belum dibayar', 0.00, 0.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (25, 1, '1-1304', 'Piutang UKT Universitas', 1, 1, 'detail', 'debit', 'IDR', 'Tagihan UKT mahasiswa yang belum dibayar', 0.00, 0.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (26, 1, '1-1400', 'Piutang Hibah', 1, 1, 'detail', 'debit', 'IDR', 'Hibah yang sudah dijanjikan tapi belum diterima', 0.00, 0.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (27, 1, '1-1500', 'Persediaan ATK', 1, 1, 'detail', 'debit', 'IDR', 'Stok alat tulis kantor dan sekolah', 15000000.00, 15000000.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (28, 1, '1-1600', 'Persediaan Bahan Praktikum', 1, 1, 'detail', 'debit', 'IDR', 'Stok bahan praktikum laboratorium', 5000000.00, 5000000.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (29, 1, '1-2100', 'Tanah', 1, 2, 'detail', 'debit', 'IDR', 'Tanah milik yayasan', 5000000000.00, 5000000000.00, 1, 1, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (30, 1, '1-2200', 'Gedung TK', 1, 2, 'detail', 'debit', 'IDR', 'Gedung untuk jenjang TK', 500000000.00, 500000000.00, 1, 1, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (31, 1, '1-2210', 'Gedung SD', 1, 2, 'detail', 'debit', 'IDR', 'Gedung untuk jenjang SD', 800000000.00, 800000000.00, 1, 1, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (32, 1, '1-2220', 'Gedung SMP', 1, 2, 'detail', 'debit', 'IDR', 'Gedung untuk jenjang SMP', 1000000000.00, 1000000000.00, 1, 1, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (33, 1, '1-2230', 'Gedung SMA', 1, 2, 'detail', 'debit', 'IDR', 'Gedung untuk jenjang SMA', 1200000000.00, 1200000000.00, 1, 1, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (34, 1, '1-2240', 'Gedung Universitas', 1, 2, 'detail', 'debit', 'IDR', 'Gedung kampus universitas', 2000000000.00, 2000000000.00, 1, 1, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (35, 1, '1-2300', 'Kendaraan Operasional', 1, 2, 'detail', 'debit', 'IDR', 'Mobil dan kendaraan dinas yayasan', 350000000.00, 350000000.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (36, 1, '1-2400', 'Peralatan & Mesin', 1, 2, 'detail', 'debit', 'IDR', 'Mesin fotokopi, AC, peralatan dapur, dll', 200000000.00, 200000000.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (37, 1, '1-2500', 'Komputer & IT Equipment', 1, 2, 'detail', 'debit', 'IDR', 'Komputer, laptop, server, projector', 300000000.00, 300000000.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (38, 1, '1-2600', 'Akumulasi Penyusutan Aset Tetap', 1, 2, 'detail', 'kredit', 'IDR', 'Akumulasi penyusutan semua aset tetap (contra asset)', -50000000.00, -50000000.00, 1, 1, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (39, 1, '1-3100', 'Dana Abadi (Endowment)', 1, 3, 'detail', 'debit', 'IDR', 'Dana yang pokoknya tidak boleh dipakai, hanya hasil investasinya', 1000000000.00, 1000000000.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (40, 1, '1-3200', 'Investasi Jangka Panjang', 1, 3, 'detail', 'debit', 'IDR', 'Investasi saham, obligasi, reksadana', 500000000.00, 500000000.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (41, 1, '2-1100', 'Utang Usaha', 2, 4, 'detail', 'kredit', 'IDR', 'Utang kepada pemasok barang/jasa', 0.00, 0.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (42, 1, '2-1200', 'Utang Gaji & Tunjangan', 2, 4, 'detail', 'kredit', 'IDR', 'Gaji guru/staf yang belum dibayar', 0.00, 0.00, 1, 1, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (43, 1, '2-1300', 'Utang BPJS Ketenagakerjaan', 2, 4, 'detail', 'kredit', 'IDR', 'Iuran BPJS yang belum disetor', 0.00, 0.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (44, 1, '2-1400', 'Pendapatan Diterima di Muka (SPP)', 2, 4, 'detail', 'kredit', 'IDR', 'SPP yang sudah dibayar tapi belum menjadi hak yayasan (periode mendatang)', 0.00, 0.00, 1, 1, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (45, 1, '2-1500', 'Utang Pajak', 2, 4, 'detail', 'kredit', 'IDR', 'Pajak yang sudah dipotong/dihitung tapi belum disetor ke negara', 0.00, 0.00, 1, 1, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (46, 1, '2-2100', 'Utang Bank Jangka Panjang', 2, 5, 'detail', 'kredit', 'IDR', 'Utang bank untuk pembangunan gedung', 2000000000.00, 2000000000.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (47, 1, '3-1100', 'Saldo Aset Bersih Tidak Terikat', 3, 6, 'detail', 'kredit', 'IDR', 'Akumulasi surplus bebas dari tahun-tahun sebelumnya', 2500000000.00, 2500000000.00, 1, 1, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (48, 1, '3-1200', 'Surplus/(Defisit) Tahun Berjalan', 3, 6, 'detail', 'kredit', 'IDR', 'Selisih pendapatan - beban tahun ini (akan ditutup ke 3-1100)', 0.00, 0.00, 1, 1, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (49, 1, '3-2100', 'Dana BOS Terikat', 3, 7, 'detail', 'kredit', 'IDR', 'Dana BOS dari pemerintah yang penggunaannya diatur', 500000000.00, 500000000.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (50, 1, '3-2200', 'Dana BOPTN Terikat', 3, 7, 'detail', 'kredit', 'IDR', 'Dana BOPTN untuk universitas', 300000000.00, 300000000.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (51, 1, '3-2300', 'Dana Hibah Beasiswa Terikat', 3, 7, 'detail', 'kredit', 'IDR', 'Hibah khusus untuk beasiswa siswa/mahasiswa', 300000000.00, 300000000.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (52, 1, '3-2400', 'Dana Pembangunan Gedung Terikat', 3, 7, 'detail', 'kredit', 'IDR', 'Dana hibah khusus untuk pembangunan gedung', 200000000.00, 200000000.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (53, 1, '3-3100', 'Dana Abadi (Endowment Fund)', 3, 8, 'detail', 'kredit', 'IDR', 'Pokok dana abadi yang tidak boleh dikurangi', 1000000000.00, 1000000000.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (54, 1, '4-1100', 'Pendapatan SPP TK', 4, 9, 'detail', 'kredit', 'IDR', 'SPP siswa TK per bulan', 0.00, 0.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (55, 1, '4-1101', 'Pendapatan SPP SD', 4, 9, 'detail', 'kredit', 'IDR', 'SPP siswa SD per bulan', 0.00, 0.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (56, 1, '4-1102', 'Pendapatan SPP SMP', 4, 9, 'detail', 'kredit', 'IDR', 'SPP siswa SMP per bulan', 0.00, 0.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (57, 1, '4-1103', 'Pendapatan SPP SMA', 4, 9, 'detail', 'kredit', 'IDR', 'SPP siswa SMA per bulan', 0.00, 0.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (58, 1, '4-1104', 'Pendapatan UKT Universitas', 4, 9, 'detail', 'kredit', 'IDR', 'UKT mahasiswa per semester', 0.00, 0.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (59, 1, '4-2100', 'Pendapatan Uang Gedung', 4, 10, 'detail', 'kredit', 'IDR', 'Pendapatan dari uang pembangunan/gedung (daftar ulang)', 0.00, 0.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (60, 1, '4-2200', 'Pendapatan Pendaftaran Siswa/Mahasiswa Baru', 4, 10, 'detail', 'kredit', 'IDR', 'Biaya pendaftaran calon siswa/mahasiswa baru', 0.00, 0.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (61, 1, '4-2300', 'Pendapatan Sewa Fasilitas', 4, 10, 'detail', 'kredit', 'IDR', 'Sewa gedung aula, lapangan, ruang pertemuan', 0.00, 0.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (62, 1, '4-2400', 'Pendapatan Kantin & Koperasi', 4, 10, 'detail', 'kredit', 'IDR', 'Sewa kantin dan koperasi sekolah', 0.00, 0.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (63, 1, '4-2500', 'Pendapatan Kegiatan Khusus', 4, 10, 'detail', 'kredit', 'IDR', 'Study tour, camping, outbound, dll', 0.00, 0.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (64, 1, '4-3100', 'Pendapatan Hibah BOS', 4, 11, 'detail', 'kredit', 'IDR', 'Dana BOS dari pemerintah', 0.00, 0.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (65, 1, '4-3110', 'Pendapatan Hibah BOP', 4, 11, 'detail', 'kredit', 'IDR', 'Dana BOP untuk jenjang SD/SMP', 0.00, 0.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (66, 1, '4-3120', 'Pendapatan Hibah BOPTN', 4, 11, 'detail', 'kredit', 'IDR', 'Dana BOPTN untuk universitas', 0.00, 0.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (67, 1, '4-3200', 'Pendapatan Donasi Alumni', 4, 11, 'detail', 'kredit', 'IDR', 'Donasi dari alumni yayasan', 0.00, 0.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (68, 1, '4-3210', 'Pendapatan Donasi Corporate', 4, 11, 'detail', 'kredit', 'IDR', 'Donasi dari perusahaan/swasta', 0.00, 0.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (69, 1, '4-3220', 'Pendapatan Donasi Orang Tua', 4, 11, 'detail', 'kredit', 'IDR', 'Sumbangan sukarela dari orang tua siswa', 0.00, 0.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (70, 1, '4-4100', 'Pendapatan Bunga Bank', 4, 12, 'detail', 'kredit', 'IDR', 'Bunga dari deposito dan tabungan', 0.00, 0.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (71, 1, '4-4200', 'Pendapatan Dividen', 4, 12, 'detail', 'kredit', 'IDR', 'Dividen dari investasi saham', 0.00, 0.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (72, 1, '4-4300', 'Pendapatan Lain-lain', 4, 12, 'detail', 'kredit', 'IDR', 'Pendapatan tidak terduga lainnya', 0.00, 0.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (73, 1, '5-1100', 'Gaji Guru TK', 5, 13, 'detail', 'debit', 'IDR', 'Gaji dan tunjangan guru TK', 0.00, 0.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (74, 1, '5-1101', 'Gaji Guru SD', 5, 13, 'detail', 'debit', 'IDR', 'Gaji dan tunjangan guru SD', 0.00, 0.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (75, 1, '5-1102', 'Gaji Guru SMP', 5, 13, 'detail', 'debit', 'IDR', 'Gaji dan tunjangan guru SMP', 0.00, 0.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (76, 1, '5-1103', 'Gaji Guru SMA', 5, 13, 'detail', 'debit', 'IDR', 'Gaji dan tunjangan guru SMA', 0.00, 0.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (77, 1, '5-1104', 'Gaji Dosen Universitas', 5, 13, 'detail', 'debit', 'IDR', 'Gaji dan honorarium dosen', 0.00, 0.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (78, 1, '5-1200', 'Beban Praktikum & Laboratorium', 5, 13, 'detail', 'debit', 'IDR', 'Biaya bahan praktikum, alat lab, dan pemeliharaan lab', 0.00, 0.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (79, 1, '5-1300', 'Beban Perpustakaan', 5, 13, 'detail', 'debit', 'IDR', 'Pembelian buku, jurnal, langganan database, pemeliharaan perpustakaan', 0.00, 0.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (80, 1, '5-1400', 'Beban Kegiatan Ekstrakurikuler', 5, 13, 'detail', 'debit', 'IDR', 'Biaya pramuka, olahraga, seni, lomba, study tour', 0.00, 0.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (81, 1, '5-1500', 'Beban Wisuda & Pelepasan', 5, 13, 'detail', 'debit', 'IDR', 'Biaya wisuda siswa/mahasiswa dan pelepasan', 0.00, 0.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (82, 1, '5-1600', 'Beban Perlombaan & Kompetisi', 5, 13, 'detail', 'debit', 'IDR', 'Biaya mengikuti lomba akademik dan non-akademik', 0.00, 0.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (83, 1, '5-1700', 'Beban Beasiswa', 5, 13, 'detail', 'debit', 'IDR', 'Biaya pemberian beasiswa kepada siswa/mahasiswa berprestasi', 0.00, 0.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (84, 1, '5-2100', 'Gaji Staf Administrasi & TU', 5, 14, 'detail', 'debit', 'IDR', 'Gaji staf tata usaha, HRD, akuntan, IT', 0.00, 0.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (85, 1, '5-2200', 'Beban Listrik & Air', 5, 14, 'detail', 'debit', 'IDR', 'Tagihan listrik, air, dan internet', 0.00, 0.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (86, 1, '5-2300', 'Beban ATK & Peralatan Kantor', 5, 14, 'detail', 'debit', 'IDR', 'Pembelian alat tulis, kertas, tinta printer, dll', 0.00, 0.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (87, 1, '5-2400', 'Beban Perawatan Gedung & Fasilitas', 5, 14, 'detail', 'debit', 'IDR', 'Biaya perbaikan, renovasi ringan, kebersihan gedung', 0.00, 0.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (88, 1, '5-2500', 'Beban Transportasi & Perjalanan Dinas', 5, 14, 'detail', 'debit', 'IDR', 'Biaya perjalanan dinas guru/staf, BBM, tol', 0.00, 0.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (89, 1, '5-2600', 'Beban Asuransi', 5, 14, 'detail', 'debit', 'IDR', 'Premi asuransi aset dan kesehatan karyawan', 0.00, 0.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (90, 1, '5-2700', 'Beban Komunikasi & Internet', 5, 14, 'detail', 'debit', 'IDR', 'Tagihan telepon, internet, dan langganan sistem', 0.00, 0.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (91, 1, '5-2800', 'Beban Pelatihan & Pengembangan SDM', 5, 14, 'detail', 'debit', 'IDR', 'Biaya seminar, workshop, pelatihan guru/staf', 0.00, 0.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (92, 1, '5-2900', 'Beban Pemasaran & Promosi', 5, 14, 'detail', 'debit', 'IDR', 'Biaya promosi penerimaan siswa/mahasiswa baru', 0.00, 0.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (93, 1, '5-3100', 'Beban Penyusutan Gedung', 5, 15, 'detail', 'debit', 'IDR', 'Penyusutan gedung sekolah dan kampus', 0.00, 0.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (94, 1, '5-3200', 'Beban Penyusutan Kendaraan', 5, 15, 'detail', 'debit', 'IDR', 'Penyusutan kendaraan operasional', 0.00, 0.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (95, 1, '5-3300', 'Beban Penyusutan Peralatan & IT', 5, 15, 'detail', 'debit', 'IDR', 'Penyusutan komputer, mesin, peralatan', 0.00, 0.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (96, 1, '5-4100', 'Beban Pajak Penghasilan', 5, 16, 'detail', 'debit', 'IDR', 'PPh terutang yayasan', 0.00, 0.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (97, 1, '5-4200', 'Beban Administrasi Bank', 5, 16, 'detail', 'debit', 'IDR', 'Biaya admin bank, transfer, materai', 0.00, 0.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (98, 1, '5-4300', 'Beban Denda & Penalti', 5, 16, 'detail', 'debit', 'IDR', 'Denda keterlambatan pembayaran pajak atau pinjaman', 0.00, 0.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (99, 1, '5-4400', 'Beban Kerugian Piutang', 5, 16, 'detail', 'debit', 'IDR', 'Piutang SPP/UKT yang dihapuskan karena tidak tertagih', 0.00, 0.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (100, 1, '5-4500', 'Beban Lain-lain', 5, 16, 'detail', 'debit', 'IDR', 'Biaya tidak terduga lainnya', 0.00, 0.00, 1, 0, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (1, 1, '1-1000', 'ASET LANCAR', 1, NULL, 'header', 'debit', 'IDR', 'Aset yang dapat dicairkan dalam waktu kurang dari 1 tahun', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (2, 1, '1-2000', 'ASET TETAP', 1, NULL, 'header', 'debit', 'IDR', 'Aset berwujud yang dimiliki untuk operasional jangka panjang', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (3, 1, '1-3000', 'ASET LAINNYA', 1, NULL, 'header', 'debit', 'IDR', 'Aset non-lancar lainnya seperti dana abadi', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (4, 1, '2-1000', 'KEWAJIBAN LANCAR', 2, NULL, 'header', 'kredit', 'IDR', 'Utang yang harus dibayar kurang dari 1 tahun', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (5, 1, '2-2000', 'KEWAJIBAN JANGKA PANJANG', 2, NULL, 'header', 'kredit', 'IDR', 'Utang dengan jatuh tempo lebih dari 1 tahun', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (6, 1, '3-1000', 'ASET BERSIH TIDAK TERIKAT', 3, NULL, 'header', 'kredit', 'IDR', 'Surplus yang bisa digunakan bebas oleh yayasan', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (7, 1, '3-2000', 'ASET BERSIH TERIKAT TEMPORER', 3, NULL, 'header', 'kredit', 'IDR', 'Dana hibah yang hanya boleh digunakan untuk tujuan tertentu dalam waktu tertentu', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (8, 1, '3-3000', 'ASET BERSIH TERIKAT PERMANEN', 3, NULL, 'header', 'kredit', 'IDR', 'Dana abadi yang pokoknya tidak boleh dipakai', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (9, 1, '4-1000', 'PENDAPATAN SPP / UKT', 4, NULL, 'header', 'kredit', 'IDR', 'Pendapatan dari SPP dan UKT semua jenjang', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (10, 1, '4-2000', 'PENDAPATAN NON-SPP', 4, NULL, 'header', 'kredit', 'IDR', 'Pendapatan selain SPP/UKT', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (11, 1, '4-3000', 'PENDAPATAN HIBAH & DONASI', 4, NULL, 'header', 'kredit', 'IDR', 'Pendapatan dari hibah pemerintah, donasi, sumbangan', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (12, 1, '4-4000', 'PENDAPATAN LAIN-LAIN', 4, NULL, 'header', 'kredit', 'IDR', 'Pendapatan investasi, sewa, dan lainnya', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (13, 1, '5-1000', 'BEBAN PROGRAM PENDIDIKAN', 5, NULL, 'header', 'debit', 'IDR', 'Biaya langsung untuk kegiatan belajar-mengajar', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (14, 1, '5-2000', 'BEBAN ADMINISTRASI & UMUM', 5, NULL, 'header', 'debit', 'IDR', 'Biaya operasional kantor dan administrasi', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (15, 1, '5-3000', 'BEBAN PENYUSUTAN', 5, NULL, 'header', 'debit', 'IDR', 'Penyusutan aset tetap', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (16, 1, '5-4000', 'BEBAN PAJAK & NON-OPERASIONAL', 5, NULL, 'header', 'debit', 'IDR', 'Beban pajak dan biaya non-operasional lainnya', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (17, 1, '1-1100', 'Kas', 1, 1, 'detail', 'debit', 'IDR', 'Uang tunai di tangan', 50000000.00, 50000000.00, 1, 1, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (18, 1, '1-1200', 'Bank BCA', 1, 1, 'detail', 'debit', 'IDR', 'Rekening Yayasan di BCA', 250000000.00, 250000000.00, 1, 1, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (19, 1, '1-1210', 'Bank Mandiri', 1, 1, 'detail', 'debit', 'IDR', 'Rekening Yayasan di Bank Mandiri', 150000000.00, 150000000.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (20, 1, '1-1220', 'Bank BRI', 1, 1, 'detail', 'debit', 'IDR', 'Rekening Yayasan di Bank BRI', 100000000.00, 100000000.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (21, 1, '1-1300', 'Piutang SPP TK', 1, 1, 'detail', 'debit', 'IDR', 'Tagihan SPP siswa TK yang belum dibayar', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (22, 1, '1-1301', 'Piutang SPP SD', 1, 1, 'detail', 'debit', 'IDR', 'Tagihan SPP siswa SD yang belum dibayar', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (23, 1, '1-1302', 'Piutang SPP SMP', 1, 1, 'detail', 'debit', 'IDR', 'Tagihan SPP siswa SMP yang belum dibayar', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (24, 1, '1-1303', 'Piutang SPP SMA', 1, 1, 'detail', 'debit', 'IDR', 'Tagihan SPP siswa SMA yang belum dibayar', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (25, 1, '1-1304', 'Piutang UKT Universitas', 1, 1, 'detail', 'debit', 'IDR', 'Tagihan UKT mahasiswa yang belum dibayar', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (26, 1, '1-1400', 'Piutang Hibah', 1, 1, 'detail', 'debit', 'IDR', 'Hibah yang sudah dijanjikan tapi belum diterima', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (27, 1, '1-1500', 'Persediaan ATK', 1, 1, 'detail', 'debit', 'IDR', 'Stok alat tulis kantor dan sekolah', 15000000.00, 15000000.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (28, 1, '1-1600', 'Persediaan Bahan Praktikum', 1, 1, 'detail', 'debit', 'IDR', 'Stok bahan praktikum laboratorium', 5000000.00, 5000000.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (29, 1, '1-2100', 'Tanah', 1, 2, 'detail', 'debit', 'IDR', 'Tanah milik yayasan', 5000000000.00, 5000000000.00, 1, 1, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (30, 1, '1-2200', 'Gedung TK', 1, 2, 'detail', 'debit', 'IDR', 'Gedung untuk jenjang TK', 500000000.00, 500000000.00, 1, 1, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (31, 1, '1-2210', 'Gedung SD', 1, 2, 'detail', 'debit', 'IDR', 'Gedung untuk jenjang SD', 800000000.00, 800000000.00, 1, 1, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (32, 1, '1-2220', 'Gedung SMP', 1, 2, 'detail', 'debit', 'IDR', 'Gedung untuk jenjang SMP', 1000000000.00, 1000000000.00, 1, 1, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (33, 1, '1-2230', 'Gedung SMA', 1, 2, 'detail', 'debit', 'IDR', 'Gedung untuk jenjang SMA', 1200000000.00, 1200000000.00, 1, 1, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (34, 1, '1-2240', 'Gedung Universitas', 1, 2, 'detail', 'debit', 'IDR', 'Gedung kampus universitas', 2000000000.00, 2000000000.00, 1, 1, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (35, 1, '1-2300', 'Kendaraan Operasional', 1, 2, 'detail', 'debit', 'IDR', 'Mobil dan kendaraan dinas yayasan', 350000000.00, 350000000.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (36, 1, '1-2400', 'Peralatan & Mesin', 1, 2, 'detail', 'debit', 'IDR', 'Mesin fotokopi, AC, peralatan dapur, dll', 200000000.00, 200000000.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (37, 1, '1-2500', 'Komputer & IT Equipment', 1, 2, 'detail', 'debit', 'IDR', 'Komputer, laptop, server, projector', 300000000.00, 300000000.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (38, 1, '1-2600', 'Akumulasi Penyusutan Aset Tetap', 1, 2, 'detail', 'kredit', 'IDR', 'Akumulasi penyusutan semua aset tetap (contra asset)', -50000000.00, -50000000.00, 1, 1, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (39, 1, '1-3100', 'Dana Abadi (Endowment)', 1, 3, 'detail', 'debit', 'IDR', 'Dana yang pokoknya tidak boleh dipakai, hanya hasil investasinya', 1000000000.00, 1000000000.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (40, 1, '1-3200', 'Investasi Jangka Panjang', 1, 3, 'detail', 'debit', 'IDR', 'Investasi saham, obligasi, reksadana', 500000000.00, 500000000.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (41, 1, '2-1100', 'Utang Usaha', 2, 4, 'detail', 'kredit', 'IDR', 'Utang kepada pemasok barang/jasa', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (42, 1, '2-1200', 'Utang Gaji & Tunjangan', 2, 4, 'detail', 'kredit', 'IDR', 'Gaji guru/staf yang belum dibayar', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (43, 1, '2-1300', 'Utang BPJS Ketenagakerjaan', 2, 4, 'detail', 'kredit', 'IDR', 'Iuran BPJS yang belum disetor', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (44, 1, '2-1400', 'Pendapatan Diterima di Muka (SPP)', 2, 4, 'detail', 'kredit', 'IDR', 'SPP yang sudah dibayar tapi belum menjadi hak yayasan (periode mendatang)', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (45, 1, '2-1500', 'Utang Pajak', 2, 4, 'detail', 'kredit', 'IDR', 'Pajak yang sudah dipotong/dihitung tapi belum disetor ke negara', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (46, 1, '2-2100', 'Utang Bank Jangka Panjang', 2, 5, 'detail', 'kredit', 'IDR', 'Utang bank untuk pembangunan gedung', 2000000000.00, 2000000000.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (47, 1, '3-1100', 'Saldo Aset Bersih Tidak Terikat', 3, 6, 'detail', 'kredit', 'IDR', 'Akumulasi surplus bebas dari tahun-tahun sebelumnya', 2500000000.00, 2500000000.00, 1, 1, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (48, 1, '3-1200', 'Surplus/(Defisit) Tahun Berjalan', 3, 6, 'detail', 'kredit', 'IDR', 'Selisih pendapatan - beban tahun ini (akan ditutup ke 3-1100)', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (49, 1, '3-2100', 'Dana BOS Terikat', 3, 7, 'detail', 'kredit', 'IDR', 'Dana BOS dari pemerintah yang penggunaannya diatur', 500000000.00, 500000000.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (50, 1, '3-2200', 'Dana BOPTN Terikat', 3, 7, 'detail', 'kredit', 'IDR', 'Dana BOPTN untuk universitas', 300000000.00, 300000000.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (51, 1, '3-2300', 'Dana Hibah Beasiswa Terikat', 3, 7, 'detail', 'kredit', 'IDR', 'Hibah khusus untuk beasiswa siswa/mahasiswa', 300000000.00, 300000000.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (52, 1, '3-2400', 'Dana Pembangunan Gedung Terikat', 3, 7, 'detail', 'kredit', 'IDR', 'Dana hibah khusus untuk pembangunan gedung', 200000000.00, 200000000.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (53, 1, '3-3100', 'Dana Abadi (Endowment Fund)', 3, 8, 'detail', 'kredit', 'IDR', 'Pokok dana abadi yang tidak boleh dikurangi', 1000000000.00, 1000000000.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (54, 1, '4-1100', 'Pendapatan SPP TK', 4, 9, 'detail', 'kredit', 'IDR', 'SPP siswa TK per bulan', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (55, 1, '4-1101', 'Pendapatan SPP SD', 4, 9, 'detail', 'kredit', 'IDR', 'SPP siswa SD per bulan', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (56, 1, '4-1102', 'Pendapatan SPP SMP', 4, 9, 'detail', 'kredit', 'IDR', 'SPP siswa SMP per bulan', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (57, 1, '4-1103', 'Pendapatan SPP SMA', 4, 9, 'detail', 'kredit', 'IDR', 'SPP siswa SMA per bulan', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (58, 1, '4-1104', 'Pendapatan UKT Universitas', 4, 9, 'detail', 'kredit', 'IDR', 'UKT mahasiswa per semester', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (59, 1, '4-2100', 'Pendapatan Uang Gedung', 4, 10, 'detail', 'kredit', 'IDR', 'Pendapatan dari uang pembangunan/gedung (daftar ulang)', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (60, 1, '4-2200', 'Pendapatan Pendaftaran Siswa/Mahasiswa Baru', 4, 10, 'detail', 'kredit', 'IDR', 'Biaya pendaftaran calon siswa/mahasiswa baru', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (61, 1, '4-2300', 'Pendapatan Sewa Fasilitas', 4, 10, 'detail', 'kredit', 'IDR', 'Sewa gedung aula, lapangan, ruang pertemuan', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (62, 1, '4-2400', 'Pendapatan Kantin & Koperasi', 4, 10, 'detail', 'kredit', 'IDR', 'Sewa kantin dan koperasi sekolah', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (63, 1, '4-2500', 'Pendapatan Kegiatan Khusus', 4, 10, 'detail', 'kredit', 'IDR', 'Study tour, camping, outbound, dll', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (64, 1, '4-3100', 'Pendapatan Hibah BOS', 4, 11, 'detail', 'kredit', 'IDR', 'Dana BOS dari pemerintah', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (65, 1, '4-3110', 'Pendapatan Hibah BOP', 4, 11, 'detail', 'kredit', 'IDR', 'Dana BOP untuk jenjang SD/SMP', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (66, 1, '4-3120', 'Pendapatan Hibah BOPTN', 4, 11, 'detail', 'kredit', 'IDR', 'Dana BOPTN untuk universitas', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (67, 1, '4-3200', 'Pendapatan Donasi Alumni', 4, 11, 'detail', 'kredit', 'IDR', 'Donasi dari alumni yayasan', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (68, 1, '4-3210', 'Pendapatan Donasi Corporate', 4, 11, 'detail', 'kredit', 'IDR', 'Donasi dari perusahaan/swasta', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (69, 1, '4-3220', 'Pendapatan Donasi Orang Tua', 4, 11, 'detail', 'kredit', 'IDR', 'Sumbangan sukarela dari orang tua siswa', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (70, 1, '4-4100', 'Pendapatan Bunga Bank', 4, 12, 'detail', 'kredit', 'IDR', 'Bunga dari deposito dan tabungan', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (71, 1, '4-4200', 'Pendapatan Dividen', 4, 12, 'detail', 'kredit', 'IDR', 'Dividen dari investasi saham', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (72, 1, '4-4300', 'Pendapatan Lain-lain', 4, 12, 'detail', 'kredit', 'IDR', 'Pendapatan tidak terduga lainnya', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (73, 1, '5-1100', 'Gaji Guru TK', 5, 13, 'detail', 'debit', 'IDR', 'Gaji dan tunjangan guru TK', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (74, 1, '5-1101', 'Gaji Guru SD', 5, 13, 'detail', 'debit', 'IDR', 'Gaji dan tunjangan guru SD', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (75, 1, '5-1102', 'Gaji Guru SMP', 5, 13, 'detail', 'debit', 'IDR', 'Gaji dan tunjangan guru SMP', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (76, 1, '5-1103', 'Gaji Guru SMA', 5, 13, 'detail', 'debit', 'IDR', 'Gaji dan tunjangan guru SMA', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (77, 1, '5-1104', 'Gaji Dosen Universitas', 5, 13, 'detail', 'debit', 'IDR', 'Gaji dan honorarium dosen', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (78, 1, '5-1200', 'Beban Praktikum & Laboratorium', 5, 13, 'detail', 'debit', 'IDR', 'Biaya bahan praktikum, alat lab, dan pemeliharaan lab', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (79, 1, '5-1300', 'Beban Perpustakaan', 5, 13, 'detail', 'debit', 'IDR', 'Pembelian buku, jurnal, langganan database, pemeliharaan perpustakaan', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (80, 1, '5-1400', 'Beban Kegiatan Ekstrakurikuler', 5, 13, 'detail', 'debit', 'IDR', 'Biaya pramuka, olahraga, seni, lomba, study tour', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (81, 1, '5-1500', 'Beban Wisuda & Pelepasan', 5, 13, 'detail', 'debit', 'IDR', 'Biaya wisuda siswa/mahasiswa dan pelepasan', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (82, 1, '5-1600', 'Beban Perlombaan & Kompetisi', 5, 13, 'detail', 'debit', 'IDR', 'Biaya mengikuti lomba akademik dan non-akademik', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (83, 1, '5-1700', 'Beban Beasiswa', 5, 13, 'detail', 'debit', 'IDR', 'Biaya pemberian beasiswa kepada siswa/mahasiswa berprestasi', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (84, 1, '5-2100', 'Gaji Staf Administrasi & TU', 5, 14, 'detail', 'debit', 'IDR', 'Gaji staf tata usaha, HRD, akuntan, IT', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (85, 1, '5-2200', 'Beban Listrik & Air', 5, 14, 'detail', 'debit', 'IDR', 'Tagihan listrik, air, dan internet', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (86, 1, '5-2300', 'Beban ATK & Peralatan Kantor', 5, 14, 'detail', 'debit', 'IDR', 'Pembelian alat tulis, kertas, tinta printer, dll', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (87, 1, '5-2400', 'Beban Perawatan Gedung & Fasilitas', 5, 14, 'detail', 'debit', 'IDR', 'Biaya perbaikan, renovasi ringan, kebersihan gedung', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (88, 1, '5-2500', 'Beban Transportasi & Perjalanan Dinas', 5, 14, 'detail', 'debit', 'IDR', 'Biaya perjalanan dinas guru/staf, BBM, tol', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (89, 1, '5-2600', 'Beban Asuransi', 5, 14, 'detail', 'debit', 'IDR', 'Premi asuransi aset dan kesehatan karyawan', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (90, 1, '5-2700', 'Beban Komunikasi & Internet', 5, 14, 'detail', 'debit', 'IDR', 'Tagihan telepon, internet, dan langganan sistem', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (91, 1, '5-2800', 'Beban Pelatihan & Pengembangan SDM', 5, 14, 'detail', 'debit', 'IDR', 'Biaya seminar, workshop, pelatihan guru/staf', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (92, 1, '5-2900', 'Beban Pemasaran & Promosi', 5, 14, 'detail', 'debit', 'IDR', 'Biaya promosi penerimaan siswa/mahasiswa baru', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (93, 1, '5-3100', 'Beban Penyusutan Gedung', 5, 15, 'detail', 'debit', 'IDR', 'Penyusutan gedung sekolah dan kampus', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (94, 1, '5-3200', 'Beban Penyusutan Kendaraan', 5, 15, 'detail', 'debit', 'IDR', 'Penyusutan kendaraan operasional', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (95, 1, '5-3300', 'Beban Penyusutan Peralatan & IT', 5, 15, 'detail', 'debit', 'IDR', 'Penyusutan komputer, mesin, peralatan', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (96, 1, '5-4100', 'Beban Pajak Penghasilan', 5, 16, 'detail', 'debit', 'IDR', 'PPh terutang yayasan', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (97, 1, '5-4200', 'Beban Administrasi Bank', 5, 16, 'detail', 'debit', 'IDR', 'Biaya admin bank, transfer, materai', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (98, 1, '5-4300', 'Beban Denda & Penalti', 5, 16, 'detail', 'debit', 'IDR', 'Denda keterlambatan pembayaran pajak atau pinjaman', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (99, 1, '5-4400', 'Beban Kerugian Piutang', 5, 16, 'detail', 'debit', 'IDR', 'Piutang SPP/UKT yang dihapuskan karena tidak tertagih', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `accounts` VALUES (100, 1, '5-4500', 'Beban Lain-lain', 5, 16, 'detail', 'debit', 'IDR', 'Biaya tidak terduga lainnya', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+
+-- ----------------------------
+-- Table structure for achievements
+-- ----------------------------
+DROP TABLE IF EXISTS `achievements`;
+CREATE TABLE `achievements`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `student_id` bigint UNSIGNED NOT NULL,
+  `achievement_type` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `title` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `level` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `date_achieved` date NULL DEFAULT NULL,
+  `certificate_url` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `points` int NOT NULL DEFAULT 0,
+  `verified_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `is_verified` tinyint(1) NOT NULL DEFAULT 0,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `achievements_student_index`(`student_id` ASC) USING BTREE,
+  INDEX `achievements_type_index`(`achievement_type` ASC) USING BTREE,
+  INDEX `achievements_level_index`(`level` ASC) USING BTREE,
+  INDEX `achievements_date_index`(`date_achieved` ASC) USING BTREE,
+  INDEX `achievements_is_verified_index`(`is_verified` ASC) USING BTREE,
+  INDEX `achievements_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `achievements_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `achievements_updated_by_index`(`updated_by` ASC) USING BTREE,
+  INDEX `achievements_verified_by_foreign`(`verified_by` ASC) USING BTREE,
+  CONSTRAINT `achievements_student_id_foreign` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `achievements_verified_by_foreign` FOREIGN KEY (`verified_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of achievements
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for action_role
@@ -467,6 +551,157 @@ INSERT INTO `actions` VALUES (4, 1, 5, 'profile-view', 'Lihat Profil', 'Melihat 
 INSERT INTO `actions` VALUES (5, 1, 5, 'profile-edit', 'Edit Profil', 'Mengedit profil pengguna', 1, '2026-09-09 17:07:41', '2026-09-09 17:07:41', NULL, NULL, NULL);
 
 -- ----------------------------
+-- Table structure for admission_selections
+-- ----------------------------
+DROP TABLE IF EXISTS `admission_selections`;
+CREATE TABLE `admission_selections`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `admission_id` bigint UNSIGNED NOT NULL,
+  `applicant_id` bigint UNSIGNED NOT NULL,
+  `selection_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `score` decimal(5, 2) NULL DEFAULT NULL,
+  `result` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `evaluator_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `evaluation_date` timestamp NULL DEFAULT NULL,
+  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `admission_selections_admission_index`(`admission_id` ASC) USING BTREE,
+  INDEX `admission_selections_applicant_index`(`applicant_id` ASC) USING BTREE,
+  INDEX `admission_selections_type_index`(`selection_type` ASC) USING BTREE,
+  INDEX `admission_selections_result_index`(`result` ASC) USING BTREE,
+  INDEX `admission_selections_evaluator_index`(`evaluator_id` ASC) USING BTREE,
+  INDEX `admission_selections_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `admission_selections_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `admission_selections_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `admission_selections_admission_id_foreign` FOREIGN KEY (`admission_id`) REFERENCES `admissions` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `admission_selections_applicant_id_foreign` FOREIGN KEY (`applicant_id`) REFERENCES `applicants` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `admission_selections_evaluator_id_foreign` FOREIGN KEY (`evaluator_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of admission_selections
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for admission_timelines
+-- ----------------------------
+DROP TABLE IF EXISTS `admission_timelines`;
+CREATE TABLE `admission_timelines`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `admission_id` bigint UNSIGNED NOT NULL,
+  `phase_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `start_date` date NULL DEFAULT NULL,
+  `end_date` date NULL DEFAULT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `order_number` int NULL DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `admission_timelines_admission_index`(`admission_id` ASC) USING BTREE,
+  INDEX `admission_timelines_order_index`(`order_number` ASC) USING BTREE,
+  INDEX `admission_timelines_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `admission_timelines_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `admission_timelines_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `admission_timelines_admission_id_foreign` FOREIGN KEY (`admission_id`) REFERENCES `admissions` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of admission_timelines
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for admissions
+-- ----------------------------
+DROP TABLE IF EXISTS `admissions`;
+CREATE TABLE `admissions`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `school_id` bigint UNSIGNED NOT NULL,
+  `academic_year_id` bigint UNSIGNED NOT NULL,
+  `class_level_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `code` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `start_date` date NOT NULL,
+  `end_date` date NOT NULL,
+  `quota` int NOT NULL DEFAULT 0,
+  `registration_fee` decimal(15, 2) NOT NULL DEFAULT 0.00,
+  `min_age` int NULL DEFAULT NULL,
+  `max_age` int NULL DEFAULT NULL,
+  `requirements` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `admissions_school_code_unique`(`school_id` ASC, `code` ASC) USING BTREE,
+  INDEX `admissions_school_index`(`school_id` ASC) USING BTREE,
+  INDEX `admissions_academic_year_index`(`academic_year_id` ASC) USING BTREE,
+  INDEX `admissions_class_level_index`(`class_level_id` ASC) USING BTREE,
+  INDEX `admissions_dates_index`(`start_date` ASC, `end_date` ASC) USING BTREE,
+  INDEX `admissions_is_active_index`(`is_active` ASC) USING BTREE,
+  INDEX `admissions_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `admissions_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `admissions_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `admissions_academic_year_id_foreign` FOREIGN KEY (`academic_year_id`) REFERENCES `academic_years` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `admissions_class_level_id_foreign` FOREIGN KEY (`class_level_id`) REFERENCES `class_levels` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `admissions_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of admissions
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for announcements
+-- ----------------------------
+DROP TABLE IF EXISTS `announcements`;
+CREATE TABLE `announcements`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `school_id` bigint UNSIGNED NOT NULL,
+  `title` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `audience` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `attachment_url` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `priority` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'NORMAL',
+  `published_at` timestamp NULL DEFAULT NULL,
+  `expired_at` timestamp NULL DEFAULT NULL,
+  `is_pinned` tinyint(1) NOT NULL DEFAULT 0,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `announcements_school_index`(`school_id` ASC) USING BTREE,
+  INDEX `announcements_audience_index`(`audience` ASC) USING BTREE,
+  INDEX `announcements_priority_index`(`priority` ASC) USING BTREE,
+  INDEX `announcements_published_at_index`(`published_at` ASC) USING BTREE,
+  INDEX `announcements_expired_at_index`(`expired_at` ASC) USING BTREE,
+  INDEX `announcements_is_pinned_index`(`is_pinned` ASC) USING BTREE,
+  INDEX `announcements_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `announcements_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `announcements_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `announcements_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of announcements
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for api_rate_limits
 -- ----------------------------
 DROP TABLE IF EXISTS `api_rate_limits`;
@@ -488,6 +723,181 @@ CREATE TABLE `api_rate_limits`  (
 
 -- ----------------------------
 -- Records of api_rate_limits
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for applicant_invoices
+-- ----------------------------
+DROP TABLE IF EXISTS `applicant_invoices`;
+CREATE TABLE `applicant_invoices`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `applicant_id` bigint UNSIGNED NOT NULL,
+  `school_id` bigint UNSIGNED NOT NULL,
+  `admission_id` bigint UNSIGNED NOT NULL,
+  `invoice_number` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `invoice_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `due_date` date NULL DEFAULT NULL,
+  `total_amount` decimal(15, 2) NOT NULL,
+  `discount_amount` decimal(15, 2) NOT NULL DEFAULT 0.00,
+  `penalty_amount` decimal(15, 2) NOT NULL DEFAULT 0.00,
+  `final_amount` decimal(15, 2) NOT NULL,
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PENDING',
+  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `applicant_invoices_school_number_unique`(`school_id` ASC, `invoice_number` ASC) USING BTREE,
+  INDEX `applicant_invoices_applicant_index`(`applicant_id` ASC) USING BTREE,
+  INDEX `applicant_invoices_school_index`(`school_id` ASC) USING BTREE,
+  INDEX `applicant_invoices_admission_index`(`admission_id` ASC) USING BTREE,
+  INDEX `applicant_invoices_status_index`(`status` ASC) USING BTREE,
+  INDEX `applicant_invoices_due_date_index`(`due_date` ASC) USING BTREE,
+  INDEX `applicant_invoices_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `applicant_invoices_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `applicant_invoices_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `applicant_invoices_admission_id_foreign` FOREIGN KEY (`admission_id`) REFERENCES `admissions` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `applicant_invoices_applicant_id_foreign` FOREIGN KEY (`applicant_id`) REFERENCES `applicants` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `applicant_invoices_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of applicant_invoices
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for applicant_payments
+-- ----------------------------
+DROP TABLE IF EXISTS `applicant_payments`;
+CREATE TABLE `applicant_payments`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `invoice_id` bigint UNSIGNED NOT NULL,
+  `applicant_id` bigint UNSIGNED NOT NULL,
+  `payment_method` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `payment_date` date NULL DEFAULT NULL,
+  `amount` decimal(15, 2) NOT NULL,
+  `reference_number` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `bank_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `payment_proof_url` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PENDING',
+  `verified_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `verification_date` timestamp NULL DEFAULT NULL,
+  `refund_date` timestamp NULL DEFAULT NULL,
+  `refund_reason` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `applicant_payments_invoice_index`(`invoice_id` ASC) USING BTREE,
+  INDEX `applicant_payments_applicant_index`(`applicant_id` ASC) USING BTREE,
+  INDEX `applicant_payments_status_index`(`status` ASC) USING BTREE,
+  INDEX `applicant_payments_verified_by_index`(`verified_by` ASC) USING BTREE,
+  INDEX `applicant_payments_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `applicant_payments_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `applicant_payments_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `applicant_payments_applicant_id_foreign` FOREIGN KEY (`applicant_id`) REFERENCES `applicants` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `applicant_payments_invoice_id_foreign` FOREIGN KEY (`invoice_id`) REFERENCES `applicant_invoices` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `applicant_payments_verified_by_foreign` FOREIGN KEY (`verified_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of applicant_payments
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for applicants
+-- ----------------------------
+DROP TABLE IF EXISTS `applicants`;
+CREATE TABLE `applicants`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `school_id` bigint UNSIGNED NOT NULL,
+  `admission_id` bigint UNSIGNED NOT NULL,
+  `full_name` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nik` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `birth_place` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `birth_date` date NULL DEFAULT NULL,
+  `gender` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `address` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `phone` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `email` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `parent_name` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `parent_phone` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `parent_email` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `previous_school` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `registration_number` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'REGISTERED',
+  `test_score` decimal(5, 2) NULL DEFAULT NULL,
+  `interview_score` decimal(5, 2) NULL DEFAULT NULL,
+  `total_score` decimal(5, 2) NULL DEFAULT NULL,
+  `ranking` int NULL DEFAULT NULL,
+  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `registered_at` timestamp NULL DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `applicants_school_registration_number_unique`(`school_id` ASC, `registration_number` ASC) USING BTREE,
+  UNIQUE INDEX `applicants_school_nik_unique`(`school_id` ASC, `nik` ASC) USING BTREE,
+  INDEX `applicants_school_index`(`school_id` ASC) USING BTREE,
+  INDEX `applicants_admission_index`(`admission_id` ASC) USING BTREE,
+  INDEX `applicants_status_index`(`status` ASC) USING BTREE,
+  INDEX `applicants_registration_number_index`(`registration_number` ASC) USING BTREE,
+  INDEX `applicants_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `applicants_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `applicants_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `applicants_admission_id_foreign` FOREIGN KEY (`admission_id`) REFERENCES `admissions` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `applicants_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of applicants
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for application_documents
+-- ----------------------------
+DROP TABLE IF EXISTS `application_documents`;
+CREATE TABLE `application_documents`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `applicant_id` bigint UNSIGNED NOT NULL,
+  `document_type` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `document_url` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `file_name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `file_size` bigint NULL DEFAULT NULL,
+  `uploaded_at` timestamp NULL DEFAULT NULL,
+  `verified` tinyint(1) NOT NULL DEFAULT 0,
+  `verified_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `verification_notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `application_documents_applicant_index`(`applicant_id` ASC) USING BTREE,
+  INDEX `application_documents_type_index`(`document_type` ASC) USING BTREE,
+  INDEX `application_documents_verified_index`(`verified` ASC) USING BTREE,
+  INDEX `application_documents_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `application_documents_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `application_documents_updated_by_index`(`updated_by` ASC) USING BTREE,
+  INDEX `application_documents_verified_by_foreign`(`verified_by` ASC) USING BTREE,
+  CONSTRAINT `application_documents_applicant_id_foreign` FOREIGN KEY (`applicant_id`) REFERENCES `applicants` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `application_documents_verified_by_foreign` FOREIGN KEY (`verified_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of application_documents
 -- ----------------------------
 
 -- ----------------------------
@@ -518,6 +928,94 @@ CREATE TABLE `asset_depreciations`  (
 
 -- ----------------------------
 -- Records of asset_depreciations
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for assets
+-- ----------------------------
+DROP TABLE IF EXISTS `assets`;
+CREATE TABLE `assets`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `school_id` bigint UNSIGNED NOT NULL,
+  `code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `category` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `brand` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `model` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `serial_number` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `purchase_date` date NULL DEFAULT NULL,
+  `purchase_price` decimal(15, 2) NULL DEFAULT NULL,
+  `supplier` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `location` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `condition` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'GOOD',
+  `assigned_to` bigint UNSIGNED NULL DEFAULT NULL,
+  `warranty_end` date NULL DEFAULT NULL,
+  `depreciation_value` decimal(15, 2) NULL DEFAULT NULL,
+  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `photo_url` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `assets_school_code_unique`(`school_id` ASC, `code` ASC) USING BTREE,
+  INDEX `assets_school_index`(`school_id` ASC) USING BTREE,
+  INDEX `assets_category_index`(`category` ASC) USING BTREE,
+  INDEX `assets_condition_index`(`condition` ASC) USING BTREE,
+  INDEX `assets_location_index`(`location` ASC) USING BTREE,
+  INDEX `assets_assigned_to_index`(`assigned_to` ASC) USING BTREE,
+  INDEX `assets_purchase_date_index`(`purchase_date` ASC) USING BTREE,
+  INDEX `assets_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `assets_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `assets_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `assets_assigned_to_foreign` FOREIGN KEY (`assigned_to`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `assets_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of assets
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for assignments_quizzes
+-- ----------------------------
+DROP TABLE IF EXISTS `assignments_quizzes`;
+CREATE TABLE `assignments_quizzes`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `course_id` bigint UNSIGNED NOT NULL,
+  `lesson_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `title` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `max_score` int NOT NULL DEFAULT 100,
+  `time_limit_minutes` int NULL DEFAULT NULL,
+  `passing_score` int NOT NULL DEFAULT 70,
+  `due_date` timestamp NULL DEFAULT NULL,
+  `is_published` tinyint(1) NOT NULL DEFAULT 0,
+  `question_data` json NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `assignments_quizzes_course_index`(`course_id` ASC) USING BTREE,
+  INDEX `assignments_quizzes_lesson_index`(`lesson_id` ASC) USING BTREE,
+  INDEX `assignments_quizzes_type_index`(`type` ASC) USING BTREE,
+  INDEX `assignments_quizzes_due_date_index`(`due_date` ASC) USING BTREE,
+  INDEX `assignments_quizzes_is_published_index`(`is_published` ASC) USING BTREE,
+  INDEX `assignments_quizzes_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `assignments_quizzes_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `assignments_quizzes_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `assignments_quizzes_course_id_foreign` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `assignments_quizzes_lesson_id_foreign` FOREIGN KEY (`lesson_id`) REFERENCES `lessons` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of assignments_quizzes
 -- ----------------------------
 
 -- ----------------------------
@@ -698,34 +1196,178 @@ CREATE TABLE `audit_trails`  (
 DROP TABLE IF EXISTS `bank_accounts`;
 CREATE TABLE `bank_accounts`  (
   `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `school_id` bigint UNSIGNED NOT NULL,
   `organization_id` bigint UNSIGNED NOT NULL,
   `account_id` bigint UNSIGNED NOT NULL,
-  `bank_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `bank_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `branch` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
   `account_number` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `account_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `currency_code` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'IDR',
-  `current_balance` decimal(15, 2) NOT NULL DEFAULT 0.00,
+  `account_name` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `currency_id` bigint UNSIGNED NOT NULL,
+  `opening_balance` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `current_balance` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `is_cash_account` tinyint(1) NOT NULL DEFAULT 0,
   `is_active` tinyint(1) NOT NULL DEFAULT 1,
-  `is_default` tinyint(1) NOT NULL DEFAULT 0,
-  `bank_code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `branch_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `swift_code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `swift_code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
   `created_by` bigint UNSIGNED NULL DEFAULT NULL,
   `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `bank_accounts_org_number_unique`(`organization_id` ASC, `account_number` ASC) USING BTREE,
-  INDEX `bank_accounts_account_fk`(`account_id` ASC) USING BTREE,
-  INDEX `bank_accounts_is_active_index`(`is_active` ASC) USING BTREE,
+  UNIQUE INDEX `bank_accounts_school_code_unique`(`school_id` ASC, `code` ASC) USING BTREE,
+  INDEX `bank_accounts_school_index`(`school_id` ASC) USING BTREE,
+  INDEX `bank_accounts_coa_index`(`account_id` ASC) USING BTREE,
+  INDEX `bank_accounts_currency_index`(`currency_id` ASC) USING BTREE,
+  INDEX `bank_accounts_number_index`(`account_number` ASC) USING BTREE,
+  INDEX `bank_accounts_is_cash_index`(`is_cash_account` ASC) USING BTREE,
   INDEX `bank_accounts_deleted_at_index`(`deleted_at` ASC) USING BTREE,
-  CONSTRAINT `bank_accounts_account_fk` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
-  CONSTRAINT `bank_accounts_org_fk` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
+  INDEX `bank_accounts_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `bank_accounts_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `bank_accounts_account_id_foreign` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `bank_accounts_currency_id_foreign` FOREIGN KEY (`currency_id`) REFERENCES `currencies` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `bank_accounts_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of bank_accounts
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for bank_mutation_imports
+-- ----------------------------
+DROP TABLE IF EXISTS `bank_mutation_imports`;
+CREATE TABLE `bank_mutation_imports`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `school_id` bigint UNSIGNED NOT NULL,
+  `bank_account_id` bigint UNSIGNED NOT NULL,
+  `file_name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `file_url` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `file_size` bigint NULL DEFAULT NULL,
+  `total_rows` int NOT NULL DEFAULT 0,
+  `success_rows` int NOT NULL DEFAULT 0,
+  `failed_rows` int NOT NULL DEFAULT 0,
+  `duplicate_rows` int NOT NULL DEFAULT 0,
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PENDING',
+  `error_log` json NULL,
+  `imported_at` timestamp NULL DEFAULT NULL,
+  `imported_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `bank_mutation_imports_school_index`(`school_id` ASC) USING BTREE,
+  INDEX `bank_mutation_imports_bank_account_index`(`bank_account_id` ASC) USING BTREE,
+  INDEX `bank_mutation_imports_status_index`(`status` ASC) USING BTREE,
+  INDEX `bank_mutation_imports_imported_by_index`(`imported_by` ASC) USING BTREE,
+  INDEX `bank_mutation_imports_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `bank_mutation_imports_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `bank_mutation_imports_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `bank_mutation_imports_bank_account_id_foreign` FOREIGN KEY (`bank_account_id`) REFERENCES `bank_accounts` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `bank_mutation_imports_imported_by_foreign` FOREIGN KEY (`imported_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `bank_mutation_imports_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of bank_mutation_imports
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for bank_mutations
+-- ----------------------------
+DROP TABLE IF EXISTS `bank_mutations`;
+CREATE TABLE `bank_mutations`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `school_id` bigint UNSIGNED NOT NULL,
+  `bank_account_id` bigint UNSIGNED NOT NULL,
+  `import_batch_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `mutation_date` date NOT NULL,
+  `value_date` date NULL DEFAULT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `reference_number` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `debit` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `credit` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `balance` decimal(20, 2) NULL DEFAULT NULL,
+  `currency_id` bigint UNSIGNED NOT NULL,
+  `exchange_rate` decimal(20, 8) NOT NULL DEFAULT 1.00000000,
+  `functional_debit` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `functional_credit` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `reconciliation_status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'UNMATCHED',
+  `matched_journal_entry_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `matched_at` timestamp NULL DEFAULT NULL,
+  `matched_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `match_notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `raw_data` json NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `bank_mutations_school_index`(`school_id` ASC) USING BTREE,
+  INDEX `bank_mutations_bank_account_index`(`bank_account_id` ASC) USING BTREE,
+  INDEX `bank_mutations_import_batch_index`(`import_batch_id` ASC) USING BTREE,
+  INDEX `bank_mutations_date_index`(`mutation_date` ASC) USING BTREE,
+  INDEX `bank_mutations_reference_index`(`reference_number` ASC) USING BTREE,
+  INDEX `bank_mutations_status_index`(`reconciliation_status` ASC) USING BTREE,
+  INDEX `bank_mutations_matched_entry_index`(`matched_journal_entry_id` ASC) USING BTREE,
+  INDEX `bank_mutations_matched_by_index`(`matched_by` ASC) USING BTREE,
+  INDEX `bank_mutations_currency_index`(`currency_id` ASC) USING BTREE,
+  INDEX `bank_mutations_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `bank_mutations_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `bank_mutations_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `bank_mutations_bank_account_id_foreign` FOREIGN KEY (`bank_account_id`) REFERENCES `bank_accounts` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `bank_mutations_currency_id_foreign` FOREIGN KEY (`currency_id`) REFERENCES `currencies` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `bank_mutations_matched_by_foreign` FOREIGN KEY (`matched_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `bank_mutations_matched_journal_entry_id_foreign` FOREIGN KEY (`matched_journal_entry_id`) REFERENCES `journal_entries` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `bank_mutations_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of bank_mutations
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for bank_reconciliation_items
+-- ----------------------------
+DROP TABLE IF EXISTS `bank_reconciliation_items`;
+CREATE TABLE `bank_reconciliation_items`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `bank_reconciliation_id` bigint UNSIGNED NOT NULL,
+  `bank_mutation_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `journal_entry_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `match_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'AUTO',
+  `match_score` decimal(5, 2) NULL DEFAULT NULL,
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'MATCHED',
+  `difference_amount` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `bank_reconciliation_items_reconciliation_index`(`bank_reconciliation_id` ASC) USING BTREE,
+  INDEX `bank_reconciliation_items_mutation_index`(`bank_mutation_id` ASC) USING BTREE,
+  INDEX `bank_reconciliation_items_entry_index`(`journal_entry_id` ASC) USING BTREE,
+  INDEX `bank_reconciliation_items_match_type_index`(`match_type` ASC) USING BTREE,
+  INDEX `bank_reconciliation_items_status_index`(`status` ASC) USING BTREE,
+  INDEX `bank_reconciliation_items_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `bank_reconciliation_items_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `bank_reconciliation_items_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `bank_reconciliation_items_bank_mutation_id_foreign` FOREIGN KEY (`bank_mutation_id`) REFERENCES `bank_mutations` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `bank_reconciliation_items_journal_entry_id_foreign` FOREIGN KEY (`journal_entry_id`) REFERENCES `journal_entries` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `bank_reconciliation_items_reconciliation_id_foreign` FOREIGN KEY (`bank_reconciliation_id`) REFERENCES `bank_reconciliations` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of bank_reconciliation_items
 -- ----------------------------
 
 -- ----------------------------
@@ -823,6 +1465,358 @@ CREATE TABLE `bonuses`  (
 
 -- ----------------------------
 -- Records of bonuses
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for bos_allocations
+-- ----------------------------
+DROP TABLE IF EXISTS `bos_allocations`;
+CREATE TABLE `bos_allocations`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `bos_period_id` bigint UNSIGNED NOT NULL,
+  `bos_component_id` bigint UNSIGNED NOT NULL,
+  `allocation_amount` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `percentage` decimal(5, 2) NULL DEFAULT NULL,
+  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `bos_allocations_period_component_unique`(`bos_period_id` ASC, `bos_component_id` ASC) USING BTREE,
+  INDEX `bos_allocations_period_index`(`bos_period_id` ASC) USING BTREE,
+  INDEX `bos_allocations_component_index`(`bos_component_id` ASC) USING BTREE,
+  INDEX `bos_allocations_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `bos_allocations_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `bos_allocations_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `bos_allocations_bos_component_id_foreign` FOREIGN KEY (`bos_component_id`) REFERENCES `bos_components` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `bos_allocations_bos_period_id_foreign` FOREIGN KEY (`bos_period_id`) REFERENCES `bos_periods` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of bos_allocations
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for bos_components
+-- ----------------------------
+DROP TABLE IF EXISTS `bos_components`;
+CREATE TABLE `bos_components`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `authority` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'KEMENDIKBUD',
+  `code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `component_type` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `regulation_code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `regulation_version` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `max_percentage` decimal(5, 2) NULL DEFAULT NULL,
+  `min_percentage` decimal(5, 2) NULL DEFAULT NULL,
+  `calculation_base` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `is_mandatory` tinyint(1) NOT NULL DEFAULT 0,
+  `is_prohibited` tinyint(1) NOT NULL DEFAULT 0,
+  `order_index` int NOT NULL DEFAULT 0,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `bos_components_authority_code_unique`(`authority` ASC, `code` ASC) USING BTREE,
+  INDEX `bos_components_authority_index`(`authority` ASC) USING BTREE,
+  INDEX `bos_components_type_index`(`component_type` ASC) USING BTREE,
+  INDEX `bos_components_regulation_index`(`regulation_code` ASC, `regulation_version` ASC) USING BTREE,
+  INDEX `bos_components_order_index`(`order_index` ASC) USING BTREE,
+  INDEX `bos_components_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `bos_components_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `bos_components_updated_by_index`(`updated_by` ASC) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of bos_components
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for bos_periods
+-- ----------------------------
+DROP TABLE IF EXISTS `bos_periods`;
+CREATE TABLE `bos_periods`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `school_id` bigint UNSIGNED NOT NULL,
+  `academic_year_id` bigint UNSIGNED NOT NULL,
+  `fiscal_period_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `authority` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'KEMENDIKBUD',
+  `regulation_version` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `period_number` int NULL DEFAULT NULL,
+  `start_date` date NOT NULL,
+  `end_date` date NOT NULL,
+  `total_allocation` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `total_received` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `total_used` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `total_remaining` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PLANNING',
+  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `bos_periods_school_code_unique`(`school_id` ASC, `code` ASC) USING BTREE,
+  INDEX `bos_periods_school_index`(`school_id` ASC) USING BTREE,
+  INDEX `bos_periods_academic_year_index`(`academic_year_id` ASC) USING BTREE,
+  INDEX `bos_periods_fiscal_period_index`(`fiscal_period_id` ASC) USING BTREE,
+  INDEX `bos_periods_authority_index`(`authority` ASC) USING BTREE,
+  INDEX `bos_periods_status_index`(`status` ASC) USING BTREE,
+  INDEX `bos_periods_dates_index`(`start_date` ASC, `end_date` ASC) USING BTREE,
+  INDEX `bos_periods_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `bos_periods_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `bos_periods_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `bos_periods_academic_year_id_foreign` FOREIGN KEY (`academic_year_id`) REFERENCES `academic_years` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `bos_periods_fiscal_period_id_foreign` FOREIGN KEY (`fiscal_period_id`) REFERENCES `fiscal_periods` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `bos_periods_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of bos_periods
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for bos_realizations
+-- ----------------------------
+DROP TABLE IF EXISTS `bos_realizations`;
+CREATE TABLE `bos_realizations`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `bos_period_id` bigint UNSIGNED NOT NULL,
+  `bos_usage_plan_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `rkas_realization_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `journal_entry_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `vendor_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `vendor_invoice_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `receipt_number` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `realization_date` date NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `amount` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `tax_amount` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `payment_method` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `attachment_url` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'RECORDED',
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `bos_realizations_period_index`(`bos_period_id` ASC) USING BTREE,
+  INDEX `bos_realizations_usage_plan_index`(`bos_usage_plan_id` ASC) USING BTREE,
+  INDEX `bos_realizations_rkas_realization_index`(`rkas_realization_id` ASC) USING BTREE,
+  INDEX `bos_realizations_journal_entry_index`(`journal_entry_id` ASC) USING BTREE,
+  INDEX `bos_realizations_vendor_index`(`vendor_id` ASC) USING BTREE,
+  INDEX `bos_realizations_vendor_invoice_index`(`vendor_invoice_id` ASC) USING BTREE,
+  INDEX `bos_realizations_date_index`(`realization_date` ASC) USING BTREE,
+  INDEX `bos_realizations_status_index`(`status` ASC) USING BTREE,
+  INDEX `bos_realizations_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `bos_realizations_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `bos_realizations_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `bos_realizations_bos_period_id_foreign` FOREIGN KEY (`bos_period_id`) REFERENCES `bos_periods` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `bos_realizations_bos_usage_plan_id_foreign` FOREIGN KEY (`bos_usage_plan_id`) REFERENCES `bos_usage_plans` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `bos_realizations_journal_entry_id_foreign` FOREIGN KEY (`journal_entry_id`) REFERENCES `journal_entries` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `bos_realizations_rkas_realization_id_foreign` FOREIGN KEY (`rkas_realization_id`) REFERENCES `rkas_realizations` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `bos_realizations_vendor_id_foreign` FOREIGN KEY (`vendor_id`) REFERENCES `vendors` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `bos_realizations_vendor_invoice_id_foreign` FOREIGN KEY (`vendor_invoice_id`) REFERENCES `vendor_invoices` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of bos_realizations
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for bos_receipts
+-- ----------------------------
+DROP TABLE IF EXISTS `bos_receipts`;
+CREATE TABLE `bos_receipts`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `bos_period_id` bigint UNSIGNED NOT NULL,
+  `bank_account_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `receipt_number` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `receipt_date` date NOT NULL,
+  `amount` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `transfer_reference` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `bank_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `transfer_proof_url` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `received_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `bos_receipts_period_number_unique`(`bos_period_id` ASC, `receipt_number` ASC) USING BTREE,
+  INDEX `bos_receipts_period_index`(`bos_period_id` ASC) USING BTREE,
+  INDEX `bos_receipts_bank_account_index`(`bank_account_id` ASC) USING BTREE,
+  INDEX `bos_receipts_date_index`(`receipt_date` ASC) USING BTREE,
+  INDEX `bos_receipts_received_by_index`(`received_by` ASC) USING BTREE,
+  INDEX `bos_receipts_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `bos_receipts_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `bos_receipts_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `bos_receipts_bank_account_id_foreign` FOREIGN KEY (`bank_account_id`) REFERENCES `bank_accounts` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `bos_receipts_bos_period_id_foreign` FOREIGN KEY (`bos_period_id`) REFERENCES `bos_periods` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `bos_receipts_received_by_foreign` FOREIGN KEY (`received_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of bos_receipts
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for bos_report_items
+-- ----------------------------
+DROP TABLE IF EXISTS `bos_report_items`;
+CREATE TABLE `bos_report_items`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `bos_report_id` bigint UNSIGNED NOT NULL,
+  `bos_component_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `rkas_source_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `account_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `allocation_amount` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `received_amount` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `realization_amount` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `remaining_amount` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `percentage` decimal(5, 2) NOT NULL DEFAULT 0.00,
+  `item_data` json NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `bos_report_items_report_index`(`bos_report_id` ASC) USING BTREE,
+  INDEX `bos_report_items_component_index`(`bos_component_id` ASC) USING BTREE,
+  INDEX `bos_report_items_source_index`(`rkas_source_id` ASC) USING BTREE,
+  INDEX `bos_report_items_coa_index`(`account_id` ASC) USING BTREE,
+  INDEX `bos_report_items_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `bos_report_items_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `bos_report_items_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `bos_report_items_account_id_foreign` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `bos_report_items_bos_component_id_foreign` FOREIGN KEY (`bos_component_id`) REFERENCES `bos_components` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `bos_report_items_bos_report_id_foreign` FOREIGN KEY (`bos_report_id`) REFERENCES `bos_reports` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `bos_report_items_rkas_source_id_foreign` FOREIGN KEY (`rkas_source_id`) REFERENCES `rkas_sources` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of bos_report_items
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for bos_reports
+-- ----------------------------
+DROP TABLE IF EXISTS `bos_reports`;
+CREATE TABLE `bos_reports`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `school_id` bigint UNSIGNED NOT NULL,
+  `bos_period_id` bigint UNSIGNED NOT NULL,
+  `fiscal_period_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `report_code` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `report_name` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `report_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PERIODIC',
+  `period_number` int NULL DEFAULT NULL,
+  `start_date` date NOT NULL,
+  `end_date` date NOT NULL,
+  `total_allocation` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `total_received` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `total_used` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `total_remaining` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `percentage` decimal(5, 2) NOT NULL DEFAULT 0.00,
+  `file_url` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `report_data` json NULL,
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'DRAFT',
+  `submitted_at` timestamp NULL DEFAULT NULL,
+  `submitted_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `verified_at` timestamp NULL DEFAULT NULL,
+  `verified_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `bos_reports_school_period_code_unique`(`school_id` ASC, `bos_period_id` ASC, `report_code` ASC) USING BTREE,
+  INDEX `bos_reports_school_index`(`school_id` ASC) USING BTREE,
+  INDEX `bos_reports_period_index`(`bos_period_id` ASC) USING BTREE,
+  INDEX `bos_reports_fiscal_period_index`(`fiscal_period_id` ASC) USING BTREE,
+  INDEX `bos_reports_code_index`(`report_code` ASC) USING BTREE,
+  INDEX `bos_reports_type_index`(`report_type` ASC) USING BTREE,
+  INDEX `bos_reports_status_index`(`status` ASC) USING BTREE,
+  INDEX `bos_reports_submitted_by_index`(`submitted_by` ASC) USING BTREE,
+  INDEX `bos_reports_verified_by_index`(`verified_by` ASC) USING BTREE,
+  INDEX `bos_reports_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `bos_reports_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `bos_reports_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `bos_reports_bos_period_id_foreign` FOREIGN KEY (`bos_period_id`) REFERENCES `bos_periods` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `bos_reports_fiscal_period_id_foreign` FOREIGN KEY (`fiscal_period_id`) REFERENCES `fiscal_periods` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `bos_reports_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `bos_reports_submitted_by_foreign` FOREIGN KEY (`submitted_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `bos_reports_verified_by_foreign` FOREIGN KEY (`verified_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of bos_reports
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for bos_usage_plans
+-- ----------------------------
+DROP TABLE IF EXISTS `bos_usage_plans`;
+CREATE TABLE `bos_usage_plans`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `bos_period_id` bigint UNSIGNED NOT NULL,
+  `rkas_document_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `rkas_item_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `bos_component_id` bigint UNSIGNED NOT NULL,
+  `code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `planned_amount` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `execution_month` tinyint UNSIGNED NULL DEFAULT NULL,
+  `execution_quarter` tinyint UNSIGNED NULL DEFAULT NULL,
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PLANNED',
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `bos_usage_plans_period_code_unique`(`bos_period_id` ASC, `code` ASC) USING BTREE,
+  INDEX `bos_usage_plans_period_index`(`bos_period_id` ASC) USING BTREE,
+  INDEX `bos_usage_plans_rkas_document_index`(`rkas_document_id` ASC) USING BTREE,
+  INDEX `bos_usage_plans_rkas_item_index`(`rkas_item_id` ASC) USING BTREE,
+  INDEX `bos_usage_plans_component_index`(`bos_component_id` ASC) USING BTREE,
+  INDEX `bos_usage_plans_month_index`(`execution_month` ASC) USING BTREE,
+  INDEX `bos_usage_plans_status_index`(`status` ASC) USING BTREE,
+  INDEX `bos_usage_plans_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `bos_usage_plans_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `bos_usage_plans_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `bos_usage_plans_bos_component_id_foreign` FOREIGN KEY (`bos_component_id`) REFERENCES `bos_components` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `bos_usage_plans_bos_period_id_foreign` FOREIGN KEY (`bos_period_id`) REFERENCES `bos_periods` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `bos_usage_plans_rkas_document_id_foreign` FOREIGN KEY (`rkas_document_id`) REFERENCES `rkas_documents` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `bos_usage_plans_rkas_item_id_foreign` FOREIGN KEY (`rkas_item_id`) REFERENCES `rkas_items` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of bos_usage_plans
 -- ----------------------------
 
 -- ----------------------------
@@ -959,6 +1953,118 @@ CREATE TABLE `cache_locks`  (
 -- ----------------------------
 
 -- ----------------------------
+-- Table structure for cbt_activity_logs
+-- ----------------------------
+DROP TABLE IF EXISTS `cbt_activity_logs`;
+CREATE TABLE `cbt_activity_logs`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `session_id` bigint UNSIGNED NOT NULL,
+  `activity_type` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `activity_data` json NULL,
+  `recorded_at` timestamp NULL DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `cbt_activity_logs_session_index`(`session_id` ASC) USING BTREE,
+  INDEX `cbt_activity_logs_type_index`(`activity_type` ASC) USING BTREE,
+  INDEX `cbt_activity_logs_recorded_at_index`(`recorded_at` ASC) USING BTREE,
+  INDEX `cbt_activity_logs_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `cbt_activity_logs_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `cbt_activity_logs_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `cbt_activity_logs_session_id_foreign` FOREIGN KEY (`session_id`) REFERENCES `cbt_sessions` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of cbt_activity_logs
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for cbt_proctoring
+-- ----------------------------
+DROP TABLE IF EXISTS `cbt_proctoring`;
+CREATE TABLE `cbt_proctoring`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `session_id` bigint UNSIGNED NOT NULL,
+  `proctor_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `start_proctoring` timestamp NULL DEFAULT NULL,
+  `end_proctoring` timestamp NULL DEFAULT NULL,
+  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `flag_reason` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `cbt_proctoring_session_index`(`session_id` ASC) USING BTREE,
+  INDEX `cbt_proctoring_proctor_index`(`proctor_id` ASC) USING BTREE,
+  INDEX `cbt_proctoring_status_index`(`status` ASC) USING BTREE,
+  INDEX `cbt_proctoring_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `cbt_proctoring_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `cbt_proctoring_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `cbt_proctoring_proctor_id_foreign` FOREIGN KEY (`proctor_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `cbt_proctoring_session_id_foreign` FOREIGN KEY (`session_id`) REFERENCES `cbt_sessions` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of cbt_proctoring
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for cbt_sessions
+-- ----------------------------
+DROP TABLE IF EXISTS `cbt_sessions`;
+CREATE TABLE `cbt_sessions`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `exam_package_id` bigint UNSIGNED NOT NULL,
+  `student_id` bigint UNSIGNED NOT NULL,
+  `schedule_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `class_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `start_time` timestamp NULL DEFAULT NULL,
+  `end_time` timestamp NULL DEFAULT NULL,
+  `duration_seconds` int NULL DEFAULT NULL,
+  `current_question_index` int NOT NULL DEFAULT 0,
+  `answers` json NULL,
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `ip_address` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `user_agent` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `proctor_notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `is_submitted` tinyint(1) NOT NULL DEFAULT 0,
+  `submitted_at` timestamp NULL DEFAULT NULL,
+  `final_score` decimal(5, 2) NULL DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `cbt_sessions_exam_package_index`(`exam_package_id` ASC) USING BTREE,
+  INDEX `cbt_sessions_student_index`(`student_id` ASC) USING BTREE,
+  INDEX `cbt_sessions_schedule_index`(`schedule_id` ASC) USING BTREE,
+  INDEX `cbt_sessions_class_index`(`class_id` ASC) USING BTREE,
+  INDEX `cbt_sessions_status_index`(`status` ASC) USING BTREE,
+  INDEX `cbt_sessions_is_submitted_index`(`is_submitted` ASC) USING BTREE,
+  INDEX `cbt_sessions_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `cbt_sessions_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `cbt_sessions_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `cbt_sessions_class_id_foreign` FOREIGN KEY (`class_id`) REFERENCES `classrooms` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `cbt_sessions_exam_package_id_foreign` FOREIGN KEY (`exam_package_id`) REFERENCES `exam_packages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `cbt_sessions_schedule_id_foreign` FOREIGN KEY (`schedule_id`) REFERENCES `schedules` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `cbt_sessions_student_id_foreign` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of cbt_sessions
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for class_levels
 -- ----------------------------
 DROP TABLE IF EXISTS `class_levels`;
@@ -1061,6 +2167,49 @@ CREATE TABLE `cost_centers`  (
 -- ----------------------------
 
 -- ----------------------------
+-- Table structure for counseling_sessions
+-- ----------------------------
+DROP TABLE IF EXISTS `counseling_sessions`;
+CREATE TABLE `counseling_sessions`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `student_id` bigint UNSIGNED NOT NULL,
+  `school_id` bigint UNSIGNED NOT NULL,
+  `counselor_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `session_date` timestamp NULL DEFAULT NULL,
+  `category` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `problem` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `action` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `follow_up` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `follow_up_date` date NULL DEFAULT NULL,
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'OPEN',
+  `is_confidential` tinyint(1) NOT NULL DEFAULT 1,
+  `parent_involved` tinyint(1) NOT NULL DEFAULT 0,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `counseling_sessions_student_index`(`student_id` ASC) USING BTREE,
+  INDEX `counseling_sessions_school_index`(`school_id` ASC) USING BTREE,
+  INDEX `counseling_sessions_counselor_index`(`counselor_id` ASC) USING BTREE,
+  INDEX `counseling_sessions_category_index`(`category` ASC) USING BTREE,
+  INDEX `counseling_sessions_status_index`(`status` ASC) USING BTREE,
+  INDEX `counseling_sessions_session_date_index`(`session_date` ASC) USING BTREE,
+  INDEX `counseling_sessions_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `counseling_sessions_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `counseling_sessions_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `counseling_sessions_counselor_id_foreign` FOREIGN KEY (`counselor_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `counseling_sessions_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `counseling_sessions_student_id_foreign` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of counseling_sessions
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for courses
 -- ----------------------------
 DROP TABLE IF EXISTS `courses`;
@@ -1100,38 +2249,108 @@ CREATE TABLE `courses`  (
 -- ----------------------------
 
 -- ----------------------------
--- Table structure for curriculum_structures
+-- Table structure for currencies
 -- ----------------------------
-DROP TABLE IF EXISTS `curriculum_structures`;
-CREATE TABLE `curriculum_structures`  (
+DROP TABLE IF EXISTS `currencies`;
+CREATE TABLE `currencies`  (
   `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
-  `organization_id` bigint UNSIGNED NOT NULL,
-  `class_level_id` bigint UNSIGNED NOT NULL,
-  `subject_id` bigint UNSIGNED NOT NULL,
-  `academic_year_id` bigint UNSIGNED NOT NULL,
-  `semester` enum('SEMESTER_1','SEMESTER_2') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `hours_per_week` int NOT NULL,
-  `hour_duration` int NULL DEFAULT 45,
-  `is_core` tinyint(1) NULL DEFAULT 1,
-  `min_student` int NULL DEFAULT 1,
-  `max_student` int NULL DEFAULT 40,
-  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
-  `is_active` tinyint(1) NULL DEFAULT 1,
+  `code` varchar(3) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `symbol` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `decimal_places` tinyint UNSIGNED NOT NULL DEFAULT 2,
+  `is_base` tinyint(1) NOT NULL DEFAULT 0,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
   `created_by` bigint UNSIGNED NULL DEFAULT NULL,
   `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `curriculum_structures_unique`(`organization_id` ASC, `class_level_id` ASC, `subject_id` ASC, `academic_year_id` ASC, `semester` ASC) USING BTREE,
-  INDEX `idx_curriculum_class`(`class_level_id` ASC) USING BTREE,
-  INDEX `idx_curriculum_subject`(`subject_id` ASC) USING BTREE,
-  INDEX `idx_curriculum_deleted_at`(`deleted_at` ASC) USING BTREE,
-  INDEX `curriculum_structures_academic_year_fk`(`academic_year_id` ASC) USING BTREE,
-  CONSTRAINT `curriculum_structures_academic_year_fk` FOREIGN KEY (`academic_year_id`) REFERENCES `academic_years` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
-  CONSTRAINT `curriculum_structures_class_fk` FOREIGN KEY (`class_level_id`) REFERENCES `class_levels` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
-  CONSTRAINT `curriculum_structures_org_fk` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
-  CONSTRAINT `curriculum_structures_subject_fk` FOREIGN KEY (`subject_id`) REFERENCES `subjects` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+  UNIQUE INDEX `currencies_code_unique`(`code` ASC) USING BTREE,
+  INDEX `currencies_is_base_index`(`is_base` ASC) USING BTREE,
+  INDEX `currencies_is_active_index`(`is_active` ASC) USING BTREE,
+  INDEX `currencies_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `currencies_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `currencies_updated_by_index`(`updated_by` ASC) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of currencies
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for curriculum_phases
+-- ----------------------------
+DROP TABLE IF EXISTS `curriculum_phases`;
+CREATE TABLE `curriculum_phases`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `school_id` bigint UNSIGNED NOT NULL,
+  `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `code` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `age_range` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `class_levels` json NULL,
+  `competencies` json NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `curriculum_phases_school_code_unique`(`school_id` ASC, `code` ASC) USING BTREE,
+  INDEX `curriculum_phases_school_index`(`school_id` ASC) USING BTREE,
+  INDEX `curriculum_phases_is_active_index`(`is_active` ASC) USING BTREE,
+  INDEX `curriculum_phases_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `curriculum_phases_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `curriculum_phases_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `curriculum_phases_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of curriculum_phases
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for curriculum_structures
+-- ----------------------------
+DROP TABLE IF EXISTS `curriculum_structures`;
+CREATE TABLE `curriculum_structures`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `school_id` bigint UNSIGNED NOT NULL,
+  `organization_id` bigint UNSIGNED NOT NULL,
+  `class_level_id` bigint UNSIGNED NOT NULL,
+  `subject_id` bigint UNSIGNED NOT NULL,
+  `academic_year_id` bigint UNSIGNED NOT NULL,
+  `curriculum_phase_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `semester` enum('SEMESTER_1','SEMESTER_2') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `hours_per_week` int NOT NULL,
+  `hour_duration` int NOT NULL DEFAULT 45,
+  `is_core` tinyint(1) NOT NULL DEFAULT 1,
+  `min_student` int NOT NULL DEFAULT 1,
+  `max_student` int NOT NULL DEFAULT 40,
+  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `curriculum_structures_unique`(`school_id` ASC, `class_level_id` ASC, `subject_id` ASC, `academic_year_id` ASC, `semester` ASC) USING BTREE,
+  INDEX `curriculum_structures_school_index`(`school_id` ASC) USING BTREE,
+  INDEX `curriculum_structures_class_index`(`class_level_id` ASC) USING BTREE,
+  INDEX `curriculum_structures_subject_index`(`subject_id` ASC) USING BTREE,
+  INDEX `curriculum_structures_academic_year_index`(`academic_year_id` ASC) USING BTREE,
+  INDEX `curriculum_structures_phase_index`(`curriculum_phase_id` ASC) USING BTREE,
+  INDEX `curriculum_structures_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `curriculum_structures_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `curriculum_structures_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `curriculum_structures_academic_year_id_foreign` FOREIGN KEY (`academic_year_id`) REFERENCES `academic_years` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `curriculum_structures_class_level_id_foreign` FOREIGN KEY (`class_level_id`) REFERENCES `class_levels` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `curriculum_structures_phase_id_foreign` FOREIGN KEY (`curriculum_phase_id`) REFERENCES `curriculum_phases` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `curriculum_structures_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `curriculum_structures_subject_id_foreign` FOREIGN KEY (`subject_id`) REFERENCES `subjects` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
@@ -1169,6 +2388,118 @@ CREATE TABLE `customers`  (
 
 -- ----------------------------
 -- Records of customers
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for dapodik_mappings
+-- ----------------------------
+DROP TABLE IF EXISTS `dapodik_mappings`;
+CREATE TABLE `dapodik_mappings`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `school_id` bigint UNSIGNED NOT NULL,
+  `local_table` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `local_id` bigint UNSIGNED NOT NULL,
+  `dapodik_id` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `dapodik_table` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `hash_value` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `last_sync_at` timestamp NULL DEFAULT NULL,
+  `sync_status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PENDING',
+  `error_message` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `retry_count` int NOT NULL DEFAULT 0,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `dapodik_mappings_local_unique`(`local_table` ASC, `local_id` ASC) USING BTREE,
+  UNIQUE INDEX `dapodik_mappings_dapodik_unique`(`dapodik_table` ASC, `dapodik_id` ASC) USING BTREE,
+  INDEX `dapodik_mappings_school_index`(`school_id` ASC) USING BTREE,
+  INDEX `dapodik_mappings_local_index`(`local_table` ASC, `local_id` ASC) USING BTREE,
+  INDEX `dapodik_mappings_dapodik_index`(`dapodik_table` ASC, `dapodik_id` ASC) USING BTREE,
+  INDEX `dapodik_mappings_status_index`(`sync_status` ASC) USING BTREE,
+  INDEX `dapodik_mappings_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `dapodik_mappings_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `dapodik_mappings_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `dapodik_mappings_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of dapodik_mappings
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for dapodik_sync_logs
+-- ----------------------------
+DROP TABLE IF EXISTS `dapodik_sync_logs`;
+CREATE TABLE `dapodik_sync_logs`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `school_id` bigint UNSIGNED NOT NULL,
+  `sync_date` timestamp NULL DEFAULT NULL,
+  `sync_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `total_records` int NOT NULL DEFAULT 0,
+  `total_synced` int NOT NULL DEFAULT 0,
+  `total_failed` int NOT NULL DEFAULT 0,
+  `total_conflicts` int NOT NULL DEFAULT 0,
+  `sync_duration_seconds` int NULL DEFAULT NULL,
+  `error_log` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `details` json NULL,
+  `triggered_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `dapodik_sync_logs_school_index`(`school_id` ASC) USING BTREE,
+  INDEX `dapodik_sync_logs_status_index`(`status` ASC) USING BTREE,
+  INDEX `dapodik_sync_logs_sync_type_index`(`sync_type` ASC) USING BTREE,
+  INDEX `dapodik_sync_logs_sync_date_index`(`sync_date` ASC) USING BTREE,
+  INDEX `dapodik_sync_logs_triggered_by_index`(`triggered_by` ASC) USING BTREE,
+  INDEX `dapodik_sync_logs_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `dapodik_sync_logs_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `dapodik_sync_logs_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `dapodik_sync_logs_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `dapodik_sync_logs_triggered_by_foreign` FOREIGN KEY (`triggered_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of dapodik_sync_logs
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for dapodik_sync_schedules
+-- ----------------------------
+DROP TABLE IF EXISTS `dapodik_sync_schedules`;
+CREATE TABLE `dapodik_sync_schedules`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `school_id` bigint UNSIGNED NOT NULL,
+  `schedule_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `sync_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `frequency` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `last_run` timestamp NULL DEFAULT NULL,
+  `next_run` timestamp NULL DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `dapodik_sync_schedules_school_index`(`school_id` ASC) USING BTREE,
+  INDEX `dapodik_sync_schedules_next_run_index`(`next_run` ASC) USING BTREE,
+  INDEX `dapodik_sync_schedules_is_active_index`(`is_active` ASC) USING BTREE,
+  INDEX `dapodik_sync_schedules_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `dapodik_sync_schedules_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `dapodik_sync_schedules_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `dapodik_sync_schedules_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of dapodik_sync_schedules
 -- ----------------------------
 
 -- ----------------------------
@@ -1306,6 +2637,74 @@ CREATE TABLE `dictionaries`  (
 
 -- ----------------------------
 -- Records of dictionaries
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for discussion_replies
+-- ----------------------------
+DROP TABLE IF EXISTS `discussion_replies`;
+CREATE TABLE `discussion_replies`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `discussion_id` bigint UNSIGNED NOT NULL,
+  `user_id` bigint UNSIGNED NOT NULL,
+  `content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `is_solution` tinyint(1) NOT NULL DEFAULT 0,
+  `likes_count` int NOT NULL DEFAULT 0,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `discussion_replies_discussion_index`(`discussion_id` ASC) USING BTREE,
+  INDEX `discussion_replies_user_index`(`user_id` ASC) USING BTREE,
+  INDEX `discussion_replies_is_solution_index`(`is_solution` ASC) USING BTREE,
+  INDEX `discussion_replies_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `discussion_replies_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `discussion_replies_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `discussion_replies_discussion_id_foreign` FOREIGN KEY (`discussion_id`) REFERENCES `discussions` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `discussion_replies_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of discussion_replies
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for discussions
+-- ----------------------------
+DROP TABLE IF EXISTS `discussions`;
+CREATE TABLE `discussions`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `course_id` bigint UNSIGNED NOT NULL,
+  `user_id` bigint UNSIGNED NOT NULL,
+  `title` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `is_pinned` tinyint(1) NOT NULL DEFAULT 0,
+  `is_locked` tinyint(1) NOT NULL DEFAULT 0,
+  `views_count` int NOT NULL DEFAULT 0,
+  `replies_count` int NOT NULL DEFAULT 0,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `discussions_course_index`(`course_id` ASC) USING BTREE,
+  INDEX `discussions_user_index`(`user_id` ASC) USING BTREE,
+  INDEX `discussions_created_at_index`(`created_at` ASC) USING BTREE,
+  INDEX `discussions_is_pinned_index`(`is_pinned` ASC) USING BTREE,
+  INDEX `discussions_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `discussions_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `discussions_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `discussions_course_id_foreign` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `discussions_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of discussions
 -- ----------------------------
 
 -- ----------------------------
@@ -1665,6 +3064,143 @@ CREATE TABLE `employees`  (
 -- ----------------------------
 
 -- ----------------------------
+-- Table structure for enrollment_conversions
+-- ----------------------------
+DROP TABLE IF EXISTS `enrollment_conversions`;
+CREATE TABLE `enrollment_conversions`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `applicant_id` bigint UNSIGNED NOT NULL,
+  `student_id` bigint UNSIGNED NOT NULL,
+  `school_id` bigint UNSIGNED NOT NULL,
+  `admission_id` bigint UNSIGNED NOT NULL,
+  `converted_at` timestamp NULL DEFAULT NULL,
+  `converted_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `enrollment_conversions_applicant_unique`(`applicant_id` ASC) USING BTREE,
+  UNIQUE INDEX `enrollment_conversions_student_unique`(`student_id` ASC) USING BTREE,
+  INDEX `enrollment_conversions_school_index`(`school_id` ASC) USING BTREE,
+  INDEX `enrollment_conversions_admission_index`(`admission_id` ASC) USING BTREE,
+  INDEX `enrollment_conversions_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `enrollment_conversions_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `enrollment_conversions_updated_by_index`(`updated_by` ASC) USING BTREE,
+  INDEX `enrollment_conversions_converted_by_foreign`(`converted_by` ASC) USING BTREE,
+  CONSTRAINT `enrollment_conversions_admission_id_foreign` FOREIGN KEY (`admission_id`) REFERENCES `admissions` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `enrollment_conversions_applicant_id_foreign` FOREIGN KEY (`applicant_id`) REFERENCES `applicants` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `enrollment_conversions_converted_by_foreign` FOREIGN KEY (`converted_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `enrollment_conversions_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `enrollment_conversions_student_id_foreign` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of enrollment_conversions
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for exam_package_questions
+-- ----------------------------
+DROP TABLE IF EXISTS `exam_package_questions`;
+CREATE TABLE `exam_package_questions`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `package_id` bigint UNSIGNED NOT NULL,
+  `question_id` bigint UNSIGNED NOT NULL,
+  `question_order` int NOT NULL DEFAULT 0,
+  `points` int NOT NULL DEFAULT 10,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `exam_package_questions_unique`(`package_id` ASC, `question_id` ASC) USING BTREE,
+  INDEX `exam_package_questions_package_index`(`package_id` ASC) USING BTREE,
+  INDEX `exam_package_questions_question_index`(`question_id` ASC) USING BTREE,
+  INDEX `exam_package_questions_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  CONSTRAINT `exam_package_questions_package_id_foreign` FOREIGN KEY (`package_id`) REFERENCES `exam_packages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `exam_package_questions_question_id_foreign` FOREIGN KEY (`question_id`) REFERENCES `question_banks` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of exam_package_questions
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for exam_packages
+-- ----------------------------
+DROP TABLE IF EXISTS `exam_packages`;
+CREATE TABLE `exam_packages`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `school_id` bigint UNSIGNED NOT NULL,
+  `subject_id` bigint UNSIGNED NOT NULL,
+  `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `duration_minutes` int NOT NULL DEFAULT 60,
+  `total_questions` int NOT NULL DEFAULT 0,
+  `passing_score` int NOT NULL DEFAULT 70,
+  `is_randomized` tinyint(1) NOT NULL DEFAULT 0,
+  `shuffle_options` tinyint(1) NOT NULL DEFAULT 0,
+  `show_results` tinyint(1) NOT NULL DEFAULT 1,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `exam_packages_school_index`(`school_id` ASC) USING BTREE,
+  INDEX `exam_packages_subject_index`(`subject_id` ASC) USING BTREE,
+  INDEX `exam_packages_is_active_index`(`is_active` ASC) USING BTREE,
+  INDEX `exam_packages_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `exam_packages_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `exam_packages_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `exam_packages_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `exam_packages_subject_id_foreign` FOREIGN KEY (`subject_id`) REFERENCES `subjects` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of exam_packages
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for exchange_rates
+-- ----------------------------
+DROP TABLE IF EXISTS `exchange_rates`;
+CREATE TABLE `exchange_rates`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `currency_id` bigint UNSIGNED NOT NULL,
+  `base_currency_id` bigint UNSIGNED NOT NULL,
+  `rate_date` date NOT NULL,
+  `rate` decimal(20, 8) NOT NULL,
+  `source` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `exchange_rates_currency_date_unique`(`currency_id` ASC, `base_currency_id` ASC, `rate_date` ASC) USING BTREE,
+  INDEX `exchange_rates_currency_index`(`currency_id` ASC) USING BTREE,
+  INDEX `exchange_rates_base_index`(`base_currency_id` ASC) USING BTREE,
+  INDEX `exchange_rates_date_index`(`rate_date` ASC) USING BTREE,
+  INDEX `exchange_rates_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `exchange_rates_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `exchange_rates_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `exchange_rates_base_currency_id_foreign` FOREIGN KEY (`base_currency_id`) REFERENCES `currencies` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `exchange_rates_currency_id_foreign` FOREIGN KEY (`currency_id`) REFERENCES `currencies` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of exchange_rates
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for expense_categories
 -- ----------------------------
 DROP TABLE IF EXISTS `expense_categories`;
@@ -1808,6 +3344,77 @@ CREATE TABLE `expenses`  (
 -- ----------------------------
 
 -- ----------------------------
+-- Table structure for extracurricular_attendances
+-- ----------------------------
+DROP TABLE IF EXISTS `extracurricular_attendances`;
+CREATE TABLE `extracurricular_attendances`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `student_extracurricular_id` bigint UNSIGNED NOT NULL,
+  `meeting_date` date NOT NULL,
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `recorded_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `extracurricular_attendances_unique`(`student_extracurricular_id` ASC, `meeting_date` ASC) USING BTREE,
+  INDEX `extracurricular_attendances_student_extracurricular_index`(`student_extracurricular_id` ASC) USING BTREE,
+  INDEX `extracurricular_attendances_date_index`(`meeting_date` ASC) USING BTREE,
+  INDEX `extracurricular_attendances_status_index`(`status` ASC) USING BTREE,
+  INDEX `extracurricular_attendances_recorded_by_index`(`recorded_by` ASC) USING BTREE,
+  INDEX `extracurricular_attendances_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `extracurricular_attendances_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `extracurricular_attendances_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `extracurricular_attendances_recorded_by_foreign` FOREIGN KEY (`recorded_by`) REFERENCES `teachers` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `extracurricular_attendances_student_extracurricular_id_foreign` FOREIGN KEY (`student_extracurricular_id`) REFERENCES `student_extracurriculars` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of extracurricular_attendances
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for extracurriculars
+-- ----------------------------
+DROP TABLE IF EXISTS `extracurriculars`;
+CREATE TABLE `extracurriculars`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `school_id` bigint UNSIGNED NOT NULL,
+  `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `code` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `teacher_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `day_of_week` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `start_time` time NULL DEFAULT NULL,
+  `end_time` time NULL DEFAULT NULL,
+  `max_students` int NOT NULL DEFAULT 30,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `extracurriculars_school_code_unique`(`school_id` ASC, `code` ASC) USING BTREE,
+  INDEX `extracurriculars_school_index`(`school_id` ASC) USING BTREE,
+  INDEX `extracurriculars_teacher_index`(`teacher_id` ASC) USING BTREE,
+  INDEX `extracurriculars_day_index`(`day_of_week` ASC) USING BTREE,
+  INDEX `extracurriculars_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `extracurriculars_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `extracurriculars_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `extracurriculars_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `extracurriculars_teacher_id_foreign` FOREIGN KEY (`teacher_id`) REFERENCES `teachers` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of extracurriculars
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for facilities
 -- ----------------------------
 DROP TABLE IF EXISTS `facilities`;
@@ -1890,6 +3497,78 @@ CREATE TABLE `failed_jobs`  (
 -- ----------------------------
 
 -- ----------------------------
+-- Table structure for fee_masters
+-- ----------------------------
+DROP TABLE IF EXISTS `fee_masters`;
+CREATE TABLE `fee_masters`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `school_id` bigint UNSIGNED NOT NULL,
+  `academic_year_id` bigint UNSIGNED NOT NULL,
+  `class_level_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `fee_category` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `fee_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `fee_code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `amount` decimal(15, 2) NOT NULL,
+  `frequency` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `is_mandatory` tinyint(1) NOT NULL DEFAULT 1,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `fee_masters_school_code_unique`(`school_id` ASC, `fee_code` ASC) USING BTREE,
+  INDEX `fee_masters_school_index`(`school_id` ASC) USING BTREE,
+  INDEX `fee_masters_academic_year_index`(`academic_year_id` ASC) USING BTREE,
+  INDEX `fee_masters_class_level_index`(`class_level_id` ASC) USING BTREE,
+  INDEX `fee_masters_category_index`(`fee_category` ASC) USING BTREE,
+  INDEX `fee_masters_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `fee_masters_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `fee_masters_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `fee_masters_academic_year_id_foreign` FOREIGN KEY (`academic_year_id`) REFERENCES `academic_years` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fee_masters_class_level_id_foreign` FOREIGN KEY (`class_level_id`) REFERENCES `class_levels` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fee_masters_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of fee_masters
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for fee_structures
+-- ----------------------------
+DROP TABLE IF EXISTS `fee_structures`;
+CREATE TABLE `fee_structures`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `fee_master_id` bigint UNSIGNED NOT NULL,
+  `period_id` bigint UNSIGNED NOT NULL,
+  `due_date` date NULL DEFAULT NULL,
+  `amount` decimal(15, 2) NOT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `fee_structures_master_period_unique`(`fee_master_id` ASC, `period_id` ASC) USING BTREE,
+  INDEX `fee_structures_master_index`(`fee_master_id` ASC) USING BTREE,
+  INDEX `fee_structures_period_index`(`period_id` ASC) USING BTREE,
+  INDEX `fee_structures_due_date_index`(`due_date` ASC) USING BTREE,
+  INDEX `fee_structures_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `fee_structures_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `fee_structures_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `fee_structures_fee_master_id_foreign` FOREIGN KEY (`fee_master_id`) REFERENCES `fee_masters` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fee_structures_period_id_foreign` FOREIGN KEY (`period_id`) REFERENCES `periods` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of fee_structures
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for finance_audit_logs
 -- ----------------------------
 DROP TABLE IF EXISTS `finance_audit_logs`;
@@ -1917,17 +3596,96 @@ CREATE TABLE `finance_audit_logs`  (
 -- ----------------------------
 
 -- ----------------------------
+-- Table structure for fiscal_period_closings
+-- ----------------------------
+DROP TABLE IF EXISTS `fiscal_period_closings`;
+CREATE TABLE `fiscal_period_closings`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `fiscal_period_id` bigint UNSIGNED NOT NULL,
+  `closing_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `closing_date` date NOT NULL,
+  `total_debit` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `total_credit` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `net_income` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `retained_earnings` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `snapshot_data` json NULL,
+  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `fiscal_period_closings_period_index`(`fiscal_period_id` ASC) USING BTREE,
+  INDEX `fiscal_period_closings_type_index`(`closing_type` ASC) USING BTREE,
+  INDEX `fiscal_period_closings_date_index`(`closing_date` ASC) USING BTREE,
+  INDEX `fiscal_period_closings_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `fiscal_period_closings_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `fiscal_period_closings_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `fiscal_period_closings_fiscal_period_id_foreign` FOREIGN KEY (`fiscal_period_id`) REFERENCES `fiscal_periods` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of fiscal_period_closings
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for fiscal_periods
+-- ----------------------------
+DROP TABLE IF EXISTS `fiscal_periods`;
+CREATE TABLE `fiscal_periods`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `school_id` bigint UNSIGNED NOT NULL,
+  `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `code` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `start_date` date NOT NULL,
+  `end_date` date NOT NULL,
+  `year` smallint UNSIGNED NOT NULL,
+  `month` tinyint UNSIGNED NULL DEFAULT NULL,
+  `is_closed` tinyint(1) NOT NULL DEFAULT 0,
+  `closed_at` timestamp NULL DEFAULT NULL,
+  `closed_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `fiscal_periods_school_code_unique`(`school_id` ASC, `code` ASC) USING BTREE,
+  INDEX `fiscal_periods_school_index`(`school_id` ASC) USING BTREE,
+  INDEX `fiscal_periods_year_index`(`year` ASC) USING BTREE,
+  INDEX `fiscal_periods_month_index`(`month` ASC) USING BTREE,
+  INDEX `fiscal_periods_date_range_index`(`start_date` ASC, `end_date` ASC) USING BTREE,
+  INDEX `fiscal_periods_is_closed_index`(`is_closed` ASC) USING BTREE,
+  INDEX `fiscal_periods_closed_by_index`(`closed_by` ASC) USING BTREE,
+  INDEX `fiscal_periods_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `fiscal_periods_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `fiscal_periods_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `fiscal_periods_closed_by_foreign` FOREIGN KEY (`closed_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `fiscal_periods_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of fiscal_periods
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for fiscal_years
 -- ----------------------------
 DROP TABLE IF EXISTS `fiscal_years`;
 CREATE TABLE `fiscal_years`  (
   `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `school_id` bigint NULL DEFAULT NULL,
   `organization_id` bigint UNSIGNED NOT NULL,
   `year` int NOT NULL,
+  `month` int NULL DEFAULT NULL,
   `start_date` date NOT NULL,
   `end_date` date NOT NULL,
   `status` enum('open','closed') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'open',
   `is_closed` tinyint(1) NOT NULL DEFAULT 0,
+  `is_active` tinyint(1) NULL DEFAULT NULL,
   `closed_at` timestamp NULL DEFAULT NULL,
   `closed_by` bigint UNSIGNED NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -1952,13 +3710,20 @@ CREATE TABLE `fiscal_years`  (
 DROP TABLE IF EXISTS `fixed_assets`;
 CREATE TABLE `fixed_assets`  (
   `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `school_id` int NULL DEFAULT NULL,
   `organization_id` bigint UNSIGNED NOT NULL,
+  `asset_category_id` int NULL DEFAULT NULL,
+  `brand` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `model` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
   `asset_code` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `serial_number` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `specification` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
   `acquisition_date` date NOT NULL,
   `acquisition_cost` decimal(15, 2) NOT NULL DEFAULT 0.00,
   `residual_value` decimal(15, 2) NOT NULL DEFAULT 0.00,
   `useful_life_months` int NOT NULL DEFAULT 0,
+  `useful_life_years` int NULL DEFAULT NULL,
   `depreciation_method` enum('straight_line','declining_balance') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'straight_line',
   `accumulated_depreciation` decimal(15, 2) NOT NULL DEFAULT 0.00,
   `book_value` decimal(15, 2) NOT NULL DEFAULT 0.00,
@@ -1966,8 +3731,11 @@ CREATE TABLE `fixed_assets`  (
   `accumulated_depreciation_account_id` bigint UNSIGNED NULL DEFAULT NULL,
   `depreciation_expense_account_id` bigint UNSIGNED NULL DEFAULT NULL,
   `status` enum('draft','active','disposed','fully_depreciated') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'draft',
+  `condition` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
   `disposed_at` date NULL DEFAULT NULL,
   `disposal_value` decimal(15, 2) NULL DEFAULT NULL,
+  `disposal_reason` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `photo_url` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
   `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -2041,6 +3809,264 @@ CREATE TABLE `genders`  (
 
 -- ----------------------------
 -- Records of genders
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for generated_reports
+-- ----------------------------
+DROP TABLE IF EXISTS `generated_reports`;
+CREATE TABLE `generated_reports`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `student_id` bigint UNSIGNED NOT NULL,
+  `period_id` bigint UNSIGNED NOT NULL,
+  `template_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `pdf_path` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `report_data` json NULL,
+  `generated_at` timestamp NULL DEFAULT NULL,
+  `downloaded_count` int NOT NULL DEFAULT 0,
+  `last_download_at` timestamp NULL DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `generated_reports_student_index`(`student_id` ASC) USING BTREE,
+  INDEX `generated_reports_period_index`(`period_id` ASC) USING BTREE,
+  INDEX `generated_reports_template_index`(`template_id` ASC) USING BTREE,
+  INDEX `generated_reports_generated_at_index`(`generated_at` ASC) USING BTREE,
+  INDEX `generated_reports_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `generated_reports_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `generated_reports_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `generated_reports_period_id_foreign` FOREIGN KEY (`period_id`) REFERENCES `periods` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `generated_reports_student_id_foreign` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `generated_reports_template_id_foreign` FOREIGN KEY (`template_id`) REFERENCES `report_card_templates` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of generated_reports
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for goods_receipt_items
+-- ----------------------------
+DROP TABLE IF EXISTS `goods_receipt_items`;
+CREATE TABLE `goods_receipt_items`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `goods_receipt_id` bigint UNSIGNED NOT NULL,
+  `purchase_order_item_id` bigint UNSIGNED NOT NULL,
+  `account_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `unit` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `ordered_quantity` decimal(20, 4) NOT NULL DEFAULT 0.0000,
+  `received_quantity` decimal(20, 4) NOT NULL DEFAULT 0.0000,
+  `rejected_quantity` decimal(20, 4) NOT NULL DEFAULT 0.0000,
+  `unit_price` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `subtotal` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `condition` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'GOOD',
+  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `is_asset` tinyint(1) NOT NULL DEFAULT 0,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `goods_receipt_items_receipt_index`(`goods_receipt_id` ASC) USING BTREE,
+  INDEX `goods_receipt_items_po_item_index`(`purchase_order_item_id` ASC) USING BTREE,
+  INDEX `goods_receipt_items_coa_index`(`account_id` ASC) USING BTREE,
+  INDEX `goods_receipt_items_is_asset_index`(`is_asset` ASC) USING BTREE,
+  INDEX `goods_receipt_items_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `goods_receipt_items_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `goods_receipt_items_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `goods_receipt_items_account_id_foreign` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `goods_receipt_items_goods_receipt_id_foreign` FOREIGN KEY (`goods_receipt_id`) REFERENCES `goods_receipts` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `goods_receipt_items_purchase_order_item_id_foreign` FOREIGN KEY (`purchase_order_item_id`) REFERENCES `purchase_order_items` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of goods_receipt_items
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for goods_receipts
+-- ----------------------------
+DROP TABLE IF EXISTS `goods_receipts`;
+CREATE TABLE `goods_receipts`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `school_id` bigint UNSIGNED NOT NULL,
+  `purchase_order_id` bigint UNSIGNED NOT NULL,
+  `vendor_id` bigint UNSIGNED NOT NULL,
+  `receipt_number` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `receipt_date` date NOT NULL,
+  `received_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `checked_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `delivery_note_number` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `vehicle_number` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `condition` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'GOOD',
+  `condition_notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'RECEIVED',
+  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `attachment_url` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `goods_receipts_school_number_unique`(`school_id` ASC, `receipt_number` ASC) USING BTREE,
+  INDEX `goods_receipts_school_index`(`school_id` ASC) USING BTREE,
+  INDEX `goods_receipts_po_index`(`purchase_order_id` ASC) USING BTREE,
+  INDEX `goods_receipts_vendor_index`(`vendor_id` ASC) USING BTREE,
+  INDEX `goods_receipts_date_index`(`receipt_date` ASC) USING BTREE,
+  INDEX `goods_receipts_received_by_index`(`received_by` ASC) USING BTREE,
+  INDEX `goods_receipts_checked_by_index`(`checked_by` ASC) USING BTREE,
+  INDEX `goods_receipts_status_index`(`status` ASC) USING BTREE,
+  INDEX `goods_receipts_condition_index`(`condition` ASC) USING BTREE,
+  INDEX `goods_receipts_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `goods_receipts_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `goods_receipts_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `goods_receipts_checked_by_foreign` FOREIGN KEY (`checked_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `goods_receipts_purchase_order_id_foreign` FOREIGN KEY (`purchase_order_id`) REFERENCES `purchase_orders` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `goods_receipts_received_by_foreign` FOREIGN KEY (`received_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `goods_receipts_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `goods_receipts_vendor_id_foreign` FOREIGN KEY (`vendor_id`) REFERENCES `vendors` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of goods_receipts
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for grade_scales
+-- ----------------------------
+DROP TABLE IF EXISTS `grade_scales`;
+CREATE TABLE `grade_scales`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `school_id` bigint UNSIGNED NOT NULL,
+  `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `min_score` decimal(5, 2) NOT NULL,
+  `max_score` decimal(5, 2) NOT NULL,
+  `grade_letter` varchar(2) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `predicate` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `is_default` tinyint(1) NOT NULL DEFAULT 0,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `grade_scales_school_letter_unique`(`school_id` ASC, `grade_letter` ASC) USING BTREE,
+  INDEX `grade_scales_school_index`(`school_id` ASC) USING BTREE,
+  INDEX `grade_scales_is_default_index`(`is_default` ASC) USING BTREE,
+  INDEX `grade_scales_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `grade_scales_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `grade_scales_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `grade_scales_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of grade_scales
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for grades
+-- ----------------------------
+DROP TABLE IF EXISTS `grades`;
+CREATE TABLE `grades`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `student_classroom_id` bigint UNSIGNED NOT NULL,
+  `subject_id` bigint UNSIGNED NOT NULL,
+  `period_id` bigint UNSIGNED NOT NULL,
+  `teacher_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `score` decimal(5, 2) NULL DEFAULT NULL,
+  `grade_letter` varchar(2) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `predicate` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `assessment_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `assessment_category` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `weight` int NOT NULL DEFAULT 1,
+  `is_final` tinyint(1) NOT NULL DEFAULT 0,
+  `is_counted_in_report` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `grades_unique`(`student_classroom_id` ASC, `subject_id` ASC, `period_id` ASC, `assessment_type` ASC) USING BTREE,
+  INDEX `grades_student_classroom_index`(`student_classroom_id` ASC) USING BTREE,
+  INDEX `grades_subject_index`(`subject_id` ASC) USING BTREE,
+  INDEX `grades_period_index`(`period_id` ASC) USING BTREE,
+  INDEX `grades_teacher_index`(`teacher_id` ASC) USING BTREE,
+  INDEX `grades_is_final_index`(`is_final` ASC) USING BTREE,
+  INDEX `grades_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `grades_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `grades_updated_by_index`(`updated_by` ASC) USING BTREE,
+  INDEX `grades_assessment_category_index`(`assessment_category` ASC) USING BTREE,
+  INDEX `grades_is_counted_in_report_index`(`is_counted_in_report` ASC) USING BTREE,
+  CONSTRAINT `grades_period_id_foreign` FOREIGN KEY (`period_id`) REFERENCES `periods` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `grades_student_classroom_id_foreign` FOREIGN KEY (`student_classroom_id`) REFERENCES `student_classrooms` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `grades_subject_id_foreign` FOREIGN KEY (`subject_id`) REFERENCES `subjects` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `grades_teacher_id_foreign` FOREIGN KEY (`teacher_id`) REFERENCES `teachers` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of grades
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for graduations
+-- ----------------------------
+DROP TABLE IF EXISTS `graduations`;
+CREATE TABLE `graduations`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `student_id` bigint UNSIGNED NOT NULL,
+  `school_id` bigint UNSIGNED NOT NULL,
+  `academic_year_id` bigint UNSIGNED NOT NULL,
+  `classroom_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `graduation_date` date NULL DEFAULT NULL,
+  `certificate_number` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `certificate_issued_at` date NULL DEFAULT NULL,
+  `skhu_number` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `skhu_issued_at` date NULL DEFAULT NULL,
+  `transcript_number` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `final_score_average` decimal(5, 2) NULL DEFAULT NULL,
+  `predicate` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'LULUS',
+  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `graduations_student_year_unique`(`student_id` ASC, `academic_year_id` ASC) USING BTREE,
+  UNIQUE INDEX `graduations_certificate_number_unique`(`certificate_number` ASC) USING BTREE,
+  UNIQUE INDEX `graduations_skhu_number_unique`(`skhu_number` ASC) USING BTREE,
+  INDEX `graduations_student_index`(`student_id` ASC) USING BTREE,
+  INDEX `graduations_school_index`(`school_id` ASC) USING BTREE,
+  INDEX `graduations_academic_year_index`(`academic_year_id` ASC) USING BTREE,
+  INDEX `graduations_classroom_index`(`classroom_id` ASC) USING BTREE,
+  INDEX `graduations_status_index`(`status` ASC) USING BTREE,
+  INDEX `graduations_graduation_date_index`(`graduation_date` ASC) USING BTREE,
+  INDEX `graduations_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `graduations_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `graduations_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `graduations_academic_year_id_foreign` FOREIGN KEY (`academic_year_id`) REFERENCES `academic_years` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `graduations_classroom_id_foreign` FOREIGN KEY (`classroom_id`) REFERENCES `classrooms` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `graduations_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `graduations_student_id_foreign` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of graduations
 -- ----------------------------
 
 -- ----------------------------
@@ -2292,42 +4318,192 @@ CREATE TABLE `journal_details`  (
 DROP TABLE IF EXISTS `journal_entries`;
 CREATE TABLE `journal_entries`  (
   `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `school_id` bigint UNSIGNED NOT NULL,
   `organization_id` bigint UNSIGNED NOT NULL,
   `accounting_period_id` bigint UNSIGNED NOT NULL,
-  `journal_number` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `fiscal_period_id` bigint UNSIGNED NOT NULL,
+  `journal_number` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `journal_date` date NOT NULL,
-  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `journal_type` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'GENERAL',
+  `reference_type` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `reference_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
   `source_type` enum('manual','payroll','sales','purchase','expense','transfer','tax','opening','adjustment','closing') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'manual',
   `source_id` bigint UNSIGNED NULL DEFAULT NULL,
   `reference_number` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `total_debit` decimal(15, 2) NOT NULL DEFAULT 0.00,
-  `total_credit` decimal(15, 2) NOT NULL DEFAULT 0.00,
+  `total_debit` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `total_credit` decimal(20, 2) NOT NULL DEFAULT 0.00,
   `status` enum('draft','approved','posted','void') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'draft',
   `reversal_of_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `reversed_by_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `reversal_reason` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `attachment_url` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `posted_at` timestamp NULL DEFAULT NULL,
+  `posted_by` bigint UNSIGNED NULL DEFAULT NULL,
   `approved_by` bigint UNSIGNED NULL DEFAULT NULL,
   `approved_at` timestamp NULL DEFAULT NULL,
-  `posted_by` bigint UNSIGNED NULL DEFAULT NULL,
-  `posted_at` timestamp NULL DEFAULT NULL,
   `created_by` bigint UNSIGNED NULL DEFAULT NULL,
   `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `journal_entries_number_unique`(`organization_id` ASC, `journal_number` ASC) USING BTREE,
-  INDEX `journal_entries_date_index`(`organization_id` ASC, `journal_date` ASC) USING BTREE,
-  INDEX `journal_entries_source_index`(`source_type` ASC, `source_id` ASC) USING BTREE,
-  INDEX `journal_entries_period_index`(`accounting_period_id` ASC) USING BTREE,
-  INDEX `journal_entries_reversal_fk`(`reversal_of_id` ASC) USING BTREE,
+  UNIQUE INDEX `journal_entries_school_number_unique`(`school_id` ASC, `journal_number` ASC) USING BTREE,
+  INDEX `journal_entries_school_index`(`school_id` ASC) USING BTREE,
+  INDEX `journal_entries_fiscal_period_index`(`fiscal_period_id` ASC) USING BTREE,
+  INDEX `journal_entries_date_index`(`journal_date` ASC) USING BTREE,
+  INDEX `journal_entries_type_index`(`journal_type` ASC) USING BTREE,
   INDEX `journal_entries_status_index`(`status` ASC) USING BTREE,
+  INDEX `journal_entries_reference_index`(`reference_type` ASC, `reference_id` ASC) USING BTREE,
+  INDEX `journal_entries_posted_by_index`(`posted_by` ASC) USING BTREE,
+  INDEX `journal_entries_reversed_by_index`(`reversed_by_id` ASC) USING BTREE,
   INDEX `journal_entries_deleted_at_index`(`deleted_at` ASC) USING BTREE,
-  CONSTRAINT `journal_entries_org_fk` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
-  CONSTRAINT `journal_entries_period_fk` FOREIGN KEY (`accounting_period_id`) REFERENCES `accounting_periods` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
-  CONSTRAINT `journal_entries_reversal_fk` FOREIGN KEY (`reversal_of_id`) REFERENCES `journal_entries` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+  INDEX `journal_entries_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `journal_entries_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `journal_entries_fiscal_period_id_foreign` FOREIGN KEY (`fiscal_period_id`) REFERENCES `fiscal_periods` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `journal_entries_posted_by_foreign` FOREIGN KEY (`posted_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `journal_entries_reversed_by_id_foreign` FOREIGN KEY (`reversed_by_id`) REFERENCES `journal_entries` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `journal_entries_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of journal_entries
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for journal_entry_lines
+-- ----------------------------
+DROP TABLE IF EXISTS `journal_entry_lines`;
+CREATE TABLE `journal_entry_lines`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `journal_entry_id` bigint UNSIGNED NOT NULL,
+  `chart_of_account_id` bigint UNSIGNED NOT NULL,
+  `line_number` int NOT NULL DEFAULT 1,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `debit` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `credit` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `currency_id` bigint UNSIGNED NOT NULL,
+  `exchange_rate` decimal(20, 8) NOT NULL DEFAULT 1.00000000,
+  `foreign_debit` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `foreign_credit` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `functional_debit` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `functional_credit` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `vendor_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `student_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `journal_entry_lines_entry_index`(`journal_entry_id` ASC) USING BTREE,
+  INDEX `journal_entry_lines_account_index`(`chart_of_account_id` ASC) USING BTREE,
+  INDEX `journal_entry_lines_currency_index`(`currency_id` ASC) USING BTREE,
+  INDEX `journal_entry_lines_vendor_index`(`vendor_id` ASC) USING BTREE,
+  INDEX `journal_entry_lines_student_index`(`student_id` ASC) USING BTREE,
+  INDEX `journal_entry_lines_line_number_index`(`line_number` ASC) USING BTREE,
+  INDEX `journal_entry_lines_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `journal_entry_lines_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `journal_entry_lines_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `journal_entry_lines_chart_of_account_id_foreign` FOREIGN KEY (`chart_of_account_id`) REFERENCES `chart_of_accounts` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `journal_entry_lines_currency_id_foreign` FOREIGN KEY (`currency_id`) REFERENCES `currencies` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `journal_entry_lines_journal_entry_id_foreign` FOREIGN KEY (`journal_entry_id`) REFERENCES `journal_entries` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `journal_entry_lines_student_id_foreign` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `journal_entry_lines_vendor_id_foreign` FOREIGN KEY (`vendor_id`) REFERENCES `vendors` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of journal_entry_lines
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for learning_materials
+-- ----------------------------
+DROP TABLE IF EXISTS `learning_materials`;
+CREATE TABLE `learning_materials`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `school_id` bigint UNSIGNED NOT NULL,
+  `lesson_plan_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `subject_id` bigint UNSIGNED NOT NULL,
+  `class_level_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `curriculum_phase_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `title` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `type` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `url` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `file_name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `file_size` bigint NULL DEFAULT NULL,
+  `mime_type` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `order_index` int NOT NULL DEFAULT 0,
+  `is_public` tinyint(1) NOT NULL DEFAULT 0,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `learning_materials_school_index`(`school_id` ASC) USING BTREE,
+  INDEX `learning_materials_lesson_plan_index`(`lesson_plan_id` ASC) USING BTREE,
+  INDEX `learning_materials_subject_index`(`subject_id` ASC) USING BTREE,
+  INDEX `learning_materials_class_level_index`(`class_level_id` ASC) USING BTREE,
+  INDEX `learning_materials_phase_index`(`curriculum_phase_id` ASC) USING BTREE,
+  INDEX `learning_materials_type_index`(`type` ASC) USING BTREE,
+  INDEX `learning_materials_order_index`(`order_index` ASC) USING BTREE,
+  INDEX `learning_materials_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `learning_materials_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `learning_materials_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `learning_materials_class_level_id_foreign` FOREIGN KEY (`class_level_id`) REFERENCES `class_levels` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `learning_materials_lesson_plan_id_foreign` FOREIGN KEY (`lesson_plan_id`) REFERENCES `lesson_plans` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `learning_materials_phase_id_foreign` FOREIGN KEY (`curriculum_phase_id`) REFERENCES `curriculum_phases` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `learning_materials_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `learning_materials_subject_id_foreign` FOREIGN KEY (`subject_id`) REFERENCES `subjects` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of learning_materials
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for learning_outcomes
+-- ----------------------------
+DROP TABLE IF EXISTS `learning_outcomes`;
+CREATE TABLE `learning_outcomes`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `school_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `curriculum_phase_id` bigint UNSIGNED NOT NULL,
+  `subject_id` bigint UNSIGNED NOT NULL,
+  `element` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `competency` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `order_index` int NOT NULL DEFAULT 0,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `learning_outcomes_school_index`(`school_id` ASC) USING BTREE,
+  INDEX `learning_outcomes_phase_index`(`curriculum_phase_id` ASC) USING BTREE,
+  INDEX `learning_outcomes_subject_index`(`subject_id` ASC) USING BTREE,
+  INDEX `learning_outcomes_element_index`(`element` ASC) USING BTREE,
+  INDEX `learning_outcomes_code_index`(`code` ASC) USING BTREE,
+  INDEX `learning_outcomes_order_index`(`order_index` ASC) USING BTREE,
+  INDEX `learning_outcomes_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `learning_outcomes_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `learning_outcomes_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `learning_outcomes_phase_id_foreign` FOREIGN KEY (`curriculum_phase_id`) REFERENCES `curriculum_phases` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `learning_outcomes_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `learning_outcomes_subject_id_foreign` FOREIGN KEY (`subject_id`) REFERENCES `subjects` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of learning_outcomes
 -- ----------------------------
 
 -- ----------------------------
@@ -2392,6 +4568,102 @@ CREATE TABLE `leave_types`  (
 -- ----------------------------
 
 -- ----------------------------
+-- Table structure for lesson_plans
+-- ----------------------------
+DROP TABLE IF EXISTS `lesson_plans`;
+CREATE TABLE `lesson_plans`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `school_id` bigint UNSIGNED NOT NULL,
+  `teacher_id` bigint UNSIGNED NOT NULL,
+  `subject_id` bigint UNSIGNED NOT NULL,
+  `class_level_id` bigint UNSIGNED NOT NULL,
+  `academic_year_id` bigint UNSIGNED NOT NULL,
+  `curriculum_phase_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `period_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `title` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `learning_objectives` json NULL,
+  `learning_outcomes` json NULL,
+  `activities` json NULL,
+  `assessment_plan` json NULL,
+  `media` json NULL,
+  `resources` json NULL,
+  `duration_minutes` int NULL DEFAULT NULL,
+  `meeting_number` int NULL DEFAULT NULL,
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'DRAFT',
+  `approved_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `approved_at` timestamp NULL DEFAULT NULL,
+  `rejection_notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `version` int NOT NULL DEFAULT 1,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `lesson_plans_school_index`(`school_id` ASC) USING BTREE,
+  INDEX `lesson_plans_teacher_index`(`teacher_id` ASC) USING BTREE,
+  INDEX `lesson_plans_subject_index`(`subject_id` ASC) USING BTREE,
+  INDEX `lesson_plans_class_level_index`(`class_level_id` ASC) USING BTREE,
+  INDEX `lesson_plans_academic_year_index`(`academic_year_id` ASC) USING BTREE,
+  INDEX `lesson_plans_phase_index`(`curriculum_phase_id` ASC) USING BTREE,
+  INDEX `lesson_plans_period_index`(`period_id` ASC) USING BTREE,
+  INDEX `lesson_plans_status_index`(`status` ASC) USING BTREE,
+  INDEX `lesson_plans_approved_by_index`(`approved_by` ASC) USING BTREE,
+  INDEX `lesson_plans_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `lesson_plans_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `lesson_plans_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `lesson_plans_academic_year_id_foreign` FOREIGN KEY (`academic_year_id`) REFERENCES `academic_years` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `lesson_plans_approved_by_foreign` FOREIGN KEY (`approved_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `lesson_plans_class_level_id_foreign` FOREIGN KEY (`class_level_id`) REFERENCES `class_levels` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `lesson_plans_period_id_foreign` FOREIGN KEY (`period_id`) REFERENCES `periods` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `lesson_plans_phase_id_foreign` FOREIGN KEY (`curriculum_phase_id`) REFERENCES `curriculum_phases` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `lesson_plans_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `lesson_plans_subject_id_foreign` FOREIGN KEY (`subject_id`) REFERENCES `subjects` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `lesson_plans_teacher_id_foreign` FOREIGN KEY (`teacher_id`) REFERENCES `teachers` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of lesson_plans
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for lesson_progress
+-- ----------------------------
+DROP TABLE IF EXISTS `lesson_progress`;
+CREATE TABLE `lesson_progress`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `student_id` bigint UNSIGNED NOT NULL,
+  `lesson_id` bigint UNSIGNED NOT NULL,
+  `is_completed` tinyint(1) NOT NULL DEFAULT 0,
+  `progress_percent` int NOT NULL DEFAULT 0,
+  `last_position_seconds` int NOT NULL DEFAULT 0,
+  `started_at` timestamp NULL DEFAULT NULL,
+  `completed_at` timestamp NULL DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `lesson_progress_student_lesson_unique`(`student_id` ASC, `lesson_id` ASC) USING BTREE,
+  INDEX `lesson_progress_student_index`(`student_id` ASC) USING BTREE,
+  INDEX `lesson_progress_lesson_index`(`lesson_id` ASC) USING BTREE,
+  INDEX `lesson_progress_completed_index`(`is_completed` ASC) USING BTREE,
+  INDEX `lesson_progress_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `lesson_progress_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `lesson_progress_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `lesson_progress_lesson_id_foreign` FOREIGN KEY (`lesson_id`) REFERENCES `lessons` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `lesson_progress_student_id_foreign` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of lesson_progress
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for lessons
 -- ----------------------------
 DROP TABLE IF EXISTS `lessons`;
@@ -2419,6 +4691,95 @@ CREATE TABLE `lessons`  (
 
 -- ----------------------------
 -- Records of lessons
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for library_books
+-- ----------------------------
+DROP TABLE IF EXISTS `library_books`;
+CREATE TABLE `library_books`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `school_id` bigint UNSIGNED NOT NULL,
+  `isbn` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `title` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `author` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `publisher` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `year_published` int NULL DEFAULT NULL,
+  `category` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `cover_url` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `total_copies` int NOT NULL DEFAULT 1,
+  `available_copies` int NOT NULL DEFAULT 1,
+  `shelf_location` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `library_books_school_code_unique`(`school_id` ASC, `code` ASC) USING BTREE,
+  INDEX `library_books_school_index`(`school_id` ASC) USING BTREE,
+  INDEX `library_books_isbn_index`(`isbn` ASC) USING BTREE,
+  INDEX `library_books_title_index`(`title` ASC) USING BTREE,
+  INDEX `library_books_category_index`(`category` ASC) USING BTREE,
+  INDEX `library_books_author_index`(`author` ASC) USING BTREE,
+  INDEX `library_books_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `library_books_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `library_books_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `library_books_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of library_books
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for library_loans
+-- ----------------------------
+DROP TABLE IF EXISTS `library_loans`;
+CREATE TABLE `library_loans`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `book_id` bigint UNSIGNED NOT NULL,
+  `student_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `teacher_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `school_id` bigint UNSIGNED NOT NULL,
+  `loan_date` date NOT NULL,
+  `due_date` date NOT NULL,
+  `return_date` date NULL DEFAULT NULL,
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'BORROWED',
+  `fine_amount` decimal(15, 2) NOT NULL DEFAULT 0.00,
+  `fine_paid` tinyint(1) NOT NULL DEFAULT 0,
+  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `handled_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `library_loans_book_index`(`book_id` ASC) USING BTREE,
+  INDEX `library_loans_student_index`(`student_id` ASC) USING BTREE,
+  INDEX `library_loans_teacher_index`(`teacher_id` ASC) USING BTREE,
+  INDEX `library_loans_school_index`(`school_id` ASC) USING BTREE,
+  INDEX `library_loans_status_index`(`status` ASC) USING BTREE,
+  INDEX `library_loans_loan_date_index`(`loan_date` ASC) USING BTREE,
+  INDEX `library_loans_due_date_index`(`due_date` ASC) USING BTREE,
+  INDEX `library_loans_handled_by_index`(`handled_by` ASC) USING BTREE,
+  INDEX `library_loans_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `library_loans_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `library_loans_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `library_loans_book_id_foreign` FOREIGN KEY (`book_id`) REFERENCES `library_books` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `library_loans_handled_by_foreign` FOREIGN KEY (`handled_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `library_loans_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `library_loans_student_id_foreign` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `library_loans_teacher_id_foreign` FOREIGN KEY (`teacher_id`) REFERENCES `teachers` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of library_loans
 -- ----------------------------
 
 -- ----------------------------
@@ -2536,7 +4897,7 @@ CREATE TABLE `menu_role`  (
   INDEX `menu_role_deleted_at_index`(`deleted_at` ASC) USING BTREE,
   CONSTRAINT `menu_role_menu_id_foreign` FOREIGN KEY (`menu_id`) REFERENCES `menus` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
   CONSTRAINT `menu_role_role_id_foreign` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 48 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 52 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of menu_role
@@ -2620,12 +4981,12 @@ CREATE TABLE `menus`  (
   INDEX `menus_is_active_index`(`is_active` ASC) USING BTREE,
   INDEX `menus_deleted_at_index`(`deleted_at` ASC) USING BTREE,
   CONSTRAINT `menus_parent_id_foreign` FOREIGN KEY (`parent_id`) REFERENCES `menus` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 26 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 25 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of menus
 -- ----------------------------
-INSERT INTO `menus` VALUES (1, 1, NULL, 'dashboard', 'Dasbor', 'Dasbor', 'dashboard', 'fas fa-tachometer-alt', 'fa', 'dashboard', 'dashboard', 'sidebar', 1, NULL, 1, NULL, NULL, '2026-09-09 17:07:41', '2026-09-09 17:07:41', NULL, NULL, NULL);
+INSERT INTO `menus` VALUES (1, 1, NULL, 'dashboard', 'Dasbord', 'Dasbord', 'dashboard', 'fas fa-home', 'fa', 'dashboard', 'dashboard', 'sidebar', 1, NULL, 1, NULL, NULL, '2026-09-09 17:07:41', '2026-09-11 12:56:37', NULL, NULL, NULL);
 INSERT INTO `menus` VALUES (2, 1, NULL, NULL, 'Data Utama', 'Data Utama', 'master', 'fas fa-database', 'fa', NULL, NULL, 'sidebar', 2, NULL, 1, NULL, NULL, '2026-09-09 17:07:41', '2026-09-09 17:07:41', NULL, NULL, NULL);
 INSERT INTO `menus` VALUES (3, 1, 2, 'user', 'Pengguna', 'Pengguna', 'user', 'fas fa-users', 'fa', 'user.index', 'user', 'sidebar', 1, NULL, 1, NULL, NULL, '2026-09-09 17:07:41', '2026-09-09 17:07:41', NULL, NULL, NULL);
 INSERT INTO `menus` VALUES (4, 1, 2, 'role', 'Peran & Izin', 'Peran & Izin', 'roles', 'fas fa-user-shield', 'fa', 'role.index', 'role', 'sidebar', 2, NULL, 1, NULL, NULL, '2026-09-09 17:07:41', '2026-09-09 17:07:41', NULL, NULL, NULL);
@@ -2647,7 +5008,44 @@ INSERT INTO `menus` VALUES (20, 1, NULL, NULL, 'Referensi', 'Reference', 'refere
 INSERT INTO `menus` VALUES (21, 1, NULL, 'Accounting', 'Accounting', 'Accounting', 'accounting', 'dashboard', 'material', NULL, NULL, 'sidebar', 9, NULL, 1, NULL, NULL, '2026-09-13 00:04:55', '2026-09-13 16:37:53', NULL, NULL, NULL);
 INSERT INTO `menus` VALUES (22, 1, 21, NULL, 'Expense Category', 'Expense Category', 'expense-category', 'fas fa-th-large', 'fa', 'expense_category.index', 'expense-category', 'sidebar', 0, NULL, 1, NULL, NULL, '2026-09-13 10:24:58', '2026-09-13 10:24:58', NULL, NULL, NULL);
 INSERT INTO `menus` VALUES (23, 1, 21, NULL, 'Account Category', 'Account Category', 'account-category', 'fas fa-th-large', 'fa', 'account_category.index', 'account-category', 'sidebar', 0, NULL, 1, NULL, NULL, '2026-09-13 10:29:58', '2026-09-13 10:29:58', NULL, NULL, NULL);
-INSERT INTO `menus` VALUES (24, 1, 21, NULL, 'Tax Type', 'Tax Type', 'tax-type', 'list_alt', 'material', 'tax-type.index', 'tax-type', 'sidebar', 10, NULL, 1, NULL, NULL, '2026-09-14 15:30:46', '2026-09-14 15:30:46', NULL, NULL, NULL);
+INSERT INTO `menus` VALUES (24, 1, 21, NULL, 'Tax Type', 'Tax Type', 'tax-type', 'list_alt', 'material', 'tax-type.index', 'tax-type', 'sidebar', 10, NULL, 1, NULL, NULL, '2026-09-13 10:29:58', '2026-09-13 10:29:58', NULL, NULL, NULL);
+
+-- ----------------------------
+-- Table structure for messages
+-- ----------------------------
+DROP TABLE IF EXISTS `messages`;
+CREATE TABLE `messages`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `sender_id` bigint UNSIGNED NOT NULL,
+  `receiver_id` bigint UNSIGNED NOT NULL,
+  `subject` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `parent_message_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `attachment_url` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `is_read` tinyint(1) NOT NULL DEFAULT 0,
+  `read_at` timestamp NULL DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `messages_sender_index`(`sender_id` ASC) USING BTREE,
+  INDEX `messages_receiver_index`(`receiver_id` ASC) USING BTREE,
+  INDEX `messages_parent_index`(`parent_message_id` ASC) USING BTREE,
+  INDEX `messages_is_read_index`(`is_read` ASC) USING BTREE,
+  INDEX `messages_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `messages_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `messages_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `messages_parent_message_id_foreign` FOREIGN KEY (`parent_message_id`) REFERENCES `messages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `messages_receiver_id_foreign` FOREIGN KEY (`receiver_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `messages_sender_id_foreign` FOREIGN KEY (`sender_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of messages
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for migrations
@@ -2717,6 +5115,45 @@ CREATE TABLE `navigation`  (
 
 -- ----------------------------
 -- Records of navigation
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for notifications
+-- ----------------------------
+DROP TABLE IF EXISTS `notifications`;
+CREATE TABLE `notifications`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `user_id` bigint UNSIGNED NOT NULL,
+  `type` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `title` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `message` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `reference_table` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `reference_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `channel` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'IN_APP',
+  `is_read` tinyint(1) NOT NULL DEFAULT 0,
+  `read_at` timestamp NULL DEFAULT NULL,
+  `sent_at` timestamp NULL DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `notifications_user_index`(`user_id` ASC) USING BTREE,
+  INDEX `notifications_type_index`(`type` ASC) USING BTREE,
+  INDEX `notifications_channel_index`(`channel` ASC) USING BTREE,
+  INDEX `notifications_is_read_index`(`is_read` ASC) USING BTREE,
+  INDEX `notifications_reference_index`(`reference_table` ASC, `reference_id` ASC) USING BTREE,
+  INDEX `notifications_sent_at_index`(`sent_at` ASC) USING BTREE,
+  INDEX `notifications_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `notifications_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `notifications_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `notifications_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of notifications
 -- ----------------------------
 
 -- ----------------------------
@@ -2969,6 +5406,288 @@ CREATE TABLE `password_reset_tokens`  (
 
 -- ----------------------------
 -- Records of password_reset_tokens
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for payment_channels
+-- ----------------------------
+DROP TABLE IF EXISTS `payment_channels`;
+CREATE TABLE `payment_channels`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `payment_gateway_id` bigint UNSIGNED NOT NULL,
+  `code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `channel_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `bank_code` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `logo_url` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `admin_fee` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `admin_fee_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'FIXED',
+  `min_amount` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `max_amount` decimal(20, 2) NULL DEFAULT NULL,
+  `expiry_minutes` int NULL DEFAULT NULL,
+  `sort_order` int NOT NULL DEFAULT 0,
+  `config` json NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `payment_channels_gateway_code_unique`(`payment_gateway_id` ASC, `code` ASC) USING BTREE,
+  INDEX `payment_channels_gateway_index`(`payment_gateway_id` ASC) USING BTREE,
+  INDEX `payment_channels_code_index`(`code` ASC) USING BTREE,
+  INDEX `payment_channels_type_index`(`channel_type` ASC) USING BTREE,
+  INDEX `payment_channels_bank_index`(`bank_code` ASC) USING BTREE,
+  INDEX `payment_channels_sort_index`(`sort_order` ASC) USING BTREE,
+  INDEX `payment_channels_is_active_index`(`is_active` ASC) USING BTREE,
+  INDEX `payment_channels_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `payment_channels_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `payment_channels_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `payment_channels_payment_gateway_id_foreign` FOREIGN KEY (`payment_gateway_id`) REFERENCES `payment_gateways` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of payment_channels
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for payment_gateways
+-- ----------------------------
+DROP TABLE IF EXISTS `payment_gateways`;
+CREATE TABLE `payment_gateways`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `school_id` bigint UNSIGNED NOT NULL,
+  `provider` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'MIDTRANS',
+  `environment` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'SANDBOX',
+  `merchant_id` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `client_key` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `server_key` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `is_production` tinyint(1) NOT NULL DEFAULT 0,
+  `is_primary` tinyint(1) NOT NULL DEFAULT 0,
+  `default_currency_id` bigint UNSIGNED NOT NULL,
+  `expiry_minutes` int NOT NULL DEFAULT 1440,
+  `config` json NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `payment_gateways_school_provider_env_unique`(`school_id` ASC, `provider` ASC, `environment` ASC) USING BTREE,
+  INDEX `payment_gateways_school_index`(`school_id` ASC) USING BTREE,
+  INDEX `payment_gateways_provider_index`(`provider` ASC) USING BTREE,
+  INDEX `payment_gateways_environment_index`(`environment` ASC) USING BTREE,
+  INDEX `payment_gateways_is_primary_index`(`is_primary` ASC) USING BTREE,
+  INDEX `payment_gateways_currency_index`(`default_currency_id` ASC) USING BTREE,
+  INDEX `payment_gateways_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `payment_gateways_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `payment_gateways_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `payment_gateways_default_currency_id_foreign` FOREIGN KEY (`default_currency_id`) REFERENCES `currencies` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `payment_gateways_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of payment_gateways
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for payment_notifications
+-- ----------------------------
+DROP TABLE IF EXISTS `payment_notifications`;
+CREATE TABLE `payment_notifications`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `school_id` bigint UNSIGNED NOT NULL,
+  `payment_transaction_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `student_invoice_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `applicant_invoice_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `recipient_user_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `recipient_name` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `recipient_phone` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `recipient_email` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `channel` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'WHATSAPP',
+  `template_code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `subject` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `message` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `provider` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `provider_message_id` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `provider_response` json NULL,
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PENDING',
+  `sent_at` timestamp NULL DEFAULT NULL,
+  `delivered_at` timestamp NULL DEFAULT NULL,
+  `read_at` timestamp NULL DEFAULT NULL,
+  `failed_reason` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `retry_count` int NOT NULL DEFAULT 0,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `payment_notifications_school_index`(`school_id` ASC) USING BTREE,
+  INDEX `payment_notifications_transaction_index`(`payment_transaction_id` ASC) USING BTREE,
+  INDEX `payment_notifications_student_invoice_index`(`student_invoice_id` ASC) USING BTREE,
+  INDEX `payment_notifications_applicant_invoice_index`(`applicant_invoice_id` ASC) USING BTREE,
+  INDEX `payment_notifications_recipient_user_index`(`recipient_user_id` ASC) USING BTREE,
+  INDEX `payment_notifications_phone_index`(`recipient_phone` ASC) USING BTREE,
+  INDEX `payment_notifications_email_index`(`recipient_email` ASC) USING BTREE,
+  INDEX `payment_notifications_channel_index`(`channel` ASC) USING BTREE,
+  INDEX `payment_notifications_status_index`(`status` ASC) USING BTREE,
+  INDEX `payment_notifications_sent_at_index`(`sent_at` ASC) USING BTREE,
+  INDEX `payment_notifications_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `payment_notifications_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `payment_notifications_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `payment_notifications_applicant_invoice_id_foreign` FOREIGN KEY (`applicant_invoice_id`) REFERENCES `applicant_invoices` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `payment_notifications_payment_transaction_id_foreign` FOREIGN KEY (`payment_transaction_id`) REFERENCES `payment_transactions` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `payment_notifications_recipient_user_id_foreign` FOREIGN KEY (`recipient_user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `payment_notifications_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `payment_notifications_student_invoice_id_foreign` FOREIGN KEY (`student_invoice_id`) REFERENCES `student_invoices` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of payment_notifications
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for payment_transactions
+-- ----------------------------
+DROP TABLE IF EXISTS `payment_transactions`;
+CREATE TABLE `payment_transactions`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `school_id` bigint UNSIGNED NOT NULL,
+  `payment_gateway_id` bigint UNSIGNED NOT NULL,
+  `payment_channel_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `student_invoice_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `applicant_invoice_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `student_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `applicant_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `order_id` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `midtrans_transaction_id` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `transaction_type` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `payment_type` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `currency_id` bigint UNSIGNED NOT NULL,
+  `gross_amount` decimal(20, 2) NOT NULL,
+  `admin_fee` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `net_amount` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `exchange_rate` decimal(20, 8) NOT NULL DEFAULT 1.00000000,
+  `functional_amount` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `transaction_status` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PENDING',
+  `fraud_status` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `status_code` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `status_message` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `transaction_time` timestamp NULL DEFAULT NULL,
+  `settlement_time` timestamp NULL DEFAULT NULL,
+  `expiry_time` timestamp NULL DEFAULT NULL,
+  `va_number` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `va_bank` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `qris_string` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `qris_url` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `payment_code` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `pdf_url` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `raw_request` json NULL,
+  `raw_response` json NULL,
+  `journal_entry_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `student_payment_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `applicant_payment_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `is_posted` tinyint(1) NOT NULL DEFAULT 0,
+  `posted_at` timestamp NULL DEFAULT NULL,
+  `expired_at` timestamp NULL DEFAULT NULL,
+  `cancelled_at` timestamp NULL DEFAULT NULL,
+  `refunded_at` timestamp NULL DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `payment_transactions_order_id_unique`(`order_id` ASC) USING BTREE,
+  UNIQUE INDEX `payment_transactions_midtrans_id_unique`(`midtrans_transaction_id` ASC) USING BTREE,
+  INDEX `payment_transactions_school_index`(`school_id` ASC) USING BTREE,
+  INDEX `payment_transactions_gateway_index`(`payment_gateway_id` ASC) USING BTREE,
+  INDEX `payment_transactions_channel_index`(`payment_channel_id` ASC) USING BTREE,
+  INDEX `payment_transactions_student_invoice_index`(`student_invoice_id` ASC) USING BTREE,
+  INDEX `payment_transactions_applicant_invoice_index`(`applicant_invoice_id` ASC) USING BTREE,
+  INDEX `payment_transactions_student_index`(`student_id` ASC) USING BTREE,
+  INDEX `payment_transactions_applicant_index`(`applicant_id` ASC) USING BTREE,
+  INDEX `payment_transactions_type_index`(`transaction_type` ASC) USING BTREE,
+  INDEX `payment_transactions_payment_type_index`(`payment_type` ASC) USING BTREE,
+  INDEX `payment_transactions_status_index`(`transaction_status` ASC) USING BTREE,
+  INDEX `payment_transactions_fraud_index`(`fraud_status` ASC) USING BTREE,
+  INDEX `payment_transactions_va_index`(`va_number` ASC) USING BTREE,
+  INDEX `payment_transactions_transaction_time_index`(`transaction_time` ASC) USING BTREE,
+  INDEX `payment_transactions_expiry_time_index`(`expiry_time` ASC) USING BTREE,
+  INDEX `payment_transactions_journal_entry_index`(`journal_entry_id` ASC) USING BTREE,
+  INDEX `payment_transactions_student_payment_index`(`student_payment_id` ASC) USING BTREE,
+  INDEX `payment_transactions_applicant_payment_index`(`applicant_payment_id` ASC) USING BTREE,
+  INDEX `payment_transactions_is_posted_index`(`is_posted` ASC) USING BTREE,
+  INDEX `payment_transactions_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `payment_transactions_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `payment_transactions_updated_by_index`(`updated_by` ASC) USING BTREE,
+  INDEX `payment_transactions_currency_id_foreign`(`currency_id` ASC) USING BTREE,
+  CONSTRAINT `payment_transactions_applicant_id_foreign` FOREIGN KEY (`applicant_id`) REFERENCES `applicants` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `payment_transactions_applicant_invoice_id_foreign` FOREIGN KEY (`applicant_invoice_id`) REFERENCES `applicant_invoices` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `payment_transactions_applicant_payment_id_foreign` FOREIGN KEY (`applicant_payment_id`) REFERENCES `applicant_payments` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `payment_transactions_currency_id_foreign` FOREIGN KEY (`currency_id`) REFERENCES `currencies` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `payment_transactions_journal_entry_id_foreign` FOREIGN KEY (`journal_entry_id`) REFERENCES `journal_entries` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `payment_transactions_payment_channel_id_foreign` FOREIGN KEY (`payment_channel_id`) REFERENCES `payment_channels` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `payment_transactions_payment_gateway_id_foreign` FOREIGN KEY (`payment_gateway_id`) REFERENCES `payment_gateways` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `payment_transactions_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `payment_transactions_student_id_foreign` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `payment_transactions_student_invoice_id_foreign` FOREIGN KEY (`student_invoice_id`) REFERENCES `student_invoices` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `payment_transactions_student_payment_id_foreign` FOREIGN KEY (`student_payment_id`) REFERENCES `student_payments` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of payment_transactions
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for payment_webhook_logs
+-- ----------------------------
+DROP TABLE IF EXISTS `payment_webhook_logs`;
+CREATE TABLE `payment_webhook_logs`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `payment_gateway_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `order_id` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `transaction_id` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `event_type` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `signature_key` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `signature_valid` tinyint(1) NOT NULL DEFAULT 0,
+  `is_processed` tinyint(1) NOT NULL DEFAULT 0,
+  `processed_at` timestamp NULL DEFAULT NULL,
+  `processing_notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `retry_count` int NOT NULL DEFAULT 0,
+  `ip_address` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `user_agent` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `headers` json NULL,
+  `payload` json NOT NULL,
+  `response_body` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `response_status` int NULL DEFAULT NULL,
+  `received_at` timestamp NULL DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `payment_webhook_logs_gateway_index`(`payment_gateway_id` ASC) USING BTREE,
+  INDEX `payment_webhook_logs_order_index`(`order_id` ASC) USING BTREE,
+  INDEX `payment_webhook_logs_transaction_index`(`transaction_id` ASC) USING BTREE,
+  INDEX `payment_webhook_logs_event_index`(`event_type` ASC) USING BTREE,
+  INDEX `payment_webhook_logs_is_processed_index`(`is_processed` ASC) USING BTREE,
+  INDEX `payment_webhook_logs_received_at_index`(`received_at` ASC) USING BTREE,
+  INDEX `payment_webhook_logs_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `payment_webhook_logs_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `payment_webhook_logs_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `payment_webhook_logs_payment_gateway_id_foreign` FOREIGN KEY (`payment_gateway_id`) REFERENCES `payment_gateways` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of payment_webhook_logs
 -- ----------------------------
 
 -- ----------------------------
@@ -3396,7 +6115,7 @@ CREATE TABLE `periods`  (
   CONSTRAINT `periods_ibfk_3` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
   CONSTRAINT `chk_periods_semester` CHECK (`semester` in (1,2,3,4)),
   CONSTRAINT `chk_periods_type` CHECK (`type` in (_utf8mb4'SEMESTER',_utf8mb4'QUARTER',_utf8mb4'TERM'))
-) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of periods
@@ -3406,6 +6125,76 @@ INSERT INTO `periods` VALUES (2, 2, 'Semester Genap', '2023-2024-GENAP-S2', 'sem
 INSERT INTO `periods` VALUES (3, 3, 'Semester Ganjil', '2024-2025-GANJIL-S1', 'semester', 1, 1, '2024-07-15', '2024-12-20', '2024-09-09', '2024-12-06', 'Sumatif', 'Semester', 0, '2026-09-13 17:09:48', '2026-09-14 00:30:05', NULL, NULL, NULL);
 INSERT INTO `periods` VALUES (4, 4, 'Semester Genap', '2024-2025-GENAP-S2', 'semester', 2, 1, '2025-01-10', '2025-06-15', '2025-03-07', '2025-06-01', 'Sumatif', 'Semester', 0, '2026-09-13 17:09:48', '2026-09-14 00:30:05', NULL, NULL, NULL);
 INSERT INTO `periods` VALUES (5, 5, 'Semester Ganjil', '2025-2026-GANJIL-S1', 'semester', 1, 1, '2025-07-15', '2025-12-20', '2025-09-09', '2025-12-06', 'Sumatif', 'Semester', 1, '2026-09-13 17:09:48', '2026-09-14 00:30:05', NULL, NULL, NULL);
+
+-- ----------------------------
+-- Table structure for permission_requests
+-- ----------------------------
+DROP TABLE IF EXISTS `permission_requests`;
+CREATE TABLE `permission_requests`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `student_id` bigint UNSIGNED NOT NULL,
+  `school_id` bigint UNSIGNED NOT NULL,
+  `request_type` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `start_date` date NOT NULL,
+  `end_date` date NOT NULL,
+  `reason` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `attachment_url` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PENDING',
+  `approved_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `approved_at` timestamp NULL DEFAULT NULL,
+  `rejection_notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `permission_requests_student_index`(`student_id` ASC) USING BTREE,
+  INDEX `permission_requests_school_index`(`school_id` ASC) USING BTREE,
+  INDEX `permission_requests_type_index`(`request_type` ASC) USING BTREE,
+  INDEX `permission_requests_status_index`(`status` ASC) USING BTREE,
+  INDEX `permission_requests_date_index`(`start_date` ASC, `end_date` ASC) USING BTREE,
+  INDEX `permission_requests_approved_by_index`(`approved_by` ASC) USING BTREE,
+  INDEX `permission_requests_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `permission_requests_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `permission_requests_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `permission_requests_approved_by_foreign` FOREIGN KEY (`approved_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `permission_requests_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `permission_requests_student_id_foreign` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of permission_requests
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for permissions
+-- ----------------------------
+DROP TABLE IF EXISTS `permissions`;
+CREATE TABLE `permissions`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `code` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `module` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `permissions_code_unique`(`code` ASC) USING BTREE,
+  INDEX `permissions_module_index`(`module` ASC) USING BTREE,
+  INDEX `permissions_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `permissions_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `permissions_updated_by_index`(`updated_by` ASC) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of permissions
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for position_user
@@ -3483,6 +6272,327 @@ CREATE TABLE `ptkp_statuses`  (
 
 -- ----------------------------
 -- Records of ptkp_statuses
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for purchase_order_items
+-- ----------------------------
+DROP TABLE IF EXISTS `purchase_order_items`;
+CREATE TABLE `purchase_order_items`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `purchase_order_id` bigint UNSIGNED NOT NULL,
+  `purchase_request_item_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `account_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `specification` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `unit` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `quantity` decimal(20, 4) NOT NULL DEFAULT 1.0000,
+  `unit_price` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `discount_amount` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `subtotal` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `tax_amount` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `total_amount` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `received_quantity` decimal(20, 4) NOT NULL DEFAULT 0.0000,
+  `line_number` int NOT NULL DEFAULT 1,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `purchase_order_items_po_index`(`purchase_order_id` ASC) USING BTREE,
+  INDEX `purchase_order_items_request_item_index`(`purchase_request_item_id` ASC) USING BTREE,
+  INDEX `purchase_order_items_coa_index`(`account_id` ASC) USING BTREE,
+  INDEX `purchase_order_items_line_number_index`(`line_number` ASC) USING BTREE,
+  INDEX `purchase_order_items_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `purchase_order_items_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `purchase_order_items_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `purchase_order_items_account_id_foreign` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `purchase_order_items_purchase_order_id_foreign` FOREIGN KEY (`purchase_order_id`) REFERENCES `purchase_orders` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `purchase_order_items_purchase_request_item_id_foreign` FOREIGN KEY (`purchase_request_item_id`) REFERENCES `purchase_request_items` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of purchase_order_items
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for purchase_orders
+-- ----------------------------
+DROP TABLE IF EXISTS `purchase_orders`;
+CREATE TABLE `purchase_orders`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `school_id` bigint UNSIGNED NOT NULL,
+  `vendor_id` bigint UNSIGNED NOT NULL,
+  `purchase_request_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `fiscal_period_id` bigint UNSIGNED NOT NULL,
+  `currency_id` bigint UNSIGNED NOT NULL,
+  `exchange_rate` decimal(20, 8) NOT NULL DEFAULT 1.00000000,
+  `po_number` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `po_date` date NOT NULL,
+  `expected_delivery_date` date NULL DEFAULT NULL,
+  `delivery_address` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `payment_terms` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `subtotal` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `discount_amount` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `tax_base` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `ppn_rate` decimal(5, 2) NOT NULL DEFAULT 0.00,
+  `ppn_amount` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `shipping_amount` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `total_amount` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `functional_total` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'DRAFT',
+  `approved_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `approved_at` timestamp NULL DEFAULT NULL,
+  `sent_at` timestamp NULL DEFAULT NULL,
+  `completed_at` timestamp NULL DEFAULT NULL,
+  `cancelled_at` timestamp NULL DEFAULT NULL,
+  `cancellation_reason` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `attachment_url` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `sip_lah_order_id` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `sip_lah_order_url` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `purchase_orders_school_number_unique`(`school_id` ASC, `po_number` ASC) USING BTREE,
+  INDEX `purchase_orders_school_index`(`school_id` ASC) USING BTREE,
+  INDEX `purchase_orders_vendor_index`(`vendor_id` ASC) USING BTREE,
+  INDEX `purchase_orders_request_index`(`purchase_request_id` ASC) USING BTREE,
+  INDEX `purchase_orders_fiscal_period_index`(`fiscal_period_id` ASC) USING BTREE,
+  INDEX `purchase_orders_currency_index`(`currency_id` ASC) USING BTREE,
+  INDEX `purchase_orders_date_index`(`po_date` ASC) USING BTREE,
+  INDEX `purchase_orders_status_index`(`status` ASC) USING BTREE,
+  INDEX `purchase_orders_approved_by_index`(`approved_by` ASC) USING BTREE,
+  INDEX `purchase_orders_siplah_order_index`(`sip_lah_order_id` ASC) USING BTREE,
+  INDEX `purchase_orders_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `purchase_orders_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `purchase_orders_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `purchase_orders_approved_by_foreign` FOREIGN KEY (`approved_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `purchase_orders_currency_id_foreign` FOREIGN KEY (`currency_id`) REFERENCES `currencies` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `purchase_orders_fiscal_period_id_foreign` FOREIGN KEY (`fiscal_period_id`) REFERENCES `fiscal_periods` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `purchase_orders_purchase_request_id_foreign` FOREIGN KEY (`purchase_request_id`) REFERENCES `purchase_requests` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `purchase_orders_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `purchase_orders_vendor_id_foreign` FOREIGN KEY (`vendor_id`) REFERENCES `vendors` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of purchase_orders
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for purchase_request_items
+-- ----------------------------
+DROP TABLE IF EXISTS `purchase_request_items`;
+CREATE TABLE `purchase_request_items`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `purchase_request_id` bigint UNSIGNED NOT NULL,
+  `rkas_item_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `account_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `specification` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `unit` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `quantity` decimal(20, 4) NOT NULL DEFAULT 1.0000,
+  `estimated_unit_price` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `estimated_subtotal` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `estimated_total` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `purchase_request_items_request_index`(`purchase_request_id` ASC) USING BTREE,
+  INDEX `purchase_request_items_rkas_item_index`(`rkas_item_id` ASC) USING BTREE,
+  INDEX `purchase_request_items_coa_index`(`account_id` ASC) USING BTREE,
+  INDEX `purchase_request_items_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `purchase_request_items_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `purchase_request_items_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `purchase_request_items_account_id_foreign` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `purchase_request_items_purchase_request_id_foreign` FOREIGN KEY (`purchase_request_id`) REFERENCES `purchase_requests` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `purchase_request_items_rkas_item_id_foreign` FOREIGN KEY (`rkas_item_id`) REFERENCES `rkas_items` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of purchase_request_items
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for purchase_requests
+-- ----------------------------
+DROP TABLE IF EXISTS `purchase_requests`;
+CREATE TABLE `purchase_requests`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `school_id` bigint UNSIGNED NOT NULL,
+  `rkas_item_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `request_number` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `title` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `requested_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `requested_at` timestamp NULL DEFAULT NULL,
+  `needed_by` date NULL DEFAULT NULL,
+  `total_estimated_amount` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'DRAFT',
+  `approved_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `approved_at` timestamp NULL DEFAULT NULL,
+  `rejection_notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `attachment_url` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `purchase_requests_school_number_unique`(`school_id` ASC, `request_number` ASC) USING BTREE,
+  INDEX `purchase_requests_school_index`(`school_id` ASC) USING BTREE,
+  INDEX `purchase_requests_rkas_item_index`(`rkas_item_id` ASC) USING BTREE,
+  INDEX `purchase_requests_requested_by_index`(`requested_by` ASC) USING BTREE,
+  INDEX `purchase_requests_approved_by_index`(`approved_by` ASC) USING BTREE,
+  INDEX `purchase_requests_status_index`(`status` ASC) USING BTREE,
+  INDEX `purchase_requests_needed_by_index`(`needed_by` ASC) USING BTREE,
+  INDEX `purchase_requests_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `purchase_requests_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `purchase_requests_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `purchase_requests_approved_by_foreign` FOREIGN KEY (`approved_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `purchase_requests_requested_by_foreign` FOREIGN KEY (`requested_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `purchase_requests_rkas_item_id_foreign` FOREIGN KEY (`rkas_item_id`) REFERENCES `rkas_items` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `purchase_requests_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of purchase_requests
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for qris_transactions
+-- ----------------------------
+DROP TABLE IF EXISTS `qris_transactions`;
+CREATE TABLE `qris_transactions`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `school_id` bigint UNSIGNED NOT NULL,
+  `payment_transaction_id` bigint UNSIGNED NOT NULL,
+  `student_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `applicant_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `issuer` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `acquirer` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `qris_string` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `qris_url` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `amount` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `expiry_time` timestamp NULL DEFAULT NULL,
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PENDING',
+  `paid_at` timestamp NULL DEFAULT NULL,
+  `raw_response` json NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `qris_transactions_school_index`(`school_id` ASC) USING BTREE,
+  INDEX `qris_transactions_transaction_index`(`payment_transaction_id` ASC) USING BTREE,
+  INDEX `qris_transactions_student_index`(`student_id` ASC) USING BTREE,
+  INDEX `qris_transactions_applicant_index`(`applicant_id` ASC) USING BTREE,
+  INDEX `qris_transactions_status_index`(`status` ASC) USING BTREE,
+  INDEX `qris_transactions_expiry_index`(`expiry_time` ASC) USING BTREE,
+  INDEX `qris_transactions_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `qris_transactions_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `qris_transactions_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `qris_transactions_applicant_id_foreign` FOREIGN KEY (`applicant_id`) REFERENCES `applicants` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `qris_transactions_payment_transaction_id_foreign` FOREIGN KEY (`payment_transaction_id`) REFERENCES `payment_transactions` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `qris_transactions_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `qris_transactions_student_id_foreign` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of qris_transactions
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for question_banks
+-- ----------------------------
+DROP TABLE IF EXISTS `question_banks`;
+CREATE TABLE `question_banks`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `school_id` bigint UNSIGNED NOT NULL,
+  `subject_id` bigint UNSIGNED NOT NULL,
+  `question_type` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `difficulty_level` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `cognitive_level` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `question_text` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `options` json NULL,
+  `correct_answer` json NULL,
+  `explanation` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `tags` json NULL,
+  `points` int NOT NULL DEFAULT 10,
+  `is_public` tinyint(1) NOT NULL DEFAULT 0,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `question_banks_school_index`(`school_id` ASC) USING BTREE,
+  INDEX `question_banks_subject_index`(`subject_id` ASC) USING BTREE,
+  INDEX `question_banks_type_index`(`question_type` ASC) USING BTREE,
+  INDEX `question_banks_difficulty_index`(`difficulty_level` ASC) USING BTREE,
+  INDEX `question_banks_cognitive_index`(`cognitive_level` ASC) USING BTREE,
+  INDEX `question_banks_is_public_index`(`is_public` ASC) USING BTREE,
+  INDEX `question_banks_is_active_index`(`is_active` ASC) USING BTREE,
+  INDEX `question_banks_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `question_banks_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `question_banks_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `question_banks_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `question_banks_subject_id_foreign` FOREIGN KEY (`subject_id`) REFERENCES `subjects` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of question_banks
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for quiz_attempts
+-- ----------------------------
+DROP TABLE IF EXISTS `quiz_attempts`;
+CREATE TABLE `quiz_attempts`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `assignment_quiz_id` bigint UNSIGNED NOT NULL,
+  `student_id` bigint UNSIGNED NOT NULL,
+  `answers` json NOT NULL,
+  `score` decimal(5, 2) NULL DEFAULT NULL,
+  `started_at` timestamp NULL DEFAULT NULL,
+  `submitted_at` timestamp NULL DEFAULT NULL,
+  `time_spent_seconds` int NULL DEFAULT NULL,
+  `is_completed` tinyint(1) NOT NULL DEFAULT 0,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `quiz_attempts_assignment_index`(`assignment_quiz_id` ASC) USING BTREE,
+  INDEX `quiz_attempts_student_index`(`student_id` ASC) USING BTREE,
+  INDEX `quiz_attempts_is_completed_index`(`is_completed` ASC) USING BTREE,
+  INDEX `quiz_attempts_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `quiz_attempts_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `quiz_attempts_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `quiz_attempts_assignment_quiz_id_foreign` FOREIGN KEY (`assignment_quiz_id`) REFERENCES `assignments_quizzes` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `quiz_attempts_student_id_foreign` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of quiz_attempts
 -- ----------------------------
 
 -- ----------------------------
@@ -3565,7 +6675,7 @@ CREATE TABLE `reference_types`  (
   UNIQUE INDEX `reference_types_code_unique`(`code` ASC) USING BTREE,
   INDEX `reference_types_is_active_index`(`is_active` ASC) USING BTREE,
   INDEX `reference_types_deleted_at_index`(`deleted_at` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of reference_types
@@ -3604,7 +6714,7 @@ CREATE TABLE `reference_values`  (
   INDEX `reference_values_sort_order_index`(`sort_order` ASC) USING BTREE,
   INDEX `reference_values_deleted_at_index`(`deleted_at` ASC) USING BTREE,
   CONSTRAINT `reference_values_type_fk` FOREIGN KEY (`reference_type_id`) REFERENCES `reference_types` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 21 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 21 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of reference_values
@@ -3655,6 +6765,631 @@ CREATE TABLE `religions`  (
 -- ----------------------------
 
 -- ----------------------------
+-- Table structure for report_card_templates
+-- ----------------------------
+DROP TABLE IF EXISTS `report_card_templates`;
+CREATE TABLE `report_card_templates`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `school_id` bigint UNSIGNED NOT NULL,
+  `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `code` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `template_data` json NOT NULL,
+  `is_default` tinyint(1) NOT NULL DEFAULT 0,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `version` int NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `report_card_templates_school_code_unique`(`school_id` ASC, `code` ASC) USING BTREE,
+  INDEX `report_card_templates_school_index`(`school_id` ASC) USING BTREE,
+  INDEX `report_card_templates_is_default_index`(`is_default` ASC) USING BTREE,
+  INDEX `report_card_templates_is_active_index`(`is_active` ASC) USING BTREE,
+  INDEX `report_card_templates_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `report_card_templates_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `report_card_templates_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `report_card_templates_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of report_card_templates
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for rkas_activities
+-- ----------------------------
+DROP TABLE IF EXISTS `rkas_activities`;
+CREATE TABLE `rkas_activities`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `rkas_program_id` bigint UNSIGNED NOT NULL,
+  `code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `order_index` int NOT NULL DEFAULT 0,
+  `total_budget` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `total_realization` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `rkas_activities_program_code_unique`(`rkas_program_id` ASC, `code` ASC) USING BTREE,
+  INDEX `rkas_activities_program_index`(`rkas_program_id` ASC) USING BTREE,
+  INDEX `rkas_activities_order_index`(`order_index` ASC) USING BTREE,
+  INDEX `rkas_activities_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `rkas_activities_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `rkas_activities_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `rkas_activities_rkas_program_id_foreign` FOREIGN KEY (`rkas_program_id`) REFERENCES `rkas_programs` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of rkas_activities
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for rkas_approvals
+-- ----------------------------
+DROP TABLE IF EXISTS `rkas_approvals`;
+CREATE TABLE `rkas_approvals`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `rkas_document_id` bigint UNSIGNED NOT NULL,
+  `approval_level` int NOT NULL DEFAULT 1,
+  `approval_role` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `approver_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `approver_name` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PENDING',
+  `approved_at` timestamp NULL DEFAULT NULL,
+  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `signature_url` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `rkas_approvals_document_index`(`rkas_document_id` ASC) USING BTREE,
+  INDEX `rkas_approvals_level_index`(`approval_level` ASC) USING BTREE,
+  INDEX `rkas_approvals_role_index`(`approval_role` ASC) USING BTREE,
+  INDEX `rkas_approvals_approver_index`(`approver_id` ASC) USING BTREE,
+  INDEX `rkas_approvals_status_index`(`status` ASC) USING BTREE,
+  INDEX `rkas_approvals_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `rkas_approvals_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `rkas_approvals_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `rkas_approvals_approver_id_foreign` FOREIGN KEY (`approver_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `rkas_approvals_rkas_document_id_foreign` FOREIGN KEY (`rkas_document_id`) REFERENCES `rkas_documents` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of rkas_approvals
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for rkas_budgets
+-- ----------------------------
+DROP TABLE IF EXISTS `rkas_budgets`;
+CREATE TABLE `rkas_budgets`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `rkas_item_id` bigint UNSIGNED NOT NULL,
+  `rkas_source_id` bigint UNSIGNED NOT NULL,
+  `amount` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `percentage` decimal(5, 2) NULL DEFAULT NULL,
+  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `rkas_budgets_item_source_unique`(`rkas_item_id` ASC, `rkas_source_id` ASC) USING BTREE,
+  INDEX `rkas_budgets_item_index`(`rkas_item_id` ASC) USING BTREE,
+  INDEX `rkas_budgets_source_index`(`rkas_source_id` ASC) USING BTREE,
+  INDEX `rkas_budgets_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `rkas_budgets_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `rkas_budgets_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `rkas_budgets_rkas_item_id_foreign` FOREIGN KEY (`rkas_item_id`) REFERENCES `rkas_items` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `rkas_budgets_rkas_source_id_foreign` FOREIGN KEY (`rkas_source_id`) REFERENCES `rkas_sources` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of rkas_budgets
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for rkas_components
+-- ----------------------------
+DROP TABLE IF EXISTS `rkas_components`;
+CREATE TABLE `rkas_components`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `school_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `component_type` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `account_code` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `account_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `regulation_code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `regulation_version` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `max_percentage` decimal(5, 2) NULL DEFAULT NULL,
+  `is_mandatory` tinyint(1) NOT NULL DEFAULT 0,
+  `order_index` int NOT NULL DEFAULT 0,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `rkas_components_school_code_unique`(`school_id` ASC, `code` ASC) USING BTREE,
+  INDEX `rkas_components_school_index`(`school_id` ASC) USING BTREE,
+  INDEX `rkas_components_type_index`(`component_type` ASC) USING BTREE,
+  INDEX `rkas_components_account_index`(`account_code` ASC) USING BTREE,
+  INDEX `rkas_components_coa_index`(`account_id` ASC) USING BTREE,
+  INDEX `rkas_components_regulation_index`(`regulation_code` ASC, `regulation_version` ASC) USING BTREE,
+  INDEX `rkas_components_order_index`(`order_index` ASC) USING BTREE,
+  INDEX `rkas_components_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `rkas_components_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `rkas_components_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `rkas_components_account_id_foreign` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `rkas_components_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of rkas_components
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for rkas_documents
+-- ----------------------------
+DROP TABLE IF EXISTS `rkas_documents`;
+CREATE TABLE `rkas_documents`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `school_id` bigint UNSIGNED NOT NULL,
+  `academic_year_id` bigint UNSIGNED NOT NULL,
+  `fiscal_period_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `version` int NOT NULL DEFAULT 1,
+  `revision_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'INITIAL',
+  `parent_document_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `total_budget` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `total_realization` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'DRAFT',
+  `approved_at` timestamp NULL DEFAULT NULL,
+  `approved_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `attachment_url` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `rkas_documents_school_code_unique`(`school_id` ASC, `code` ASC) USING BTREE,
+  INDEX `rkas_documents_school_index`(`school_id` ASC) USING BTREE,
+  INDEX `rkas_documents_academic_year_index`(`academic_year_id` ASC) USING BTREE,
+  INDEX `rkas_documents_fiscal_period_index`(`fiscal_period_id` ASC) USING BTREE,
+  INDEX `rkas_documents_revision_type_index`(`revision_type` ASC) USING BTREE,
+  INDEX `rkas_documents_parent_index`(`parent_document_id` ASC) USING BTREE,
+  INDEX `rkas_documents_status_index`(`status` ASC) USING BTREE,
+  INDEX `rkas_documents_approved_by_index`(`approved_by` ASC) USING BTREE,
+  INDEX `rkas_documents_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `rkas_documents_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `rkas_documents_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `rkas_documents_academic_year_id_foreign` FOREIGN KEY (`academic_year_id`) REFERENCES `academic_years` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `rkas_documents_approved_by_foreign` FOREIGN KEY (`approved_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `rkas_documents_fiscal_period_id_foreign` FOREIGN KEY (`fiscal_period_id`) REFERENCES `fiscal_periods` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `rkas_documents_parent_document_id_foreign` FOREIGN KEY (`parent_document_id`) REFERENCES `rkas_documents` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `rkas_documents_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of rkas_documents
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for rkas_items
+-- ----------------------------
+DROP TABLE IF EXISTS `rkas_items`;
+CREATE TABLE `rkas_items`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `rkas_sub_activity_id` bigint UNSIGNED NOT NULL,
+  `rkas_component_id` bigint UNSIGNED NOT NULL,
+  `code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `specification` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `unit` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `volume` decimal(20, 4) NOT NULL DEFAULT 0.0000,
+  `unit_price` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `subtotal` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `tax_amount` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `shipping_amount` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `admin_amount` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `total_amount` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `execution_month` tinyint UNSIGNED NULL DEFAULT NULL,
+  `execution_quarter` tinyint UNSIGNED NULL DEFAULT NULL,
+  `order_index` int NOT NULL DEFAULT 0,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `rkas_items_sub_activity_code_unique`(`rkas_sub_activity_id` ASC, `code` ASC) USING BTREE,
+  INDEX `rkas_items_sub_activity_index`(`rkas_sub_activity_id` ASC) USING BTREE,
+  INDEX `rkas_items_component_index`(`rkas_component_id` ASC) USING BTREE,
+  INDEX `rkas_items_month_index`(`execution_month` ASC) USING BTREE,
+  INDEX `rkas_items_quarter_index`(`execution_quarter` ASC) USING BTREE,
+  INDEX `rkas_items_order_index`(`order_index` ASC) USING BTREE,
+  INDEX `rkas_items_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `rkas_items_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `rkas_items_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `rkas_items_rkas_component_id_foreign` FOREIGN KEY (`rkas_component_id`) REFERENCES `rkas_components` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `rkas_items_rkas_sub_activity_id_foreign` FOREIGN KEY (`rkas_sub_activity_id`) REFERENCES `rkas_sub_activities` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of rkas_items
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for rkas_programs
+-- ----------------------------
+DROP TABLE IF EXISTS `rkas_programs`;
+CREATE TABLE `rkas_programs`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `rkas_document_id` bigint UNSIGNED NOT NULL,
+  `standard_id` bigint UNSIGNED NOT NULL,
+  `code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `order_index` int NOT NULL DEFAULT 0,
+  `total_budget` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `total_realization` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `rkas_programs_document_code_unique`(`rkas_document_id` ASC, `code` ASC) USING BTREE,
+  INDEX `rkas_programs_document_index`(`rkas_document_id` ASC) USING BTREE,
+  INDEX `rkas_programs_standard_index`(`standard_id` ASC) USING BTREE,
+  INDEX `rkas_programs_order_index`(`order_index` ASC) USING BTREE,
+  INDEX `rkas_programs_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `rkas_programs_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `rkas_programs_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `rkas_programs_rkas_document_id_foreign` FOREIGN KEY (`rkas_document_id`) REFERENCES `rkas_documents` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `rkas_programs_standard_id_foreign` FOREIGN KEY (`standard_id`) REFERENCES `rkas_standards` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of rkas_programs
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for rkas_realizations
+-- ----------------------------
+DROP TABLE IF EXISTS `rkas_realizations`;
+CREATE TABLE `rkas_realizations`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `rkas_item_id` bigint UNSIGNED NOT NULL,
+  `rkas_source_id` bigint UNSIGNED NOT NULL,
+  `fiscal_period_id` bigint UNSIGNED NOT NULL,
+  `journal_entry_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `realization_date` date NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `amount` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `tax_amount` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `vendor_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `vendor_invoice_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `payment_reference` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `attachment_url` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'RECORDED',
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `rkas_realizations_item_index`(`rkas_item_id` ASC) USING BTREE,
+  INDEX `rkas_realizations_source_index`(`rkas_source_id` ASC) USING BTREE,
+  INDEX `rkas_realizations_fiscal_period_index`(`fiscal_period_id` ASC) USING BTREE,
+  INDEX `rkas_realizations_journal_entry_index`(`journal_entry_id` ASC) USING BTREE,
+  INDEX `rkas_realizations_date_index`(`realization_date` ASC) USING BTREE,
+  INDEX `rkas_realizations_vendor_index`(`vendor_id` ASC) USING BTREE,
+  INDEX `rkas_realizations_vendor_invoice_index`(`vendor_invoice_id` ASC) USING BTREE,
+  INDEX `rkas_realizations_status_index`(`status` ASC) USING BTREE,
+  INDEX `rkas_realizations_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `rkas_realizations_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `rkas_realizations_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `rkas_realizations_fiscal_period_id_foreign` FOREIGN KEY (`fiscal_period_id`) REFERENCES `fiscal_periods` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `rkas_realizations_journal_entry_id_foreign` FOREIGN KEY (`journal_entry_id`) REFERENCES `journal_entries` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `rkas_realizations_rkas_item_id_foreign` FOREIGN KEY (`rkas_item_id`) REFERENCES `rkas_items` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `rkas_realizations_rkas_source_id_foreign` FOREIGN KEY (`rkas_source_id`) REFERENCES `rkas_sources` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `rkas_realizations_vendor_id_foreign` FOREIGN KEY (`vendor_id`) REFERENCES `vendors` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `rkas_realizations_vendor_invoice_id_foreign` FOREIGN KEY (`vendor_invoice_id`) REFERENCES `vendor_invoices` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of rkas_realizations
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for rkas_report_items
+-- ----------------------------
+DROP TABLE IF EXISTS `rkas_report_items`;
+CREATE TABLE `rkas_report_items`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `rkas_report_id` bigint UNSIGNED NOT NULL,
+  `rkas_component_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `rkas_source_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `account_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `budget_amount` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `realization_amount` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `remaining_amount` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `percentage` decimal(5, 2) NOT NULL DEFAULT 0.00,
+  `item_data` json NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `rkas_report_items_report_index`(`rkas_report_id` ASC) USING BTREE,
+  INDEX `rkas_report_items_component_index`(`rkas_component_id` ASC) USING BTREE,
+  INDEX `rkas_report_items_source_index`(`rkas_source_id` ASC) USING BTREE,
+  INDEX `rkas_report_items_coa_index`(`account_id` ASC) USING BTREE,
+  INDEX `rkas_report_items_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `rkas_report_items_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `rkas_report_items_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `rkas_report_items_account_id_foreign` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `rkas_report_items_rkas_component_id_foreign` FOREIGN KEY (`rkas_component_id`) REFERENCES `rkas_components` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `rkas_report_items_rkas_report_id_foreign` FOREIGN KEY (`rkas_report_id`) REFERENCES `rkas_reports` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `rkas_report_items_rkas_source_id_foreign` FOREIGN KEY (`rkas_source_id`) REFERENCES `rkas_sources` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of rkas_report_items
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for rkas_reports
+-- ----------------------------
+DROP TABLE IF EXISTS `rkas_reports`;
+CREATE TABLE `rkas_reports`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `school_id` bigint UNSIGNED NOT NULL,
+  `rkas_document_id` bigint UNSIGNED NOT NULL,
+  `fiscal_period_id` bigint UNSIGNED NOT NULL,
+  `report_code` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `report_name` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `report_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PERIODIC',
+  `period_number` int NULL DEFAULT NULL,
+  `start_date` date NOT NULL,
+  `end_date` date NOT NULL,
+  `total_budget` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `total_realization` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `total_remaining` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `percentage` decimal(5, 2) NOT NULL DEFAULT 0.00,
+  `file_url` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `report_data` json NULL,
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'DRAFT',
+  `submitted_at` timestamp NULL DEFAULT NULL,
+  `submitted_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `verified_at` timestamp NULL DEFAULT NULL,
+  `verified_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `rkas_reports_school_document_code_period_unique`(`school_id` ASC, `rkas_document_id` ASC, `report_code` ASC, `period_number` ASC) USING BTREE,
+  INDEX `rkas_reports_school_index`(`school_id` ASC) USING BTREE,
+  INDEX `rkas_reports_document_index`(`rkas_document_id` ASC) USING BTREE,
+  INDEX `rkas_reports_fiscal_period_index`(`fiscal_period_id` ASC) USING BTREE,
+  INDEX `rkas_reports_code_index`(`report_code` ASC) USING BTREE,
+  INDEX `rkas_reports_type_index`(`report_type` ASC) USING BTREE,
+  INDEX `rkas_reports_status_index`(`status` ASC) USING BTREE,
+  INDEX `rkas_reports_submitted_by_index`(`submitted_by` ASC) USING BTREE,
+  INDEX `rkas_reports_verified_by_index`(`verified_by` ASC) USING BTREE,
+  INDEX `rkas_reports_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `rkas_reports_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `rkas_reports_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `rkas_reports_fiscal_period_id_foreign` FOREIGN KEY (`fiscal_period_id`) REFERENCES `fiscal_periods` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `rkas_reports_rkas_document_id_foreign` FOREIGN KEY (`rkas_document_id`) REFERENCES `rkas_documents` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `rkas_reports_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `rkas_reports_submitted_by_foreign` FOREIGN KEY (`submitted_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `rkas_reports_verified_by_foreign` FOREIGN KEY (`verified_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of rkas_reports
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for rkas_revisions
+-- ----------------------------
+DROP TABLE IF EXISTS `rkas_revisions`;
+CREATE TABLE `rkas_revisions`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `rkas_document_id` bigint UNSIGNED NOT NULL,
+  `parent_revision_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `revision_number` int NOT NULL DEFAULT 1,
+  `revision_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `revision_date` date NOT NULL,
+  `reason` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `total_before` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `total_after` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `difference` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `changes` json NULL,
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'DRAFT',
+  `approved_at` timestamp NULL DEFAULT NULL,
+  `approved_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `approval_notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `rkas_revisions_document_number_unique`(`rkas_document_id` ASC, `revision_number` ASC) USING BTREE,
+  INDEX `rkas_revisions_document_index`(`rkas_document_id` ASC) USING BTREE,
+  INDEX `rkas_revisions_parent_index`(`parent_revision_id` ASC) USING BTREE,
+  INDEX `rkas_revisions_type_index`(`revision_type` ASC) USING BTREE,
+  INDEX `rkas_revisions_date_index`(`revision_date` ASC) USING BTREE,
+  INDEX `rkas_revisions_status_index`(`status` ASC) USING BTREE,
+  INDEX `rkas_revisions_approved_by_index`(`approved_by` ASC) USING BTREE,
+  INDEX `rkas_revisions_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `rkas_revisions_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `rkas_revisions_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `rkas_revisions_approved_by_foreign` FOREIGN KEY (`approved_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `rkas_revisions_parent_revision_id_foreign` FOREIGN KEY (`parent_revision_id`) REFERENCES `rkas_revisions` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `rkas_revisions_rkas_document_id_foreign` FOREIGN KEY (`rkas_document_id`) REFERENCES `rkas_documents` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of rkas_revisions
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for rkas_sources
+-- ----------------------------
+DROP TABLE IF EXISTS `rkas_sources`;
+CREATE TABLE `rkas_sources`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `school_id` bigint UNSIGNED NOT NULL,
+  `code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `source_type` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `authority` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `account_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `allocation_amount` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `regulation_version` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `rkas_sources_school_code_unique`(`school_id` ASC, `code` ASC) USING BTREE,
+  INDEX `rkas_sources_school_index`(`school_id` ASC) USING BTREE,
+  INDEX `rkas_sources_type_index`(`source_type` ASC) USING BTREE,
+  INDEX `rkas_sources_authority_index`(`authority` ASC) USING BTREE,
+  INDEX `rkas_sources_coa_index`(`account_id` ASC) USING BTREE,
+  INDEX `rkas_sources_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `rkas_sources_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `rkas_sources_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `rkas_sources_account_id_foreign` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `rkas_sources_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of rkas_sources
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for rkas_standards
+-- ----------------------------
+DROP TABLE IF EXISTS `rkas_standards`;
+CREATE TABLE `rkas_standards`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `code` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `order_index` int NOT NULL DEFAULT 0,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `rkas_standards_code_unique`(`code` ASC) USING BTREE,
+  INDEX `rkas_standards_order_index`(`order_index` ASC) USING BTREE,
+  INDEX `rkas_standards_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `rkas_standards_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `rkas_standards_updated_by_index`(`updated_by` ASC) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of rkas_standards
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for rkas_sub_activities
+-- ----------------------------
+DROP TABLE IF EXISTS `rkas_sub_activities`;
+CREATE TABLE `rkas_sub_activities`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `rkas_activity_id` bigint UNSIGNED NOT NULL,
+  `code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `order_index` int NOT NULL DEFAULT 0,
+  `total_budget` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `total_realization` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `rkas_sub_activities_activity_code_unique`(`rkas_activity_id` ASC, `code` ASC) USING BTREE,
+  INDEX `rkas_sub_activities_activity_index`(`rkas_activity_id` ASC) USING BTREE,
+  INDEX `rkas_sub_activities_order_index`(`order_index` ASC) USING BTREE,
+  INDEX `rkas_sub_activities_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `rkas_sub_activities_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `rkas_sub_activities_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `rkas_sub_activities_rkas_activity_id_foreign` FOREIGN KEY (`rkas_activity_id`) REFERENCES `rkas_activities` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of rkas_sub_activities
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for role_permissions
+-- ----------------------------
+DROP TABLE IF EXISTS `role_permissions`;
+CREATE TABLE `role_permissions`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `role_id` bigint UNSIGNED NOT NULL,
+  `permission_id` bigint UNSIGNED NOT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `role_permissions_unique`(`role_id` ASC, `permission_id` ASC) USING BTREE,
+  INDEX `role_permissions_role_index`(`role_id` ASC) USING BTREE,
+  INDEX `role_permissions_permission_index`(`permission_id` ASC) USING BTREE,
+  INDEX `role_permissions_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  CONSTRAINT `role_permissions_permission_id_foreign` FOREIGN KEY (`permission_id`) REFERENCES `permissions` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `role_permissions_role_id_foreign` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of role_permissions
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for role_user
 -- ----------------------------
 DROP TABLE IF EXISTS `role_user`;
@@ -3683,9 +7418,6 @@ CREATE TABLE `role_user`  (
 -- ----------------------------
 -- Records of role_user
 -- ----------------------------
-INSERT INTO `role_user` VALUES (4, 1, 1, 1, 1, '2026-09-12 06:54:20', '2026-09-12 06:54:20', NULL, NULL, NULL);
-INSERT INTO `role_user` VALUES (5, 1, 2, 1, 0, '2026-09-12 06:54:20', '2026-09-12 06:54:20', NULL, NULL, NULL);
-INSERT INTO `role_user` VALUES (6, 2, 3, 1, 1, '2026-09-12 06:54:20', '2026-09-12 06:54:20', NULL, NULL, NULL);
 
 -- ----------------------------
 -- Table structure for roles
@@ -3719,35 +7451,36 @@ INSERT INTO `roles` VALUES (2, 1, 'admin', 'Administrator', 'Mengelola konten da
 INSERT INTO `roles` VALUES (3, 1, 'user', 'Pengguna', 'Pengguna biasa', 1, 1, '2026-09-09 17:07:41', '2026-09-09 17:07:41', NULL, NULL, NULL);
 
 -- ----------------------------
--- Table structure for roles_copy1
+-- Table structure for room_constraints
 -- ----------------------------
-DROP TABLE IF EXISTS `roles_copy1`;
-CREATE TABLE `roles_copy1`  (
+DROP TABLE IF EXISTS `room_constraints`;
+CREATE TABLE `room_constraints`  (
   `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
-  `organization_id` bigint UNSIGNED NOT NULL,
-  `name` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `display_name` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
-  `is_system` tinyint(1) NOT NULL DEFAULT 0,
-  `is_active` int NULL DEFAULT NULL,
+  `room_id` bigint UNSIGNED NOT NULL,
+  `day_of_week` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `time_slot_start` time NULL DEFAULT NULL,
+  `time_slot_end` time NULL DEFAULT NULL,
+  `constraint_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `reason` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
   `created_by` bigint UNSIGNED NULL DEFAULT NULL,
   `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `roles_org_name_unique`(`organization_id` ASC, `name` ASC) USING BTREE,
-  INDEX `roles_is_system_index`(`is_system` ASC) USING BTREE,
-  INDEX `roles_deleted_at_index`(`deleted_at` ASC) USING BTREE,
-  CONSTRAINT `roles_copy1_ibfk_1` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+  INDEX `room_constraints_room_index`(`room_id` ASC) USING BTREE,
+  INDEX `room_constraints_day_index`(`day_of_week` ASC) USING BTREE,
+  INDEX `room_constraints_type_index`(`constraint_type` ASC) USING BTREE,
+  INDEX `room_constraints_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `room_constraints_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `room_constraints_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `room_constraints_room_id_foreign` FOREIGN KEY (`room_id`) REFERENCES `timetable_rooms` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
--- Records of roles_copy1
+-- Records of room_constraints
 -- ----------------------------
-INSERT INTO `roles_copy1` VALUES (1, 1, 'super-admin', 'Super Administrator', 'Memiliki akses penuh ke seluruh sistem', 1, 1, '2026-09-09 17:07:41', '2026-09-09 17:07:41', NULL, NULL, NULL);
-INSERT INTO `roles_copy1` VALUES (2, 1, 'admin', 'Administrator', 'Mengelola konten dan pengguna biasa', 1, 1, '2026-09-09 17:07:41', '2026-09-09 17:07:41', NULL, NULL, NULL);
-INSERT INTO `roles_copy1` VALUES (3, 1, 'user', 'Pengguna', 'Pengguna biasa', 1, 1, '2026-09-09 17:07:41', '2026-09-09 17:07:41', NULL, NULL, NULL);
 
 -- ----------------------------
 -- Table structure for rooms
@@ -3916,6 +7649,7 @@ CREATE TABLE `schedules`  (
   `start_time` time NOT NULL,
   `end_time` time NOT NULL,
   `room_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `generation_id` bigint UNSIGNED NULL DEFAULT NULL,
   `is_locked` tinyint(1) NULL DEFAULT 0,
   `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
   `is_active` tinyint(1) NULL DEFAULT 1,
@@ -3931,8 +7665,12 @@ CREATE TABLE `schedules`  (
   INDEX `idx_schedules_academic_year`(`academic_year_id` ASC) USING BTREE,
   INDEX `idx_schedules_deleted_at`(`deleted_at` ASC) USING BTREE,
   INDEX `schedules_subject_fk`(`subject_id` ASC) USING BTREE,
+  INDEX `schedules_room_index`(`room_id` ASC) USING BTREE,
+  INDEX `schedules_generation_index`(`generation_id` ASC) USING BTREE,
   CONSTRAINT `schedules_academic_year_fk` FOREIGN KEY (`academic_year_id`) REFERENCES `academic_years` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `schedules_classroom_fk` FOREIGN KEY (`classroom_id`) REFERENCES `classrooms` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `schedules_generation_id_foreign` FOREIGN KEY (`generation_id`) REFERENCES `timetable_generations` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `schedules_room_id_foreign` FOREIGN KEY (`room_id`) REFERENCES `timetable_rooms` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `schedules_subject_fk` FOREIGN KEY (`subject_id`) REFERENCES `subjects` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `schedules_teacher_fk` FOREIGN KEY (`teacher_id`) REFERENCES `teachers` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
@@ -3989,7 +7727,6 @@ CREATE TABLE `sessions`  (
 -- ----------------------------
 -- Records of sessions
 -- ----------------------------
-INSERT INTO `sessions` VALUES ('SQes3LQjO0jRy2wMURbnITD3tY6FEKn587ppRSxQ', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36', 'YTo2OntzOjY6Il90b2tlbiI7czo0MDoianJtMTFFa0cxYzBncFY2Znp3RmpqeHBtMG5CZTRZUXo3SUxhcTVUcyI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MzI6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9zaGlmdC1zd2FwIjtzOjU6InJvdXRlIjtzOjE2OiJzaGlmdF9zd2FwLmluZGV4Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo1MDoibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6MTtzOjk6InVzZXJfYXV0aCI7YTo3OntzOjg6ImxvZ2luX2FzIjtzOjExOiJzdXBlci1hZG1pbiI7czoxNDoiYWN0aXZlX3JvbGVfaWQiO2k6MTtzOjEzOiJhdXRoX3JvbGVfaWRzIjtPOjI5OiJJbGx1bWluYXRlXFN1cHBvcnRcQ29sbGVjdGlvbiI6Mjp7czo4OiIAKgBpdGVtcyI7YToyOntpOjA7aToxO2k6MTtpOjI7fXM6Mjg6IgAqAGVzY2FwZVdoZW5DYXN0aW5nVG9TdHJpbmciO2I6MDt9czoxMDoiYXV0aF9yb2xlcyI7TzoyOToiSWxsdW1pbmF0ZVxTdXBwb3J0XENvbGxlY3Rpb24iOjI6e3M6ODoiACoAaXRlbXMiO2E6Mjp7aTowO3M6MTE6InN1cGVyLWFkbWluIjtpOjE7czo1OiJhZG1pbiI7fXM6Mjg6IgAqAGVzY2FwZVdoZW5DYXN0aW5nVG9TdHJpbmciO2I6MDt9czo5OiJhdXRoX3JvbGUiO086MTE6Ik1vZGVsc1xSb2xlIjozNjp7czoxMzoiACoAY29ubmVjdGlvbiI7czo1OiJteXNxbCI7czo4OiIAKgB0YWJsZSI7czo1OiJyb2xlcyI7czoxMzoiACoAcHJpbWFyeUtleSI7czoyOiJpZCI7czoxMDoiACoAa2V5VHlwZSI7czozOiJpbnQiO3M6MTI6ImluY3JlbWVudGluZyI7YjoxO3M6NzoiACoAd2l0aCI7YTowOnt9czoxMjoiACoAd2l0aENvdW50IjthOjA6e31zOjE5OiJwcmV2ZW50c0xhenlMb2FkaW5nIjtiOjA7czoxMDoiACoAcGVyUGFnZSI7aToxNTtzOjY6ImV4aXN0cyI7YjoxO3M6MTg6Indhc1JlY2VudGx5Q3JlYXRlZCI7YjowO3M6Mjg6IgAqAGVzY2FwZVdoZW5DYXN0aW5nVG9TdHJpbmciO2I6MDtzOjEzOiIAKgBhdHRyaWJ1dGVzIjthOjEyOntzOjI6ImlkIjtpOjE7czoxNToib3JnYW5pemF0aW9uX2lkIjtpOjE7czo0OiJuYW1lIjtzOjExOiJzdXBlci1hZG1pbiI7czoxMjoiZGlzcGxheV9uYW1lIjtzOjE5OiJTdXBlciBBZG1pbmlzdHJhdG9yIjtzOjExOiJkZXNjcmlwdGlvbiI7czozODoiTWVtaWxpa2kgYWtzZXMgcGVudWgga2Ugc2VsdXJ1aCBzaXN0ZW0iO3M6OToiaXNfc3lzdGVtIjtpOjE7czo5OiJpc19hY3RpdmUiO2k6MTtzOjEwOiJjcmVhdGVkX2F0IjtzOjE5OiIyMDI2LTA5LTA5IDE3OjA3OjQxIjtzOjEwOiJ1cGRhdGVkX2F0IjtzOjE5OiIyMDI2LTA5LTA5IDE3OjA3OjQxIjtzOjEwOiJkZWxldGVkX2F0IjtOO3M6MTA6ImNyZWF0ZWRfYnkiO047czoxMDoidXBkYXRlZF9ieSI7Tjt9czoxMToiACoAb3JpZ2luYWwiO2E6MTc6e3M6MjoiaWQiO2k6MTtzOjE1OiJvcmdhbml6YXRpb25faWQiO2k6MTtzOjQ6Im5hbWUiO3M6MTE6InN1cGVyLWFkbWluIjtzOjEyOiJkaXNwbGF5X25hbWUiO3M6MTk6IlN1cGVyIEFkbWluaXN0cmF0b3IiO3M6MTE6ImRlc2NyaXB0aW9uIjtzOjM4OiJNZW1pbGlraSBha3NlcyBwZW51aCBrZSBzZWx1cnVoIHNpc3RlbSI7czo5OiJpc19zeXN0ZW0iO2k6MTtzOjk6ImlzX2FjdGl2ZSI7aToxO3M6MTA6ImNyZWF0ZWRfYXQiO3M6MTk6IjIwMjYtMDktMDkgMTc6MDc6NDEiO3M6MTA6InVwZGF0ZWRfYXQiO3M6MTk6IjIwMjYtMDktMDkgMTc6MDc6NDEiO3M6MTA6ImRlbGV0ZWRfYXQiO047czoxMDoiY3JlYXRlZF9ieSI7TjtzOjEwOiJ1cGRhdGVkX2J5IjtOO3M6MTM6InBpdm90X3VzZXJfaWQiO2k6MTtzOjEzOiJwaXZvdF9yb2xlX2lkIjtpOjE7czoxNjoicGl2b3RfaXNfZGVmYXVsdCI7aToxO3M6MTY6InBpdm90X2NyZWF0ZWRfYXQiO3M6MTk6IjIwMjYtMDktMTIgMDY6NTQ6MjAiO3M6MTY6InBpdm90X3VwZGF0ZWRfYXQiO3M6MTk6IjIwMjYtMDktMTIgMDY6NTQ6MjAiO31zOjEwOiIAKgBjaGFuZ2VzIjthOjA6e31zOjExOiIAKgBwcmV2aW91cyI7YTowOnt9czo4OiIAKgBjYXN0cyI7YTozOntzOjEwOiJjcmVhdGVkX2F0IjtzOjg6ImRhdGV0aW1lIjtzOjEwOiJ1cGRhdGVkX2F0IjtzOjg6ImRhdGV0aW1lIjtzOjEwOiJkZWxldGVkX2F0IjtzOjg6ImRhdGV0aW1lIjt9czoxNzoiACoAY2xhc3NDYXN0Q2FjaGUiO2E6MDp7fXM6MjE6IgAqAGF0dHJpYnV0ZUNhc3RDYWNoZSI7YTowOnt9czoxMzoiACoAZGF0ZUZvcm1hdCI7TjtzOjEwOiIAKgBhcHBlbmRzIjthOjA6e31zOjE5OiIAKgBkaXNwYXRjaGVzRXZlbnRzIjthOjA6e31zOjE0OiIAKgBvYnNlcnZhYmxlcyI7YTowOnt9czoxMjoiACoAcmVsYXRpb25zIjthOjE6e3M6NToicGl2b3QiO086NDQ6IklsbHVtaW5hdGVcRGF0YWJhc2VcRWxvcXVlbnRcUmVsYXRpb25zXFBpdm90IjozNzp7czoxMzoiACoAY29ubmVjdGlvbiI7czo1OiJteXNxbCI7czo4OiIAKgB0YWJsZSI7czo5OiJyb2xlX3VzZXIiO3M6MTM6IgAqAHByaW1hcnlLZXkiO3M6MjoiaWQiO3M6MTA6IgAqAGtleVR5cGUiO3M6MzoiaW50IjtzOjEyOiJpbmNyZW1lbnRpbmciO2I6MDtzOjc6IgAqAHdpdGgiO2E6MDp7fXM6MTI6IgAqAHdpdGhDb3VudCI7YTowOnt9czoxOToicHJldmVudHNMYXp5TG9hZGluZyI7YjowO3M6MTA6IgAqAHBlclBhZ2UiO2k6MTU7czo2OiJleGlzdHMiO2I6MTtzOjE4OiJ3YXNSZWNlbnRseUNyZWF0ZWQiO2I6MDtzOjI4OiIAKgBlc2NhcGVXaGVuQ2FzdGluZ1RvU3RyaW5nIjtiOjA7czoxMzoiACoAYXR0cmlidXRlcyI7YTo1OntzOjc6InVzZXJfaWQiO2k6MTtzOjc6InJvbGVfaWQiO2k6MTtzOjEwOiJpc19kZWZhdWx0IjtpOjE7czoxMDoiY3JlYXRlZF9hdCI7czoxOToiMjAyNi0wOS0xMiAwNjo1NDoyMCI7czoxMDoidXBkYXRlZF9hdCI7czoxOToiMjAyNi0wOS0xMiAwNjo1NDoyMCI7fXM6MTE6IgAqAG9yaWdpbmFsIjthOjU6e3M6NzoidXNlcl9pZCI7aToxO3M6Nzoicm9sZV9pZCI7aToxO3M6MTA6ImlzX2RlZmF1bHQiO2k6MTtzOjEwOiJjcmVhdGVkX2F0IjtzOjE5OiIyMDI2LTA5LTEyIDA2OjU0OjIwIjtzOjEwOiJ1cGRhdGVkX2F0IjtzOjE5OiIyMDI2LTA5LTEyIDA2OjU0OjIwIjt9czoxMDoiACoAY2hhbmdlcyI7YTowOnt9czoxMToiACoAcHJldmlvdXMiO2E6MDp7fXM6ODoiACoAY2FzdHMiO2E6MDp7fXM6MTc6IgAqAGNsYXNzQ2FzdENhY2hlIjthOjA6e31zOjIxOiIAKgBhdHRyaWJ1dGVDYXN0Q2FjaGUiO2E6MDp7fXM6MTM6IgAqAGRhdGVGb3JtYXQiO047czoxMDoiACoAYXBwZW5kcyI7YTowOnt9czoxOToiACoAZGlzcGF0Y2hlc0V2ZW50cyI7YTowOnt9czoxNDoiACoAb2JzZXJ2YWJsZXMiO2E6MDp7fXM6MTI6IgAqAHJlbGF0aW9ucyI7YTowOnt9czoxMDoiACoAdG91Y2hlcyI7YTowOnt9czoyNzoiACoAcmVsYXRpb25BdXRvbG9hZENhbGxiYWNrIjtOO3M6MjY6IgAqAHJlbGF0aW9uQXV0b2xvYWRDb250ZXh0IjtOO3M6MTA6InRpbWVzdGFtcHMiO2I6MTtzOjEzOiJ1c2VzVW5pcXVlSWRzIjtiOjA7czo5OiIAKgBoaWRkZW4iO2E6MDp7fXM6MTA6IgAqAHZpc2libGUiO2E6MDp7fXM6MTE6IgAqAGZpbGxhYmxlIjthOjA6e31zOjEwOiIAKgBndWFyZGVkIjthOjA6e31zOjExOiJwaXZvdFBhcmVudCI7TzoxNToiQXBwXE1vZGVsc1xVc2VyIjozNzp7czoxMzoiACoAY29ubmVjdGlvbiI7czo1OiJteXNxbCI7czo4OiIAKgB0YWJsZSI7czo1OiJ1c2VycyI7czoxMzoiACoAcHJpbWFyeUtleSI7czoyOiJpZCI7czoxMDoiACoAa2V5VHlwZSI7czozOiJpbnQiO3M6MTI6ImluY3JlbWVudGluZyI7YjoxO3M6NzoiACoAd2l0aCI7YTowOnt9czoxMjoiACoAd2l0aENvdW50IjthOjA6e31zOjE5OiJwcmV2ZW50c0xhenlMb2FkaW5nIjtiOjA7czoxMDoiACoAcGVyUGFnZSI7aToxNTtzOjY6ImV4aXN0cyI7YjoxO3M6MTg6Indhc1JlY2VudGx5Q3JlYXRlZCI7YjowO3M6Mjg6IgAqAGVzY2FwZVdoZW5DYXN0aW5nVG9TdHJpbmciO2I6MDtzOjEzOiIAKgBhdHRyaWJ1dGVzIjthOjE2OntzOjI6ImlkIjtpOjE7czo0OiJuYW1lIjtzOjE5OiJBZG1pbmlzdHJhdG9yIFV0YW1hIjtzOjU6ImVtYWlsIjtzOjE1OiJhZG1pbkBjb250b2guaWQiO3M6MTc6ImVtYWlsX3ZlcmlmaWVkX2F0IjtzOjE5OiIyMDI2LTA5LTA5IDE3OjA4OjIzIjtzOjg6InBhc3N3b3JkIjtzOjYwOiIkMnkkMTIkQXBaWllzdUVDcVNBeDJkbE9Fd2xMLmJLY0tDYUQuaWxLbzNrTEo4NTBvdHNYY250cjdYMFMiO3M6MTQ6InJlbWVtYmVyX3Rva2VuIjtOO3M6MTc6InR3b19mYWN0b3Jfc2VjcmV0IjtOO3M6MjU6InR3b19mYWN0b3JfcmVjb3ZlcnlfY29kZXMiO047czoyMzoidHdvX2ZhY3Rvcl9jb25maXJtZWRfYXQiO047czoxMzoibGFzdF9sb2dpbl9hdCI7TjtzOjEzOiJsYXN0X2xvZ2luX2lwIjtOO3M6MTA6ImNyZWF0ZWRfYXQiO3M6MTk6IjIwMjYtMDktMDkgMTc6MDg6MjMiO3M6MTA6InVwZGF0ZWRfYXQiO3M6MTk6IjIwMjYtMDktMDkgMTc6MDg6MjMiO3M6MTA6ImRlbGV0ZWRfYXQiO047czoxMDoiY3JlYXRlZF9ieSI7TjtzOjEwOiJ1cGRhdGVkX2J5IjtOO31zOjExOiIAKgBvcmlnaW5hbCI7YToxNjp7czoyOiJpZCI7aToxO3M6NDoibmFtZSI7czoxOToiQWRtaW5pc3RyYXRvciBVdGFtYSI7czo1OiJlbWFpbCI7czoxNToiYWRtaW5AY29udG9oLmlkIjtzOjE3OiJlbWFpbF92ZXJpZmllZF9hdCI7czoxOToiMjAyNi0wOS0wOSAxNzowODoyMyI7czo4OiJwYXNzd29yZCI7czo2MDoiJDJ5JDEyJEFwWlpZc3VFQ3FTQXgyZGxPRXdsTC5iS2NLQ2FELmlsS28za0xKODUwb3RzWGNudHI3WDBTIjtzOjE0OiJyZW1lbWJlcl90b2tlbiI7TjtzOjE3OiJ0d29fZmFjdG9yX3NlY3JldCI7TjtzOjI1OiJ0d29fZmFjdG9yX3JlY292ZXJ5X2NvZGVzIjtOO3M6MjM6InR3b19mYWN0b3JfY29uZmlybWVkX2F0IjtOO3M6MTM6Imxhc3RfbG9naW5fYXQiO047czoxMzoibGFzdF9sb2dpbl9pcCI7TjtzOjEwOiJjcmVhdGVkX2F0IjtzOjE5OiIyMDI2LTA5LTA5IDE3OjA4OjIzIjtzOjEwOiJ1cGRhdGVkX2F0IjtzOjE5OiIyMDI2LTA5LTA5IDE3OjA4OjIzIjtzOjEwOiJkZWxldGVkX2F0IjtOO3M6MTA6ImNyZWF0ZWRfYnkiO047czoxMDoidXBkYXRlZF9ieSI7Tjt9czoxMDoiACoAY2hhbmdlcyI7YTowOnt9czoxMToiACoAcHJldmlvdXMiO2E6MDp7fXM6ODoiACoAY2FzdHMiO2E6Mzp7czoxNzoiZW1haWxfdmVyaWZpZWRfYXQiO3M6ODoiZGF0ZXRpbWUiO3M6ODoicGFzc3dvcmQiO3M6NjoiaGFzaGVkIjtzOjEwOiJkZWxldGVkX2F0IjtzOjg6ImRhdGV0aW1lIjt9czoxNzoiACoAY2xhc3NDYXN0Q2FjaGUiO2E6MDp7fXM6MjE6IgAqAGF0dHJpYnV0ZUNhc3RDYWNoZSI7YTowOnt9czoxMzoiACoAZGF0ZUZvcm1hdCI7TjtzOjEwOiIAKgBhcHBlbmRzIjthOjA6e31zOjE5OiIAKgBkaXNwYXRjaGVzRXZlbnRzIjthOjA6e31zOjE0OiIAKgBvYnNlcnZhYmxlcyI7YTowOnt9czoxMjoiACoAcmVsYXRpb25zIjthOjE6e3M6NToicm9sZXMiO086Mzk6IklsbHVtaW5hdGVcRGF0YWJhc2VcRWxvcXVlbnRcQ29sbGVjdGlvbiI6Mjp7czo4OiIAKgBpdGVtcyI7YToyOntpOjA7cjoyMztpOjE7TzoxMToiTW9kZWxzXFJvbGUiOjM2OntzOjEzOiIAKgBjb25uZWN0aW9uIjtzOjU6Im15c3FsIjtzOjg6IgAqAHRhYmxlIjtzOjU6InJvbGVzIjtzOjEzOiIAKgBwcmltYXJ5S2V5IjtzOjI6ImlkIjtzOjEwOiIAKgBrZXlUeXBlIjtzOjM6ImludCI7czoxMjoiaW5jcmVtZW50aW5nIjtiOjE7czo3OiIAKgB3aXRoIjthOjA6e31zOjEyOiIAKgB3aXRoQ291bnQiO2E6MDp7fXM6MTk6InByZXZlbnRzTGF6eUxvYWRpbmciO2I6MDtzOjEwOiIAKgBwZXJQYWdlIjtpOjE1O3M6NjoiZXhpc3RzIjtiOjE7czoxODoid2FzUmVjZW50bHlDcmVhdGVkIjtiOjA7czoyODoiACoAZXNjYXBlV2hlbkNhc3RpbmdUb1N0cmluZyI7YjowO3M6MTM6IgAqAGF0dHJpYnV0ZXMiO2E6MTI6e3M6MjoiaWQiO2k6MjtzOjE1OiJvcmdhbml6YXRpb25faWQiO2k6MTtzOjQ6Im5hbWUiO3M6NToiYWRtaW4iO3M6MTI6ImRpc3BsYXlfbmFtZSI7czoxMzoiQWRtaW5pc3RyYXRvciI7czoxMToiZGVzY3JpcHRpb24iO3M6MzU6Ik1lbmdlbG9sYSBrb250ZW4gZGFuIHBlbmdndW5hIGJpYXNhIjtzOjk6ImlzX3N5c3RlbSI7aToxO3M6OToiaXNfYWN0aXZlIjtpOjE7czoxMDoiY3JlYXRlZF9hdCI7czoxOToiMjAyNi0wOS0wOSAxNzowNzo0MSI7czoxMDoidXBkYXRlZF9hdCI7czoxOToiMjAyNi0wOS0wOSAxNzowNzo0MSI7czoxMDoiZGVsZXRlZF9hdCI7TjtzOjEwOiJjcmVhdGVkX2J5IjtOO3M6MTA6InVwZGF0ZWRfYnkiO047fXM6MTE6IgAqAG9yaWdpbmFsIjthOjE3OntzOjI6ImlkIjtpOjI7czoxNToib3JnYW5pemF0aW9uX2lkIjtpOjE7czo0OiJuYW1lIjtzOjU6ImFkbWluIjtzOjEyOiJkaXNwbGF5X25hbWUiO3M6MTM6IkFkbWluaXN0cmF0b3IiO3M6MTE6ImRlc2NyaXB0aW9uIjtzOjM1OiJNZW5nZWxvbGEga29udGVuIGRhbiBwZW5nZ3VuYSBiaWFzYSI7czo5OiJpc19zeXN0ZW0iO2k6MTtzOjk6ImlzX2FjdGl2ZSI7aToxO3M6MTA6ImNyZWF0ZWRfYXQiO3M6MTk6IjIwMjYtMDktMDkgMTc6MDc6NDEiO3M6MTA6InVwZGF0ZWRfYXQiO3M6MTk6IjIwMjYtMDktMDkgMTc6MDc6NDEiO3M6MTA6ImRlbGV0ZWRfYXQiO047czoxMDoiY3JlYXRlZF9ieSI7TjtzOjEwOiJ1cGRhdGVkX2J5IjtOO3M6MTM6InBpdm90X3VzZXJfaWQiO2k6MTtzOjEzOiJwaXZvdF9yb2xlX2lkIjtpOjI7czoxNjoicGl2b3RfaXNfZGVmYXVsdCI7aTowO3M6MTY6InBpdm90X2NyZWF0ZWRfYXQiO3M6MTk6IjIwMjYtMDktMTIgMDY6NTQ6MjAiO3M6MTY6InBpdm90X3VwZGF0ZWRfYXQiO3M6MTk6IjIwMjYtMDktMTIgMDY6NTQ6MjAiO31zOjEwOiIAKgBjaGFuZ2VzIjthOjA6e31zOjExOiIAKgBwcmV2aW91cyI7YTowOnt9czo4OiIAKgBjYXN0cyI7YTozOntzOjEwOiJjcmVhdGVkX2F0IjtzOjg6ImRhdGV0aW1lIjtzOjEwOiJ1cGRhdGVkX2F0IjtzOjg6ImRhdGV0aW1lIjtzOjEwOiJkZWxldGVkX2F0IjtzOjg6ImRhdGV0aW1lIjt9czoxNzoiACoAY2xhc3NDYXN0Q2FjaGUiO2E6MDp7fXM6MjE6IgAqAGF0dHJpYnV0ZUNhc3RDYWNoZSI7YTowOnt9czoxMzoiACoAZGF0ZUZvcm1hdCI7TjtzOjEwOiIAKgBhcHBlbmRzIjthOjA6e31zOjE5OiIAKgBkaXNwYXRjaGVzRXZlbnRzIjthOjA6e31zOjE0OiIAKgBvYnNlcnZhYmxlcyI7YTowOnt9czoxMjoiACoAcmVsYXRpb25zIjthOjE6e3M6NToicGl2b3QiO086NDQ6IklsbHVtaW5hdGVcRGF0YWJhc2VcRWxvcXVlbnRcUmVsYXRpb25zXFBpdm90IjozNzp7czoxMzoiACoAY29ubmVjdGlvbiI7czo1OiJteXNxbCI7czo4OiIAKgB0YWJsZSI7czo5OiJyb2xlX3VzZXIiO3M6MTM6IgAqAHByaW1hcnlLZXkiO3M6MjoiaWQiO3M6MTA6IgAqAGtleVR5cGUiO3M6MzoiaW50IjtzOjEyOiJpbmNyZW1lbnRpbmciO2I6MDtzOjc6IgAqAHdpdGgiO2E6MDp7fXM6MTI6IgAqAHdpdGhDb3VudCI7YTowOnt9czoxOToicHJldmVudHNMYXp5TG9hZGluZyI7YjowO3M6MTA6IgAqAHBlclBhZ2UiO2k6MTU7czo2OiJleGlzdHMiO2I6MTtzOjE4OiJ3YXNSZWNlbnRseUNyZWF0ZWQiO2I6MDtzOjI4OiIAKgBlc2NhcGVXaGVuQ2FzdGluZ1RvU3RyaW5nIjtiOjA7czoxMzoiACoAYXR0cmlidXRlcyI7YTo1OntzOjc6InVzZXJfaWQiO2k6MTtzOjc6InJvbGVfaWQiO2k6MjtzOjEwOiJpc19kZWZhdWx0IjtpOjA7czoxMDoiY3JlYXRlZF9hdCI7czoxOToiMjAyNi0wOS0xMiAwNjo1NDoyMCI7czoxMDoidXBkYXRlZF9hdCI7czoxOToiMjAyNi0wOS0xMiAwNjo1NDoyMCI7fXM6MTE6IgAqAG9yaWdpbmFsIjthOjU6e3M6NzoidXNlcl9pZCI7aToxO3M6Nzoicm9sZV9pZCI7aToyO3M6MTA6ImlzX2RlZmF1bHQiO2k6MDtzOjEwOiJjcmVhdGVkX2F0IjtzOjE5OiIyMDI2LTA5LTEyIDA2OjU0OjIwIjtzOjEwOiJ1cGRhdGVkX2F0IjtzOjE5OiIyMDI2LTA5LTEyIDA2OjU0OjIwIjt9czoxMDoiACoAY2hhbmdlcyI7YTowOnt9czoxMToiACoAcHJldmlvdXMiO2E6MDp7fXM6ODoiACoAY2FzdHMiO2E6MDp7fXM6MTc6IgAqAGNsYXNzQ2FzdENhY2hlIjthOjA6e31zOjIxOiIAKgBhdHRyaWJ1dGVDYXN0Q2FjaGUiO2E6MDp7fXM6MTM6IgAqAGRhdGVGb3JtYXQiO047czoxMDoiACoAYXBwZW5kcyI7YTowOnt9czoxOToiACoAZGlzcGF0Y2hlc0V2ZW50cyI7YTowOnt9czoxNDoiACoAb2JzZXJ2YWJsZXMiO2E6MDp7fXM6MTI6IgAqAHJlbGF0aW9ucyI7YTowOnt9czoxMDoiACoAdG91Y2hlcyI7YTowOnt9czoyNzoiACoAcmVsYXRpb25BdXRvbG9hZENhbGxiYWNrIjtOO3M6MjY6IgAqAHJlbGF0aW9uQXV0b2xvYWRDb250ZXh0IjtOO3M6MTA6InRpbWVzdGFtcHMiO2I6MTtzOjEzOiJ1c2VzVW5pcXVlSWRzIjtiOjA7czo5OiIAKgBoaWRkZW4iO2E6MDp7fXM6MTA6IgAqAHZpc2libGUiO2E6MDp7fXM6MTE6IgAqAGZpbGxhYmxlIjthOjA6e31zOjEwOiIAKgBndWFyZGVkIjthOjA6e31zOjExOiJwaXZvdFBhcmVudCI7cjoxMjQ7czoxMjoicGl2b3RSZWxhdGVkIjtPOjExOiJNb2RlbHNcUm9sZSI6MzY6e3M6MTM6IgAqAGNvbm5lY3Rpb24iO3M6NToibXlzcWwiO3M6ODoiACoAdGFibGUiO047czoxMzoiACoAcHJpbWFyeUtleSI7czoyOiJpZCI7czoxMDoiACoAa2V5VHlwZSI7czozOiJpbnQiO3M6MTI6ImluY3JlbWVudGluZyI7YjoxO3M6NzoiACoAd2l0aCI7YTowOnt9czoxMjoiACoAd2l0aENvdW50IjthOjA6e31zOjE5OiJwcmV2ZW50c0xhenlMb2FkaW5nIjtiOjA7czoxMDoiACoAcGVyUGFnZSI7aToxNTtzOjY6ImV4aXN0cyI7YjowO3M6MTg6Indhc1JlY2VudGx5Q3JlYXRlZCI7YjowO3M6Mjg6IgAqAGVzY2FwZVdoZW5DYXN0aW5nVG9TdHJpbmciO2I6MDtzOjEzOiIAKgBhdHRyaWJ1dGVzIjthOjA6e31zOjExOiIAKgBvcmlnaW5hbCI7YTowOnt9czoxMDoiACoAY2hhbmdlcyI7YTowOnt9czoxMToiACoAcHJldmlvdXMiO2E6MDp7fXM6ODoiACoAY2FzdHMiO2E6Mzp7czoxMDoiY3JlYXRlZF9hdCI7czo4OiJkYXRldGltZSI7czoxMDoidXBkYXRlZF9hdCI7czo4OiJkYXRldGltZSI7czoxMDoiZGVsZXRlZF9hdCI7czo4OiJkYXRldGltZSI7fXM6MTc6IgAqAGNsYXNzQ2FzdENhY2hlIjthOjA6e31zOjIxOiIAKgBhdHRyaWJ1dGVDYXN0Q2FjaGUiO2E6MDp7fXM6MTM6IgAqAGRhdGVGb3JtYXQiO047czoxMDoiACoAYXBwZW5kcyI7YTowOnt9czoxOToiACoAZGlzcGF0Y2hlc0V2ZW50cyI7YTowOnt9czoxNDoiACoAb2JzZXJ2YWJsZXMiO2E6MDp7fXM6MTI6IgAqAHJlbGF0aW9ucyI7YTowOnt9czoxMDoiACoAdG91Y2hlcyI7YTowOnt9czoyNzoiACoAcmVsYXRpb25BdXRvbG9hZENhbGxiYWNrIjtOO3M6MjY6IgAqAHJlbGF0aW9uQXV0b2xvYWRDb250ZXh0IjtOO3M6MTA6InRpbWVzdGFtcHMiO2I6MTtzOjEzOiJ1c2VzVW5pcXVlSWRzIjtiOjA7czo5OiIAKgBoaWRkZW4iO2E6Mzp7aTowO3M6MTA6ImNyZWF0ZWRfYXQiO2k6MTtzOjEwOiJ1cGRhdGVkX2F0IjtpOjI7czoxMDoiZGVsZXRlZF9hdCI7fXM6MTA6IgAqAHZpc2libGUiO2E6MDp7fXM6MTE6IgAqAGZpbGxhYmxlIjthOjA6e31zOjEwOiIAKgBndWFyZGVkIjthOjE6e2k6MDtzOjI6ImlkIjt9czoxMzoiACoAZXhjZXB0aW9ucyI7YTo5OntpOjA7czo3OiJfbWV0aG9kIjtpOjE7czo2OiJfdG9rZW4iO2k6MjtzOjI6ImlkIjtpOjM7czoyMToicGFzc3dvcmRfY29uZmlybWF0aW9uIjtpOjQ7czo1OiJpbWFnZSI7aTo1O3M6NToicGhvdG8iO2k6NjtzOjQ6ImZpbGUiO2k6NztzOjQ6ImxvZ28iO2k6ODtzOjU6InRodW1iIjt9czoxMDoiACoAaWdub3JlZCI7YTowOnt9czoxNjoiACoAZm9yY2VEZWxldGluZyI7YjowO31zOjEzOiIAKgBmb3JlaWduS2V5IjtzOjc6InVzZXJfaWQiO3M6MTM6IgAqAHJlbGF0ZWRLZXkiO3M6Nzoicm9sZV9pZCI7fX1zOjEwOiIAKgB0b3VjaGVzIjthOjA6e31zOjI3OiIAKgByZWxhdGlvbkF1dG9sb2FkQ2FsbGJhY2siO047czoyNjoiACoAcmVsYXRpb25BdXRvbG9hZENvbnRleHQiO047czoxMDoidGltZXN0YW1wcyI7YjoxO3M6MTM6InVzZXNVbmlxdWVJZHMiO2I6MDtzOjk6IgAqAGhpZGRlbiI7YTozOntpOjA7czoxMDoiY3JlYXRlZF9hdCI7aToxO3M6MTA6InVwZGF0ZWRfYXQiO2k6MjtzOjEwOiJkZWxldGVkX2F0Ijt9czoxMDoiACoAdmlzaWJsZSI7YTowOnt9czoxMToiACoAZmlsbGFibGUiO2E6MDp7fXM6MTA6IgAqAGd1YXJkZWQiO2E6MTp7aTowO3M6MjoiaWQiO31zOjEzOiIAKgBleGNlcHRpb25zIjthOjk6e2k6MDtzOjc6Il9tZXRob2QiO2k6MTtzOjY6Il90b2tlbiI7aToyO3M6MjoiaWQiO2k6MztzOjIxOiJwYXNzd29yZF9jb25maXJtYXRpb24iO2k6NDtzOjU6ImltYWdlIjtpOjU7czo1OiJwaG90byI7aTo2O3M6NDoiZmlsZSI7aTo3O3M6NDoibG9nbyI7aTo4O3M6NToidGh1bWIiO31zOjEwOiIAKgBpZ25vcmVkIjthOjA6e31zOjE2OiIAKgBmb3JjZURlbGV0aW5nIjtiOjA7fX1zOjI4OiIAKgBlc2NhcGVXaGVuQ2FzdGluZ1RvU3RyaW5nIjtiOjA7fX1zOjEwOiIAKgB0b3VjaGVzIjthOjA6e31zOjI3OiIAKgByZWxhdGlvbkF1dG9sb2FkQ2FsbGJhY2siO047czoyNjoiACoAcmVsYXRpb25BdXRvbG9hZENvbnRleHQiO047czoxMDoidGltZXN0YW1wcyI7YjoxO3M6MTM6InVzZXNVbmlxdWVJZHMiO2I6MDtzOjk6IgAqAGhpZGRlbiI7YToyOntpOjA7czo4OiJwYXNzd29yZCI7aToxO3M6MTQ6InJlbWVtYmVyX3Rva2VuIjt9czoxMDoiACoAdmlzaWJsZSI7YTowOnt9czoxMToiACoAZmlsbGFibGUiO2E6MDp7fXM6MTA6IgAqAGd1YXJkZWQiO2E6MTp7aTowO3M6MjoiaWQiO31zOjE5OiIAKgBhdXRoUGFzc3dvcmROYW1lIjtzOjg6InBhc3N3b3JkIjtzOjIwOiIAKgByZW1lbWJlclRva2VuTmFtZSI7czoxNDoicmVtZW1iZXJfdG9rZW4iO3M6MTQ6IgAqAGFjY2Vzc1Rva2VuIjtOO3M6MTY6IgAqAGZvcmNlRGVsZXRpbmciO2I6MDt9czoxMjoicGl2b3RSZWxhdGVkIjtyOjI4OTtzOjEzOiIAKgBmb3JlaWduS2V5IjtzOjc6InVzZXJfaWQiO3M6MTM6IgAqAHJlbGF0ZWRLZXkiO3M6Nzoicm9sZV9pZCI7fX1zOjEwOiIAKgB0b3VjaGVzIjthOjA6e31zOjI3OiIAKgByZWxhdGlvbkF1dG9sb2FkQ2FsbGJhY2siO047czoyNjoiACoAcmVsYXRpb25BdXRvbG9hZENvbnRleHQiO047czoxMDoidGltZXN0YW1wcyI7YjoxO3M6MTM6InVzZXNVbmlxdWVJZHMiO2I6MDtzOjk6IgAqAGhpZGRlbiI7YTozOntpOjA7czoxMDoiY3JlYXRlZF9hdCI7aToxO3M6MTA6InVwZGF0ZWRfYXQiO2k6MjtzOjEwOiJkZWxldGVkX2F0Ijt9czoxMDoiACoAdmlzaWJsZSI7YTowOnt9czoxMToiACoAZmlsbGFibGUiO2E6MDp7fXM6MTA6IgAqAGd1YXJkZWQiO2E6MTp7aTowO3M6MjoiaWQiO31zOjEzOiIAKgBleGNlcHRpb25zIjthOjk6e2k6MDtzOjc6Il9tZXRob2QiO2k6MTtzOjY6Il90b2tlbiI7aToyO3M6MjoiaWQiO2k6MztzOjIxOiJwYXNzd29yZF9jb25maXJtYXRpb24iO2k6NDtzOjU6ImltYWdlIjtpOjU7czo1OiJwaG90byI7aTo2O3M6NDoiZmlsZSI7aTo3O3M6NDoibG9nbyI7aTo4O3M6NToidGh1bWIiO31zOjEwOiIAKgBpZ25vcmVkIjthOjA6e31zOjE2OiIAKgBmb3JjZURlbGV0aW5nIjtiOjA7fXM6NjoibGF5b3V0IjtOO3M6MTE6Im9yaWdpbl9yb2xlIjtyOjIzO31zOjg6InJvbGVfaWRzIjtPOjI5OiJJbGx1bWluYXRlXFN1cHBvcnRcQ29sbGVjdGlvbiI6Mjp7czo4OiIAKgBpdGVtcyI7YToyOntpOjA7aToxO2k6MTtpOjI7fXM6Mjg6IgAqAGVzY2FwZVdoZW5DYXN0aW5nVG9TdHJpbmciO2I6MDt9fQ==', 1789402745);
 
 -- ----------------------------
 -- Table structure for shift_rates
@@ -4110,6 +7847,49 @@ CREATE TABLE `shifts`  (
 -- ----------------------------
 
 -- ----------------------------
+-- Table structure for student_attendances
+-- ----------------------------
+DROP TABLE IF EXISTS `student_attendances`;
+CREATE TABLE `student_attendances`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `student_id` bigint UNSIGNED NOT NULL,
+  `schedule_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `classroom_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `date` date NOT NULL,
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `check_in_time` time NULL DEFAULT NULL,
+  `check_out_time` time NULL DEFAULT NULL,
+  `late_minutes` int NOT NULL DEFAULT 0,
+  `reason` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `verified_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `attendances_student_schedule_date_unique`(`student_id` ASC, `schedule_id` ASC, `date` ASC) USING BTREE,
+  INDEX `attendances_student_index`(`student_id` ASC) USING BTREE,
+  INDEX `attendances_schedule_index`(`schedule_id` ASC) USING BTREE,
+  INDEX `attendances_classroom_index`(`classroom_id` ASC) USING BTREE,
+  INDEX `attendances_date_index`(`date` ASC) USING BTREE,
+  INDEX `attendances_status_index`(`status` ASC) USING BTREE,
+  INDEX `attendances_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `attendances_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `attendances_updated_by_index`(`updated_by` ASC) USING BTREE,
+  INDEX `attendances_verified_by_foreign`(`verified_by` ASC) USING BTREE,
+  CONSTRAINT `attendances_classroom_id_foreign` FOREIGN KEY (`classroom_id`) REFERENCES `classrooms` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `attendances_schedule_id_foreign` FOREIGN KEY (`schedule_id`) REFERENCES `schedules` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `attendances_student_id_foreign` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `attendances_verified_by_foreign` FOREIGN KEY (`verified_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of student_attendances
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for student_classrooms
 -- ----------------------------
 DROP TABLE IF EXISTS `student_classrooms`;
@@ -4141,6 +7921,285 @@ CREATE TABLE `student_classrooms`  (
 -- ----------------------------
 
 -- ----------------------------
+-- Table structure for student_disciplines
+-- ----------------------------
+DROP TABLE IF EXISTS `student_disciplines`;
+CREATE TABLE `student_disciplines`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `student_id` bigint UNSIGNED NOT NULL,
+  `school_id` bigint UNSIGNED NOT NULL,
+  `category` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `points` int NOT NULL DEFAULT 0,
+  `action_taken` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `incident_date` date NULL DEFAULT NULL,
+  `reported_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `witness` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `attachment_url` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `parent_notified` tinyint(1) NOT NULL DEFAULT 0,
+  `parent_notified_at` timestamp NULL DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `student_disciplines_student_index`(`student_id` ASC) USING BTREE,
+  INDEX `student_disciplines_school_index`(`school_id` ASC) USING BTREE,
+  INDEX `student_disciplines_category_index`(`category` ASC) USING BTREE,
+  INDEX `student_disciplines_incident_date_index`(`incident_date` ASC) USING BTREE,
+  INDEX `student_disciplines_reported_by_index`(`reported_by` ASC) USING BTREE,
+  INDEX `student_disciplines_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `student_disciplines_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `student_disciplines_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `student_disciplines_reported_by_foreign` FOREIGN KEY (`reported_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `student_disciplines_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `student_disciplines_student_id_foreign` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of student_disciplines
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for student_extracurriculars
+-- ----------------------------
+DROP TABLE IF EXISTS `student_extracurriculars`;
+CREATE TABLE `student_extracurriculars`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `student_id` bigint UNSIGNED NOT NULL,
+  `extracurricular_id` bigint UNSIGNED NOT NULL,
+  `enrollment_date` date NULL DEFAULT NULL,
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'ACTIVE',
+  `grade_letter` varchar(2) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `predicate` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `certificate_url` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `achievement_notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `evaluated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `evaluated_at` timestamp NULL DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `student_extracurriculars_unique`(`student_id` ASC, `extracurricular_id` ASC) USING BTREE,
+  INDEX `student_extracurriculars_student_index`(`student_id` ASC) USING BTREE,
+  INDEX `student_extracurriculars_extracurricular_index`(`extracurricular_id` ASC) USING BTREE,
+  INDEX `student_extracurriculars_status_index`(`status` ASC) USING BTREE,
+  INDEX `student_extracurriculars_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `student_extracurriculars_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `student_extracurriculars_updated_by_index`(`updated_by` ASC) USING BTREE,
+  INDEX `student_extracurriculars_evaluated_by_index`(`evaluated_by` ASC) USING BTREE,
+  CONSTRAINT `student_extracurriculars_evaluated_by_foreign` FOREIGN KEY (`evaluated_by`) REFERENCES `teachers` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `student_extracurriculars_extracurricular_id_foreign` FOREIGN KEY (`extracurricular_id`) REFERENCES `extracurriculars` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `student_extracurriculars_student_id_foreign` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of student_extracurriculars
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for student_health_records
+-- ----------------------------
+DROP TABLE IF EXISTS `student_health_records`;
+CREATE TABLE `student_health_records`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `student_id` bigint UNSIGNED NOT NULL,
+  `school_id` bigint UNSIGNED NOT NULL,
+  `record_date` date NOT NULL,
+  `complaint` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `diagnosis` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `treatment` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `height_cm` decimal(5, 2) NULL DEFAULT NULL,
+  `weight_kg` decimal(5, 2) NULL DEFAULT NULL,
+  `blood_type` varchar(3) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `blood_pressure` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `allergies` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `vaccination_notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `handled_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `referred_to` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `student_health_records_student_index`(`student_id` ASC) USING BTREE,
+  INDEX `student_health_records_school_index`(`school_id` ASC) USING BTREE,
+  INDEX `student_health_records_record_date_index`(`record_date` ASC) USING BTREE,
+  INDEX `student_health_records_handled_by_index`(`handled_by` ASC) USING BTREE,
+  INDEX `student_health_records_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `student_health_records_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `student_health_records_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `student_health_records_handled_by_foreign` FOREIGN KEY (`handled_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `student_health_records_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `student_health_records_student_id_foreign` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of student_health_records
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for student_installments
+-- ----------------------------
+DROP TABLE IF EXISTS `student_installments`;
+CREATE TABLE `student_installments`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `invoice_id` bigint UNSIGNED NOT NULL,
+  `installment_number` int NOT NULL,
+  `due_date` date NULL DEFAULT NULL,
+  `amount` decimal(15, 2) NOT NULL,
+  `is_paid` tinyint(1) NOT NULL DEFAULT 0,
+  `paid_date` date NULL DEFAULT NULL,
+  `paid_amount` decimal(15, 2) NULL DEFAULT NULL,
+  `payment_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `student_installments_invoice_number_unique`(`invoice_id` ASC, `installment_number` ASC) USING BTREE,
+  INDEX `student_installments_invoice_index`(`invoice_id` ASC) USING BTREE,
+  INDEX `student_installments_due_date_index`(`due_date` ASC) USING BTREE,
+  INDEX `student_installments_is_paid_index`(`is_paid` ASC) USING BTREE,
+  INDEX `student_installments_payment_index`(`payment_id` ASC) USING BTREE,
+  INDEX `student_installments_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `student_installments_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `student_installments_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `student_installments_invoice_id_foreign` FOREIGN KEY (`invoice_id`) REFERENCES `student_invoices` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of student_installments
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for student_invoice_batches
+-- ----------------------------
+DROP TABLE IF EXISTS `student_invoice_batches`;
+CREATE TABLE `student_invoice_batches`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `invoice_id` bigint UNSIGNED NOT NULL,
+  `batch_id` bigint UNSIGNED NOT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `student_invoice_batches_unique`(`invoice_id` ASC, `batch_id` ASC) USING BTREE,
+  INDEX `student_invoice_batches_invoice_index`(`invoice_id` ASC) USING BTREE,
+  INDEX `student_invoice_batches_batch_index`(`batch_id` ASC) USING BTREE,
+  INDEX `student_invoice_batches_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  CONSTRAINT `student_invoice_batches_batch_id_foreign` FOREIGN KEY (`batch_id`) REFERENCES `student_payment_batches` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `student_invoice_batches_invoice_id_foreign` FOREIGN KEY (`invoice_id`) REFERENCES `student_invoices` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of student_invoice_batches
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for student_invoices
+-- ----------------------------
+DROP TABLE IF EXISTS `student_invoices`;
+CREATE TABLE `student_invoices`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `school_id` bigint UNSIGNED NOT NULL,
+  `student_id` bigint UNSIGNED NOT NULL,
+  `fee_master_id` bigint UNSIGNED NOT NULL,
+  `student_classroom_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `invoice_number` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `period_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `invoice_date` date NULL DEFAULT NULL,
+  `due_date` date NULL DEFAULT NULL,
+  `total_amount` decimal(15, 2) NOT NULL,
+  `discount_amount` decimal(15, 2) NOT NULL DEFAULT 0.00,
+  `penalty_amount` decimal(15, 2) NOT NULL DEFAULT 0.00,
+  `final_amount` decimal(15, 2) NOT NULL,
+  `paid_amount` decimal(15, 2) NOT NULL DEFAULT 0.00,
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PENDING',
+  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `student_invoices_school_number_unique`(`school_id` ASC, `invoice_number` ASC) USING BTREE,
+  INDEX `student_invoices_student_index`(`student_id` ASC) USING BTREE,
+  INDEX `student_invoices_school_index`(`school_id` ASC) USING BTREE,
+  INDEX `student_invoices_fee_master_index`(`fee_master_id` ASC) USING BTREE,
+  INDEX `student_invoices_student_classroom_index`(`student_classroom_id` ASC) USING BTREE,
+  INDEX `student_invoices_status_index`(`status` ASC) USING BTREE,
+  INDEX `student_invoices_due_date_index`(`due_date` ASC) USING BTREE,
+  INDEX `student_invoices_period_index`(`period_id` ASC) USING BTREE,
+  INDEX `student_invoices_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `student_invoices_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `student_invoices_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `student_invoices_fee_master_id_foreign` FOREIGN KEY (`fee_master_id`) REFERENCES `fee_masters` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `student_invoices_period_id_foreign` FOREIGN KEY (`period_id`) REFERENCES `periods` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `student_invoices_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `student_invoices_student_classroom_id_foreign` FOREIGN KEY (`student_classroom_id`) REFERENCES `student_classrooms` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `student_invoices_student_id_foreign` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of student_invoices
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for student_outcome_achievements
+-- ----------------------------
+DROP TABLE IF EXISTS `student_outcome_achievements`;
+CREATE TABLE `student_outcome_achievements`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `student_id` bigint UNSIGNED NOT NULL,
+  `learning_outcome_id` bigint UNSIGNED NOT NULL,
+  `period_id` bigint UNSIGNED NOT NULL,
+  `subject_id` bigint UNSIGNED NOT NULL,
+  `achievement_level` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `score` decimal(5, 2) NULL DEFAULT NULL,
+  `narrative` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `teacher_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `student_outcome_achievements_unique`(`student_id` ASC, `learning_outcome_id` ASC, `period_id` ASC) USING BTREE,
+  INDEX `student_outcome_achievements_student_index`(`student_id` ASC) USING BTREE,
+  INDEX `student_outcome_achievements_outcome_index`(`learning_outcome_id` ASC) USING BTREE,
+  INDEX `student_outcome_achievements_period_index`(`period_id` ASC) USING BTREE,
+  INDEX `student_outcome_achievements_subject_index`(`subject_id` ASC) USING BTREE,
+  INDEX `student_outcome_achievements_level_index`(`achievement_level` ASC) USING BTREE,
+  INDEX `student_outcome_achievements_teacher_index`(`teacher_id` ASC) USING BTREE,
+  INDEX `student_outcome_achievements_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `student_outcome_achievements_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `student_outcome_achievements_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `student_outcome_achievements_outcome_id_foreign` FOREIGN KEY (`learning_outcome_id`) REFERENCES `learning_outcomes` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `student_outcome_achievements_period_id_foreign` FOREIGN KEY (`period_id`) REFERENCES `periods` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `student_outcome_achievements_student_id_foreign` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `student_outcome_achievements_subject_id_foreign` FOREIGN KEY (`subject_id`) REFERENCES `subjects` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `student_outcome_achievements_teacher_id_foreign` FOREIGN KEY (`teacher_id`) REFERENCES `teachers` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of student_outcome_achievements
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for student_parents
 -- ----------------------------
 DROP TABLE IF EXISTS `student_parents`;
@@ -4163,6 +8222,139 @@ CREATE TABLE `student_parents`  (
 
 -- ----------------------------
 -- Records of student_parents
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for student_payment_batches
+-- ----------------------------
+DROP TABLE IF EXISTS `student_payment_batches`;
+CREATE TABLE `student_payment_batches`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `school_id` bigint UNSIGNED NOT NULL,
+  `batch_number` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `academic_year_id` bigint UNSIGNED NOT NULL,
+  `period_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `total_invoices` int NOT NULL DEFAULT 0,
+  `total_amount` decimal(15, 2) NOT NULL DEFAULT 0.00,
+  `paid_amount` decimal(15, 2) NOT NULL DEFAULT 0.00,
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PENDING',
+  `processed_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `processed_at` timestamp NULL DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `student_payment_batches_school_number_unique`(`school_id` ASC, `batch_number` ASC) USING BTREE,
+  INDEX `student_payment_batches_school_index`(`school_id` ASC) USING BTREE,
+  INDEX `student_payment_batches_academic_year_index`(`academic_year_id` ASC) USING BTREE,
+  INDEX `student_payment_batches_period_index`(`period_id` ASC) USING BTREE,
+  INDEX `student_payment_batches_status_index`(`status` ASC) USING BTREE,
+  INDEX `student_payment_batches_processed_by_index`(`processed_by` ASC) USING BTREE,
+  INDEX `student_payment_batches_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `student_payment_batches_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `student_payment_batches_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `student_payment_batches_academic_year_id_foreign` FOREIGN KEY (`academic_year_id`) REFERENCES `academic_years` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `student_payment_batches_period_id_foreign` FOREIGN KEY (`period_id`) REFERENCES `periods` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `student_payment_batches_processed_by_foreign` FOREIGN KEY (`processed_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `student_payment_batches_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of student_payment_batches
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for student_payments
+-- ----------------------------
+DROP TABLE IF EXISTS `student_payments`;
+CREATE TABLE `student_payments`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `invoice_id` bigint UNSIGNED NOT NULL,
+  `student_id` bigint UNSIGNED NOT NULL,
+  `payment_method` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `payment_date` date NULL DEFAULT NULL,
+  `amount` decimal(15, 2) NOT NULL,
+  `reference_number` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `bank_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `payment_proof_url` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PENDING',
+  `verified_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `verification_date` timestamp NULL DEFAULT NULL,
+  `refund_date` timestamp NULL DEFAULT NULL,
+  `refund_reason` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `student_payments_invoice_index`(`invoice_id` ASC) USING BTREE,
+  INDEX `student_payments_student_index`(`student_id` ASC) USING BTREE,
+  INDEX `student_payments_status_index`(`status` ASC) USING BTREE,
+  INDEX `student_payments_verified_by_index`(`verified_by` ASC) USING BTREE,
+  INDEX `student_payments_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `student_payments_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `student_payments_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `student_payments_invoice_id_foreign` FOREIGN KEY (`invoice_id`) REFERENCES `student_invoices` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `student_payments_student_id_foreign` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `student_payments_verified_by_foreign` FOREIGN KEY (`verified_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of student_payments
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for student_promotions
+-- ----------------------------
+DROP TABLE IF EXISTS `student_promotions`;
+CREATE TABLE `student_promotions`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `student_id` bigint UNSIGNED NOT NULL,
+  `school_id` bigint UNSIGNED NOT NULL,
+  `from_classroom_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `to_classroom_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `academic_year_id` bigint UNSIGNED NOT NULL,
+  `decision` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `decision_date` date NULL DEFAULT NULL,
+  `meeting_notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `final_score_average` decimal(5, 2) NULL DEFAULT NULL,
+  `attendance_percentage` decimal(5, 2) NULL DEFAULT NULL,
+  `decided_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `student_promotions_student_year_unique`(`student_id` ASC, `academic_year_id` ASC) USING BTREE,
+  INDEX `student_promotions_student_index`(`student_id` ASC) USING BTREE,
+  INDEX `student_promotions_school_index`(`school_id` ASC) USING BTREE,
+  INDEX `student_promotions_from_classroom_index`(`from_classroom_id` ASC) USING BTREE,
+  INDEX `student_promotions_to_classroom_index`(`to_classroom_id` ASC) USING BTREE,
+  INDEX `student_promotions_academic_year_index`(`academic_year_id` ASC) USING BTREE,
+  INDEX `student_promotions_decision_index`(`decision` ASC) USING BTREE,
+  INDEX `student_promotions_decided_by_index`(`decided_by` ASC) USING BTREE,
+  INDEX `student_promotions_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `student_promotions_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `student_promotions_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `student_promotions_academic_year_id_foreign` FOREIGN KEY (`academic_year_id`) REFERENCES `academic_years` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `student_promotions_decided_by_foreign` FOREIGN KEY (`decided_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `student_promotions_from_classroom_id_foreign` FOREIGN KEY (`from_classroom_id`) REFERENCES `classrooms` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `student_promotions_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `student_promotions_student_id_foreign` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `student_promotions_to_classroom_id_foreign` FOREIGN KEY (`to_classroom_id`) REFERENCES `classrooms` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of student_promotions
 -- ----------------------------
 
 -- ----------------------------
@@ -4200,6 +8392,7 @@ CREATE TABLE `students`  (
   `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `organization_id` bigint UNSIGNED NOT NULL,
   `user_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `applicant_id` bigint UNSIGNED NULL DEFAULT NULL,
   `nis` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `nisn` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
   `registration_number` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
@@ -4228,6 +8421,8 @@ CREATE TABLE `students`  (
   INDEX `idx_students_status`(`status` ASC) USING BTREE,
   INDEX `idx_students_birth_date`(`birth_date` ASC) USING BTREE,
   INDEX `idx_students_deleted_at`(`deleted_at` ASC) USING BTREE,
+  INDEX `students_applicant_index`(`applicant_id` ASC) USING BTREE,
+  CONSTRAINT `students_applicant_id_foreign` FOREIGN KEY (`applicant_id`) REFERENCES `applicants` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `students_org_fk` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
@@ -4266,11 +8461,59 @@ CREATE TABLE `subjects`  (
 -- ----------------------------
 
 -- ----------------------------
+-- Table structure for submissions
+-- ----------------------------
+DROP TABLE IF EXISTS `submissions`;
+CREATE TABLE `submissions`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `assignment_quiz_id` bigint UNSIGNED NOT NULL,
+  `student_id` bigint UNSIGNED NOT NULL,
+  `submission_text` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `file_urls` json NULL,
+  `score` decimal(5, 2) NULL DEFAULT NULL,
+  `feedback` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `graded_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `submitted_at` timestamp NULL DEFAULT NULL,
+  `graded_at` timestamp NULL DEFAULT NULL,
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'SUBMITTED',
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `submissions_assignment_student_unique`(`assignment_quiz_id` ASC, `student_id` ASC) USING BTREE,
+  INDEX `submissions_assignment_index`(`assignment_quiz_id` ASC) USING BTREE,
+  INDEX `submissions_student_index`(`student_id` ASC) USING BTREE,
+  INDEX `submissions_status_index`(`status` ASC) USING BTREE,
+  INDEX `submissions_graded_by_index`(`graded_by` ASC) USING BTREE,
+  INDEX `submissions_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `submissions_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `submissions_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `submissions_assignment_quiz_id_foreign` FOREIGN KEY (`assignment_quiz_id`) REFERENCES `assignments_quizzes` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `submissions_graded_by_foreign` FOREIGN KEY (`graded_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `submissions_student_id_foreign` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of submissions
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for system_logs
 -- ----------------------------
 DROP TABLE IF EXISTS `system_logs`;
 CREATE TABLE `system_logs`  (
   `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `user_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `action` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `table_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `record_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `old_data` json NULL,
+  `new_data` json NULL,
+  `ip_address` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `user_agent` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
   `organization_id` bigint UNSIGNED NULL DEFAULT NULL,
   `level` enum('debug','info','warning','error','critical') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `message` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -4368,7 +8611,8 @@ CREATE TABLE `tax_settings`  (
   `organization_id` bigint UNSIGNED NOT NULL,
   `tax_code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `tax_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `tax_type_id` bigint UNSIGNED NOT NULL,
+  `tax_type` enum('pph21','pph23','pph25','ppn','ppnbm','other') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  
   `tax_rate` decimal(12, 4) NOT NULL DEFAULT 0.0000,
   `min_amount` decimal(15, 2) NULL DEFAULT NULL,
   `max_amount` decimal(15, 2) NULL DEFAULT NULL,
@@ -4391,24 +8635,24 @@ CREATE TABLE `tax_settings`  (
 -- ----------------------------
 -- Records of tax_settings
 -- ----------------------------
-INSERT INTO `tax_settings` VALUES (19, 1, 'PPN-001', 'PPN 11% (Tarif Normal)', 4, 11.0000, NULL, NULL, '2022-04-01', '2025-03-31', 0, 'Tarif PPN 11% berlaku mulai 1 April 2022 sesuai UU HPP', '2026-09-14 16:08:53', '2026-09-14 16:08:53', NULL, NULL, NULL);
-INSERT INTO `tax_settings` VALUES (20, 1, 'PPN-002', 'PPN 12% (Tarif Baru)', 4, 12.0000, NULL, NULL, '2025-04-01', NULL, 1, 'Tarif PPN 12% berlaku mulai 1 April 2025 sesuai UU HPP', '2026-09-14 16:08:53', '2026-09-14 16:08:53', NULL, NULL, NULL);
-INSERT INTO `tax_settings` VALUES (21, 1, 'PPh21-01', 'PPh Pasal 21 - 0% (PTKP)', 1, 0.0000, 0.00, 54000000.00, '2024-01-01', NULL, 1, 'Penghasilan kena pajak sampai dengan Rp 54.000.000 (PTKP)', '2026-09-14 16:08:53', '2026-09-14 16:08:53', NULL, NULL, NULL);
-INSERT INTO `tax_settings` VALUES (22, 1, 'PPh21-02', 'PPh Pasal 21 - 5%', 1, 5.0000, 54000000.00, 60000000.00, '2024-01-01', NULL, 1, 'Tarif 5% untuk PKP Rp 54.000.001 - Rp 60.000.000', '2026-09-14 16:08:53', '2026-09-14 16:08:53', NULL, NULL, NULL);
-INSERT INTO `tax_settings` VALUES (23, 1, 'PPh21-03', 'PPh Pasal 21 - 15%', 1, 15.0000, 60000000.00, 250000000.00, '2024-01-01', NULL, 1, 'Tarif 15% untuk PKP Rp 60.000.001 - Rp 250.000.000', '2026-09-14 16:08:53', '2026-09-14 16:08:53', NULL, NULL, NULL);
-INSERT INTO `tax_settings` VALUES (24, 1, 'PPh21-04', 'PPh Pasal 21 - 25%', 1, 25.0000, 250000000.00, 500000000.00, '2024-01-01', NULL, 1, 'Tarif 25% untuk PKP Rp 250.000.001 - Rp 500.000.000', '2026-09-14 16:08:53', '2026-09-14 16:08:53', NULL, NULL, NULL);
-INSERT INTO `tax_settings` VALUES (25, 1, 'PPh21-05', 'PPh Pasal 21 - 30%', 1, 30.0000, 500000000.00, 5000000000.00, '2024-01-01', NULL, 1, 'Tarif 30% untuk PKP Rp 500.000.001 - Rp 5.000.000.000', '2026-09-14 16:08:53', '2026-09-14 16:08:53', NULL, NULL, NULL);
-INSERT INTO `tax_settings` VALUES (26, 1, 'PPh21-06', 'PPh Pasal 21 - 35%', 1, 35.0000, 5000000000.00, NULL, '2024-01-01', NULL, 1, 'Tarif 35% untuk PKP di atas Rp 5.000.000.000', '2026-09-14 16:08:53', '2026-09-14 16:08:53', NULL, NULL, NULL);
-INSERT INTO `tax_settings` VALUES (27, 1, 'PPh23-01', 'PPh Pasal 23 - 2% (Jasa)', 2, 2.0000, NULL, NULL, '2024-01-01', NULL, 1, 'PPh 23 untuk jasa (2% dari bruto) - tidak termasuk PPN', '2026-09-14 16:08:53', '2026-09-14 16:08:53', NULL, NULL, NULL);
-INSERT INTO `tax_settings` VALUES (28, 1, 'PPh23-02', 'PPh Pasal 23 - 15% (Sewa)', 2, 15.0000, NULL, NULL, '2024-01-01', NULL, 1, 'PPh 23 untuk sewa (15% dari bruto)', '2026-09-14 16:08:53', '2026-09-14 16:08:53', NULL, NULL, NULL);
-INSERT INTO `tax_settings` VALUES (29, 1, 'PPh22-01', 'PPh Pasal 22 - 1.5% (Pembelian)', 6, 1.5000, 2000000.00, NULL, '2024-01-01', NULL, 1, 'PPh 22 untuk pembelian barang (1.5% dari harga) - minimal Rp 2.000.000', '2026-09-14 16:08:53', '2026-09-14 16:08:53', NULL, NULL, NULL);
-INSERT INTO `tax_settings` VALUES (30, 1, 'PPh4-2-01', 'PPh Final - 10% (Sewa Tanah/Bangunan)', 6, 10.0000, NULL, NULL, '2024-01-01', NULL, 1, 'PPh Final 10% untuk sewa tanah dan/atau bangunan', '2026-09-14 16:08:53', '2026-09-14 16:08:53', NULL, NULL, NULL);
-INSERT INTO `tax_settings` VALUES (31, 1, 'PPh4-2-02', 'PPh Final - 0.5% (UMKM)', 6, 0.5000, NULL, 4800000000.00, '2024-01-01', NULL, 1, 'PPh Final 0.5% untuk UMKM dengan omzet maksimal Rp 4.8M per tahun', '2026-09-14 16:08:53', '2026-09-14 16:08:53', NULL, NULL, NULL);
-INSERT INTO `tax_settings` VALUES (32, 1, 'PBB-001', 'Pajak Bumi dan Bangunan (PBB)', 6, 0.1000, NULL, NULL, '2024-01-01', NULL, 1, 'PBB untuk bangunan yayasan (0.1% dari NJOP)', '2026-09-14 16:08:53', '2026-09-14 16:08:53', NULL, NULL, NULL);
-INSERT INTO `tax_settings` VALUES (33, 1, 'BPHTB-001', 'Bea Perolehan Hak atas Tanah dan Bangunan', 6, 5.0000, NULL, NULL, '2024-01-01', NULL, 1, 'BPHTB 5% untuk perolehan tanah/bangunan', '2026-09-14 16:08:53', '2026-09-14 16:08:53', NULL, NULL, NULL);
-INSERT INTO `tax_settings` VALUES (34, 1, 'MTR-001', 'Bea Meterai Rp 10.000', 6, 10000.0000, NULL, NULL, '2024-01-01', NULL, 1, 'Bea meterai untuk dokumen tertentu (Rp 10.000)', '2026-09-14 16:08:53', '2026-09-14 16:08:53', NULL, NULL, NULL);
-INSERT INTO `tax_settings` VALUES (35, 1, 'MTR-002', 'Bea Meterai Rp 6.000', 6, 6000.0000, NULL, NULL, '2024-01-01', NULL, 1, 'Bea meterai untuk dokumen tertentu (Rp 6.000)', '2026-09-14 16:08:53', '2026-09-14 16:08:53', NULL, NULL, NULL);
-INSERT INTO `tax_settings` VALUES (36, 1, 'PPN-OLD', 'PPN 10% (Tarif Lama)', 4, 10.0000, NULL, NULL, '2000-01-01', '2022-03-31', 0, 'Tarif PPN 10% berlaku sebelum 1 April 2022 (sudah diganti 11%)', '2026-09-14 16:08:53', '2026-09-14 16:08:53', NULL, NULL, NULL);
+INSERT INTO `tax_settings` VALUES (19, 1, 'PPN-001', 'PPN 11% (Tarif Normal)', 'ppn', 4, 11.0000, NULL, NULL, '2022-04-01', '2025-03-31', 0, 'Tarif PPN 11% berlaku mulai 1 April 2022 sesuai UU HPP', '2026-09-14 16:08:53', '2026-09-14 16:08:53', NULL, NULL, NULL);
+INSERT INTO `tax_settings` VALUES (20, 1, 'PPN-002', 'PPN 12% (Tarif Baru)', 'ppn', 4, 12.0000, NULL, NULL, '2025-04-01', NULL, 1, 'Tarif PPN 12% berlaku mulai 1 April 2025 sesuai UU HPP', '2026-09-14 16:08:53', '2026-09-14 16:08:53', NULL, NULL, NULL);
+INSERT INTO `tax_settings` VALUES (21, 1, 'PPh21-01', 'PPh Pasal 21 - 0% (PTKP)', 'pph21', 1, 0.0000, 0.00, 54000000.00, '2024-01-01', NULL, 1, 'Penghasilan kena pajak sampai dengan Rp 54.000.000 (PTKP)', '2026-09-14 16:08:53', '2026-09-14 16:08:53', NULL, NULL, NULL);
+INSERT INTO `tax_settings` VALUES (22, 1, 'PPh21-02', 'PPh Pasal 21 - 5%', 'pph21', 1, 5.0000, 54000000.00, 60000000.00, '2024-01-01', NULL, 1, 'Tarif 5% untuk PKP Rp 54.000.001 - Rp 60.000.000', '2026-09-14 16:08:53', '2026-09-14 16:08:53', NULL, NULL, NULL);
+INSERT INTO `tax_settings` VALUES (23, 1, 'PPh21-03', 'PPh Pasal 21 - 15%', 'pph21', 1, 15.0000, 60000000.00, 250000000.00, '2024-01-01', NULL, 1, 'Tarif 15% untuk PKP Rp 60.000.001 - Rp 250.000.000', '2026-09-14 16:08:53', '2026-09-14 16:08:53', NULL, NULL, NULL);
+INSERT INTO `tax_settings` VALUES (24, 1, 'PPh21-04', 'PPh Pasal 21 - 25%', 'pph21', 1, 25.0000, 250000000.00, 500000000.00, '2024-01-01', NULL, 1, 'Tarif 25% untuk PKP Rp 250.000.001 - Rp 500.000.000', '2026-09-14 16:08:53', '2026-09-14 16:08:53', NULL, NULL, NULL);
+INSERT INTO `tax_settings` VALUES (25, 1, 'PPh21-05', 'PPh Pasal 21 - 30%', 'pph21', 1, 30.0000, 500000000.00, 5000000000.00, '2024-01-01', NULL, 1, 'Tarif 30% untuk PKP Rp 500.000.001 - Rp 5.000.000.000', '2026-09-14 16:08:53', '2026-09-14 16:08:53', NULL, NULL, NULL);
+INSERT INTO `tax_settings` VALUES (26, 1, 'PPh21-06', 'PPh Pasal 21 - 35%', 'pph21', 1, 35.0000, 5000000000.00, NULL, '2024-01-01', NULL, 1, 'Tarif 35% untuk PKP di atas Rp 5.000.000.000', '2026-09-14 16:08:53', '2026-09-14 16:08:53', NULL, NULL, NULL);
+INSERT INTO `tax_settings` VALUES (27, 1, 'PPh23-01', 'PPh Pasal 23 - 2% (Jasa)', 'pph23', 2, 2.0000, NULL, NULL, '2024-01-01', NULL, 1, 'PPh 23 untuk jasa (2% dari bruto) - tidak termasuk PPN', '2026-09-14 16:08:53', '2026-09-14 16:08:53', NULL, NULL, NULL);
+INSERT INTO `tax_settings` VALUES (28, 1, 'PPh23-02', 'PPh Pasal 23 - 15% (Sewa)', 'pph23', 2, 15.0000, NULL, NULL, '2024-01-01', NULL, 1, 'PPh 23 untuk sewa (15% dari bruto)', '2026-09-14 16:08:53', '2026-09-14 16:08:53', NULL, NULL, NULL);
+INSERT INTO `tax_settings` VALUES (29, 1, 'PPh22-01', 'PPh Pasal 22 - 1.5% (Pembelian)', 'other', 6, 1.5000, 2000000.00, NULL, '2024-01-01', NULL, 1, 'PPh 22 untuk pembelian barang (1.5% dari harga) - minimal Rp 2.000.000', '2026-09-14 16:08:53', '2026-09-14 16:08:53', NULL, NULL, NULL);
+INSERT INTO `tax_settings` VALUES (30, 1, 'PPh4-2-01', 'PPh Final - 10% (Sewa Tanah/Bangunan)', 'other', 6, 10.0000, NULL, NULL, '2024-01-01', NULL, 1, 'PPh Final 10% untuk sewa tanah dan/atau bangunan', '2026-09-14 16:08:53', '2026-09-14 16:08:53', NULL, NULL, NULL);
+INSERT INTO `tax_settings` VALUES (31, 1, 'PPh4-2-02', 'PPh Final - 0.5% (UMKM)', 'other', 6, 0.5000, NULL, 4800000000.00, '2024-01-01', NULL, 1, 'PPh Final 0.5% untuk UMKM dengan omzet maksimal Rp 4.8M per tahun', '2026-09-14 16:08:53', '2026-09-14 16:08:53', NULL, NULL, NULL);
+INSERT INTO `tax_settings` VALUES (32, 1, 'PBB-001', 'Pajak Bumi dan Bangunan (PBB)', 'other', 6, 0.1000, NULL, NULL, '2024-01-01', NULL, 1, 'PBB untuk bangunan yayasan (0.1% dari NJOP)', '2026-09-14 16:08:53', '2026-09-14 16:08:53', NULL, NULL, NULL);
+INSERT INTO `tax_settings` VALUES (33, 1, 'BPHTB-001', 'Bea Perolehan Hak atas Tanah dan Bangunan', 'other', 6, 5.0000, NULL, NULL, '2024-01-01', NULL, 1, 'BPHTB 5% untuk perolehan tanah/bangunan', '2026-09-14 16:08:53', '2026-09-14 16:08:53', NULL, NULL, NULL);
+INSERT INTO `tax_settings` VALUES (34, 1, 'MTR-001', 'Bea Meterai Rp 10.000', 'other', 6, 10000.0000, NULL, NULL, '2024-01-01', NULL, 1, 'Bea meterai untuk dokumen tertentu (Rp 10.000)', '2026-09-14 16:08:53', '2026-09-14 16:08:53', NULL, NULL, NULL);
+INSERT INTO `tax_settings` VALUES (35, 1, 'MTR-002', 'Bea Meterai Rp 6.000', 'other', 6, 6000.0000, NULL, NULL, '2024-01-01', NULL, 1, 'Bea meterai untuk dokumen tertentu (Rp 6.000)', '2026-09-14 16:08:53', '2026-09-14 16:08:53', NULL, NULL, NULL);
+INSERT INTO `tax_settings` VALUES (36, 1, 'PPN-OLD', 'PPN 10% (Tarif Lama)', 'ppn', 4, 10.0000, NULL, NULL, '2000-01-01', '2022-03-31', 0, 'Tarif PPN 10% berlaku sebelum 1 April 2022 (sudah diganti 11%)', '2026-09-14 16:08:53', '2026-09-14 16:08:53', NULL, NULL, NULL);
 
 -- ----------------------------
 -- Table structure for tax_types
@@ -4426,7 +8670,7 @@ CREATE TABLE `tax_types`  (
   `deleted_at` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `tax_types_code_unique`(`code`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of tax_types
@@ -4437,6 +8681,42 @@ INSERT INTO `tax_types` VALUES (3, 1, 'pph25', 'PPh Pasal 25', 'Pajak Penghasila
 INSERT INTO `tax_types` VALUES (4, 1, 'ppn', 'PPN', 'Pajak Pertambahan Nilai', 1, NULL, NULL, NULL);
 INSERT INTO `tax_types` VALUES (5, 1, 'ppnbm', 'PPnBM', 'Pajak Penjualan Barang Mewah', 1, NULL, NULL, NULL);
 INSERT INTO `tax_types` VALUES (6, 1, 'other', 'Lainnya', 'Jenis pajak lainnya', 1, NULL, NULL, NULL);
+
+-- ----------------------------
+-- Table structure for teacher_comments
+-- ----------------------------
+DROP TABLE IF EXISTS `teacher_comments`;
+CREATE TABLE `teacher_comments`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `student_id` bigint UNSIGNED NOT NULL,
+  `period_id` bigint UNSIGNED NOT NULL,
+  `classroom_id` bigint UNSIGNED NOT NULL,
+  `teacher_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `comment` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `comment_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `teacher_comments_student_index`(`student_id` ASC) USING BTREE,
+  INDEX `teacher_comments_period_index`(`period_id` ASC) USING BTREE,
+  INDEX `teacher_comments_classroom_index`(`classroom_id` ASC) USING BTREE,
+  INDEX `teacher_comments_teacher_index`(`teacher_id` ASC) USING BTREE,
+  INDEX `teacher_comments_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `teacher_comments_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `teacher_comments_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `teacher_comments_classroom_id_foreign` FOREIGN KEY (`classroom_id`) REFERENCES `classrooms` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `teacher_comments_period_id_foreign` FOREIGN KEY (`period_id`) REFERENCES `periods` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `teacher_comments_student_id_foreign` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `teacher_comments_teacher_id_foreign` FOREIGN KEY (`teacher_id`) REFERENCES `teachers` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of teacher_comments
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for teachers
@@ -4502,6 +8782,115 @@ CREATE TABLE `teaching_loads`  (
 
 -- ----------------------------
 -- Records of teaching_loads
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for timetable_constraints
+-- ----------------------------
+DROP TABLE IF EXISTS `timetable_constraints`;
+CREATE TABLE `timetable_constraints`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `school_id` bigint UNSIGNED NOT NULL,
+  `teacher_id` bigint UNSIGNED NOT NULL,
+  `day_of_week` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `time_slot_start` time NULL DEFAULT NULL,
+  `time_slot_end` time NULL DEFAULT NULL,
+  `constraint_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `reason` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `timetable_constraints_school_index`(`school_id` ASC) USING BTREE,
+  INDEX `timetable_constraints_teacher_index`(`teacher_id` ASC) USING BTREE,
+  INDEX `timetable_constraints_day_index`(`day_of_week` ASC) USING BTREE,
+  INDEX `timetable_constraints_type_index`(`constraint_type` ASC) USING BTREE,
+  INDEX `timetable_constraints_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `timetable_constraints_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `timetable_constraints_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `timetable_constraints_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `timetable_constraints_teacher_id_foreign` FOREIGN KEY (`teacher_id`) REFERENCES `teachers` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of timetable_constraints
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for timetable_generations
+-- ----------------------------
+DROP TABLE IF EXISTS `timetable_generations`;
+CREATE TABLE `timetable_generations`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `school_id` bigint UNSIGNED NOT NULL,
+  `academic_year_id` bigint UNSIGNED NOT NULL,
+  `semester` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `generation_date` timestamp NULL DEFAULT NULL,
+  `algorithm_version` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `total_conflicts` int NOT NULL DEFAULT 0,
+  `total_assignments` int NOT NULL DEFAULT 0,
+  `total_teachers` int NOT NULL DEFAULT 0,
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'GENERATED',
+  `generation_data` json NULL,
+  `generated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `timetable_generations_school_index`(`school_id` ASC) USING BTREE,
+  INDEX `timetable_generations_academic_year_index`(`academic_year_id` ASC) USING BTREE,
+  INDEX `timetable_generations_status_index`(`status` ASC) USING BTREE,
+  INDEX `timetable_generations_generated_by_index`(`generated_by` ASC) USING BTREE,
+  INDEX `timetable_generations_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `timetable_generations_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `timetable_generations_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `timetable_generations_academic_year_id_foreign` FOREIGN KEY (`academic_year_id`) REFERENCES `academic_years` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `timetable_generations_generated_by_foreign` FOREIGN KEY (`generated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `timetable_generations_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of timetable_generations
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for timetable_rooms
+-- ----------------------------
+DROP TABLE IF EXISTS `timetable_rooms`;
+CREATE TABLE `timetable_rooms`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `school_id` bigint UNSIGNED NOT NULL,
+  `room_code` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `room_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `capacity` int NOT NULL DEFAULT 30,
+  `room_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `floor_number` int NULL DEFAULT NULL,
+  `building` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `facilities` json NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `timetable_rooms_school_code_unique`(`school_id` ASC, `room_code` ASC) USING BTREE,
+  INDEX `timetable_rooms_school_index`(`school_id` ASC) USING BTREE,
+  INDEX `timetable_rooms_type_index`(`room_type` ASC) USING BTREE,
+  INDEX `timetable_rooms_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `timetable_rooms_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `timetable_rooms_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `timetable_rooms_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of timetable_rooms
 -- ----------------------------
 
 -- ----------------------------
@@ -4617,6 +9006,43 @@ CREATE TABLE `trial_registrations`  (
 -- ----------------------------
 
 -- ----------------------------
+-- Table structure for user_roles
+-- ----------------------------
+DROP TABLE IF EXISTS `user_roles`;
+CREATE TABLE `user_roles`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `user_id` bigint UNSIGNED NOT NULL,
+  `role_id` bigint UNSIGNED NOT NULL,
+  `school_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `assigned_at` timestamp NULL DEFAULT NULL,
+  `assigned_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `expired_at` timestamp NULL DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `user_roles_user_role_school_unique`(`user_id` ASC, `role_id` ASC, `school_id` ASC) USING BTREE,
+  INDEX `user_roles_user_index`(`user_id` ASC) USING BTREE,
+  INDEX `user_roles_role_index`(`role_id` ASC) USING BTREE,
+  INDEX `user_roles_school_index`(`school_id` ASC) USING BTREE,
+  INDEX `user_roles_assigned_by_index`(`assigned_by` ASC) USING BTREE,
+  INDEX `user_roles_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `user_roles_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `user_roles_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `user_roles_assigned_by_foreign` FOREIGN KEY (`assigned_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `user_roles_role_id_foreign` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `user_roles_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `user_roles_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of user_roles
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for users
 -- ----------------------------
 DROP TABLE IF EXISTS `users`;
@@ -4650,19 +9076,22 @@ INSERT INTO `users` VALUES (1, 'Administrator Utama', 'admin@contoh.id', '2026-0
 INSERT INTO `users` VALUES (2, 'Pengguna Biasa', 'user@contoh.id', '2026-09-09 17:08:24', '$2y$12$n75I8iQeGGpOxxKLuT/B2uzArGBZeWRDJneqatSDIVJOtFCPIeLCi', NULL, NULL, NULL, NULL, NULL, NULL, '2026-09-09 17:08:24', '2026-09-09 17:08:24', NULL, NULL, NULL);
 
 -- ----------------------------
--- Table structure for vendors
+-- Table structure for vendor_invoice_lines
 -- ----------------------------
-DROP TABLE IF EXISTS `vendors`;
-CREATE TABLE `vendors`  (
+DROP TABLE IF EXISTS `vendor_invoice_lines`;
+CREATE TABLE `vendor_invoice_lines`  (
   `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
-  `organization_id` bigint UNSIGNED NOT NULL,
-  `code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `phone` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `tax_number` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `address` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
-  `payable_account_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `vendor_invoice_id` bigint UNSIGNED NOT NULL,
+  `chart_of_account_id` bigint UNSIGNED NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `quantity` decimal(20, 4) NOT NULL DEFAULT 1.0000,
+  `unit` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `unit_price` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `discount_amount` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `subtotal` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `tax_amount` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `total_amount` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `line_number` int NOT NULL DEFAULT 1,
   `is_active` tinyint(1) NOT NULL DEFAULT 1,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -4670,16 +9099,241 @@ CREATE TABLE `vendors`  (
   `created_by` bigint UNSIGNED NULL DEFAULT NULL,
   `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `vendors_org_code_unique`(`organization_id` ASC, `code` ASC) USING BTREE,
-  INDEX `vendors_payable_account_fk`(`payable_account_id` ASC) USING BTREE,
-  INDEX `vendors_is_active_index`(`is_active` ASC) USING BTREE,
+  INDEX `vendor_invoice_lines_invoice_index`(`vendor_invoice_id` ASC) USING BTREE,
+  INDEX `vendor_invoice_lines_coa_index`(`chart_of_account_id` ASC) USING BTREE,
+  INDEX `vendor_invoice_lines_line_number_index`(`line_number` ASC) USING BTREE,
+  INDEX `vendor_invoice_lines_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `vendor_invoice_lines_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `vendor_invoice_lines_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `vendor_invoice_lines_chart_of_account_id_foreign` FOREIGN KEY (`chart_of_account_id`) REFERENCES `chart_of_accounts` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `vendor_invoice_lines_vendor_invoice_id_foreign` FOREIGN KEY (`vendor_invoice_id`) REFERENCES `vendor_invoices` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of vendor_invoice_lines
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for vendor_invoices
+-- ----------------------------
+DROP TABLE IF EXISTS `vendor_invoices`;
+CREATE TABLE `vendor_invoices`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `school_id` bigint UNSIGNED NOT NULL,
+  `vendor_id` bigint UNSIGNED NOT NULL,
+  `fiscal_period_id` bigint UNSIGNED NOT NULL,
+  `currency_id` bigint UNSIGNED NOT NULL,
+  `exchange_rate` decimal(20, 8) NOT NULL DEFAULT 1.00000000,
+  `invoice_number` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `internal_number` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `invoice_date` date NOT NULL,
+  `due_date` date NULL DEFAULT NULL,
+  `received_date` date NULL DEFAULT NULL,
+  `subtotal` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `discount_amount` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `tax_base` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `ppn_rate` decimal(5, 2) NOT NULL DEFAULT 0.00,
+  `ppn_amount` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `pph_rate` decimal(5, 2) NOT NULL DEFAULT 0.00,
+  `pph_amount` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `total_amount` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `paid_amount` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `outstanding_amount` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `functional_total` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'UNPAID',
+  `payment_status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PENDING',
+  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `attachment_url` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `posted_journal_entry_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `vendor_invoices_school_internal_unique`(`school_id` ASC, `internal_number` ASC) USING BTREE,
+  UNIQUE INDEX `vendor_invoices_vendor_number_unique`(`vendor_id` ASC, `invoice_number` ASC) USING BTREE,
+  INDEX `vendor_invoices_school_index`(`school_id` ASC) USING BTREE,
+  INDEX `vendor_invoices_vendor_index`(`vendor_id` ASC) USING BTREE,
+  INDEX `vendor_invoices_fiscal_period_index`(`fiscal_period_id` ASC) USING BTREE,
+  INDEX `vendor_invoices_currency_index`(`currency_id` ASC) USING BTREE,
+  INDEX `vendor_invoices_date_index`(`invoice_date` ASC) USING BTREE,
+  INDEX `vendor_invoices_due_date_index`(`due_date` ASC) USING BTREE,
+  INDEX `vendor_invoices_status_index`(`status` ASC) USING BTREE,
+  INDEX `vendor_invoices_payment_status_index`(`payment_status` ASC) USING BTREE,
+  INDEX `vendor_invoices_posted_entry_index`(`posted_journal_entry_id` ASC) USING BTREE,
+  INDEX `vendor_invoices_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `vendor_invoices_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `vendor_invoices_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `vendor_invoices_currency_id_foreign` FOREIGN KEY (`currency_id`) REFERENCES `currencies` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `vendor_invoices_fiscal_period_id_foreign` FOREIGN KEY (`fiscal_period_id`) REFERENCES `fiscal_periods` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `vendor_invoices_posted_journal_entry_id_foreign` FOREIGN KEY (`posted_journal_entry_id`) REFERENCES `journal_entries` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `vendor_invoices_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `vendor_invoices_vendor_id_foreign` FOREIGN KEY (`vendor_id`) REFERENCES `vendors` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of vendor_invoices
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for vendor_payments
+-- ----------------------------
+DROP TABLE IF EXISTS `vendor_payments`;
+CREATE TABLE `vendor_payments`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `school_id` bigint UNSIGNED NOT NULL,
+  `vendor_id` bigint UNSIGNED NOT NULL,
+  `vendor_invoice_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `bank_account_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `fiscal_period_id` bigint UNSIGNED NOT NULL,
+  `currency_id` bigint UNSIGNED NOT NULL,
+  `exchange_rate` decimal(20, 8) NOT NULL DEFAULT 1.00000000,
+  `payment_number` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `payment_date` date NOT NULL,
+  `payment_method` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `reference_number` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `amount` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `pph_amount` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `functional_amount` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `attachment_url` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `posted_journal_entry_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'POSTED',
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `vendor_payments_school_number_unique`(`school_id` ASC, `payment_number` ASC) USING BTREE,
+  INDEX `vendor_payments_school_index`(`school_id` ASC) USING BTREE,
+  INDEX `vendor_payments_vendor_index`(`vendor_id` ASC) USING BTREE,
+  INDEX `vendor_payments_invoice_index`(`vendor_invoice_id` ASC) USING BTREE,
+  INDEX `vendor_payments_bank_account_index`(`bank_account_id` ASC) USING BTREE,
+  INDEX `vendor_payments_fiscal_period_index`(`fiscal_period_id` ASC) USING BTREE,
+  INDEX `vendor_payments_currency_index`(`currency_id` ASC) USING BTREE,
+  INDEX `vendor_payments_date_index`(`payment_date` ASC) USING BTREE,
+  INDEX `vendor_payments_status_index`(`status` ASC) USING BTREE,
+  INDEX `vendor_payments_posted_entry_index`(`posted_journal_entry_id` ASC) USING BTREE,
+  INDEX `vendor_payments_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `vendor_payments_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `vendor_payments_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `vendor_payments_bank_account_id_foreign` FOREIGN KEY (`bank_account_id`) REFERENCES `bank_accounts` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `vendor_payments_currency_id_foreign` FOREIGN KEY (`currency_id`) REFERENCES `currencies` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `vendor_payments_fiscal_period_id_foreign` FOREIGN KEY (`fiscal_period_id`) REFERENCES `fiscal_periods` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `vendor_payments_posted_journal_entry_id_foreign` FOREIGN KEY (`posted_journal_entry_id`) REFERENCES `journal_entries` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `vendor_payments_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `vendor_payments_vendor_id_foreign` FOREIGN KEY (`vendor_id`) REFERENCES `vendors` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `vendor_payments_vendor_invoice_id_foreign` FOREIGN KEY (`vendor_invoice_id`) REFERENCES `vendor_invoices` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of vendor_payments
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for vendors
+-- ----------------------------
+DROP TABLE IF EXISTS `vendors`;
+CREATE TABLE `vendors`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `school_id` bigint UNSIGNED NOT NULL,
+  `organization_id` bigint UNSIGNED NOT NULL,
+  `code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `legal_name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `vendor_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'COMPANY',
+  `npwp` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `is_pkp` tinyint(1) NOT NULL DEFAULT 0,
+  `pkp_number` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `ppn_rate` decimal(5, 2) NOT NULL DEFAULT 0.00,
+  `contact_person` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `phone` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `email` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `website` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `address` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `city` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `province` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `postal_code` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `bank_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `bank_account_number` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `bank_account_name` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `payment_terms_days` int NOT NULL DEFAULT 30,
+  `payable_account_id` bigint UNSIGNED NOT NULL,
+  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `vendors_school_code_unique`(`school_id` ASC, `code` ASC) USING BTREE,
+  INDEX `vendors_school_index`(`school_id` ASC) USING BTREE,
+  INDEX `vendors_name_index`(`name` ASC) USING BTREE,
+  INDEX `vendors_npwp_index`(`npwp` ASC) USING BTREE,
+  INDEX `vendors_is_pkp_index`(`is_pkp` ASC) USING BTREE,
+  INDEX `vendors_vendor_type_index`(`vendor_type` ASC) USING BTREE,
   INDEX `vendors_deleted_at_index`(`deleted_at` ASC) USING BTREE,
-  CONSTRAINT `vendors_org_fk` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
-  CONSTRAINT `vendors_payable_account_fk` FOREIGN KEY (`payable_account_id`) REFERENCES `accounts` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+  INDEX `vendors_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `vendors_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `vendors_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of vendors
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for virtual_accounts
+-- ----------------------------
+DROP TABLE IF EXISTS `virtual_accounts`;
+CREATE TABLE `virtual_accounts`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `school_id` bigint UNSIGNED NOT NULL,
+  `payment_transaction_id` bigint UNSIGNED NOT NULL,
+  `student_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `applicant_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `bank_code` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `va_number` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `va_name` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `amount` decimal(20, 2) NOT NULL DEFAULT 0.00,
+  `billing_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'FIXED',
+  `expiry_time` timestamp NULL DEFAULT NULL,
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PENDING',
+  `paid_at` timestamp NULL DEFAULT NULL,
+  `inquiry_text` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `payment_text` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `raw_response` json NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `virtual_accounts_bank_va_unique`(`bank_code` ASC, `va_number` ASC) USING BTREE,
+  INDEX `virtual_accounts_school_index`(`school_id` ASC) USING BTREE,
+  INDEX `virtual_accounts_transaction_index`(`payment_transaction_id` ASC) USING BTREE,
+  INDEX `virtual_accounts_student_index`(`student_id` ASC) USING BTREE,
+  INDEX `virtual_accounts_applicant_index`(`applicant_id` ASC) USING BTREE,
+  INDEX `virtual_accounts_bank_index`(`bank_code` ASC) USING BTREE,
+  INDEX `virtual_accounts_status_index`(`status` ASC) USING BTREE,
+  INDEX `virtual_accounts_expiry_index`(`expiry_time` ASC) USING BTREE,
+  INDEX `virtual_accounts_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  INDEX `virtual_accounts_created_by_index`(`created_by` ASC) USING BTREE,
+  INDEX `virtual_accounts_updated_by_index`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `virtual_accounts_applicant_id_foreign` FOREIGN KEY (`applicant_id`) REFERENCES `applicants` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `virtual_accounts_payment_transaction_id_foreign` FOREIGN KEY (`payment_transaction_id`) REFERENCES `payment_transactions` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `virtual_accounts_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `virtual_accounts_student_id_foreign` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of virtual_accounts
 -- ----------------------------
 
 SET FOREIGN_KEY_CHECKS = 1;
