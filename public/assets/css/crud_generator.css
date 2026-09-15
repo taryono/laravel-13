@@ -389,3 +389,7 @@
 .loading-spinner.show {
     display: block;
 }
+
+.material-symbols-outlined {
+    font-size: 10px;
+}

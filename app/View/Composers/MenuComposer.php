@@ -21,7 +21,7 @@ class MenuComposer
             request()->url(),
             Auth::user()
         );
-        
+
         $view->with('menu', $split['menu'] ?? collect());
         $view->with('topnavMenu', $split['topnavMenu'] ?? collect());
     }

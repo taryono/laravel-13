@@ -21,7 +21,7 @@
     {{-- ============================================= --}}
     {{-- Bootstrap 5.3 hanya 1x --}}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css"
         rel="stylesheet" />
     {{-- Fonts --}}
@@ -86,19 +86,19 @@
     {{-- ============================================= --}}
 
     {{-- jQuery 3.7.1 (stable) --}}
-    <script src="{{asset('vendor/jquery/jquery-3.7.1.min.js')}}"></script>
+    <script src="{{ asset('vendor/jquery/jquery-3.7.1.min.js') }}"></script>
 
     {{-- Bootstrap Bundle 5.3.3 --}}
-    <script src="{{asset('vendor/bootstrap/js/bootstrap.bundle.min.js')}}"></script> 
+    <script src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
 
     {{-- Select2 --}}
-    <script src="{{asset('vendor/select2/select2.min.js')}}"></script>
-    
+    <script src="{{ asset('vendor/select2/select2.min.js') }}"></script>
+
     {{-- SweetAlert2 --}}
-    <script src="{{asset('vendor/sweetalert2/sweetalert2.min.js')}}"></script>
+    <script src="{{ asset('vendor/sweetalert2/sweetalert2.min.js') }}"></script>
 
     {{-- Axios --}}
-    <script src="{{asset('vendor/axios/axios.min.js')}}"></script>
+    <script src="{{ asset('vendor/axios/axios.min.js') }}"></script>
 
     {{-- DataTables (minimal) --}}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"
@@ -118,6 +118,11 @@
     <script src="{{ asset('assets/js/modal.js') }}"></script>
     {{-- 2. Core.js (HARUS PERTAMA) --}}
     <script src="{{ asset('assets/js/core.js') }}?v={{ time() }}"></script>
+    <script>
+        document.addEventListener('ajax-modal:loaded', function() {
+            initSelect2InModal();
+        });
+    </script>
 
     {{-- 3. Button.js (KEDUA) --}}
     <script src="{{ asset('assets/js/button.js') }}?v={{ time() }}"></script>

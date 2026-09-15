@@ -17,7 +17,7 @@ class TaxSettingDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['tax_code', 'tax_name', 'tax_rate', 'min_amount', 'max_amount', 'effective_date', 'expiry_date', 'is_active', 'description','status'];
+    protected array $columns = ['tax_code', 'tax_name', 'tax_rate', 'min_amount', 'max_amount', 'effective_date', 'expiry_date', 'description', 'status'];
 
     /**
      * Build DataTable response.
@@ -29,10 +29,16 @@ class TaxSettingDataTable extends DataTable
                 return $this->renderActionButtons($row);
             })
             ->addColumn('status', function ($row) {
-                return $row->is_active ? '<span class="badge    bg-success">Aktif</span>' : '<span class="badge bg-danger">Tidak Aktif</span>';
+                return $row->is_active ? '<span class="badge bg-success">Aktif</span>' : '<span class="badge bg-danger">Tidak Aktif</span>';
+            })
+            ->addColumn('effective_date', function ($row) {
+                return $row->effective_date ? date('d M Y H:i:s', strtotime($row->effective_date)) : '';
+            })
+            ->addColumn('expiry_date', function ($row) {
+                return $row->expiry_date ? date('d M Y H:i:s', strtotime($row->expiry_date)) : '';
             })
             ->addIndexColumn()
-            ->rawColumns(['action', 'status']) // ✅ Tetap wajib ada!
+            ->rawColumns(['action', 'status', 'effective_date', 'expiry_date']) // ✅ Tetap wajib ada!
             ->setRowId('id');
     }
 
@@ -141,14 +147,14 @@ class TaxSettingDataTable extends DataTable
                  * Custom Bootstrap 5 layout.
                  */
                 'dom' =>
-                    '<"row mb-3"' .
-                        '<"col-md-6 d-flex align-items-center"B>' .
-                        '<"col-md-6"f>' .
+                '<"row mb-3"' .
+                    '<"col-md-6 d-flex align-items-center"B>' .
+                    '<"col-md-6"f>' .
                     '>' .
                     'rt' .
                     '<"row mt-3"' .
-                        '<"col-md-6"i>' .
-                        '<"col-md-6 d-flex justify-content-md-end"p>' .
+                    '<"col-md-6"i>' .
+                    '<"col-md-6 d-flex justify-content-md-end"p>' .
                     '>',
 
                 /*
@@ -267,12 +273,12 @@ class TaxSettingDataTable extends DataTable
      * explode() dari string literal seperti versi lama, yang rapuh
      * terhadap karakter khusus pada nama kolom.
      */
-     
+
     protected function getColumns(): array
     {
         return collect($this->columns)
-            ->map(fn (string $kolom) => Column::make($kolom)
-                ->title(ucwords(str_replace(['_',"."], [' ',' '], $kolom))))
+            ->map(fn(string $kolom) => Column::make($kolom)
+                ->title(ucwords(str_replace(['_', "."], [' ', ' '], $kolom))))
             // 1. PREPEND: Masukkan kolom No di posisi PALING AWAL (indeks 0)
             ->prepend(
                 Column::make('DT_RowIndex')

@@ -1,11 +1,13 @@
 {{ Form::open([
     'method' => $method ?? 'POST',
-    'route'  => $action ?? 'account.store',
-    'class'  => 'form-horizontal',
-    'id'     => 'formAccount'
+    'route' => $action ?? 'account.store',
+    'class' => 'form-horizontal',
+    'id' => 'formAccount',
 ]) }}
 @csrf
-@if(($account->id ?? 0) > 0) @method('PUT') @endif
+@if (($account->id ?? 0) > 0)
+    @method('PUT')
+@endif
 
 <div class="row g-3">
     <div class="col-12">
@@ -19,40 +21,47 @@
         <label class="form-label">Kode Akun <span class="text-danger">*</span></label>
         <input type="text" name="code" class="form-control @error('code') is-invalid @enderror"
             value="{{ old('code', $account->code ?? '') }}" placeholder="Contoh: 1-1000" required>
-        @error('code')<div class="invalid-feedback">{{ $message }}</div>@enderror
+        @error('code')
+            <div class="invalid-feedback">{{ $message }}</div>
+        @enderror
     </div>
 
     <div class="col-md-8">
         <label class="form-label">Nama Akun <span class="text-danger">*</span></label>
         <input type="text" name="name" class="form-control @error('name') is-invalid @enderror"
             value="{{ old('name', $account->name ?? '') }}" placeholder="Contoh: Kas Kecil" required>
-        @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
+        @error('name')
+            <div class="invalid-feedback">{{ $message }}</div>
+        @enderror
     </div>
 
     {{-- Kategori & Jenis Akun --}}
     <div class="col-md-4">
         <label class="form-label">Kategori Akun <span class="text-danger">*</span></label>
-        <select name="account_category_id" class="form-select @error('account_category_id') is-invalid @enderror" required>
+        <select name="account_category_id" class="form-select @error('account_category_id') is-invalid @enderror"
+            required>
             <option value="">-- Pilih Kategori --</option>
-            @foreach($categories as $cat)
-            <option value="{{ $cat->id }}"
-                {{ old('account_category_id', $account->account_category_id ?? '') == $cat->id ? 'selected' : '' }}>
-                {{ $cat->name }}
-            </option>
+            @foreach ($categories as $cat)
+                <option value="{{ $cat->id }}"
+                    {{ old('account_category_id', $account->account_category_id ?? '') == $cat->id ? 'selected' : '' }}>
+                    {{ $cat->name }}
+                </option>
             @endforeach
         </select>
-        @error('account_category_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
+        @error('account_category_id')
+            <div class="invalid-feedback">{{ $message }}</div>
+        @enderror
     </div>
 
     <div class="col-md-4">
         <label class="form-label">Jenis Akun</label>
         <select name="account_type" class="form-select">
             @php $types = ['header' => 'Header / Induk', 'detail' => 'Rincian / Transaksi']; @endphp
-            @foreach($types as $val => $label)
-            <option value="{{ $val }}"
-                {{ old('account_type', $account->account_type ?? 'detail') == $val ? 'selected' : '' }}>
-                {{ $label }}
-            </option>
+            @foreach ($types as $val => $label)
+                <option value="{{ $val }}"
+                    {{ old('account_type', $account->account_type ?? 'detail') == $val ? 'selected' : '' }}>
+                    {{ $label }}
+                </option>
             @endforeach
         </select>
         <small class="text-muted">Header = hanya kelompok, Detail = bisa dipakai transaksi</small>
@@ -62,14 +71,16 @@
         <label class="form-label">Saldo Normal <span class="text-danger">*</span></label>
         <select name="normal_balance" class="form-select @error('normal_balance') is-invalid @enderror" required>
             @php $balances = ['debit' => 'Debit', 'kredit' => 'Kredit']; @endphp
-            @foreach($balances as $val => $label)
-            <option value="{{ $val }}"
-                {{ old('normal_balance', $account->normal_balance ?? '') == $val ? 'selected' : '' }}>
-                {{ $label }}
-            </option>
+            @foreach ($balances as $val => $label)
+                <option value="{{ $val }}"
+                    {{ old('normal_balance', $account->normal_balance ?? '') == $val ? 'selected' : '' }}>
+                    {{ $label }}
+                </option>
             @endforeach
         </select>
-        @error('normal_balance')<div class="invalid-feedback">{{ $message }}</div>@enderror
+        @error('normal_balance')
+            <div class="invalid-feedback">{{ $message }}</div>
+        @enderror
     </div>
 
     {{-- Akun Induk & Mata Uang --}}
@@ -77,11 +88,11 @@
         <label class="form-label">Akun Induk</label>
         <select name="parent_id" class="form-select">
             <option value="">-- Tidak Ada Induk (Akun Utama) --</option>
-            @foreach($parentAccounts as $pAcc)
-            <option value="{{ $pAcc->id }}"
-                {{ old('parent_id', $account->parent_id ?? '') == $pAcc->id ? 'selected' : '' }}>
-                {{ $pAcc->code }} — {{ $pAcc->name }}
-            </option>
+            @foreach ($parentAccounts as $pAcc)
+                <option value="{{ $pAcc->id }}"
+                    {{ old('parent_id', $account->parent_id ?? '') == $pAcc->id ? 'selected' : '' }}>
+                    {{ $pAcc->code }} — {{ $pAcc->name }}
+                </option>
             @endforeach
         </select>
     </div>
@@ -89,11 +100,11 @@
     <div class="col-md-6">
         <label class="form-label">Mata Uang</label>
         <select name="currency_code" class="form-select">
-            @foreach($currencies as $curr)
-            <option value="{{ $curr }}"
-                {{ old('currency_code', $account->currency_code ?? 'IDR') == $curr ? 'selected' : '' }}>
-                {{ $curr }}
-            </option>
+            @foreach ($currencies as $curr)
+                <option value="{{ $curr }}"
+                    {{ old('currency_code', $account->currency_code ?? 'IDR') == $curr ? 'selected' : '' }}>
+                    {{ $curr }}
+                </option>
             @endforeach
         </select>
     </div>
@@ -120,20 +131,6 @@
     <div class="col-12">
         <label class="form-label">Keterangan</label>
         <textarea name="description" class="form-control" rows="3">{{ old('description', $account->description ?? '') }}</textarea>
-    </div>
-
-    {{-- Tombol --}}
-    <div class="col-12 text-end mt-2">
-        <a href="{{ route('account.index') }}" class="btn btn-secondary px-4">Kembali</a>
-        @if(($account->id ?? 0) > 0)
-            @if(empty($account->is_system))
-                <button type="submit" class="btn btn-primary px-4">Perbarui Akun</button>
-            @else
-                <button type="button" class="btn btn-primary px-4" disabled>Akun Sistem (Tidak Bisa Diubah)</button>
-            @endif
-        @else
-            <button type="submit" class="btn btn-primary px-4">Simpan Akun</button>
-        @endif
     </div>
 </div>
 {{ Form::close() }}

@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 | Application Routes
 |--------------------------------------------------------------------------
 */
+
 Route::group([
     'prefix'    => 'menu_management',
     'namespace' => 'App\Modules\MenuManagement\Controllers',
