@@ -4,7 +4,7 @@
 // ==============================================
 const AppCore = (() => {
     'use strict';
-    
+
     // ==============================================
     // 2. DEPENDENSI CHECK
     // ==============================================
@@ -14,7 +14,7 @@ const AppCore = (() => {
             { name: 'SweetAlert2', global: 'Swal' },
             { name: 'jQuery', global: '$' }
         ];
-        
+
         let missing = false;
         deps.forEach(dep => {
             if (typeof window[dep.global] === 'undefined') {
@@ -22,11 +22,11 @@ const AppCore = (() => {
                 missing = true;
             }
         });
-        
+
         if (missing) {
             console.warn('⚠️ Beberapa dependensi tidak tersedia, beberapa fitur mungkin tidak berfungsi.');
         }
-        
+
         return !missing;
     };
 
@@ -38,16 +38,16 @@ const AppCore = (() => {
             const el = document.querySelector(`meta[name="${name}"]`);
             return el?.content || null;
         },
-        
+
         parseError: (error) => {
             if (!error.response) return { status: null, message: 'Tidak dapat terhubung ke server. Periksa koneksi internet Anda.', isAuth: false };
-            
+
             const { status, data } = error.response;
             const message = data?.message || 'Terjadi kesalahan tak dikenal.';
-            
+
             const errorMap = {
-                422: data?.errors 
-                    ? Object.values(data.errors).flat().join('<br>') 
+                422: data?.errors
+                    ? Object.values(data.errors).flat().join('<br>')
                     : 'Data yang dikirim tidak valid.',
                 401: 'Sesi Anda telah berakhir. Silakan login kembali.',
                 403: 'Anda tidak memiliki izin untuk aksi ini.',
@@ -55,7 +55,7 @@ const AppCore = (() => {
                 419: 'Sesi keamanan habis. Silakan coba lagi.',
                 500: message
             };
-            
+
             return {
                 status,
                 message: errorMap[status] || message,
@@ -70,14 +70,14 @@ const AppCore = (() => {
     const axiosConfig = {
         setup: () => {
             if (typeof axios === 'undefined') return;
-            
+
             const csrfToken = utils.getMeta('csrf-token');
             if (csrfToken) {
                 axios.defaults.headers.common['X-CSRF-TOKEN'] = csrfToken;
             }
             axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
             axios.defaults.withCredentials = true;
-            
+
             // CSRF Token refresh interceptor
             axios.interceptors.response.use(
                 response => response,
@@ -120,7 +120,7 @@ const AppCore = (() => {
                 Swal.close();
             }
         },
-        
+
         notify: {
             toast: (icon, title, timer = 3000) => {
                 if (typeof Swal === 'undefined') {
@@ -137,7 +137,7 @@ const AppCore = (() => {
                     timerProgressBar: true
                 });
             },
-            success: (message) =>  UI.notify.toast('success', message),
+            success: (message) => UI.notify.toast('success', message),
             error: (message) => {
                 if (typeof Swal === 'undefined') {
                     alert(message);
@@ -149,10 +149,10 @@ const AppCore = (() => {
                     text: message
                 });
             },
-            warning: (message) =>  UI.notify.toast('warning', message),
-            info: (message) =>  UI.notify.toast('info', message)
+            warning: (message) => UI.notify.toast('warning', message),
+            info: (message) => UI.notify.toast('info', message)
         },
-        
+
         confirm: (options = {}) => {
             const defaults = {
                 title: 'Anda yakin?',
@@ -161,13 +161,13 @@ const AppCore = (() => {
                 confirmButtonText: 'Ya, lanjutkan',
                 cancelButtonText: 'Batal'
             };
-            
+
             const config = { ...defaults, ...options };
-            
+
             if (typeof Swal === 'undefined') {
                 return Promise.resolve(confirm(config.text));
             }
-            
+
             return Swal.fire({
                 ...config,
                 showCancelButton: true,
@@ -190,13 +190,13 @@ const AppCore = (() => {
                 successMessage = null,
                 headers = {}
             } = config;
-            
+
             if (typeof axios === 'undefined') {
                 throw new Error('Axios belum dimuat.');
             }
-            
+
             if (showLoading) UI.loading.show(loadingMessage);
-            
+
             try {
                 const response = await axios({ url, method, data, headers });
                 console.log(response)
@@ -206,7 +206,7 @@ const AppCore = (() => {
             } catch (error) {
                 if (showLoading) UI.loading.hide();
                 const errorInfo = utils.parseError(error);
-                
+
                 if (errorInfo.isAuth) {
                     await UI.confirm({
                         title: 'Sesi Berakhir',
@@ -219,7 +219,7 @@ const AppCore = (() => {
                 } else {
                     UI.notify.error(errorInfo.message);
                 }
-                
+
                 throw error;
             }
         }
@@ -230,8 +230,8 @@ const AppCore = (() => {
     // ==============================================
     const ElementManager = {
         initialized: new WeakSet(),
-        
-         // PERBAIKI: Gunakan method shorthand (bukan arrow function)
+
+        // PERBAIKI: Gunakan method shorthand (bukan arrow function)
         initDeleteButtons(container = document) {
             const buttons = container.querySelectorAll('.delete-button:not([data-initialized])');
             buttons.forEach(btn => {
@@ -239,7 +239,7 @@ const AppCore = (() => {
                     e.preventDefault();
                     const confirmed = await UI.confirm({ title: 'Hapus data ini?' });
                     if (!confirmed) return;
-                    
+
                     const url = btn.dataset.url || btn.getAttribute('href');
                     if (url) {
                         await ajax.request({
@@ -249,13 +249,13 @@ const AppCore = (() => {
                         });
                     }
                 };
-                
+
                 btn.setAttribute('data-initialized', 'true');
                 btn.addEventListener('click', handler);
                 this.initialized.add(btn);
             });
         },
-        
+
         initConfirmButtons(container = document) {
             const buttons = container.querySelectorAll('[data-confirm-delete]:not([data-initialized])');
             buttons.forEach(btn => {
@@ -263,21 +263,21 @@ const AppCore = (() => {
                     e.preventDefault();
                     const confirmed = await UI.confirm();
                     if (!confirmed) return;
-                    
+
                     await ajax.request({
                         url: btn.dataset.url,
                         method: 'DELETE',
                         successMessage: 'Data berhasil dihapus.'
                     });
                 };
-                
+
                 btn.setAttribute('data-initialized', 'true');
                 btn.addEventListener('click', handler);
                 this.initialized.add(btn);
             });
         },
-        
-        initForms(container = document){
+
+        initForms(container = document) {
             const forms = container.querySelectorAll('.form-validation:not([data-initialized])');
             forms.forEach(form => {
                 const handler = async (e) => {
@@ -285,7 +285,7 @@ const AppCore = (() => {
                     const formData = new FormData(form);
                     const url = form.dataset.url;
                     const method = form.dataset.method || 'POST';
-                    
+
                     await ajax.request({
                         url,
                         method,
@@ -293,19 +293,19 @@ const AppCore = (() => {
                         successMessage: 'Data berhasil disimpan!'
                     });
                 };
-                
+
                 form.setAttribute('data-initialized', 'true');
                 form.addEventListener('submit', handler);
                 this.initialized.add(form);
             });
         },
-        
+
         initAll(container = document) {
             this.initDeleteButtons(container);
             this.initConfirmButtons(container);
             this.initForms(container);
         },
-        
+
         // Cleanup function untuk menghindari memory leak
         cleanup: (container = document) => {
             // Hanya cleanup yang perlu
@@ -318,22 +318,22 @@ const AppCore = (() => {
     const PageLoader = {
         isLoading: false,
         container: null,
-        
+
         init: () => {
             PageLoader.container = document.querySelector('main.main-content');
-            
+
             // Event delegation untuk link
             document.addEventListener('click', (e) => {
                 const link = e.target.closest('.edit[data-ajax-url]');
                 if (!link) return;
-                
+
                 e.preventDefault();
                 if (PageLoader.isLoading) return;
-                
+
                 const url = link.dataset.ajaxUrl;
                 if (url) PageLoader.loadContent(url);
             });
-            
+
             // Browser back/forward
             window.addEventListener('popstate', (e) => {
                 if (e.state?.path) {
@@ -341,12 +341,12 @@ const AppCore = (() => {
                 }
             });
         },
-        
+
         loadContent: async (url) => {
             if (!url || url === '#' || !PageLoader.container || PageLoader.isLoading) return;
-            
+
             PageLoader.isLoading = true;
-            
+
             // Show loading state
             PageLoader.container.innerHTML = `
                 <div class="d-flex align-items-center justify-content-center py-5">
@@ -354,34 +354,34 @@ const AppCore = (() => {
                     <span>Sedang memuat halaman...</span>
                 </div>
             `;
-            
+
             try {
                 const response = await axios.get(url);
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(response.data, 'text/html');
-                
-                const newContent = doc.querySelector('.main-content')?.innerHTML 
-                    || doc.body?.innerHTML 
+
+                const newContent = doc.querySelector('.main-content')?.innerHTML
+                    || doc.body?.innerHTML
                     || response.data;
-                
+
                 PageLoader.container.innerHTML = newContent;
                 window.history.pushState({ path: url }, '', url);
-                
+
                 // Update title
                 const title = doc.querySelector('title')?.textContent || document.title;
                 document.title = title;
-                
+
                 // Scroll to top
                 window.scrollTo({ top: 0, behavior: 'smooth' });
-                
+
                 // Reinitialize elements
                 ElementManager.initAll(PageLoader.container);
-                
+
                 // Trigger custom event for other scripts
-                document.dispatchEvent(new CustomEvent('contentLoaded', { 
-                    detail: { container: PageLoader.container, url } 
+                document.dispatchEvent(new CustomEvent('contentLoaded', {
+                    detail: { container: PageLoader.container, url }
                 }));
-                
+
             } catch (error) {
                 console.error('Failed to load page:', error);
                 await UI.confirm({
@@ -415,7 +415,7 @@ const AppCore = (() => {
             remote: "Silakan perbaiki isian ini",
             url: "Format URL tidak valid"
         },
-        
+
         customRules: {
             alphanumeric: {
                 regex: /^[a-zA-Z0-9_]+$/,
@@ -430,24 +430,24 @@ const AppCore = (() => {
                 message: "NIP harus 18 digit angka"
             }
         },
-        
+
         init: () => {
             if (typeof $ === 'undefined' || typeof $.validator === 'undefined') return;
-            
+
             // Register custom rules
             Object.entries(FormValidator.customRules).forEach(([name, rule]) => {
-                $.validator.addMethod(name, function(value) {
+                $.validator.addMethod(name, function (value) {
                     return this.optional(value) || rule.regex.test(value);
                 }, rule.message);
             });
         },
-        
+
         attach: (form) => {
             const $form = $(form);
             if ($form.data('validator-attached')) return;
-            
+
             $form.data('validator-attached', true);
-            
+
             $form.validate({
                 errorElement: 'span',
                 errorClass: 'text-danger small mt-1 d-block',
@@ -455,12 +455,12 @@ const AppCore = (() => {
                 unhighlight: (el) => $(el).removeClass('is-invalid'),
                 errorPlacement: (error, element) => error.insertAfter(element),
                 messages: FormValidator.messages,
-                
+
                 submitHandler: async (form) => {
                     const formData = new FormData(form);
                     const url = form.dataset.url || form.action;
                     const method = form.dataset.method || form.method || 'POST';
-                    
+
                     await ajax.request({
                         url,
                         method,
@@ -470,7 +470,7 @@ const AppCore = (() => {
                 }
             });
         },
-        
+
         reinit: (container = document) => {
             $(container).find('form[data-validate="true"]').each((_, form) => {
                 FormValidator.attach(form);
@@ -487,46 +487,46 @@ const AppCore = (() => {
         axios: axiosConfig,
         ui: UI,
         ajax,
-        
+
         // Initializers
         init: () => {
             if (!checkDependencies()) {
                 console.warn('⚠️ Beberapa fitur mungkin tidak berfungsi karena dependensi yang hilang.');
             }
-            
+
             // Setup axios
             axiosConfig.setup();
-            
+
             // Setup global variables
             window._token = utils.getMeta('csrf-token');
             window.userId = utils.getMeta('user_id');
             window.loginAs = utils.getMeta('login_as');
-            
+
             // Init form validator
             FormValidator.init();
-            
+
             // Init elements
             ElementManager.initAll();
             FormValidator.reinit();
-            
+
             // Init page loader
             PageLoader.init();
-            
+
             // Auto-reinit on content loaded
             document.addEventListener('contentLoaded', (e) => {
                 ElementManager.initAll(e.detail.container);
                 FormValidator.reinit(e.detail.container);
             });
-            
+
             console.log('✅ AppCore initialized successfully');
         },
-        
+
         // Public methods
         refresh: (container = document) => {
             ElementManager.initAll(container);
             FormValidator.reinit(container);
         },
-        
+
         // For backward compatibility
         get Legacy() {
             return {
@@ -552,7 +552,7 @@ const AppCore = (() => {
 // ==============================================
 document.addEventListener('DOMContentLoaded', () => {
     AppCore.init();
-    
+
     // Dispatch event bahwa core sudah siap
     document.dispatchEvent(new CustomEvent('appcore:ready', {
         detail: { version: '1.0.0' }
@@ -568,7 +568,7 @@ Object.assign(window, AppCore.Legacy);
 // Export untuk modular usage
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = AppCore;
-} 
+}
 // 🚀 Cara Penggunaan
 // Cara modern (recommended)
 // AppCore.ajax.request({
@@ -588,3 +588,31 @@ if (typeof module !== 'undefined' && module.exports) {
 
 // Refresh elements setelah AJAX load
 // AppCore.refresh(document.getElementById('new-content'));
+
+/**
+ * Init Select2 untuk semua <select> di dalam modal.
+ * Pakai jQuery Select2 (karena Select2 official butuh jQuery).
+ */
+function initSelect2InModal() {
+    var $modalContent = $('#modalContent');
+
+    $modalContent.find('select').each(function () {
+        var $el = $(this);
+
+        // Skip kalau sudah di-init
+        if ($el.hasClass('select2-hidden-accessible')) return;
+
+        // Skip kalau ada class 'no-select2'
+        if ($el.hasClass('no-select2')) return;
+
+        var placeholder = $el.find('option[value=""]').first().text() || 'Pilih...';
+
+        $el.select2({
+            theme: 'bootstrap-5',
+            width: '100%',
+            placeholder: placeholder,
+            allowClear: $el.find('option[value=""]').length > 0,
+            dropdownParent: $('#dynamicModal'),   // 🔥 PENTING!
+        });
+    });
+}

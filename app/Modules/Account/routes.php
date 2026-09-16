@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Route;
 | and give it the controller to call when that URI is requested.
 |
  */
+
 Route::group(['prefix' => 'account', 'namespace' => 'App\Modules\Account\Controllers', 'middleware' => ['web']], function () {
     Route::get('/', ['as' => 'account.index', 'uses' => 'AccountController@index']);
     Route::any('/search', ['as' => 'account.search', 'uses' => 'AccountController@search']);
@@ -25,6 +26,6 @@ Route::group(['prefix' => 'account', 'namespace' => 'App\Modules\Account\Control
     Route::delete('/delete/{id}', ['as' => 'account.destroy', 'uses' => 'AccountController@destroy']);
     Route::get('/getDataTree', ['as' => 'account.getDataTree', 'uses' => 'AccountController@getDataTree']);
     Route::get('/getData', ['as' => 'account.getData', 'uses' => 'AccountController@getData']);
-    Route::get('/tree', ['as' => 'account.getTreeData', 'uses' => 'AccountController@getTreeData']); 
+    Route::get('/tree', ['as' => 'account.getTreeData', 'uses' => 'AccountController@getTreeData']);
     Route::get('/getDataWithRecursive', ['as' => 'account.Tree', 'uses' => 'AccountController@getDataWithRecursive']);
 });

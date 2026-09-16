@@ -141,6 +141,14 @@
             url: trigger.dataset.url,
             method: trigger.dataset.method || 'GET',
             buttons: extractButtonOptions(trigger),
+            // 🔥 INI YANG DITAMBAHKAN
+            onContentLoaded: function (html) {
+                // Dispatch custom event supaya bisa didengar dari luar
+                document.dispatchEvent(new CustomEvent('ajax-modal:loaded', {
+                    detail: { modalId: MODAL_ID }
+                }));
+            }
+
         });
     });
 

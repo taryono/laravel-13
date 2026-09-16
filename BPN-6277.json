@@ -1,0 +1,179 @@
+/* https://taryono.pintro.dev/home/getMonthlyTransaction?force_update=1&ng_academic_year=2026&ng_academic_cost_component_id=1276&ng_department_id=&month_year=*/
+{
+    "status": "success",
+    "message": "Successfully get data.",
+    "data": {
+        "data_monthly": {
+            "transaction_count": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "transaction_total": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "average_total": 0,
+            "average_count": 0,
+            "month_data": [
+                "Jul 2026",
+                "Aug 2026",
+                "Sep 2026",
+                "Oct 2026",
+                "Nov 2026",
+                "Dec 2026",
+                "Jan 2027",
+                "Feb 2027",
+                "Mar 2027",
+                "Apr 2027",
+                "May 2027",
+                "Jun 2027"
+            ]
+        }
+    }
+}
+/**
+https://taryono.pintro.dev/home/getDataSuperApp?force_update=0&ng_academic_year=2026&ng_academic_cost_component_id=0&ng_department_id=&month_year= */
+{
+    "status": "success",
+    "message": "Successfully get data.",
+    "data": {
+        "data_yearly": "{\"1317\":{\"total_income\":0,\"total_target\":5445000,\"total_difference\":5445000}}",
+        "data_departments": [
+            {
+                "id": 1317,
+                "name": "TPQ Al-Hamidiyah",
+                "parent": 1316
+            },
+            {
+                "id": 1318,
+                "name": "KB-TK Al-Hamidiyah",
+                "parent": 1316
+            },
+            {
+                "id": 1319,
+                "name": "SDIT Al-Hamidiyah",
+                "parent": 1316
+            },
+            {
+                "id": 1320,
+                "name": "SMPI Al-Hamidiyah",
+                "parent": 1316
+            },
+            {
+                "id": 1321,
+                "name": "Madrasah Tsanawiyah Al-Hamidiyah",
+                "parent": 1316
+            },
+            {
+                "id": 1322,
+                "name": "Madrasah Aliyah",
+                "parent": 1316
+            },
+            {
+                "id": 1323,
+                "name": "Sekolah Tinggi Agama Islam (STAI)",
+                "parent": 1316
+            },
+            {
+                "id": 1324,
+                "name": "Pendidikan Agama Islam (PAI) STAIT",
+                "parent": 1323
+            },
+            {
+                "id": 1325,
+                "name": "Pendidikan Islam Anak Usia Dini STAIT",
+                "parent": 1323
+            },
+            {
+                "id": 124856,
+                "name": "PASCA SARJANA",
+                "parent": null
+            }
+        ]
+    }
+}
+// https://taryono.pintro.dev/home/getDataSuperApp?force_update=1&ng_academic_year=2026&ng_academic_cost_component_id=1276&ng_department_id=1317
+{
+    "status": "success",
+    "message": "Successfully get data.",
+    "data": {
+        "data_yearly": "[]",
+        "data_departments": [
+            {
+                "id": 1317,
+                "name": "TPQ Al-Hamidiyah",
+                "parent": 1316
+            }
+        ],
+        "data_month_years": [
+            {
+                "month_year": "2026-07",
+                "name": "Juli 2026"
+            },
+            {
+                "month_year": "2026-08",
+                "name": "Agustus 2026"
+            },
+            {
+                "month_year": "2026-09",
+                "name": "September 2026"
+            },
+            {
+                "month_year": "2026-10",
+                "name": "Oktober 2026"
+            },
+            {
+                "month_year": "2026-11",
+                "name": "November 2026"
+            },
+            {
+                "month_year": "2026-12",
+                "name": "Desember 2026"
+            },
+            {
+                "month_year": "2027-01",
+                "name": "Januari 2027"
+            },
+            {
+                "month_year": "2027-02",
+                "name": "Februari 2027"
+            },
+            {
+                "month_year": "2027-03",
+                "name": "Maret 2027"
+            },
+            {
+                "month_year": "2027-04",
+                "name": "April 2027"
+            },
+            {
+                "month_year": "2027-05",
+                "name": "Mei 2027"
+            },
+            {
+                "month_year": "2027-06",
+                "name": "Juni 2027"
+            }
+        ]
+    }
+}

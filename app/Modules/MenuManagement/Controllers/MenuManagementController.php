@@ -15,22 +15,6 @@ use Models\Menu;
 use Models\Role;
 use App\Models\User; // sesuaikan namespace kalau User model kamu bukan di sini
 
-/**
- * CATATAN MIGRASI DARI SKEMA LAMA:
- * - Tabel `modules` sudah tidak dipakai lagi -> semua referensi module_id dihapus.
- * - Kolom menu: text -> title, name -> slug, menu_type_id(int) -> type(enum topbar/sidebar),
- *   sequence -> sort_order. Kolom action, can, is_publish sudah tidak ada.
- * - `role` (string tunggal di menu) digantikan tabel pivot `menu_role` (many-to-many,
- *   dengan flag is_view/is_create/is_edit/is_delete per role).
- * - Permission granular per aksi sekarang pakai tabel `actions` + `action_role` + `action_user`.
- * - `flyout_title` tidak ada di dump SQL yang dilampirkan, ditambahkan lewat migration terpisah
- *   (2026_08_01_000000_add_flyout_title_to_menus_table.php). Kalau memang tidak dipakai lagi,
- *   silakan hapus dari $fillable, validasi di bawah, dan migration-nya.
- *
- * PENTING: MenuRepository & MenuTreeBuilder belum saya sentuh karena kodenya tidak ada
- * di percakapan ini. Keduanya kemungkinan besar masih mereferensikan kolom lama (`text`,
- * `sequence`, dst) dan perlu disesuaikan manual ke `title` / `sort_order`.
- */
 class MenuManagementController extends MainController
 {
     public function __construct()
@@ -71,13 +55,14 @@ class MenuManagementController extends MainController
 
     public function show(Menu $menu)
     {
+
         return response()->json($menu->load(['actions', 'roles']));
     }
 
     public function update(Request $request, Menu $menu)
     {
-        $data = $this->validated($request, $menu->id);
 
+        $data = $this->validated($request, $menu->id);
         if (isset($data['parent_id']) && $this->wouldCreateCycle($menu->id, $data['parent_id'])) {
             return response()->json([
                 'message' => 'Parent menu tidak valid: menu tidak boleh menjadi turunannya sendiri.',
@@ -157,7 +142,7 @@ class MenuManagementController extends MainController
             // Lepas role yang tidak lagi disertakan
             $menu->roles()->newPivotStatement()
                 ->where('menu_id', $menu->id)
-                ->when(!empty($submittedRoleIds), fn ($q) => $q->whereNotIn('role_id', $submittedRoleIds))
+                ->when(!empty($submittedRoleIds), fn($q) => $q->whereNotIn('role_id', $submittedRoleIds))
                 ->delete();
 
             foreach ($validated['assignments'] as $assignment) {
@@ -309,6 +294,8 @@ class MenuManagementController extends MainController
             ]),
             'sort_order'    => 'nullable|integer|min:0',
             'is_active'     => 'required|boolean',
+            'id_text'       => 'nullable|string|max:255',
+            'en_text'       => 'nullable|string|max:255',
         ]);
     }
 
@@ -334,7 +321,7 @@ class MenuManagementController extends MainController
         }
 
         return false;
-    } 
+    }
 
     private function clearMenuCache(): void
     {

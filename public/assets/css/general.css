@@ -67,7 +67,7 @@ body.dark-mode {
 }
 
 .material-symbols-outlined {
-    font-variation-settings: 'FILL'0, 'wght'400, 'GRAD'0, 'opsz'24;
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
     vertical-align: middle;
 }
 
@@ -367,9 +367,32 @@ body.dark-mode {
 }
 
 .material-symbols-outlined {
-    font-variation-settings: 'wght'400, 'FILL'0;
+    font-variation-settings: 'wght' 400, 'FILL' 0;
     /* nilai default */
     font-size: 20px;
     /* ukuran dasar */
     vertical-align: middle;
+}
+
+.material-symbols-outlined {
+    font-size: 10px;
+}
+
+/* Pastikan dropdown Select2 di atas modal */
+.select2-container--open {
+    z-index: 9999 !important;
+}
+
+.select2-dropdown {
+    z-index: 9999 !important;
+}
+
+/* Opsional: agar select2 full width */
+.select2-container {
+    width: 100% !important;
+}
+
+/* Fix untuk select2 di dalam modal */
+.modal .select2-container--open .select2-dropdown {
+    z-index: 9999 !important;
 }

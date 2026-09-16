@@ -12,7 +12,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
-use Throwable; 
+use Throwable;
+use Yajra\DataTables\Services\DataTable;
+
 class AccountController extends MainController
 {
     public function __construct()
@@ -35,17 +37,17 @@ class AccountController extends MainController
     /**
      * Show form to create new account.
      */
-     public function create()
+    public function create()
     {
-        return view('accounts.create', [
-            'action'         => route('account.store'),
+        return view('Account::create', [
+            'action'         => 'account.store',
             'method'         => 'POST',
             'account'        => new Account(),
             'categories'     => AccountCategory::orderBy('name')->get(),
             'parentAccounts' => Account::where('account_type', 'header')
                 ->orWhere('account_type', 'detail')
                 ->orderBy('code')
-                ->get(['id','code','name']),
+                ->get(['id', 'code', 'name']),
             'currencies'     => ['IDR', 'USD', 'SGD', 'EUR'],
         ]);
     }
@@ -60,23 +62,24 @@ class AccountController extends MainController
                 $validated['current_balance'] = $validated['opening_balance'];
                 return Account::create($validated);
             });
-           return response()->json(['success' => true, 'data' => $coa]);
+            return response()->json(['success' => true, 'data' => $coa]);
         } catch (Throwable $e) {
             Log::error('Gagal mengambil COA.', ['exception' => $e]);
             return response()->json(['success' => false, 'message' => 'Gagal mengambil data.'], 500);
         }
     }
 
-    public function edit(Account $account)
+    public function edit($id)
     {
-        return view('accounts.edit', [
-            'action'         => route('account.update', $account),
+        $account = Account::find($id);
+        return view('Account::edit', [
+            'action'         =>  ["account.edit", $id],
             'method'         => 'PUT',
             'account'        => $account,
             'categories'     => AccountCategory::orderBy('name')->get(),
             'parentAccounts' => Account::where('id', '!=', $account->id)
                 ->orderBy('code')
-                ->get(['id','code','name']),
+                ->get(['id', 'code', 'name']),
             'currencies'     => ['IDR', 'USD', 'SGD', 'EUR'],
         ]);
     }
@@ -162,12 +165,11 @@ class AccountController extends MainController
                 $request,
                 'Akun berhasil dihapus.'
             );
-
         } catch (Throwable $e) {
             Log::error('Gagal menghapus akun.', [
                 'exception' => $e,
                 'account_id' => $id,
-                'user_id' => auth()->id(),
+                'user_id' => auth()->id,
             ]);
 
             return $this->errorResponse(
@@ -195,12 +197,11 @@ class AccountController extends MainController
                     'normal_balance' => $account->normal_balance,
                 ]
             ]);
-
         } catch (Throwable $e) {
             Log::error('Gagal mengambil saldo akun.', [
                 'exception' => $e,
                 'account_id' => $id,
-                'user_id' => auth()->id(),
+                'user_id' => auth()->id,
             ]);
 
             return response()->json([
@@ -211,55 +212,55 @@ class AccountController extends MainController
     }
 
     public function getTreeData(Request $request)
-{
-    $accounts = Account::with(['children' => function($query) {
-        $query->where('is_active', true)->orderBy('code');
-    }, 'account_category'])
-    ->whereNull('parent_id')
-    ->orderBy('code')
-    ->get();
+    {
+        $accounts = Account::with(['children' => function ($query) {
+            $query->where('is_active', true)->orderBy('code');
+        }, 'account_category'])
+            ->whereNull('parent_id')
+            ->orderBy('code')
+            ->get();
 
-    return response()->json($this->buildJsTreeData($accounts));
-}
-
-private function buildJsTreeData($accounts)
-{
-    $result = [];
-    foreach ($accounts as $account) {
-        $node = [
-            'id' => (string) $account->id, // ✅ Wajib string!
-            'text' => $account->code . ' - ' . $account->name,
-            'code' => $account->code,
-            'name' => $account->name,
-            'type' => $account->account_type, // header atau detail
-            'state' => [
-                'opened' => false, // Default: collapsed
-                'selected' => false
-            ],
-            'li_attr' => [
-                'data-id' => $account->id
-            ],
-            'a_attr' => [
-                'data-code' => $account->code,
-                'data-type' => $account->account_type
-            ],
-            'icon' => $account->account_type == 'header' 
-                ? 'fas fa-folder-open text-warning' 
-                : 'fas fa-file-invoice text-primary'
-        ];
-
-        if ($account->children->isNotEmpty()) {
-            $node['children'] = $this->buildJsTreeData($account->children);
-        }
-
-        $result[] = $node;
+        return response()->json($this->buildJsTreeData($accounts));
     }
-    return $result;
-}
 
-public function getDataWithRecursive(Request $request)
-{
-    $query = "
+    private function buildJsTreeData($accounts)
+    {
+        $result = [];
+        foreach ($accounts as $account) {
+            $node = [
+                'id' => (string) $account->id, // ✅ Wajib string!
+                'text' => $account->code . ' - ' . $account->name,
+                'code' => $account->code,
+                'name' => $account->name,
+                'type' => $account->account_type, // header atau detail
+                'state' => [
+                    'opened' => false, // Default: collapsed
+                    'selected' => false
+                ],
+                'li_attr' => [
+                    'data-id' => $account->id
+                ],
+                'a_attr' => [
+                    'data-code' => $account->code,
+                    'data-type' => $account->account_type
+                ],
+                'icon' => $account->account_type == 'header'
+                    ? 'fas fa-folder-open text-warning'
+                    : 'fas fa-file-invoice text-primary'
+            ];
+
+            if ($account->children->isNotEmpty()) {
+                $node['children'] = $this->buildJsTreeData($account->children);
+            }
+
+            $result[] = $node;
+        }
+        return $result;
+    }
+
+    public function getDataWithRecursive(Request $request)
+    {
+        $query = "
         WITH RECURSIVE account_tree AS (
             SELECT 
                 id, code, name, category_id, parent_id, account_type,
@@ -284,21 +285,21 @@ public function getDataWithRecursive(Request $request)
         ORDER BY path;
     ";
 
-    $accounts = DB::select($query);
+        $accounts = DB::select($query);
 
-    return DataTables::of($accounts)
-        ->addColumn('name_display', function ($account) {
-            $prefix = str_repeat('&nbsp;&nbsp;&nbsp;', $account->level);
-            if ($account->level > 0) {
-                $prefix .= '└─ ';
-            }
-            return $prefix . $account->name;
-        })
-        ->make(true);
-}
+        return DataTable::of($accounts)
+            ->addColumn('name_display', function ($account) {
+                $prefix = str_repeat('&nbsp;&nbsp;&nbsp;', $account->level);
+                if ($account->level > 0) {
+                    $prefix .= '└─ ';
+                }
+                return $prefix . $account->name;
+            })
+            ->make(true);
+    }
 
-public function getDataTree(Request $request): View
-    { 
+    public function getDataTree(Request $request): View
+    {
         return view(
             'Account::tree'
         );

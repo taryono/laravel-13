@@ -97,7 +97,7 @@ async function handleMenuSubmit(e) {
     try {
         await request({ url, method, data: payload, successMessage: 'Menu berhasil disimpan.' });
         menuModal.hide();
-        window.location.reload(); // simpel: reload supaya tree ke-refresh.
+        //window.location.reload(); // simpel: reload supaya tree ke-refresh.
     } catch (e) {
         // handleAjaxError sudah menampilkan pesan validasi
     }
