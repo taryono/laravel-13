@@ -25,10 +25,11 @@ use App\Core\Menu\MenuTreeBuilder;
 class CrudGeneratorController extends MainController
 {
 
-    public function __construct(){
+    public function __construct()
+    {
         parent::__construct(new CrudGenerator(), 'crud_generator');
     }
-     /**
+    /**
      * Tampilkan form generator CRUD
      */
     public function index()
@@ -50,9 +51,9 @@ class CrudGeneratorController extends MainController
             'list_alt' => 'Default',
         ];
         // dump(auth()->user()->organizationIds());
-        $data = $this->listModulesToGenerate(); 
-        $tables = $data['tables']??[];
-        $filtered = $data['filtered']??[];
+        $data = $this->listModulesToGenerate();
+        $tables = $data['tables'] ?? [];
+        $filtered = $data['filtered'] ?? [];
         $roles = Role::where('is_active', 1)
             ->orderBy('name')
             ->get();
@@ -61,8 +62,8 @@ class CrudGeneratorController extends MainController
         $tree  = (new MenuTreeBuilder())->build($items);
         $organizations = Organization::all();
         $parentOptions = $this->flattenForSelect($tree);
-        
-        return view('CrudGenerator::index', compact('icons', 'tables','roles', 'filtered', 'parentOptions','organizations'));
+
+        return view('CrudGenerator::index', compact('icons', 'tables', 'roles', 'filtered', 'parentOptions', 'organizations'));
     }
 
     /**
@@ -70,10 +71,10 @@ class CrudGeneratorController extends MainController
      */
     public function generate(Request $request)
     {
-        
+
         $request->validate([
             'model_name' => 'required|string|max:100|regex:/^[a-zA-Z]+$/',
-            'columns' => 'required|string|max:500',
+            'columns' => 'required|string|max:1000',
             'icon' => 'nullable|string',
             'create_menu' => 'boolean',
             'parent_menu' => 'nullable|string',
@@ -81,16 +82,16 @@ class CrudGeneratorController extends MainController
 
         $modelName = Str::studly($request->model_name);
         $columns = $request->columns;
-        
+
         // Bangun command
         $command = "make:crud-yajra {$modelName} --columns={$columns}";
-        
+
         // Tambahkan opsi no-menu jika tidak ingin membuat menu
         if (!$request->boolean('create_menu')) {
             $command .= " --no-menu --model=\App\{$modelName}";
         }
-        try { 
-    
+        try {
+
             // Simpan ke session untuk tracking
             $processId = uniqid('crud_', true);
             session()->put("crud_process_{$processId}", [
@@ -100,9 +101,9 @@ class CrudGeneratorController extends MainController
             ]);
             // Eksekusi command dengan output capture
             $output = new \Symfony\Component\Console\Output\BufferedOutput();
-            
+
             Artisan::call($command, [], $output);
-            
+
             $result = [
                 'success' => true,
                 'message' => "CRUD {$modelName} berhasil dibuat!",
@@ -128,7 +129,6 @@ class CrudGeneratorController extends MainController
             return redirect()->route('crud_generator.index')
                 ->with('success', $result['message'])
                 ->with('output', $result['output']);
-
         } catch (\Exception $e) {
             Log::error("CRUD Generator Error", [
                 'error' => $e->getMessage(),
@@ -157,24 +157,24 @@ class CrudGeneratorController extends MainController
     {
         $request->validate([
             'model_name' => 'required|string|max:100|regex:/^[a-zA-Z]+$/',
-            'columns' => 'required|string|max:500',
+            'columns' => 'required|string|max:1000',
             'create_menu' => 'boolean',
         ]);
 
         $modelName = Str::studly($request->model_name);
         $columns = $request->columns;
         $createMenu = $request->boolean('create_menu');
-        
+
         // Gunakan Artisan::queue() untuk menjalankan di background
         $command = "make:crud-yajra {$modelName} --model=\\App\\Models\\{$modelName} --columns={$columns}";
-        
+
         if (!$createMenu) {
             $command .= " --no-menu";
         }
         Artisan::call('queue:work --queue=default --stop-when-empty');
         // Artisan::queue akan otomatis mendispatch ke queue
         Artisan::queue($command, [], 'default');
-        
+
         return redirect()->route('crud_generator.index')
             ->with('info', "CRUD {$modelName} sedang diproses di background. Anda akan diberitahu saat selesai.");
     }
@@ -185,7 +185,7 @@ class CrudGeneratorController extends MainController
     public function status($processId)
     {
         $process = session()->get("crud_process_{$processId}");
-        
+
         if (!$process) {
             return response()->json(['error' => 'Process not found'], 404);
         }
@@ -200,11 +200,12 @@ class CrudGeneratorController extends MainController
     {
         // Ambil dari log atau database
         $logs = Log::getLogger();
-        
+
         return view('CrudGenerator::history');
     }
 
-    protected function listModulesToGenerate(){
+    protected function listModulesToGenerate()
+    {
         $database = DB::getDatabaseName();
 
         $columns = DB::select("
@@ -213,11 +214,11 @@ class CrudGeneratorController extends MainController
             WHERE TABLE_SCHEMA = ?
             ORDER BY TABLE_NAME, ORDINAL_POSITION
         ", [$database]);
-        $excluded = ['CrudGenerator', 'Controllers', 'VIews', 'Module','partials', 'JobBatch','Job','MenuRole','Migration','Module','CacheLock','Cache',"RoleUser","Session","FailedJob", "ActionUser","PasswordResetToken"]; // nama yang mau di-exclude
-        $excluded_to_snake = array_map(function($item) {
+        $excluded = ['CrudGenerator', 'Controllers', 'VIews', 'Module', 'partials', 'JobBatch', 'Job', 'MenuRole', 'Migration', 'Module', 'CacheLock', 'Cache', "RoleUser", "Session", "FailedJob", "ActionUser", "PasswordResetToken"]; // nama yang mau di-exclude
+        $excluded_to_snake = array_map(function ($item) {
             return Str::plural(Str::snake($item));
         }, $excluded);
-         
+
         $tables = collect($columns)
             ->groupBy('TABLE_NAME')
             ->map(function ($columns, $tableName) {
@@ -227,25 +228,25 @@ class CrudGeneratorController extends MainController
                     'columns' => $columns->pluck('COLUMN_NAME')->values()->toArray(),
                 ];
             });
-        
+
         $modules = (new \Lib\Directories(app_path('Modules')))->getModules();
         // Atau lebih simpel
-        $names = $modules->map('basename'); 
-        $filtered = $names->reject(function($name) use ($excluded) {
+        $names = $modules->map('basename');
+        $filtered = $names->reject(function ($name) use ($excluded) {
             return in_array($name, $excluded);
-        })->toArray(); 
-        $rejected = explode(",","action_user,cache,cache_locks,failed_jobs,job_batches,jobs,menu_role,migrations,modules,password_reset_tokens,role_user,sessions");
-        $tables = $tables->filter(function ($table) use ($filtered, $rejected) { 
-            return !in_array(Str::singular(Str::studly($table['name'])) , $filtered) && !in_array($table['name'] , $rejected);
-        }); 
-        return ['tables'=> $tables, 'filtered'=> $names];
+        })->toArray();
+        $rejected = explode(",", "action_user,cache,cache_locks,failed_jobs,job_batches,jobs,menu_role,migrations,modules,password_reset_tokens,role_user,sessions");
+        $tables = $tables->filter(function ($table) use ($filtered, $rejected) {
+            return !in_array(Str::singular(Str::studly($table['name'])), $filtered) && !in_array($table['name'], $rejected);
+        });
+        return ['tables' => $tables, 'filtered' => $names];
     }
 
     // Di Controller
     public function checkQueueStatus()
     {
         $isRunning = $this->isQueueWorkerRunning();
-        
+
         return response()->json([
             'running' => $isRunning,
             'message' => $isRunning ? 'Queue worker is running' : 'Queue worker is not running'
@@ -257,19 +258,19 @@ class CrudGeneratorController extends MainController
         // Cek di Linux
         $output = shell_exec("pgrep -f 'queue:work'");
         return !empty(trim($output));
-        
+
         // Atau cek via Supervisor
         // $output = shell_exec("supervisorctl status laravel-worker:* | grep RUNNING");
         // return str_contains($output, 'RUNNING');
-    } 
+    }
 
-     /**
+    /**
      * Generate menu from form
      */
     public function menuGenerator(Request $request)
     {
         try {
-            
+
             DB::beginTransaction();
 
             // 1. Validate request
@@ -278,7 +279,7 @@ class CrudGeneratorController extends MainController
                 'title' => 'required|string|max:191',
                 'flyout_title' => 'nullable|string|max:255',
                 'id_text' => 'nullable|string|max:50',
-                'en_text' => 'nullable|string|max:50',                 
+                'en_text' => 'nullable|string|max:50',
                 'route' => 'nullable|string|max:191',
                 'url' => 'nullable|string|max:255',
                 'parent_id' => 'nullable|exists:menus,id',
@@ -293,7 +294,7 @@ class CrudGeneratorController extends MainController
 
             // 2. Generate slug if empty
             $slug = $request->slug ?: Str::slug($request->title);
-            
+
             // 3. Generate name from title (lowercase, replace spaces with underscores)
             $name = Str::slug($request->url, '_');
 
@@ -314,19 +315,19 @@ class CrudGeneratorController extends MainController
                 'type' => $request->type ?? 'sidebar',
                 'sort_order' => $request->sort_order ?? 0,
                 'is_active' => $request->has('is_active') ? 1 : 0,
-                'organization_id' => auth()->user()?->organization_id ?? 1,
             ];
-         
-             $menu = Menu::where('slug', $slug)->whereNotNull('url')->first();
-             
+
+            $menu = Menu::where('slug', $slug)->whereNotNull('url')->first();
+
             // 5. Create or update menu
             if ($request->id) {
                 $menu = Menu::findOrFail($request->id);
                 $menu->update($menuData);
                 $message = 'Menu berhasil diupdate!';
-            }if ($menu) {
-                 $menu->update($menuData);
-                 $message = 'Menu berhasil diupdate!';
+            }
+            if ($menu) {
+                $menu->update($menuData);
+                $message = 'Menu berhasil diupdate!';
             } else {
                 $menu = Menu::create($menuData);
                 $message = 'Menu berhasil dibuat!';
@@ -342,7 +343,7 @@ class CrudGeneratorController extends MainController
                     // 🔍 Cari dulu barisnya
                     $menuRole = MenuRole::where('menu_id', (int)$menu->id)
                         ->where('role_id', (int)$roleId)
-                        ->first(); 
+                        ->first();
                     if ($menuRole) {
                         // ✅ SUDAH ADA → UPDATE saja
                         $menuRole->update([
@@ -360,13 +361,13 @@ class CrudGeneratorController extends MainController
                             'is_create' => 0,
                             'is_edit'   => 0,
                             'is_delete' => 0,
-                        ]); 
+                        ]);
                     }
                 }
             }
 
             DB::commit();
-            $this->clearMenuCache(); 
+            $this->clearMenuCache();
             return $this->successResponse(
                 $request,
                 'Menu berhasil dibuat.',
@@ -381,7 +382,7 @@ class CrudGeneratorController extends MainController
             return $this->errorResponse(
                 $request,
                 'Gagal menyimpan menu: ' . $e->getMessage()
-            ); 
+            );
         }
     }
 

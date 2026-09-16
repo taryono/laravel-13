@@ -1,142 +1,142 @@
 <!DOCTYPE html>
 <html lang="en">
+{{-- resources/views/layouts/cbt.blade.php --}}
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    {{-- @vite(['resources/css/app.css', 'resources/js/app.js']) --}}
+    <link rel="stylesheet" href="{{ asset('vendor/bootstrap/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/general.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/custom-datatable.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/modal.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet">
+    <link
+        href="https://cdn.datatables.net/v/bs5/moment-2.29.4/jszip-3.10.1/dt-3.0.0/af-3.0.0/b-4.0.0/cr-3.0.0/cc-2.0.0/date-2.0.0/fc-6.0.0/fh-5.0.0/r-4.0.0/rr-2.0.0/sc-3.0.0/sb-2.0.0/sl-4.0.0/datatables.min.css"
+        rel="stylesheet" integrity="sha384-YNHRxm6Vr29HJTQ8v1aLtlWi3mpEkk1B+elXLCf/7tFakByky4LC7vDLiRM6Fh4t"
+        crossorigin="anonymous">
+
     {{-- Di halaman ujian --}}
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+    <style>
+        #proctoring-widget {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 9999;
+            width: 320px;
+            height: 240px;
+        }
 
-    <video id="webcam" autoplay muted playsinline style="display:none;"></video>
-    <canvas id="detection-canvas" style="position:absolute;top:0;left:0;display:none;"></canvas>
+        #webcam {
+            display: block;
+            width: 320px;
+            height: 240px;
+            border: 3px solid #10b981;
+            border-radius: 4px;
+            object-fit: cover;
+        }
+
+        #detection-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 320px;
+            height: 240px;
+            pointer-events: none;
+            /* biar klik tembus */
+            border: 3px solid #10b981;
+            /* samakan border biar align */
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        #proctoring-widget {
+            border: 3px solid #10b981;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        #webcam,
+        #detection-canvas {
+            width: 320px;
+            height: 240px;
+            display: block;
+        }
+
+        #detection-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+    </style>
+    @stack('styles')
 </head>
+
 <body>
-    
+    <main class="flex-grow-1 p-4 mx-auto w-100 main-content" id="mainContent" style="max-width:1320px;">
+        @yield('content')
+    </main>
+    <div id="proctoring-widget" style="position:fixed;top:20px;left:20px;z-index:9999;">
+        <video id="webcam" autoplay muted playsinline width="320" height="240"></video>
+        <canvas id="detection-canvas" style="position:absolute;top:0;left:0;"></canvas>
+    </div>
+    {{-- ============================================= --}}
+    {{-- 1. JAVASCRIPT (Optimized Order) --}}
+    {{-- ============================================= --}}
 
+    {{-- jQuery 3.7.1 (stable) --}}
+    <script src="{{ asset('vendor/jquery/jquery-3.7.1.min.js') }}"></script>
+
+    {{-- Bootstrap Bundle 5.3.3 --}}
+    <script src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+
+    {{-- Select2 --}}
+    <script src="{{ asset('vendor/select2/select2.min.js') }}"></script>
+
+    {{-- SweetAlert2 --}}
+    <script src="{{ asset('vendor/sweetalert2/sweetalert2.min.js') }}"></script>
+
+    {{-- Axios --}}
+    <script src="{{ asset('vendor/axios/axios.min.js') }}"></script>
+
+    {{-- ============================================= --}}
+    {{-- 2. CUSTOM SCRIPTS --}}
+    {{-- ============================================= --}}
+    <script src="{{ asset('assets/js/modal.js') }}"></script>
+    {{-- 1. Core.js (HARUS PERTAMA) --}}
+    <script src="{{ asset('assets/js/core.js') }}?v={{ filemtime(public_path('assets/js/core.js')) }}"></script>
     <script>
-        // php artisan reverb:start    # Jalankan server WebSocket
-        // php artisan queue:work       # Jika menggunakan antrean
-        // 📤 Langkah 6: Pengiriman Detak Jantung & Log dari Halaman Ujian
-        // Tambahkan ini ke halaman ujian peserta:
-
-        // Di halaman ujian peserta
-        const SESSION_ID = {{ $current_session->id }};
-        const DETECTION_INTERVAL = 30000; // periksa setiap 30 detik
-        const THRESHOLD_MULTIPLE_FACES = 1; // lebih dari 1 wajah = pelanggaran
-        const THRESHOLD_CONFIDENCE = 0.7;
-
-        let modelsLoaded = false;
-
-        // Muat model sekali saat halaman dibuka
-        async function loadModels() {
-            const MODEL_URL = 'https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/weights';
-            await Promise.all([
-                faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
-                faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
-                faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL),
-            ]);
-            modelsLoaded = true;
-            console.log('✅ Model deteksi wajah siap');
-            startDetectionLoop();
-        }
-
-        // Inisialisasi kamera
-        async function initWebcam() {
-            const stream = await navigator.mediaDevices.getUserMedia({ 
-                video: { width: 640, height: 480 },
-                audio: true 
-            });
-            document.getElementById('webcam').srcObject = stream;
-        }
-
-        // Analisis bingkai & laporkan pelanggaran
-        async function analyzeFrame() {
-            if (!modelsLoaded) return;
-
-            const video = document.getElementById('webcam');
-            const canvas = document.getElementById('detection-canvas');
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-
-            // Deteksi wajah
-            const detections = await faceapi.detectAllFaces(
-                video,
-                new faceapi.TinyFaceDetectorOptions({ scoreThreshold: THRESHOLD_CONFIDENCE })
-            )
-            .withFaceLandmarks();
-
-            const count = detections.length;
-            const report = {
-                session_id: SESSION_ID,
-                face_count: count,
-                timestamp: new Date().toISOString(),
-            };
-
-            // === LOGIKA PELANGGARAN ===
-            if (count === 0) {
-                reportViolation('no_face_detected', 'Wajah tidak terlihat di kamera', 'danger', report);
-            } else if (count > THRESHOLD_MULTIPLE_FACES) {
-                reportViolation('multiple_faces', `${count} wajah terdeteksi — dilarang`, 'critical', report);
-            } else {
-                // Cek arah pandangan menggunakan titik wajah
-                checkGazeDirection(detections[0], report);
-            }
-        }
-
-        // Periksa apakah peserta sering menengok ke samping
-        function checkGazeDirection(detection, baseReport) {
-            const landmarks = detection.landmarks;
-            const nose = landmarks.getNose();
-            const jaw = landmarks.getJawOutline();
-            
-            // Hitung posisi hidung relatif ke wajah
-            const leftJaw = jaw[0];
-            const rightJaw = jaw[jaw.length - 1];
-            const noseX = nose[30].x;
-            const faceWidth = rightJaw.x - leftJaw.x;
-            const centerX = leftJaw.x + faceWidth / 2;
-            const offset = (noseX - centerX) / faceWidth; // -0.5 s/d +0.5
-
-            const report = { ...baseReport, gaze_offset: offset.toFixed(3) };
-
-            if (Math.abs(offset) > 0.25) {
-                reportViolation('looking_away', 
-                    offset > 0 ? 'Menengok ke kanan' : 'Menengok ke kiri', 
-                    'warning', report);
-            }
-        }
-
-        // Kirim pelanggaran ke Laravel
-        function reportViolation(type, description, severity = 'warning', extraData = {}) {
-            fetch('/api/proctoring/log-activity', {
-                method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json', 
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}' 
-                },
-                body: JSON.stringify({
-                    session_id: SESSION_ID,
-                    activity_type: type,
-                    activity_data: extraData,
-                    severity: severity,
-                })
-            });
-        }
-
-        // Jalankan berulang
-        function startDetectionLoop() {
-            analyzeFrame();
-            setInterval(analyzeFrame, DETECTION_INTERVAL);
-        }
-
-        // Mulai
-        document.addEventListener('DOMContentLoaded', async () => {
-            await initWebcam();
-            await loadModels();
+        document.addEventListener('ajax-modal:loaded', function() {
+            initSelect2InModal();
         });
     </script>
 
+    {{-- 3. Button.js (KEDUA) --}}
+    <script src="{{ asset('assets/js/button.js') }}?v={{ filemtime(public_path('assets/js/button.js')) }}"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+    <script>
+        window.CBT_CONFIG = {
+            sessionId: {{ $current_session?->id ?? 'null' }},
+            csrfToken: '{{ csrf_token() }}',
+            detectionInterval: 5000,
+            debug: false,
+        };
+    </script>
+    <script src="{{ asset('assets/js/proctoring.js') }}?v={{ filemtime(public_path('assets/js/proctoring.js')) }}">
+    </script>
+
+    @stack('scripts')
+
 </body>
+
 </html>

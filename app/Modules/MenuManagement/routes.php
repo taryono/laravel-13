@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::group([
-    'prefix'    => 'menu_management',
+    'prefix'    => 'menu-management',
     'namespace' => 'App\Modules\MenuManagement\Controllers',
     'middleware' => ['web', 'auth', 'superuser'],
     'as'        => 'menu_management.',

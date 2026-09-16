@@ -4,6 +4,7 @@ namespace App\Core\Menu;
 
 use Models\Menu;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 
 class MenuRepository
 {
@@ -13,11 +14,11 @@ class MenuRepository
             ->where('is_publish', 1)
             ->where('is_active', 1);
 
-        // ✅ Terapkan filter hanya jika user SUDAH login dan BUKAN Superuser
-        if (auth()->check()) {
-            
-            $userRoleNames = auth()->user()->roles->pluck('name')->toArray();
-    
+        // ✅ Terapkan filter hanya jika user SUDAH login
+        if (Auth::check()) {
+
+            $userRoleNames = Auth::user()->roles->pluck('name')->toArray();
+
             // Tampilkan menu yang role-nya cocok ATAU role-nya kosong (umum)
             $query->where(function ($q) use ($userRoleNames) {
                 $q->whereIn('role', $userRoleNames)
@@ -29,7 +30,7 @@ class MenuRepository
             ->orderBy('sequence')
             ->orderBy('name')
             ->get()
-            ->map(fn (Menu $m) => MenuItem::fromModel($m));
+            ->map(fn(Menu $m) => MenuItem::fromModel($m));
     }
 
     /**
@@ -42,7 +43,7 @@ class MenuRepository
             ->orderBy('sequence')
             ->orderBy('name')
             ->get()
-            ->map(fn (Menu $m) => MenuItem::fromModel($m));
+            ->map(fn(Menu $m) => MenuItem::fromModel($m));
     }
 
     public function findRaw(int $id): Menu
