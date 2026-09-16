@@ -3,15 +3,15 @@
 
  Source Server         : localhost
  Source Server Type    : MySQL
- Source Server Version : 80031 (8.0.31)
+ Source Server Version : 80200 (8.2.0)
  Source Host           : localhost:3306
  Source Schema         : laravel
 
  Target Server Type    : MySQL
- Target Server Version : 80031 (8.0.31)
+ Target Server Version : 80200 (8.2.0)
  File Encoding         : 65001
 
- Date: 16/09/2026 20:46:59
+ Date: 17/09/2026 01:46:20
 */
 
 SET NAMES utf8mb4;
@@ -1929,8 +1929,13 @@ CREATE TABLE `cache`  (
 -- ----------------------------
 -- Records of cache
 -- ----------------------------
-INSERT INTO `cache` VALUES ('laravel-cache-acl-all-actions', 'O:29:\"Illuminate\\Support\\Collection\":2:{s:8:\"\0*\0items\";a:5:{i:1;s:9:\"user-view\";i:2;s:11:\"user-manage\";i:3;s:12:\"roles-manage\";i:4;s:12:\"profile-view\";i:5;s:12:\"profile-edit\";}s:28:\"\0*\0escapeWhenCastingToString\";b:0;}', 1789568038);
-INSERT INTO `cache` VALUES ('laravel-cache-acl-all-menus', 'O:29:\"Illuminate\\Support\\Collection\":2:{s:8:\"\0*\0items\";a:29:{i:1;s:9:\"dashboard\";i:2;s:6:\"master\";i:3;s:4:\"user\";i:4;s:5:\"roles\";i:5;s:7:\"profile\";i:6;s:4:\"menu\";i:7;s:16:\"module-generator\";i:9;s:23:\"academic-calendar-event\";i:10;s:15:\"account-mapping\";i:11;s:8:\"academic\";i:12;s:7:\"student\";i:13;s:13:\"academic-year\";i:14;s:14:\"reference-type\";i:15;s:15:\"reference-value\";i:16;s:6:\"period\";i:17;s:7:\"account\";i:18;s:11:\"tax-setting\";i:19;s:10:\"shift-swap\";i:20;s:9:\"referensi\";i:21;s:10:\"accounting\";i:22;s:16:\"expense-category\";i:23;s:16:\"account-category\";i:24;s:8:\"tax-type\";i:25;s:11:\"cbt-session\";i:26;s:16:\"cbt-activity-log\";i:27;s:14:\"cbt-proctoring\";i:28;s:9:\"classroom\";i:29;s:16:\"homeroom-teacher\";i:30;s:7:\"teacher\";}s:28:\"\0*\0escapeWhenCastingToString\";b:0;}', 1789568038);
+INSERT INTO `cache` VALUES ('laravel-cache-acl-all-actions', 'O:29:\"Illuminate\\Support\\Collection\":2:{s:8:\"\0*\0items\";a:5:{i:1;s:9:\"user-view\";i:2;s:11:\"user-manage\";i:3;s:12:\"roles-manage\";i:4;s:12:\"profile-view\";i:5;s:12:\"profile-edit\";}s:28:\"\0*\0escapeWhenCastingToString\";b:0;}', 1789587759);
+INSERT INTO `cache` VALUES ('laravel-cache-acl-all-menus', 'O:29:\"Illuminate\\Support\\Collection\":2:{s:8:\"\0*\0items\";a:40:{i:1;s:9:\"dashboard\";i:2;s:6:\"master\";i:3;s:4:\"user\";i:4;s:5:\"roles\";i:5;s:7:\"profile\";i:6;s:4:\"menu\";i:7;s:16:\"module-generator\";i:9;s:23:\"academic-calendar-event\";i:10;s:15:\"account-mapping\";i:11;s:8:\"academic\";i:12;s:8:\"students\";i:13;s:13:\"academic-year\";i:14;s:14:\"reference-type\";i:15;s:15:\"reference-value\";i:16;s:6:\"period\";i:17;s:7:\"account\";i:18;s:11:\"tax-setting\";i:19;s:10:\"shift-swap\";i:20;s:9:\"referensi\";i:21;s:10:\"accounting\";i:22;s:16:\"expense-category\";i:23;s:16:\"account-category\";i:24;s:8:\"tax-type\";i:25;s:11:\"cbt-session\";i:26;s:16:\"cbt-activity-log\";i:27;s:14:\"cbt-proctoring\";i:28;s:9:\"classroom\";i:29;s:16:\"homeroom-teacher\";i:30;s:7:\"teacher\";i:31;s:15:\"menu-management\";i:32;s:7:\"student\";i:33;s:18:\"Pendaftaran (PPDB)\";i:34;s:9:\"applicant\";i:35;s:9:\"admission\";i:36;s:19:\"admission-selection\";i:37;s:18:\"admission-timeline\";i:38;s:20:\"application-document\";i:39;s:11:\"class-level\";i:40;s:9:\"test-type\";i:41;s:13:\"test-schedule\";}s:28:\"\0*\0escapeWhenCastingToString\";b:0;}', 1789587759);
+INSERT INTO `cache` VALUES ('laravel-cache-formlib_cols_tax_types', 'O:8:\"stdClass\":6:{s:2:\"id\";O:8:\"stdClass\":7:{s:4:\"type\";s:15:\"bigint unsigned\";s:7:\"is_null\";s:2:\"NO\";s:3:\"key\";s:3:\"PRI\";s:7:\"default\";N;s:5:\"extra\";s:14:\"auto_increment\";s:10:\"privileges\";s:31:\"select,insert,update,references\";s:7:\"comment\";s:0:\"\";}s:15:\"organization_id\";O:8:\"stdClass\":7:{s:4:\"type\";s:6:\"bigint\";s:7:\"is_null\";s:3:\"YES\";s:3:\"key\";s:0:\"\";s:7:\"default\";N;s:5:\"extra\";s:0:\"\";s:10:\"privileges\";s:31:\"select,insert,update,references\";s:7:\"comment\";s:0:\"\";}s:4:\"code\";O:8:\"stdClass\":7:{s:4:\"type\";s:11:\"varchar(20)\";s:7:\"is_null\";s:2:\"NO\";s:3:\"key\";s:3:\"UNI\";s:7:\"default\";N;s:5:\"extra\";s:0:\"\";s:10:\"privileges\";s:31:\"select,insert,update,references\";s:7:\"comment\";s:0:\"\";}s:4:\"name\";O:8:\"stdClass\":7:{s:4:\"type\";s:12:\"varchar(191)\";s:7:\"is_null\";s:2:\"NO\";s:3:\"key\";s:0:\"\";s:7:\"default\";N;s:5:\"extra\";s:0:\"\";s:10:\"privileges\";s:31:\"select,insert,update,references\";s:7:\"comment\";s:0:\"\";}s:11:\"description\";O:8:\"stdClass\":7:{s:4:\"type\";s:12:\"varchar(191)\";s:7:\"is_null\";s:3:\"YES\";s:3:\"key\";s:0:\"\";s:7:\"default\";N;s:5:\"extra\";s:0:\"\";s:10:\"privileges\";s:31:\"select,insert,update,references\";s:7:\"comment\";s:0:\"\";}s:9:\"is_active\";O:8:\"stdClass\":7:{s:4:\"type\";s:10:\"tinyint(1)\";s:7:\"is_null\";s:2:\"NO\";s:3:\"key\";s:0:\"\";s:7:\"default\";s:1:\"1\";s:5:\"extra\";s:0:\"\";s:10:\"privileges\";s:31:\"select,insert,update,references\";s:7:\"comment\";s:0:\"\";}}', 1789587771);
+INSERT INTO `cache` VALUES ('laravel-cache-formlib_fields_tax_types', 'a:6:{i:0;s:2:\"id\";i:1;s:15:\"organization_id\";i:2;s:4:\"code\";i:3;s:4:\"name\";i:4;s:11:\"description\";i:5;s:9:\"is_active\";}', 1789587771);
+INSERT INTO `cache` VALUES ('laravel-cache-formlib_rel_organization', 'a:7:{i:1;s:16:\"Perusahaan Utama\";i:2;s:21:\"Kantor Cabang Jakarta\";i:3;s:22:\"Kantor Cabang Surabaya\";i:4;s:19:\"Kantor Cabang Medan\";i:5;s:12:\"Divisi Pusat\";i:6;s:18:\"Divisi Operasional\";i:7;s:29:\"Divisi Ekspor / Internasional\";}', 1789587771);
+INSERT INTO `cache` VALUES ('laravel-cache-user_1_role_manager', 'b:0;', 1789587759);
+INSERT INTO `cache` VALUES ('laravel-cache-user_1_role_special_role', 'b:0;', 1789587759);
 
 -- ----------------------------
 -- Table structure for cache_locks
@@ -4165,7 +4170,7 @@ CREATE TABLE `homeroom_teachers`  (
   CONSTRAINT `hr_classroom_fk` FOREIGN KEY (`classroom_id`) REFERENCES `classrooms` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
   CONSTRAINT `hr_org_fk` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
   CONSTRAINT `hr_teacher_fk` FOREIGN KEY (`teacher_id`) REFERENCES `teachers` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 15 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'Penugasan wali kelas per tahun ajaran' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 15 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'Penugasan wali kelas per tahun ajaran' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of homeroom_teachers
@@ -4984,7 +4989,7 @@ CREATE TABLE `menu_role`  (
   INDEX `menu_role_deleted_at_index`(`deleted_at` ASC) USING BTREE,
   CONSTRAINT `menu_role_menu_id_foreign` FOREIGN KEY (`menu_id`) REFERENCES `menus` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
   CONSTRAINT `menu_role_role_id_foreign` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 58 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 87 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of menu_role
@@ -5033,13 +5038,42 @@ INSERT INTO `menu_role` VALUES (41, 21, 3, 1, 1, 1, 1, '2026-09-13 16:29:10', '2
 INSERT INTO `menu_role` VALUES (43, 11, 2, 1, 1, 1, 1, '2026-09-13 16:49:59', '2026-09-13 16:49:59', NULL, NULL, NULL);
 INSERT INTO `menu_role` VALUES (44, 11, 1, 1, 1, 1, 1, '2026-09-13 16:49:59', '2026-09-13 16:49:59', NULL, NULL, NULL);
 INSERT INTO `menu_role` VALUES (45, 11, 3, 1, 1, 1, 1, '2026-09-13 16:49:59', '2026-09-13 16:49:59', NULL, NULL, NULL);
-INSERT INTO `menu_role` VALUES (47, 24, 1, 1, 1, 1, 1, '2026-09-14 15:30:46', '2026-09-14 15:30:46', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (47, 24, 1, 1, 1, 1, 1, '2026-09-16 18:42:27', '2026-09-16 18:42:27', NULL, NULL, NULL);
 INSERT INTO `menu_role` VALUES (52, 25, 1, 1, 1, 1, 1, '2026-09-16 02:49:45', '2026-09-16 02:49:45', NULL, NULL, NULL);
 INSERT INTO `menu_role` VALUES (53, 26, 1, 1, 1, 1, 1, '2026-09-16 02:51:41', '2026-09-16 02:51:41', NULL, NULL, NULL);
 INSERT INTO `menu_role` VALUES (54, 27, 1, 1, 1, 1, 1, '2026-09-16 02:54:03', '2026-09-16 02:54:03', NULL, NULL, NULL);
 INSERT INTO `menu_role` VALUES (55, 28, 1, 1, 1, 1, 1, '2026-09-16 05:49:42', '2026-09-16 05:49:42', NULL, NULL, NULL);
 INSERT INTO `menu_role` VALUES (56, 29, 1, 1, 1, 1, 1, '2026-09-16 05:52:19', '2026-09-16 05:52:19', NULL, NULL, NULL);
 INSERT INTO `menu_role` VALUES (57, 30, 1, 1, 1, 1, 1, '2026-09-16 05:58:00', '2026-09-16 05:58:00', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (58, 31, 2, 1, 0, 0, 0, '2026-09-16 16:52:10', '2026-09-16 16:52:10', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (59, 31, 1, 1, 0, 0, 0, '2026-09-16 16:52:10', '2026-09-16 16:52:10', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (60, 31, 3, 1, 0, 0, 0, '2026-09-16 16:52:10', '2026-09-16 16:52:10', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (61, 32, 2, 1, 1, 1, 1, '2026-09-16 17:24:47', '2026-09-16 17:24:47', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (62, 32, 1, 1, 1, 1, 1, '2026-09-16 17:24:47', '2026-09-16 17:24:47', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (63, 32, 3, 1, 1, 1, 1, '2026-09-16 17:24:47', '2026-09-16 17:24:47', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (64, 33, 2, 1, 1, 1, 1, '2026-09-16 17:24:59', '2026-09-16 17:24:59', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (65, 33, 1, 1, 1, 1, 1, '2026-09-16 17:24:59', '2026-09-16 17:24:59', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (66, 33, 3, 1, 1, 1, 1, '2026-09-16 17:24:59', '2026-09-16 17:24:59', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (67, 34, 1, 1, 1, 1, 1, '2026-09-16 17:50:15', '2026-09-16 17:50:15', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (68, 35, 1, 1, 1, 1, 1, '2026-09-16 17:50:45', '2026-09-16 17:50:45', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (69, 36, 1, 1, 1, 1, 1, '2026-09-16 17:50:35', '2026-09-16 17:50:35', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (70, 37, 1, 1, 1, 1, 1, '2026-09-16 17:50:23', '2026-09-16 17:50:23', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (71, 34, 2, 1, 1, 1, 1, '2026-09-16 17:50:15', '2026-09-16 17:50:15', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (72, 34, 3, 1, 1, 1, 1, '2026-09-16 17:50:15', '2026-09-16 17:50:15', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (73, 37, 2, 1, 1, 1, 1, '2026-09-16 17:50:23', '2026-09-16 17:50:23', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (74, 37, 3, 1, 1, 1, 1, '2026-09-16 17:50:23', '2026-09-16 17:50:23', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (75, 36, 2, 1, 1, 1, 1, '2026-09-16 17:50:35', '2026-09-16 17:50:35', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (76, 36, 3, 1, 1, 1, 1, '2026-09-16 17:50:35', '2026-09-16 17:50:35', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (77, 35, 2, 1, 1, 1, 1, '2026-09-16 17:50:45', '2026-09-16 17:50:45', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (78, 35, 3, 1, 1, 1, 1, '2026-09-16 17:50:45', '2026-09-16 17:50:45', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (79, 38, 1, 1, 1, 1, 1, '2026-09-16 17:52:44', '2026-09-16 17:52:44', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (80, 38, 2, 1, 1, 1, 1, '2026-09-16 17:52:44', '2026-09-16 17:52:44', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (81, 38, 3, 1, 1, 1, 1, '2026-09-16 17:52:44', '2026-09-16 17:52:44', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (82, 39, 1, 1, 1, 1, 1, '2026-09-16 17:57:39', '2026-09-16 17:57:39', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (83, 40, 1, 1, 1, 1, 1, '2026-09-16 18:13:52', '2026-09-16 18:13:52', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (84, 41, 1, 1, 1, 1, 1, '2026-09-16 18:16:34', '2026-09-16 18:16:34', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (85, 24, 2, 1, 1, 1, 1, '2026-09-16 18:42:27', '2026-09-16 18:42:27', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (86, 24, 3, 1, 1, 1, 1, '2026-09-16 18:42:27', '2026-09-16 18:42:27', NULL, NULL, NULL);
 
 -- ----------------------------
 -- Table structure for menus
@@ -5074,7 +5108,7 @@ CREATE TABLE `menus`  (
   INDEX `menus_is_active_index`(`is_active` ASC) USING BTREE,
   INDEX `menus_deleted_at_index`(`deleted_at` ASC) USING BTREE,
   CONSTRAINT `menus_parent_id_foreign` FOREIGN KEY (`parent_id`) REFERENCES `menus` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 31 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 42 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of menus
@@ -5086,10 +5120,10 @@ INSERT INTO `menus` VALUES (4, 1, 2, 'role', 'Peran & Izin', 'Peran & Izin', 'ro
 INSERT INTO `menus` VALUES (5, 1, NULL, 'profile', 'Profil', 'Profil', 'profile', 'fas fa-user-circle', 'fa', 'profile.edit', 'profile', 'topbar', 1, NULL, 1, NULL, NULL, '2026-09-09 17:07:41', '2026-09-09 17:07:41', NULL, NULL, NULL);
 INSERT INTO `menus` VALUES (6, 1, 2, 'menu management', 'Manage Menu', 'Manage Menu', 'menu', 'fas fa-user-circle', 'fa', 'menu_management.index', 'menu_management', 'sidebar', 1, NULL, 1, NULL, NULL, '2026-09-09 17:07:41', '2026-09-09 17:07:41', NULL, NULL, NULL);
 INSERT INTO `menus` VALUES (7, 1, 2, 'module-generator', 'Module Generator', 'Module Generator', 'module-generator', 'fas fa-user-circle', 'fa', 'crud_generator.index', 'crud-generator', 'sidebar', 1, NULL, 1, NULL, NULL, '2026-09-09 17:07:41', '2026-09-09 17:07:41', NULL, NULL, NULL);
-INSERT INTO `menus` VALUES (9, 1, 11, NULL, 'Academic Calendar Event', 'Academic Calendar Event', 'academic-calendar-event', 'fas fa-calendar', 'fa', 'academic_calendar_event.index', 'academic_calendar_event', 'sidebar', 0, NULL, 1, NULL, NULL, '2026-09-12 06:56:01', '2026-09-13 00:24:09', NULL, NULL, NULL);
+INSERT INTO `menus` VALUES (9, 1, 11, 'Event', 'Event', 'Event', 'academic-calendar-event', 'fas fa-calendar', 'fa', 'academic_calendar_event.index', 'academic_calendar_event', 'sidebar', 0, NULL, 1, NULL, NULL, '2026-09-12 06:56:01', '2026-09-16 18:39:36', NULL, NULL, NULL);
 INSERT INTO `menus` VALUES (10, 1, 21, 'Account Mapping', 'COA Mapping', 'ACOA Mapping', 'account-mapping', 'fas fa-th-large', 'fa', 'account_mapping.index', 'account-mapping', 'sidebar', 0, NULL, 1, NULL, NULL, '2026-09-12 07:00:11', '2026-09-13 02:59:13', NULL, NULL, NULL);
 INSERT INTO `menus` VALUES (11, 1, NULL, NULL, 'Academic', 'Academic', 'academic', 'fas fa-box', 'fa', NULL, 'academic', 'sidebar', 3, NULL, 1, NULL, NULL, '2026-09-12 07:04:21', '2026-09-12 07:04:21', NULL, NULL, NULL);
-INSERT INTO `menus` VALUES (12, 1, NULL, NULL, 'Kesiswaan', 'Kesiswaan', 'student', 'fas fa-user', 'fa', NULL, 'student', 'sidebar', 4, NULL, 1, NULL, NULL, '2026-09-12 07:05:17', '2026-09-12 07:06:16', NULL, NULL, NULL);
+INSERT INTO `menus` VALUES (12, 1, NULL, 'Kesiswaan', 'Kesiswaan', 'Kesiswaan', 'students', 'fas fa-user', 'fa', NULL, 'student', 'sidebar', 4, NULL, 1, NULL, NULL, '2026-09-12 07:05:17', '2026-09-16 17:22:32', NULL, NULL, NULL);
 INSERT INTO `menus` VALUES (13, 1, 11, NULL, 'Academic Year', 'Academic Year', 'academic-year', 'fas fa-th-large', 'fa', 'academic_year.index', 'academic-year', 'sidebar', 0, NULL, 1, NULL, NULL, '2026-09-12 07:29:52', '2026-09-13 00:34:43', NULL, NULL, NULL);
 INSERT INTO `menus` VALUES (14, 1, 20, NULL, 'Reference Type', NULL, 'reference-type', 'list_alt', 'material', 'reference-type.index', 'reference-type', 'sidebar', 5, NULL, 1, NULL, NULL, '2026-09-12 07:33:13', '2026-09-12 23:59:59', NULL, NULL, NULL);
 INSERT INTO `menus` VALUES (15, 1, 20, NULL, 'Reference Value', NULL, 'reference-value', 'list_alt', 'material', 'reference-value.index', 'reference-value', 'sidebar', 6, NULL, 1, NULL, NULL, '2026-09-12 07:35:16', '2026-09-13 00:00:27', NULL, NULL, NULL);
@@ -5100,7 +5134,7 @@ INSERT INTO `menus` VALUES (19, 1, NULL, NULL, 'Shift Swap', 'Shift Swap', 'shif
 INSERT INTO `menus` VALUES (20, 1, NULL, NULL, 'Referensi', 'Reference', 'referensi', 'fas fa-chart-pie', 'fa', NULL, 'reference', 'sidebar', 8, NULL, 1, NULL, NULL, '2026-09-12 23:58:17', '2026-09-13 00:01:41', NULL, NULL, NULL);
 INSERT INTO `menus` VALUES (21, 1, NULL, 'Accounting', 'Accounting', 'Accounting', 'accounting', 'dashboard', 'material', NULL, NULL, 'sidebar', 9, NULL, 1, NULL, NULL, '2026-09-13 00:04:55', '2026-09-13 16:37:53', NULL, NULL, NULL);
 INSERT INTO `menus` VALUES (22, 1, 21, NULL, 'Expense Category', 'Expense Category', 'expense-category', 'fas fa-th-large', 'fa', 'expense_category.index', 'expense-category', 'sidebar', 0, NULL, 1, NULL, NULL, '2026-09-13 10:24:58', '2026-09-13 10:24:58', NULL, NULL, NULL);
-INSERT INTO `menus` VALUES (23, 1, 21, NULL, 'Account Category', 'Account Category', 'account-category', 'fas fa-th-large', 'fa', 'account_category.index', 'account-category', 'sidebar', 0, NULL, 1, NULL, NULL, '2026-09-13 10:29:58', '2026-09-13 10:29:58', NULL, NULL, NULL);
+INSERT INTO `menus` VALUES (23, 1, 21, 'COA Category', 'COA Category', 'COA Category', 'account-category', 'fas fa-th-large', 'fa', 'account_category.index', 'account-category', 'sidebar', 0, NULL, 1, NULL, NULL, '2026-09-13 10:29:58', '2026-09-16 18:40:22', NULL, NULL, NULL);
 INSERT INTO `menus` VALUES (24, 1, 21, NULL, 'Tax Type', 'Tax Type', 'tax-type', 'list_alt', 'material', 'tax-type.index', 'tax-type', 'sidebar', 10, NULL, 1, NULL, NULL, '2026-09-13 10:29:58', '2026-09-13 10:29:58', NULL, NULL, NULL);
 INSERT INTO `menus` VALUES (25, NULL, NULL, NULL, 'Cbt Session', NULL, 'cbt-session', 'list_alt', 'material', 'cbt-session.index', 'cbt-session', 'sidebar', 11, NULL, 1, NULL, NULL, '2026-09-16 02:49:45', '2026-09-16 02:49:45', NULL, NULL, NULL);
 INSERT INTO `menus` VALUES (26, NULL, NULL, NULL, 'Cbt Activity Log', NULL, 'cbt-activity-log', 'list_alt', 'material', 'cbt-activity-log.index', 'cbt-activity-log', 'sidebar', 12, NULL, 1, NULL, NULL, '2026-09-16 02:51:41', '2026-09-16 02:51:41', NULL, NULL, NULL);
@@ -5108,6 +5142,17 @@ INSERT INTO `menus` VALUES (27, NULL, NULL, NULL, 'Cbt Proctoring', NULL, 'cbt-p
 INSERT INTO `menus` VALUES (28, NULL, NULL, NULL, 'Classroom', NULL, 'classroom', 'list_alt', 'material', 'classroom.index', 'classroom', 'sidebar', 14, NULL, 1, NULL, NULL, '2026-09-16 05:49:42', '2026-09-16 05:49:42', NULL, NULL, NULL);
 INSERT INTO `menus` VALUES (29, NULL, NULL, NULL, 'Homeroom Teacher', NULL, 'homeroom-teacher', 'list_alt', 'material', 'homeroom-teacher.index', 'homeroom-teacher', 'sidebar', 15, NULL, 1, NULL, NULL, '2026-09-16 05:52:19', '2026-09-16 05:52:19', NULL, NULL, NULL);
 INSERT INTO `menus` VALUES (30, NULL, NULL, NULL, 'Teacher', NULL, 'teacher', 'list_alt', 'material', 'teacher.index', 'teacher', 'sidebar', 16, NULL, 1, NULL, NULL, '2026-09-16 05:58:00', '2026-09-16 05:58:00', NULL, NULL, NULL);
+INSERT INTO `menus` VALUES (31, 1, 2, 'Menu Management', 'Menu Management', 'Menu Management', 'menu-management', 'fas fa-th-large', 'fa', 'menu_management.index', 'menu-management', 'sidebar', 0, NULL, 1, NULL, NULL, '2026-09-16 16:52:10', '2026-09-16 16:52:10', NULL, NULL, NULL);
+INSERT INTO `menus` VALUES (32, 1, 12, 'Students', 'Data Siswa', 'Students', 'student', 'fas fa-user', 'fa', 'student.index', 'student', 'sidebar', 11, NULL, 1, NULL, NULL, '2026-09-16 17:23:28', '2026-09-16 17:23:28', NULL, NULL, NULL);
+INSERT INTO `menus` VALUES (33, 1, 12, 'Pendaftaran (PPDB)', 'Pendaftaran (PPDB)', 'Pendaftaran (PPDB)', 'Pendaftaran (PPDB)', 'edit', 'material', NULL, NULL, 'sidebar', 12, NULL, 1, NULL, NULL, '2026-09-16 17:24:36', '2026-09-16 18:24:02', NULL, NULL, NULL);
+INSERT INTO `menus` VALUES (34, 1, 33, 'Pendaftar', 'Pendaftar', 'Applicant', 'applicant', 'list_alt', 'material', 'applicant.index', 'applicant', 'sidebar', 13, NULL, 1, NULL, NULL, '2026-09-16 17:39:34', '2026-09-16 17:42:20', NULL, NULL, NULL);
+INSERT INTO `menus` VALUES (35, 1, 33, 'Admission', 'Admission', 'Admission', 'admission', 'list_alt', 'material', 'admission.index', 'admission', 'sidebar', 14, NULL, 1, NULL, NULL, '2026-09-16 17:43:12', '2026-09-16 17:48:01', NULL, NULL, NULL);
+INSERT INTO `menus` VALUES (36, 1, 33, 'Admission Selection', 'Admission Selection', 'Admission Selection', 'admission-selection', 'list_alt', 'material', 'admission-selection.index', 'admission-selection', 'sidebar', 15, NULL, 1, NULL, NULL, '2026-09-16 17:44:23', '2026-09-16 17:48:43', NULL, NULL, NULL);
+INSERT INTO `menus` VALUES (37, 1, 33, 'Admission Timeline', 'Admission Timeline', 'Admission Timeline', 'admission-timeline', 'list_alt', 'material', 'admission-timeline.index', 'admission-timeline', 'sidebar', 16, NULL, 1, NULL, NULL, '2026-09-16 17:45:11', '2026-09-16 17:49:53', NULL, NULL, NULL);
+INSERT INTO `menus` VALUES (38, 1, 33, 'Application Document', 'Application Document', 'Application Document', 'application-document', 'list_alt', 'material', 'application-document.index', 'application-document', 'sidebar', 17, NULL, 1, NULL, NULL, '2026-09-16 17:51:18', '2026-09-16 17:52:37', NULL, NULL, NULL);
+INSERT INTO `menus` VALUES (39, 1, NULL, NULL, 'Class Level', NULL, 'class-level', 'list_alt', 'material', 'class-level.index', 'class-level', 'sidebar', 18, NULL, 1, NULL, NULL, '2026-09-16 17:57:39', '2026-09-16 17:57:39', NULL, NULL, NULL);
+INSERT INTO `menus` VALUES (40, 1, 33, 'Test Type', 'Test Type', 'Test Type', 'test-type', 'list_alt', 'material', 'test-type.index', 'test-type', 'sidebar', 19, NULL, 1, NULL, NULL, '2026-09-16 18:13:52', '2026-09-16 18:21:38', NULL, NULL, NULL);
+INSERT INTO `menus` VALUES (41, 1, 33, 'Test Schedule', 'Test Schedule', 'Test Schedule', 'test-schedule', 'list_alt', 'material', 'test-schedule.index', 'test-schedule', 'sidebar', 20, NULL, 1, NULL, NULL, '2026-09-16 18:16:34', '2026-09-16 18:21:07', NULL, NULL, NULL);
 
 -- ----------------------------
 -- Table structure for messages
@@ -7512,11 +7557,12 @@ CREATE TABLE `role_user`  (
   CONSTRAINT `role_user_org_fk` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
   CONSTRAINT `role_user_role_id_foreign` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
   CONSTRAINT `role_user_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 8 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of role_user
 -- ----------------------------
+INSERT INTO `role_user` VALUES (7, 1, 1, 1, 1, NULL, NULL, NULL, NULL, NULL);
 
 -- ----------------------------
 -- Table structure for roles
@@ -7826,6 +7872,7 @@ CREATE TABLE `sessions`  (
 -- ----------------------------
 -- Records of sessions
 -- ----------------------------
+INSERT INTO `sessions` VALUES ('0RlRyLc28PLq28vmbxaQ8V0zk0rlImptnF7PHnT2', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36', 'YToxNDp7czo2OiJfdG9rZW4iO3M6NDA6ImJhanNBT3JwRDdLVFFrdWFDZVRlMGsxUFp1dFNGdmlxWmRxeGRkdTkiO3M6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fXM6OToiX3ByZXZpb3VzIjthOjI6e3M6MzoidXJsIjtzOjM2OiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvY3J1ZC1nZW5lcmF0b3IiO3M6NToicm91dGUiO3M6MjA6ImNydWRfZ2VuZXJhdG9yLmluZGV4Ijt9czo1MDoibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6MTtzOjk6InVzZXJfYXV0aCI7YTo3OntzOjg6ImxvZ2luX2FzIjtzOjExOiJzdXBlci1hZG1pbiI7czoxNDoiYWN0aXZlX3JvbGVfaWQiO2k6MTtzOjEzOiJhdXRoX3JvbGVfaWRzIjtPOjI5OiJJbGx1bWluYXRlXFN1cHBvcnRcQ29sbGVjdGlvbiI6Mjp7czo4OiIAKgBpdGVtcyI7YToxOntpOjA7aToxO31zOjI4OiIAKgBlc2NhcGVXaGVuQ2FzdGluZ1RvU3RyaW5nIjtiOjA7fXM6MTA6ImF1dGhfcm9sZXMiO086Mjk6IklsbHVtaW5hdGVcU3VwcG9ydFxDb2xsZWN0aW9uIjoyOntzOjg6IgAqAGl0ZW1zIjthOjE6e2k6MDtzOjExOiJzdXBlci1hZG1pbiI7fXM6Mjg6IgAqAGVzY2FwZVdoZW5DYXN0aW5nVG9TdHJpbmciO2I6MDt9czo5OiJhdXRoX3JvbGUiO086MTE6Ik1vZGVsc1xSb2xlIjozNjp7czoxMzoiACoAY29ubmVjdGlvbiI7czo1OiJteXNxbCI7czo4OiIAKgB0YWJsZSI7czo1OiJyb2xlcyI7czoxMzoiACoAcHJpbWFyeUtleSI7czoyOiJpZCI7czoxMDoiACoAa2V5VHlwZSI7czozOiJpbnQiO3M6MTI6ImluY3JlbWVudGluZyI7YjoxO3M6NzoiACoAd2l0aCI7YTowOnt9czoxMjoiACoAd2l0aENvdW50IjthOjA6e31zOjE5OiJwcmV2ZW50c0xhenlMb2FkaW5nIjtiOjA7czoxMDoiACoAcGVyUGFnZSI7aToxNTtzOjY6ImV4aXN0cyI7YjoxO3M6MTg6Indhc1JlY2VudGx5Q3JlYXRlZCI7YjowO3M6Mjg6IgAqAGVzY2FwZVdoZW5DYXN0aW5nVG9TdHJpbmciO2I6MDtzOjEzOiIAKgBhdHRyaWJ1dGVzIjthOjEyOntzOjI6ImlkIjtpOjE7czoxNToib3JnYW5pemF0aW9uX2lkIjtpOjE7czo0OiJuYW1lIjtzOjExOiJzdXBlci1hZG1pbiI7czoxMjoiZGlzcGxheV9uYW1lIjtzOjE5OiJTdXBlciBBZG1pbmlzdHJhdG9yIjtzOjExOiJkZXNjcmlwdGlvbiI7czozODoiTWVtaWxpa2kgYWtzZXMgcGVudWgga2Ugc2VsdXJ1aCBzaXN0ZW0iO3M6OToiaXNfc3lzdGVtIjtpOjE7czo5OiJpc19hY3RpdmUiO2k6MTtzOjEwOiJjcmVhdGVkX2F0IjtzOjE5OiIyMDI2LTA5LTA5IDE3OjA3OjQxIjtzOjEwOiJ1cGRhdGVkX2F0IjtzOjE5OiIyMDI2LTA5LTA5IDE3OjA3OjQxIjtzOjEwOiJkZWxldGVkX2F0IjtOO3M6MTA6ImNyZWF0ZWRfYnkiO047czoxMDoidXBkYXRlZF9ieSI7Tjt9czoxMToiACoAb3JpZ2luYWwiO2E6MTc6e3M6MjoiaWQiO2k6MTtzOjE1OiJvcmdhbml6YXRpb25faWQiO2k6MTtzOjQ6Im5hbWUiO3M6MTE6InN1cGVyLWFkbWluIjtzOjEyOiJkaXNwbGF5X25hbWUiO3M6MTk6IlN1cGVyIEFkbWluaXN0cmF0b3IiO3M6MTE6ImRlc2NyaXB0aW9uIjtzOjM4OiJNZW1pbGlraSBha3NlcyBwZW51aCBrZSBzZWx1cnVoIHNpc3RlbSI7czo5OiJpc19zeXN0ZW0iO2k6MTtzOjk6ImlzX2FjdGl2ZSI7aToxO3M6MTA6ImNyZWF0ZWRfYXQiO3M6MTk6IjIwMjYtMDktMDkgMTc6MDc6NDEiO3M6MTA6InVwZGF0ZWRfYXQiO3M6MTk6IjIwMjYtMDktMDkgMTc6MDc6NDEiO3M6MTA6ImRlbGV0ZWRfYXQiO047czoxMDoiY3JlYXRlZF9ieSI7TjtzOjEw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Ojk3MTA3NjEzO2E6Mzp7czo3OiJjb21tYW5kIjtzOjMzODoibWFrZTpjcnVkLXlhanJhIEFwcGxpY2FudCAtLWNvbHVtbnM9aWQsc2Nob29sX2lkLGFkbWlzc2lvbl9pZCxmdWxsX25hbWUsbmlrLGJpcnRoX3BsYWNlLGJpcnRoX2RhdGUsZ2VuZGVyLGFkZHJlc3MscGhvbmUsZW1haWwscGFyZW50X25hbWUscGFyZW50X3Bob25lLHBhcmVudF9lbWFpbCxwcmV2aW91c19zY2hvb2wscmVnaXN0cmF0aW9uX251bWJlcixzdGF0dXMsdGVzdF9zY29yZSxpbnRlcnZpZXdfc2NvcmUsdG90YWxfc2NvcmUscmFua2luZyxub3RlcyxyZWdpc3RlcmVkX2F0LGlzX2FjdGl2ZSxjcmVhdGVkX2F0LHVwZGF0ZWRfYXQsZGVsZXRlZF9hdCxjcmVhdGVkX2J5LHVwZGF0ZWRfYnkiO3M6Njoic3RhdHVzIjtzOjc6InJ1bm5pbmciO3M6MTA6InN0YXJ0ZWRfYXQiO086MjU6IklsbHVtaW5hdGVcU3VwcG9ydFxDYXJib24iOjM6e3M6NDoiZGF0ZSI7czoyNjoiMjAyNi0wOS0xNiAxNzozOTozNC40MjE0NzAiO3M6MTM6InRpbWV6b25lX3R5cGUiO2k6MztzOjg6InRpbWV6b25lIjtzOjM6IlVUQyI7fX19czozMjoiY3J1ZF9wcm9jZXNzX2NydWRfNmFhYWQ1MzAzNTMzNTkiO2E6MTp7aToxNTUyMzE3MjthOjM6e3M6NzoiY29tbWFuZCI7czoyMzI6Im1ha2U6Y3J1ZC15YWpyYSBBZG1pc3Npb24gLS1jb2x1bW5zPWlkLHNjaG9vbF9pZCxhY2FkZW1pY195ZWFyX2lkLGNsYXNzX2xldmVsX2lkLG5hbWUsY29kZSx0eXBlLHN0YXJ0X2RhdGUsZW5kX2RhdGUscXVvdGEscmVnaXN0cmF0aW9uX2ZlZSxtaW5fYWdlLG1heF9hZ2UscmVxdWlyZW1lbnRzLGlzX2FjdGl2ZSxjcmVhdGVkX2F0LHVwZGF0ZWRfYXQsZGVsZXRlZF9hdCxjcmVhdGVkX2J5LHVwZGF0ZWRfYnkiO3M6Njoic3RhdHVzIjtzOjc6InJ1bm5pbmciO3M6MTA6InN0YXJ0ZWRfYXQiO086MjU6IklsbHVtaW5hdGVcU3VwcG9ydFxDYXJib24iOjM6e3M6NDoiZGF0ZSI7czoyNjoiMjAyNi0wOS0xNiAxNzo0MzoxMi4yMTc5NzIiO3M6MTM6InRpbWV6b25lX3R5cGUiO2k6MztzOjg6InRpbWV6b25lIjtzOjM6IlVUQyI7fX19czozMjoiY3J1ZF9wcm9jZXNzX2NydWRfNmFhYWQ1Nzc5Mjk5YzQiO2E6MTp7aTo5MDgxOTk5NDthOjM6e3M6NzoiY29tbWFuZCI7czoyMDE6Im1ha2U6Y3J1ZC15YWpyYSBBZG1pc3Npb25TZWxlY3Rpb24gLS1jb2x1bW5zPWlkLGFkbWlzc2lvbl9pZCxhcHBsaWNhbnRfaWQsc2VsZWN0aW9uX3R5cGUsc2NvcmUscmVzdWx0LGV2YWx1YXRvcl9pZCxldmFsdWF0aW9uX2RhdGUsbm90ZXMsaXNfYWN0aXZlLGNyZWF0ZWRfYXQsdXBkYXRlZF9hdCxkZWxldGVkX2F0LGNyZWF0ZWRfYnksdXBkYXRlZF9ieSI7czo2OiJzdGF0dXMiO3M6NzoicnVubmluZyI7czoxMDoic3RhcnRlZF9hdCI7TzoyNToiSWxsdW1pbmF0ZVxTdXBwb3J0XENhcmJvbiI6Mzp7czo0OiJkYXRlIjtzOjI2OiIyMDI2LTA5LTE2IDE3OjQ0OjIzLjYwMDU1MCI7czoxMzoidGltZXpvbmVfdHlwZSI7aTozO3M6ODoidGltZXpvbmUiO3M6MzoiVVRDIjt9fX1zOjMyOiJjcnVkX3Byb2Nlc3NfY3J1ZF82YWFhZDVhNzEzMzhiMiI7YToxOntpOjc2ODYzNTUzO2E6Mzp7czo3OiJjb21tYW5kIjtzOjE4MDoibWFrZTpjcnVkLXlhanJhIEFkbWlzc2lvblRpbWVsaW5lIC0tY29sdW1ucz1pZCxhZG1pc3Npb25faWQscGhhc2VfbmFtZSxzdGFydF9kYXRlLGVuZF9kYXRlLGRlc2NyaXB0aW9uLG9yZGVyX251bWJlcixpc19hY3RpdmUsY3JlYXRlZF9hdCx1cGRhdGVkX2F0LGRlbGV0ZWRfYXQsY3JlYXRlZF9ieSx1cGRhdGVkX2J5IjtzOjY6InN0YXR1cyI7czo3OiJydW5uaW5nIjtzOjEwOiJzdGFydGVkX2F0IjtPOjI1OiJJbGx1bWluYXRlXFN1cHBvcnRcQ2FyYm9uIjozOntzOjQ6ImRhdGUiO3M6MjY6IjIwMjYtMDktMTYgMTc6NDU6MTEuMDc4Nzg5IjtzOjEzOiJ0aW1lem9uZV90eXBlIjtpOjM7czo4OiJ0aW1lem9uZSI7czozOiJVVEMiO319fXM6MzI6ImNydWRfcHJvY2Vzc19jcnVkXzZhYWFkNzE2MjgyMDg3IjthOjE6e2k6NTY4ODM3Nzk7YTozOntzOjc6ImNvbW1hbmQiO3M6MjI1OiJtYWtlOmNydWQteWFqcmEgQXBwbGljYXRpb25Eb2N1bWVudCAtLWNvbHVtbnM9aWQsYXBwbGljYW50X2lkLGRvY3VtZW50X3R5cGUsZG9jdW1lbnRfdXJsLGZpbGVfbmFtZSxmaWxlX3NpemUsdXBsb2FkZWRfYXQsdmVyaWZpZWQsdmVyaWZpZWRfYnksdmVyaWZpY2F0aW9uX25vdGVzLGlzX2FjdGl2ZSxjcmVhdGVkX2F0LHVwZGF0ZWRfYXQsZGVsZXRlZF9hdCxjcmVhdGVkX2J5LHVwZGF0ZWRfYnkiO3M6Njoic3RhdHVzIjtzOjc6InJ1bm5pbmciO3M6MTA6InN0YXJ0ZWRfYXQiO086MjU6IklsbHVtaW5hdGVcU3VwcG9ydFxDYXJib24iOjM6e3M6NDoiZGF0ZSI7czoyNjoiMjAyNi0wOS0xNiAxNzo1MToxOC4xNjQ1NjMiO3M6MTM6InRpbWV6b25lX3R5cGUiO2k6MztzOjg6InRpbWV6b25lIjtzOjM6IlVUQyI7fX19czozMjoiY3J1ZF9wcm9jZXNzX2NydWRfNmFhYWQ4OTMzMzY1YTIiO2E6MTp7aTozNzI5MDMxMTthOjM6e3M6NzoiY29tbWFuZCI7czoxNTQ6Im1ha2U6Y3J1ZC15YWpyYSBDbGFzc0xldmVsIC0tY29sdW1ucz1pZCxvcmdhbml6YXRpb25faWQsY29kZSxuYW1lLGxldmVsX29yZGVyLGRlc2NyaXB0aW9uLGlzX2FjdGl2ZSxjcmVhdGVkX2F0LHVwZGF0ZWRfYXQsZGVsZXRlZF9hdCxjcmVhdGVkX2J5LHVwZGF0ZWRfYnkiO3M6Njoic3RhdHVzIjtzOjc6InJ1bm5pbmciO3M6MTA6InN0YXJ0ZWRfYXQiO086MjU6IklsbHVtaW5hdGVcU3VwcG9ydFxDYXJib24iOjM6e3M6NDoiZGF0ZSI7czoyNjoiMjAyNi0wOS0xNiAxNzo1NzozOS4yMTA1OTQiO3M6MTM6InRpbWV6b25lX3R5cGUiO2k6MztzOjg6InRpbWV6b25lIjtzOjM6IlVUQyI7fX19czozMjoiY3J1ZF9wcm9jZXNzX2NydWRfNmFhYWRjNjA4MmQ3NDUiO2E6MTp7aToxMDMxNTY3ODthOjM6e3M6NzoiY29tbWFuZCI7czozNzU6Im1ha2U6Y3J1ZC15YWpyYSBUZXN0VHlwZSAtLWNvbHVtbnM9aWQsY29kZSxuYW1lLG5hbWVfZW4sc2x1ZyxkZXNjcmlwdGlvbixjYXRlZ29yeSxwYXJlbnRfaWQsaWNvbixjb2xvcixiYWRnZV9jbGFzcyxkZWZhdWx0X2R1cmF0aW9uX21pbnV0ZXMsZGVmYXVsdF9wYXNzaW5nX3Njb3JlLGRlZmF1bHRfbWF4X3Njb3JlLGRlZmF1bHRfd2VpZ2h0LGRlZmF1bHRfbWV0aG9kLHJlcXVpcmVzX3Jvb20scmVxdWlyZXNfc3VwZXJ2aXNvcixyZXF1aXJlc19jYnQsc2NvcmluZ19jb21wb25lbnRzLHNldHRpbmdzLG9yZGVyLGlzX2FjdGl2ZSxpc19zeXN0ZW0sc2Nob29sX2lkLGNyZWF0ZWRfYnksdXBkYXRlZF9ieSxjcmVhdGVkX2F0LHVwZGF0ZWRfYXQsZGVsZXRlZF9hdCI7czo2OiJzdGF0dXMiO3M6NzoicnVubmluZyI7czoxMDoic3RhcnRlZF9hdCI7TzoyNToiSWxsdW1pbmF0ZVxTdXBwb3J0XENhcmJvbiI6Mzp7czo0OiJkYXRlIjtzOjI2OiIyMDI2LTA5LTE2IDE4OjEzOjUyLjUzNTk3NyI7czoxMzoidGltZXpvbmVfdHlwZSI7aTozO3M6ODoidGltZXpvbmUiO3M6MzoiVVRDIjt9fX1zOjMyOiJjcnVkX3Byb2Nlc3NfY3J1ZF82YWFhZGQwMjIzMTlkMyI7YToxOntpOjExNDE5MzM3O2E6Mzp7czo3OiJjb21tYW5kIjtzOjY0ODoibWFrZTpjcnVkLXlhanJhIFRlc3RTY2hlZHVsZSAtLWNvbHVtbnM9aWQsYWRtaXNzaW9uX2lkLGFkbWlzc2lvbl9zZWxlY3Rpb25faWQsYWNhZGVtaWNfeWVhcl9pZCxzY2hvb2xfaWQsY29kZSxuYW1lLGRlc2NyaXB0aW9uLHRlc3RfdHlwZSx0ZXN0X21ldGhvZCx0ZXN0X2RhdGUsc3RhcnRfdGltZSxlbmRfdGltZSxkdXJhdGlvbl9taW51dGVzLHJlZ2lzdHJhdGlvbl9zdGFydCxyZWdpc3RyYXRpb25fZW5kLHJvb21faWQsYnVpbGRpbmdfaWQsbG9jYXRpb25fZGV0YWlsLG9ubGluZV9tZWV0aW5nX3VybCxvbmxpbmVfbWVldGluZ19pZCxvbmxpbmVfcGFzc3dvcmQsY2J0X3Nlc3Npb25faWQsZXhhbV9wYWNrYWdlX2lkLHF1b3RhLGJvb2tlZF9jb3VudCxtaW5fcGFydGljaXBhbnRzLHN1cGVydmlzb3JfaWQsY29vcmRpbmF0b3JfaWQscHJvY3Rvcl9pZHMsYWxsb3dfc2VsZl9yZWdpc3RlcixhbGxvd19yZXNjaGVkdWxlLGxhdGVfdG9sZXJhbmNlX21pbixzdGF0dXMsaXNfYWN0aXZlLHBhc3Npbmdfc2NvcmUsbWF4X3Njb3JlLHNjb3JlX2lucHV0X2RlYWRsaW5lLHJlc3VsdF9hbm5vdW5jZW1lbnQsbm90ZXMsYXR0YWNobWVudHMsc2V0dGluZ3MsY3JlYXRlZF9ieSx1cGRhdGVkX2J5LGNyZWF0ZWRfYXQsdXBkYXRlZF9hdCxkZWxldGVkX2F0IjtzOjY6InN0YXR1cyI7czo3OiJydW5uaW5nIjtzOjEwOiJzdGFydGVkX2F0IjtPOjI1OiJJbGx1bWluYXRlXFN1cHBvcnRcQ2FyYm9uIjozOntzOjQ6ImRhdGUiO3M6MjY6IjIwMjYtMDktMTYgMTg6MTY6MzQuMTQzODcyIjtzOjEzOiJ0aW1lem9uZV90eXBlIjtpOjM7czo4OiJ0aW1lem9uZSI7czozOiJVVEMiO319fX0=', 1789584178);
 
 -- ----------------------------
 -- Table structure for shift_rates
@@ -8898,6 +8945,124 @@ CREATE TABLE `teaching_loads`  (
 
 -- ----------------------------
 -- Records of teaching_loads
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for test_schedules
+-- ----------------------------
+DROP TABLE IF EXISTS `test_schedules`;
+CREATE TABLE `test_schedules`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `admission_id` bigint UNSIGNED NOT NULL,
+  `admission_selection_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `academic_year_id` bigint UNSIGNED NOT NULL,
+  `school_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `name` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
+  `test_type` enum('tulis','wawancara','praktek','kesehatan','psikotes','lainnya') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'tulis',
+  `test_method` enum('offline','online','hybrid') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'offline',
+  `test_date` date NOT NULL,
+  `start_time` time NOT NULL,
+  `end_time` time NOT NULL,
+  `duration_minutes` int UNSIGNED NULL DEFAULT NULL,
+  `registration_start` datetime NULL DEFAULT NULL,
+  `registration_end` datetime NULL DEFAULT NULL,
+  `room_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `building_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `location_detail` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `online_meeting_url` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `online_meeting_id` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `online_password` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `cbt_session_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `exam_package_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `quota` int UNSIGNED NOT NULL DEFAULT 0,
+  `booked_count` int UNSIGNED NOT NULL DEFAULT 0,
+  `min_participants` int UNSIGNED NULL DEFAULT 0,
+  `supervisor_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `coordinator_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `proctor_ids` json NULL,
+  `allow_self_register` tinyint(1) NOT NULL DEFAULT 0,
+  `allow_reschedule` tinyint(1) NOT NULL DEFAULT 0,
+  `late_tolerance_min` int UNSIGNED NULL DEFAULT 15,
+  `status` enum('draft','published','ongoing','completed','cancelled') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'draft',
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `passing_score` decimal(5, 2) NULL DEFAULT NULL,
+  `max_score` decimal(5, 2) NULL DEFAULT NULL,
+  `score_input_deadline` datetime NULL DEFAULT NULL,
+  `result_announcement` datetime NULL DEFAULT NULL,
+  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
+  `attachments` json NULL,
+  `settings` json NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `code`(`code`) USING BTREE,
+  INDEX `idx_admission`(`admission_id`) USING BTREE,
+  INDEX `idx_selection`(`admission_selection_id`) USING BTREE,
+  INDEX `idx_academic_year`(`academic_year_id`) USING BTREE,
+  INDEX `idx_test_date`(`test_date`, `start_time`) USING BTREE,
+  INDEX `idx_status`(`status`, `is_active`) USING BTREE,
+  INDEX `idx_test_type`(`test_type`) USING BTREE,
+  INDEX `idx_cbt_session`(`cbt_session_id`) USING BTREE,
+  INDEX `fk_test_schedules_room`(`room_id`) USING BTREE,
+  INDEX `fk_test_schedules_exam_package`(`exam_package_id`) USING BTREE
+) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of test_schedules
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for test_types
+-- ----------------------------
+DROP TABLE IF EXISTS `test_types`;
+CREATE TABLE `test_types`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `name` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `name_en` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `slug` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
+  `category` enum('akademik','non_akademik','kesehatan','administrasi','lainnya') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'akademik',
+  `parent_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `icon` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `color` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `badge_class` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `default_duration_minutes` int UNSIGNED NULL DEFAULT NULL,
+  `default_passing_score` decimal(5, 2) NULL DEFAULT NULL,
+  `default_max_score` decimal(5, 2) NULL DEFAULT NULL,
+  `default_weight` decimal(5, 2) NULL DEFAULT 100.00,
+  `default_method` enum('offline','online','hybrid') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'offline',
+  `requires_room` tinyint(1) NOT NULL DEFAULT 1,
+  `requires_supervisor` tinyint(1) NOT NULL DEFAULT 1,
+  `requires_cbt` tinyint(1) NOT NULL DEFAULT 0,
+  `scoring_components` json NULL,
+  `settings` json NULL,
+  `order` int UNSIGNED NULL DEFAULT 0,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `is_system` tinyint(1) NOT NULL DEFAULT 0,
+  `school_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `code`(`code`) USING BTREE,
+  UNIQUE INDEX `slug`(`slug`) USING BTREE,
+  INDEX `idx_code`(`code`) USING BTREE,
+  INDEX `idx_category`(`category`, `is_active`) USING BTREE,
+  INDEX `idx_parent`(`parent_id`) USING BTREE,
+  INDEX `idx_order`(`order`) USING BTREE,
+  INDEX `idx_school`(`school_id`) USING BTREE
+) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of test_types
 -- ----------------------------
 
 -- ----------------------------
