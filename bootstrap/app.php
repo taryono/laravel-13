@@ -12,10 +12,12 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->statefulApi();
         $middleware->alias([
             'superuser' => \App\Http\Middleware\EnsureSuperUser::class,
             'access'    => \App\Http\Middleware\AccessCheck::class,
             'acl'       => \App\Http\Middleware\AclMiddleware::class,
+            'proctor' => \App\Http\Middleware\Proctor::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

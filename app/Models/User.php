@@ -96,10 +96,16 @@ class User extends Authenticatable implements MustVerifyEmail
      public function hasRole($role)
     {
         $cacheKey = "user_{$this->id}_role_{$role}";
-        
-        return Cache::remember($cacheKey, 3600, function() use ($role) {
-            return $this->roles()->where('name', $role)->exists();
-        });
+        if(!is_array($role)){
+            return Cache::remember($cacheKey, 3600, function() use ($role) {
+                return $this->roles()->where('name', $role)->exists();
+            });
+        } else {
+            return Cache::remember($cacheKey, 3600, function() use ($role) {
+                return $this->roles()->whereIn('name', $role)->exists();
+            });
+
+        }
     }
 
     // Panggil saat role berubah
