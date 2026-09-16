@@ -114,4 +114,32 @@ class ProctoringApiController extends Controller
 
         return response()->json(['success' => true, 'proctoring' => $proctoring]);
     }
+
+    // app/Http/Controllers/Api/ProctoringApiController.php
+    public function analyzeFrame(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'session_id' => 'required|exists:cbt_sessions,id',
+            'frame'      => 'required|string', // base64 jpeg
+        ]);
+
+        // OPSI A: Kirim ke API eksternal (Face++ / AWS Rekognition)
+        // $result = Http::post('https://api.example.com/detect', ['image' => $request->frame]);
+
+        // OPSI B: Simpan cuplikan untuk ditinjau nanti
+        $path = 'proctoring/snapshots/' . $request->session_id . '_' . time() . '.jpg';
+        \Storage::put($path, base64_decode(str_replace('data:image/jpeg;base64,', '', $request->frame)));
+
+        // Catat bahwa bingkai telah disimpan untuk peninjauan
+        CbtActivityLog::create([
+            'session_id'    => $request->session_id,
+            'activity_type' => 'snapshot_captured',
+            'activity_data' => ['path' => $path, 'review_status' => 'pending'],
+            'severity'      => 'info',
+            'snapshot_url'  => \Storage::url($path),
+            'recorded_at'   => now(),
+        ]);
+
+        return response()->json(['saved' => true, 'path' => $path]);
+    }
 } 

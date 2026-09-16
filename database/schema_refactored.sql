@@ -3051,8 +3051,7 @@ CREATE TABLE `classrooms` (
     `class_level_id` BIGINT UNSIGNED NOT NULL,
     `name` VARCHAR(50) NOT NULL,
     `code` VARCHAR(20) NOT NULL,
-    `capacity` INT NULL DEFAULT 30,
-    `homeroom_teacher_id` BIGINT UNSIGNED NULL,
+    `capacity` INT NULL DEFAULT 30, 
     `academic_year_id` BIGINT UNSIGNED NOT NULL,
     `is_active` TINYINT(1) NULL DEFAULT 1,
     `created_at` TIMESTAMP NULL,
@@ -3071,6 +3070,54 @@ CREATE TABLE `classrooms` (
     CONSTRAINT `classrooms_level_fk` FOREIGN KEY (`class_level_id`) REFERENCES `class_levels` (`id`) ON DELETE RESTRICT,
     CONSTRAINT `classrooms_academic_year_fk` FOREIGN KEY (`academic_year_id`) REFERENCES `academic_years` (`id`) ON DELETE RESTRICT
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
+CREATE TABLE `homeroom_teachers` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `organization_id` BIGINT UNSIGNED NOT NULL,
+    `teacher_id` BIGINT UNSIGNED NOT NULL COMMENT 'Merujuk ke tabel teachers',
+    `classroom_id` BIGINT UNSIGNED NOT NULL COMMENT 'Merujuk ke tabel classrooms',
+    `academic_year_id` BIGINT UNSIGNED NOT NULL COMMENT 'Tahun ajaran penugasan',
+    `is_active` TINYINT(1) NOT NULL DEFAULT 1,
+    `assignment_date` DATE NULL COMMENT 'Tanggal ditunjuk sebagai wali kelas',
+    `end_date` DATE NULL COMMENT 'Tanggal berakhirnya tugas (jika diganti)',
+    `notes` VARCHAR(255) NULL COMMENT 'Catatan tambahan',
+    `created_at` TIMESTAMP NULL,
+    `updated_at` TIMESTAMP NULL,
+    `deleted_at` TIMESTAMP NULL,
+    `created_by` BIGINT UNSIGNED NULL,
+    `updated_by` BIGINT UNSIGNED NULL,
+
+    PRIMARY KEY (`id`),
+
+    -- Satu kelas dalam satu tahun ajaran hanya punya 1 wali kelas
+    UNIQUE INDEX `homeroom_class_year_unique` (`classroom_id`, `academic_year_id`),
+
+    -- Satu guru dalam satu tahun ajaran tidak duplikat di kelas yang sama
+    UNIQUE INDEX `homeroom_teacher_class_unique` (`teacher_id`, `classroom_id`, `academic_year_id`),
+
+    INDEX `idx_teacher_id` (`teacher_id`),
+    INDEX `idx_classroom_id` (`classroom_id`),
+    INDEX `idx_academic_year` (`academic_year_id`),
+    INDEX `idx_organization` (`organization_id`),
+    INDEX `idx_is_active` (`is_active`),
+
+    CONSTRAINT `hr_org_fk` 
+        FOREIGN KEY (`organization_id`) 
+        REFERENCES `organizations` (`id`) ON DELETE CASCADE,
+
+    CONSTRAINT `hr_teacher_fk` 
+        FOREIGN KEY (`teacher_id`) 
+        REFERENCES `teachers` (`id`) ON DELETE CASCADE,
+
+    CONSTRAINT `hr_classroom_fk` 
+        FOREIGN KEY (`classroom_id`) 
+        REFERENCES `classrooms` (`id`) ON DELETE CASCADE,
+
+    CONSTRAINT `hr_academic_year_fk` 
+        FOREIGN KEY (`academic_year_id`) 
+        REFERENCES `academic_years` (`id`) ON DELETE RESTRICT
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT='Penugasan wali kelas per tahun ajaran';
+
 
 -- 89. students
 CREATE TABLE `students` (
