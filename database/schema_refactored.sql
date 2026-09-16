@@ -2575,20 +2575,28 @@ CREATE TABLE `expense_payments` (
         CONSTRAINT `expense_payments_org_fk` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
+DROP TABLE IF EXISTS `tax_types`;
+CREATE TABLE `tax_types`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `organization_id` bigint NULL DEFAULT NULL,
+  `code` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` datetime NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `tax_types_code_unique`(`code`) USING BTREE
+) ENGINE = MyISAM AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+
 -- 70. tax_settings
 CREATE TABLE `tax_settings` (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     `organization_id` BIGINT UNSIGNED NOT NULL,
     `tax_code` VARCHAR(50) NOT NULL,
     `tax_name` VARCHAR(255) NOT NULL,
-    `tax_type` ENUM(
-        'pph21',
-        'pph23',
-        'pph25',
-        'ppn',
-        'ppnbm',
-        'other'
-    ) NOT NULL,
+    `tax_type_id` BIGINT UNSIGNED NOT NULL,
     `tax_rate` DECIMAL(7, 4) NOT NULL DEFAULT 0.0000,
     `min_amount` DECIMAL(15, 2) NULL,
     `max_amount` DECIMAL(15, 2) NULL,
@@ -2605,7 +2613,8 @@ CREATE TABLE `tax_settings` (
     UNIQUE INDEX `tax_settings_org_code_unique` (`organization_id`, `tax_code`),
     INDEX `tax_settings_is_active_index` (`is_active`),
     INDEX `tax_settings_deleted_at_index` (`deleted_at`),
-    CONSTRAINT `tax_settings_org_fk` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE CASCADE
+    CONSTRAINT `tax_settings_org_fk` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE ,
+    CONSTRAINT `tax_settings_org_tax_type_fk` FOREIGN KEY (`tax_type_id`) REFERENCES `tax_types` (`id`) ON DELETE ,
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
 -- 71. tax_liabilities
@@ -3086,33 +3095,25 @@ CREATE TABLE `homeroom_teachers` (
     `deleted_at` TIMESTAMP NULL,
     `created_by` BIGINT UNSIGNED NULL,
     `updated_by` BIGINT UNSIGNED NULL,
-
     PRIMARY KEY (`id`),
-
     -- Satu kelas dalam satu tahun ajaran hanya punya 1 wali kelas
     UNIQUE INDEX `homeroom_class_year_unique` (`classroom_id`, `academic_year_id`),
-
     -- Satu guru dalam satu tahun ajaran tidak duplikat di kelas yang sama
     UNIQUE INDEX `homeroom_teacher_class_unique` (`teacher_id`, `classroom_id`, `academic_year_id`),
-
     INDEX `idx_teacher_id` (`teacher_id`),
     INDEX `idx_classroom_id` (`classroom_id`),
     INDEX `idx_academic_year` (`academic_year_id`),
     INDEX `idx_organization` (`organization_id`),
     INDEX `idx_is_active` (`is_active`),
-
     CONSTRAINT `hr_org_fk` 
         FOREIGN KEY (`organization_id`) 
         REFERENCES `organizations` (`id`) ON DELETE CASCADE,
-
     CONSTRAINT `hr_teacher_fk` 
         FOREIGN KEY (`teacher_id`) 
         REFERENCES `teachers` (`id`) ON DELETE CASCADE,
-
     CONSTRAINT `hr_classroom_fk` 
         FOREIGN KEY (`classroom_id`) 
         REFERENCES `classrooms` (`id`) ON DELETE CASCADE,
-
     CONSTRAINT `hr_academic_year_fk` 
         FOREIGN KEY (`academic_year_id`) 
         REFERENCES `academic_years` (`id`) ON DELETE RESTRICT

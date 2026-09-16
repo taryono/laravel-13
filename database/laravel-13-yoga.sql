@@ -1925,17 +1925,7 @@ CREATE TABLE `cache`  (
   `expiration` int NOT NULL,
   PRIMARY KEY (`key`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
-
--- ----------------------------
--- Records of cache
--- ----------------------------
-INSERT INTO `cache` VALUES ('laravel-cache-acl-all-actions', 'O:29:\"Illuminate\\Support\\Collection\":2:{s:8:\"\0*\0items\";a:5:{i:1;s:9:\"user-view\";i:2;s:11:\"user-manage\";i:3;s:12:\"roles-manage\";i:4;s:12:\"profile-view\";i:5;s:12:\"profile-edit\";}s:28:\"\0*\0escapeWhenCastingToString\";b:0;}', 1789403447);
-INSERT INTO `cache` VALUES ('laravel-cache-acl-all-menus', 'O:29:\"Illuminate\\Support\\Collection\":2:{s:8:\"\0*\0items\";a:23:{i:1;s:9:\"dashboard\";i:2;s:6:\"master\";i:3;s:4:\"user\";i:4;s:5:\"roles\";i:5;s:7:\"profile\";i:6;s:4:\"menu\";i:7;s:16:\"module-generator\";i:9;s:23:\"academic-calendar-event\";i:10;s:15:\"account-mapping\";i:11;s:8:\"academic\";i:12;s:7:\"student\";i:13;s:13:\"academic-year\";i:14;s:14:\"reference-type\";i:15;s:15:\"reference-value\";i:16;s:6:\"period\";i:17;s:7:\"account\";i:18;s:11:\"tax-setting\";i:19;s:10:\"shift-swap\";i:20;s:9:\"referensi\";i:21;s:10:\"accounting\";i:22;s:16:\"expense-category\";i:23;s:16:\"account-category\";i:24;s:8:\"tax-type\";}s:28:\"\0*\0escapeWhenCastingToString\";b:0;}', 1789403447);
-INSERT INTO `cache` VALUES ('laravel-cache-formlib_cols_tax_types', 'O:8:\"stdClass\":6:{s:2:\"id\";O:8:\"stdClass\":7:{s:4:\"type\";s:15:\"bigint unsigned\";s:7:\"is_null\";s:2:\"NO\";s:3:\"key\";s:3:\"PRI\";s:7:\"default\";N;s:5:\"extra\";s:14:\"auto_increment\";s:10:\"privileges\";s:31:\"select,insert,update,references\";s:7:\"comment\";s:0:\"\";}s:15:\"organization_id\";O:8:\"stdClass\":7:{s:4:\"type\";s:6:\"bigint\";s:7:\"is_null\";s:3:\"YES\";s:3:\"key\";s:0:\"\";s:7:\"default\";N;s:5:\"extra\";s:0:\"\";s:10:\"privileges\";s:31:\"select,insert,update,references\";s:7:\"comment\";s:0:\"\";}s:4:\"code\";O:8:\"stdClass\":7:{s:4:\"type\";s:11:\"varchar(20)\";s:7:\"is_null\";s:2:\"NO\";s:3:\"key\";s:3:\"UNI\";s:7:\"default\";N;s:5:\"extra\";s:0:\"\";s:10:\"privileges\";s:31:\"select,insert,update,references\";s:7:\"comment\";s:0:\"\";}s:4:\"name\";O:8:\"stdClass\":7:{s:4:\"type\";s:12:\"varchar(191)\";s:7:\"is_null\";s:2:\"NO\";s:3:\"key\";s:0:\"\";s:7:\"default\";N;s:5:\"extra\";s:0:\"\";s:10:\"privileges\";s:31:\"select,insert,update,references\";s:7:\"comment\";s:0:\"\";}s:11:\"description\";O:8:\"stdClass\":7:{s:4:\"type\";s:12:\"varchar(191)\";s:7:\"is_null\";s:3:\"YES\";s:3:\"key\";s:0:\"\";s:7:\"default\";N;s:5:\"extra\";s:0:\"\";s:10:\"privileges\";s:31:\"select,insert,update,references\";s:7:\"comment\";s:0:\"\";}s:9:\"is_active\";O:8:\"stdClass\":7:{s:4:\"type\";s:10:\"tinyint(1)\";s:7:\"is_null\";s:2:\"NO\";s:3:\"key\";s:0:\"\";s:7:\"default\";s:1:\"1\";s:5:\"extra\";s:0:\"\";s:10:\"privileges\";s:31:\"select,insert,update,references\";s:7:\"comment\";s:0:\"\";}}', 1789404975);
-INSERT INTO `cache` VALUES ('laravel-cache-formlib_fields_tax_types', 'a:6:{i:0;s:2:\"id\";i:1;s:15:\"organization_id\";i:2;s:4:\"code\";i:3;s:4:\"name\";i:4;s:11:\"description\";i:5;s:9:\"is_active\";}', 1789404975);
-INSERT INTO `cache` VALUES ('laravel-cache-formlib_rel_organization', 'a:7:{i:1;s:16:\"Perusahaan Utama\";i:2;s:21:\"Kantor Cabang Jakarta\";i:3;s:22:\"Kantor Cabang Surabaya\";i:4;s:19:\"Kantor Cabang Medan\";i:5;s:12:\"Divisi Pusat\";i:6;s:18:\"Divisi Operasional\";i:7;s:29:\"Divisi Ekspor / Internasional\";}', 1789404975);
-INSERT INTO `cache` VALUES ('laravel-cache-user_1_role_manager', 'b:0;', 1789403462);
-INSERT INTO `cache` VALUES ('laravel-cache-user_1_role_special_role', 'b:0;', 1789403462);
+-- ---------------------------- 
 
 -- ----------------------------
 -- Table structure for cache_locks
@@ -2107,7 +2097,6 @@ CREATE TABLE `classrooms`  (
   `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `code` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `capacity` int NULL DEFAULT 30,
-  `homeroom_teacher_id` bigint UNSIGNED NULL DEFAULT NULL,
   `academic_year_id` bigint UNSIGNED NOT NULL,
   `is_active` tinyint(1) NULL DEFAULT 1,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -2118,8 +2107,7 @@ CREATE TABLE `classrooms`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `classrooms_org_code_unique`(`organization_id` ASC, `code` ASC) USING BTREE,
   INDEX `idx_classrooms_level`(`class_level_id` ASC) USING BTREE,
-  INDEX `idx_classrooms_academic_year`(`academic_year_id` ASC) USING BTREE,
-  INDEX `idx_classrooms_teacher`(`homeroom_teacher_id` ASC) USING BTREE,
+  INDEX `idx_classrooms_academic_year`(`academic_year_id` ASC) USING BTREE, 
   INDEX `idx_classrooms_is_active`(`is_active` ASC) USING BTREE,
   INDEX `idx_classrooms_deleted_at`(`deleted_at` ASC) USING BTREE,
   CONSTRAINT `classrooms_academic_year_fk` FOREIGN KEY (`academic_year_id`) REFERENCES `academic_years` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
@@ -2718,6 +2706,7 @@ CREATE TABLE `education_levels`  (
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
   `sort_order` int NOT NULL DEFAULT 0,
+  `level` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `is_active` tinyint(1) NOT NULL DEFAULT 1,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -4097,6 +4086,46 @@ CREATE TABLE `holidays`  (
 -- ----------------------------
 -- Records of holidays
 -- ----------------------------
+
+CREATE TABLE `homeroom_teachers` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `organization_id` BIGINT UNSIGNED NOT NULL,
+    `teacher_id` BIGINT UNSIGNED NOT NULL COMMENT 'Merujuk ke tabel teachers',
+    `classroom_id` BIGINT UNSIGNED NOT NULL COMMENT 'Merujuk ke tabel classrooms',
+    `academic_year_id` BIGINT UNSIGNED NOT NULL COMMENT 'Tahun ajaran penugasan',
+    `is_active` TINYINT(1) NOT NULL DEFAULT 1,
+    `assignment_date` DATE NULL COMMENT 'Tanggal ditunjuk sebagai wali kelas',
+    `end_date` DATE NULL COMMENT 'Tanggal berakhirnya tugas (jika diganti)',
+    `notes` VARCHAR(255) NULL COMMENT 'Catatan tambahan',
+    `created_at` TIMESTAMP NULL,
+    `updated_at` TIMESTAMP NULL,
+    `deleted_at` TIMESTAMP NULL,
+    `created_by` BIGINT UNSIGNED NULL,
+    `updated_by` BIGINT UNSIGNED NULL,
+    PRIMARY KEY (`id`),
+    -- Satu kelas dalam satu tahun ajaran hanya punya 1 wali kelas
+    UNIQUE INDEX `homeroom_class_year_unique` (`classroom_id`, `academic_year_id`),
+    -- Satu guru dalam satu tahun ajaran tidak duplikat di kelas yang sama
+    UNIQUE INDEX `homeroom_teacher_class_unique` (`teacher_id`, `classroom_id`, `academic_year_id`),
+    INDEX `idx_teacher_id` (`teacher_id`),
+    INDEX `idx_classroom_id` (`classroom_id`),
+    INDEX `idx_academic_year` (`academic_year_id`),
+    INDEX `idx_organization` (`organization_id`),
+    INDEX `idx_is_active` (`is_active`),
+    CONSTRAINT `hr_org_fk` 
+        FOREIGN KEY (`organization_id`) 
+        REFERENCES `organizations` (`id`) ON DELETE CASCADE,
+    CONSTRAINT `hr_teacher_fk` 
+        FOREIGN KEY (`teacher_id`) 
+        REFERENCES `teachers` (`id`) ON DELETE CASCADE,
+    CONSTRAINT `hr_classroom_fk` 
+        FOREIGN KEY (`classroom_id`) 
+        REFERENCES `classrooms` (`id`) ON DELETE CASCADE,
+    CONSTRAINT `hr_academic_year_fk` 
+        FOREIGN KEY (`academic_year_id`) 
+        REFERENCES `academic_years` (`id`) ON DELETE RESTRICT
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT='Penugasan wali kelas per tahun ajaran';
+
 
 -- ----------------------------
 -- Table structure for identity_types
@@ -8612,7 +8641,7 @@ CREATE TABLE `tax_settings`  (
   `tax_code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `tax_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `tax_type` enum('pph21','pph23','pph25','ppn','ppnbm','other') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  
+  `tax_type_id` bigint UNSIGNED NOT NULL,
   `tax_rate` decimal(12, 4) NOT NULL DEFAULT 0.0000,
   `min_amount` decimal(15, 2) NULL DEFAULT NULL,
   `max_amount` decimal(15, 2) NULL DEFAULT NULL,
@@ -8727,9 +8756,9 @@ CREATE TABLE `teachers`  (
   `organization_id` bigint UNSIGNED NOT NULL,
   `user_id` bigint UNSIGNED NULL DEFAULT NULL,
   `nip` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `full_name` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `specialization` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `education_level` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `education_level_id` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
   `join_date` date NULL DEFAULT NULL,
   `status` enum('ACTIVE','RESIGNED','RETIRED') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT 'ACTIVE',
   `created_at` timestamp NULL DEFAULT NULL,
