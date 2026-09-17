@@ -755,3 +755,26 @@ document.addEventListener('mousemove', (e) => {
 
     console.log('✅ Tooltip portal initialized');
 })();
+
+document.addEventListener('DOMContentLoaded', function () {
+    // Cari dropdown yang berisi #profileDropdown
+    const profileToggle = document.getElementById('profileDropdown');
+    if (!profileToggle) return;
+
+    const dropdown = profileToggle.closest('.dropdown');
+    const menu = dropdown.querySelector('.dropdown-menu');
+    const bsDropdown = bootstrap.Dropdown.getOrCreateInstance(profileToggle);
+
+    let hideTimer = null;
+
+    dropdown.addEventListener('mouseenter', function () {
+        clearTimeout(hideTimer);
+        bsDropdown.show();
+    });
+
+    dropdown.addEventListener('mouseleave', function () {
+        hideTimer = setTimeout(function () {
+            bsDropdown.hide();
+        }, 100);
+    });
+});

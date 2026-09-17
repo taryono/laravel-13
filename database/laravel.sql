@@ -3053,7 +3053,7 @@ CREATE TABLE `employees`  (
   `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `organization_id` bigint UNSIGNED NOT NULL,
   `nik` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `employee_number` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nip` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `user_id` bigint UNSIGNED NULL DEFAULT NULL,
   `department_id` bigint UNSIGNED NULL DEFAULT NULL,
   `position_id` bigint UNSIGNED NULL DEFAULT NULL,
@@ -8507,6 +8507,80 @@ CREATE TABLE `student_promotions`  (
 -- ----------------------------
 -- Records of student_promotions
 -- ----------------------------
+
+-- ----------------------------
+-- Table structure for student_ranges
+-- ----------------------------
+DROP TABLE IF EXISTS `promotion_batches`;
+CREATE TABLE promotion_batches (
+    id                      BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    code                    VARCHAR(50) NOT NULL UNIQUE,   -- "PROMO-2024-2025"
+    name                    VARCHAR(150) NOT NULL,         -- "Promosi Akhir Tahun 2024/2025"
+    from_academic_year_id   BIGINT UNSIGNED NOT NULL,
+    to_academic_year_id     BIGINT UNSIGNED NOT NULL,
+    total_students          INT UNSIGNED DEFAULT 0,
+    processed_count         INT UNSIGNED DEFAULT 0,
+    promoted_count          INT UNSIGNED DEFAULT 0,
+    retained_count          INT UNSIGNED DEFAULT 0,
+    graduated_count         INT UNSIGNED DEFAULT 0,
+    status                  ENUM('draft','processing','completed','cancelled') 
+                            NOT NULL DEFAULT 'draft',
+    started_at              DATETIME NULL,
+    completed_at            DATETIME NULL,
+    created_by              BIGINT UNSIGNED NULL,
+    created_at              TIMESTAMP NULL,
+    updated_at              TIMESTAMP NULL,
+    
+    FOREIGN KEY (from_academic_year_id) REFERENCES academic_years(id),
+    FOREIGN KEY (to_academic_year_id) REFERENCES academic_years(id)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Table structure for promotion_criteria
+-- ----------------------------
+DROP TABLE IF EXISTS `promotion_criteria`;
+CREATE TABLE promotion_criteria (
+    id                      BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    academic_year_id        BIGINT UNSIGNED NOT NULL,
+    class_level_id          BIGINT UNSIGNED NULL,          -- kriteria per tingkat (nullable = semua)
+    
+    min_final_score         DECIMAL(5,2) NULL,             -- 70.00
+    min_attendance_rate     DECIMAL(5,2) NULL,             -- 80.00
+    min_behavior_score      DECIMAL(5,2) NULL,             -- 75.00
+    max_failed_subjects     INT UNSIGNED DEFAULT 0,        -- maksimal mapel yang remedial
+    
+    auto_promote            BOOLEAN DEFAULT TRUE,          -- otomatis naik kalau memenuhi?
+    allow_manual_override   BOOLEAN DEFAULT TRUE,
+    
+    notes                   TEXT NULL,
+    is_active               BOOLEAN DEFAULT TRUE,
+    created_at              TIMESTAMP NULL,
+    updated_at              TIMESTAMP NULL,
+    
+    FOREIGN KEY (academic_year_id) REFERENCES academic_years(id),
+    FOREIGN KEY (class_level_id) REFERENCES class_levels(id)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Table structure for promotion_approvals
+-- ----------------------------
+DROP TABLE IF EXISTS `promotion_approvals`;
+CREATE TABLE promotion_approvals (
+    id                      BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    promotion_id            BIGINT UNSIGNED NOT NULL,
+    approver_id             BIGINT UNSIGNED NOT NULL,      -- user yang approve
+    approver_role           VARCHAR(50) NOT NULL,          -- "wali_kelas", "kepsek"
+    approval_level          INT UNSIGNED DEFAULT 1,        -- urutan approval
+    status                  ENUM('pending','approved','rejected') 
+                            NOT NULL DEFAULT 'pending',
+    notes                   TEXT NULL,
+    approved_at             DATETIME NULL,
+    created_at              TIMESTAMP NULL,
+    updated_at              TIMESTAMP NULL,
+    
+    FOREIGN KEY (promotion_id) REFERENCES student_promotions(id) ON DELETE CASCADE
+    
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Table structure for student_ranges

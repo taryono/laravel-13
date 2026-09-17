@@ -161,8 +161,8 @@ Tabel-tabel baru telah dibuatkan skrip modular di dalam direktori [database/ente
 
 ### 3. File Patch Upgrade Siap Pakai
 
--   **[database/enterprise_upgrade_patch.sql](file:///c:/wamp64/www/laravel-13/database/enterprise_upgrade_patch.sql)**:
-    Skrip migrasi langsung yang dapat dieksekusi di database MySQL / Navicat yang sudah berjalan tanpa perlu menghapus database (_non-destructive_).
+- **[database/enterprise_upgrade_patch.sql](file:///c:/wamp64/www/laravel-13/database/enterprise_upgrade_patch.sql)**:
+  Skrip migrasi langsung yang dapat dieksekusi di database MySQL / Navicat yang sudah berjalan tanpa perlu menghapus database (_non-destructive_).
 
 ---
 
@@ -185,3 +185,40 @@ Total tables parsed: 306
 ```
 
 Semua relasi antar tabel (foreign key), indeks komposit, dan tipe data telah terverifikasi 100% konsisten dan valid untuk MySQL 8.0+.
+
+1. Admin buat batch promosi (promotion_batches)
+   ↓
+2. Sistem generate draft promosi untuk semua siswa aktif
+    - Hitung nilai akhir, kehadiran
+    - Bandingkan dengan promotion_criteria
+    - Set promotion_status: promoted/retained/graduated
+      ↓
+3. Admin review & bisa override manual (student_promotions)
+    - Ubah status siswa tertentu
+    - Tambah catatan
+      ↓
+4. Submit untuk approval (promotion_approvals)
+    - Wali kelas approve
+    - Kepala sekolah approve
+      ↓
+5. Setelah approved → FINALIZE:
+    - Update student_classrooms (tutup lama, buat baru)
+    - Update students.class_level (jika ada kolom)
+    - Kalau graduated → update students.status = 'alumni'
+      ↓
+6. Generate laporan promosi
+
+;
+🔗 Relasi Antar Tabel Kurikuler
+
+
+p5_themes ─────┐
+               ↓
+p5_dimensions ─┼──→ p5_projects ──┬──→ p5_project_dimensions ──→ p5_dimensions
+               ↓                  │
+p5_elements ───┘                  ├──→ p5_groups ──→ p5_group_members ──→ students
+                                  │
+                                  └──→ p5_assessments ──→ p5_assessment_details
+                                            ↓                    ↓
+                                        students          p5_dimensions
+                                                          p5_elements
