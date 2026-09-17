@@ -184,7 +184,7 @@ async function handleMenuRolesSubmit(e) {
             successMessage: 'Role untuk menu berhasil disimpan.',
         });
         menuRolesModal.hide();
-        window.location.reload(); // supaya badge role di tree ikut ter-update
+        // window.location.reload(); // supaya badge role di tree ikut ter-update
     } catch (e) {
         // handleAjaxError sudah menampilkan pesan validasi
     }

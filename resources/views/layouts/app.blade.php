@@ -42,6 +42,7 @@
     {{-- Custom Styles --}}
     <link rel="stylesheet" href="{{ asset('assets/css/general.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/menu.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/connector-line-menu.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/custom-datatable.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/modal.css') }}">
     @stack('styles')

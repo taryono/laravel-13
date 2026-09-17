@@ -21,7 +21,8 @@
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Indonesia</label>
-                        <input type="text" class="form-control" name="id_text" id="id_text" placeholder="Judul indonesia">
+                        <input type="text" class="form-control" name="id_text" id="id_text"
+                            placeholder="Judul indonesia">
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">English</label>

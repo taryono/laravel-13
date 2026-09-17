@@ -1,32 +1,29 @@
 <?php
-
-
 if (!function_exists('isSuperUser')) {
     function isSuperUser()
     {
         return session()->get('user_auth.login_as') == "super-admin";
-    
     }
 }
 
 if (!function_exists('say')) {
     function say($text)
     {
-        return $text;    
+        return $text;
     }
 }
 
 if (!function_exists('getkDarkMode')) {
     function getkDarkMode()
     {
-        return  false;    
+        return  false;
     }
 }
 
 if (!function_exists('renderFields')) {
     function renderFields()
     {
-        return  [];    
+        return  [];
     }
 }
 
@@ -39,7 +36,7 @@ if (!function_exists('submit')) {
         unset($attributes['class']);
 
         $attrString = collect($attributes)
-            ->map(fn ($value, $key) => e($key) . '="' . e($value) . '"')
+            ->map(fn($value, $key) => e($key) . '="' . e($value) . '"')
             ->implode(' ');
 
         return '<button type="submit" class="' . e($class) . '" ' . $attrString . '>' . e($label) . '</button>';
@@ -63,7 +60,7 @@ if (!function_exists('cancel')) {
         unset($attributes['url']);
 
         $attrString = collect($attributes)
-            ->map(fn ($value, $key) => e($key) . '="' . e($value) . '"')
+            ->map(fn($value, $key) => e($key) . '="' . e($value) . '"')
             ->implode(' ');
 
         if ($url) {
@@ -72,26 +69,26 @@ if (!function_exists('cancel')) {
 
         return '<button type="button" class="' . e($class) . '" data-bs-dismiss="modal" ' . $attrString . '>' . e($label) . '</button>';
     }
-} 
+}
 
 if (!function_exists('generateExpenseNumber')) {
     function generateExpenseNumber()
     {
         $year = date('Y');
         $month = date('m');
-        
-        $lastExpense = \App\Models\Expense::whereYear('created_at', $year)
+
+        $lastExpense = \Models\Expense::whereYear('created_at', $year)
             ->whereMonth('created_at', $month)
             ->orderBy('id', 'desc')
             ->first();
-            
+
         if ($lastExpense) {
             $lastNumber = intval(substr($lastExpense->expense_number, -4));
             $sequence = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
         } else {
             $sequence = '0001';
         }
-        
+
         return "EXP-{$year}{$month}-{$sequence}";
     }
 }

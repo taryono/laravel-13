@@ -220,7 +220,7 @@ body.dark-mode {
 }
 
 .profile-dropdown-item .material-symbols-outlined {
-    font-size: 18px;
+    font-size: 10px;
     color: var(--bnsp-text-muted);
 }
 
@@ -368,14 +368,8 @@ body.dark-mode {
 
 .material-symbols-outlined {
     font-variation-settings: 'wght' 400, 'FILL' 0;
-    /* nilai default */
-    font-size: 20px;
     /* ukuran dasar */
     vertical-align: middle;
-}
-
-.material-symbols-outlined {
-    font-size: 10px;
 }
 
 /* Pastikan dropdown Select2 di atas modal */
@@ -395,4 +389,8 @@ body.dark-mode {
 /* Fix untuk select2 di dalam modal */
 .modal .select2-container--open .select2-dropdown {
     z-index: 9999 !important;
+}
+
+.material-symbols-outlined {
+    font-size: 10px !important;
 }

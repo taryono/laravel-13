@@ -8566,7 +8566,7 @@ DROP TABLE IF EXISTS `tax_liabilities`;
 CREATE TABLE `tax_liabilities`  (
   `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `organization_id` bigint UNSIGNED NOT NULL,
-  `tax_type` enum('pph21','pph23','pph25','ppn','ppnbm','other') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `tax_type_id` bigint UNSIGNED NOT NULL,
   `tax_period` varchar(7) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `tax_amount` decimal(15, 2) NOT NULL DEFAULT 0.00,
   `paid_amount` decimal(15, 2) NOT NULL DEFAULT 0.00,
@@ -8640,7 +8640,6 @@ CREATE TABLE `tax_settings`  (
   `organization_id` bigint UNSIGNED NOT NULL,
   `tax_code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `tax_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `tax_type` enum('pph21','pph23','pph25','ppn','ppnbm','other') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `tax_type_id` bigint UNSIGNED NOT NULL,
   `tax_rate` decimal(12, 4) NOT NULL DEFAULT 0.0000,
   `min_amount` decimal(15, 2) NULL DEFAULT NULL,
@@ -8812,6 +8811,177 @@ CREATE TABLE `teaching_loads`  (
 -- ----------------------------
 -- Records of teaching_loads
 -- ----------------------------
+
+CREATE TABLE test_schedules (
+    id                  BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    
+    -- Relasi
+    admission_id        BIGINT UNSIGNED NOT NULL,          -- FK ke admissions (gelombang PPDB)
+    admission_selection_id BIGINT UNSIGNED NULL,           -- FK opsional ke admission_selections
+    academic_year_id    BIGINT UNSIGNED NOT NULL,          -- FK ke academic_years
+    school_id           BIGINT UNSIGNED NULL,              -- kalau multi-tenant
+    
+    -- Info Dasar
+    code                VARCHAR(50) NOT NULL UNIQUE,       -- "TES-TULIS-2025-01"
+    name                VARCHAR(150) NOT NULL,             -- "Tes Tulis Gelombang 1 - Sesi A"
+    description         TEXT NULL,
+    
+    -- Jenis & Metode Tes
+    test_type           ENUM('tulis','wawancara','praktek','kesehatan','psikotes','lainnya') 
+                        NOT NULL DEFAULT 'tulis',
+    test_method         ENUM('offline','online','hybrid') 
+                        NOT NULL DEFAULT 'offline',
+    
+    -- Jadwal & Waktu
+    test_date           DATE NOT NULL,                     -- tanggal pelaksanaan
+    start_time          TIME NOT NULL,                     -- jam mulai
+    end_time            TIME NOT NULL,                     -- jam selesai
+    duration_minutes    INT UNSIGNED NULL,                 -- durasi (auto dari start-end)
+    registration_start  DATETIME NULL,                     -- kapan pendaftaran slot dibuka
+    registration_end    DATETIME NULL,                     -- kapan pendaftaran slot ditutup
+    
+    -- Lokasi
+    room_id             BIGINT UNSIGNED NULL,              -- FK ke rooms (kalau offline)
+    building_id         BIGINT UNSIGNED NULL,              -- FK ke buildings
+    location_detail     VARCHAR(255) NULL,                 -- "Gedung A Lt. 2 Ruang 201"
+    online_meeting_url  VARCHAR(500) NULL,                 -- Zoom/Meet (kalau online)
+    online_meeting_id   VARCHAR(100) NULL,
+    online_password     VARCHAR(100) NULL,
+    
+    -- CBT Integration (kalau tes online via CBT)
+    cbt_session_id      BIGINT UNSIGNED NULL,              -- FK ke cbt_sessions
+    exam_package_id     BIGINT UNSIGNED NULL,              -- FK ke exam_packages
+    
+    -- Kapasitas & Kuota
+    quota               INT UNSIGNED NOT NULL DEFAULT 0,   -- 0 = unlimited
+    booked_count        INT UNSIGNED NOT NULL DEFAULT 0,   -- cached count
+    min_participants    INT UNSIGNED DEFAULT 0,            -- minimal peserta agar tes jalan
+    
+    -- Pengawas & Panitia
+    supervisor_id       BIGINT UNSIGNED NULL,              -- FK ke employees/users
+    coordinator_id      BIGINT UNSIGNED NULL,              -- penanggung jawab
+    proctor_ids         JSON NULL,                         -- array ID pengawas tambahan
+    
+    -- Pengaturan Peserta
+    allow_self_register BOOLEAN NOT NULL DEFAULT FALSE,    -- peserta pilih sendiri?
+    allow_reschedule    BOOLEAN NOT NULL DEFAULT FALSE,    -- boleh reschedule?
+    late_tolerance_min  INT UNSIGNED DEFAULT 15,           -- toleransi keterlambatan (menit)
+    
+    -- Status
+    status              ENUM('draft','published','ongoing','completed','cancelled') 
+                        NOT NULL DEFAULT 'draft',
+    is_active           BOOLEAN NOT NULL DEFAULT TRUE,
+    
+    -- Hasil & Nilai
+    passing_score       DECIMAL(5,2) NULL,                 -- nilai minimum lulus
+    max_score           DECIMAL(5,2) NULL,                 -- nilai maksimum
+    score_input_deadline DATETIME NULL,                    -- batas input nilai
+    result_announcement DATETIME NULL,                     -- kapan hasil diumumkan
+    
+    -- Metadata
+    notes               TEXT NULL,                         -- catatan internal
+    attachments         JSON NULL,                         -- file pendukung (prosedur, dll)
+    settings            JSON NULL,                         -- konfigurasi fleksibel
+    
+    -- Audit
+    created_by          BIGINT UNSIGNED NULL,
+    updated_by          BIGINT UNSIGNED NULL,
+    created_at          TIMESTAMP NULL,
+    updated_at          TIMESTAMP NULL,
+    deleted_at          TIMESTAMP NULL,                    -- soft delete
+    
+    -- Indexes
+    INDEX idx_admission (admission_id),
+    INDEX idx_selection (admission_selection_id),
+    INDEX idx_academic_year (academic_year_id),
+    INDEX idx_test_date (test_date, start_time),
+    INDEX idx_status (status, is_active),
+    INDEX idx_test_type (test_type),
+    INDEX idx_cbt_session (cbt_session_id),
+    
+    -- Foreign Keys
+    CONSTRAINT fk_test_schedules_admission 
+        FOREIGN KEY (admission_id) REFERENCES admissions(id) ON DELETE CASCADE,
+    CONSTRAINT fk_test_schedules_selection 
+        FOREIGN KEY (admission_selection_id) REFERENCES admission_selections(id) ON DELETE SET NULL,
+    CONSTRAINT fk_test_schedules_academic_year 
+        FOREIGN KEY (academic_year_id) REFERENCES academic_years(id) ON DELETE RESTRICT,
+    CONSTRAINT fk_test_schedules_room 
+        FOREIGN KEY (room_id) REFERENCES rooms(id) ON DELETE SET NULL,
+    CONSTRAINT fk_test_schedules_cbt_session 
+        FOREIGN KEY (cbt_session_id) REFERENCES cbt_sessions(id) ON DELETE SET NULL,
+    CONSTRAINT fk_test_schedules_exam_package 
+        FOREIGN KEY (exam_package_id) REFERENCES exam_packages(id) ON DELETE SET NULL
+);
+
+CREATE TABLE test_types (
+    id                  BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    
+    -- Identitas
+    code                VARCHAR(50) NOT NULL UNIQUE,       -- "tulis", "wawancara", "psikotes"
+    name                VARCHAR(150) NOT NULL,             -- "Tes Tulis"
+    name_en             VARCHAR(150) NULL,                 -- "Written Test" (opsional)
+    slug                VARCHAR(150) NOT NULL UNIQUE,      -- "tes-tulis"
+    description         TEXT NULL,
+    
+    -- Kategorisasi
+    category            ENUM('akademik','non_akademik','kesehatan','administrasi','lainnya')
+                        NOT NULL DEFAULT 'akademik',
+    parent_id           BIGINT UNSIGNED NULL,              -- untuk sub-jenis (hierarchical)
+    
+    -- Visual
+    icon                VARCHAR(100) NULL,                 -- "bi-pencil-square"
+    color               VARCHAR(20) NULL,                  -- "#3b82f6" (hex)
+    badge_class         VARCHAR(50) NULL,                  -- "badge-primary" (Bootstrap)
+    
+    -- Pengaturan Default
+    default_duration_minutes INT UNSIGNED NULL,            -- 90 menit
+    default_passing_score    DECIMAL(5,2) NULL,            -- 70.00
+    default_max_score        DECIMAL(5,2) NULL,            -- 100.00
+    default_weight           DECIMAL(5,2) DEFAULT 100.00,  -- bobot dalam seleksi
+    
+    -- Mode Pelaksanaan
+    default_method      ENUM('offline','online','hybrid') 
+                        NOT NULL DEFAULT 'offline',
+    requires_room       BOOLEAN NOT NULL DEFAULT TRUE,     -- butuh ruangan?
+    requires_supervisor BOOLEAN NOT NULL DEFAULT TRUE,     -- butuh pengawas?
+    requires_cbt        BOOLEAN NOT NULL DEFAULT FALSE,    -- pakai CBT?
+    
+    -- Komponen Penilaian (JSON fleksibel)
+    -- Contoh: {"komponen": ["pengetahuan", "logika", "bahasa"], "skala": "0-100"}
+    scoring_components  JSON NULL,
+    
+    -- Konfigurasi tambahan
+    settings            JSON NULL,
+    
+    -- Status & Urutan
+    order               INT UNSIGNED DEFAULT 0,
+    is_active           BOOLEAN NOT NULL DEFAULT TRUE,
+    is_system           BOOLEAN NOT NULL DEFAULT FALSE,    -- TRUE = tidak bisa dihapus user
+    
+    -- Multi-tenant (kalau ada)
+    school_id           BIGINT UNSIGNED NULL,
+    
+    -- Audit
+    created_by          BIGINT UNSIGNED NULL,
+    updated_by          BIGINT UNSIGNED NULL,
+    created_at          TIMESTAMP NULL,
+    updated_at          TIMESTAMP NULL,
+    deleted_at          TIMESTAMP NULL,                    -- soft delete
+    
+    -- Indexes
+    INDEX idx_code (code),
+    INDEX idx_category (category, is_active),
+    INDEX idx_parent (parent_id),
+    INDEX idx_order (order),
+    INDEX idx_school (school_id),
+    
+    -- Foreign Keys
+    CONSTRAINT fk_test_types_parent 
+        FOREIGN KEY (parent_id) REFERENCES test_types(id) ON DELETE SET NULL,
+    CONSTRAINT fk_test_types_school 
+        FOREIGN KEY (school_id) REFERENCES schools(id) ON DELETE CASCADE
+);
 
 -- ----------------------------
 -- Table structure for timetable_constraints

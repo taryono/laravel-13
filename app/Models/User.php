@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-use App\Notifications\VerifyEmail;
-use App\Notifications\ResetPasswordNotification;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -11,7 +9,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\HasApiTokens;
 // use Spatie\Permission\Traits\HasRoles;
 
@@ -40,8 +37,8 @@ class User extends Authenticatable implements MustVerifyEmail
     public function roles()
     {
         return $this->belongsToMany(\Models\Role::class, 'role_user')
-                    ->withPivot('is_default')
-                    ->withTimestamps();
+            ->withPivot('is_default')
+            ->withTimestamps();
     }
 
     // --- Cek Peran ---
@@ -55,21 +52,24 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
 
-    public function isAdmin()     { return $this->hasRole('admin'); }
+    public function isAdmin()
+    {
+        return $this->hasRole('admin');
+    }
 
     // --- Fungsi Bantu ---
     public function authorizeRoles($roles)
     {
         if ($this->isSuperUser()) return true;
-        
-        $hasRole = is_array($roles) 
-            ? $this->hasAnyRole($roles) 
+
+        $hasRole = is_array($roles)
+            ? $this->hasAnyRole($roles)
             : $this->hasRole($roles);
-        
+
         if (!$hasRole) {
             abort(403, 'Anda tidak memiliki akses ke halaman ini.');
         }
-        
+
         return true;
     }
 
@@ -93,18 +93,17 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     // Atau pakai cache dengan tag (Redis/Memcached)
-     public function hasRole($role)
+    public function hasRole($role)
     {
         $cacheKey = "user_{$this->id}_role_{$role}";
-        if(!is_array($role)){
-            return Cache::remember($cacheKey, 3600, function() use ($role) {
+        if (!is_array($role)) {
+            return Cache::remember($cacheKey, 3600, function () use ($role) {
                 return $this->roles()->where('name', $role)->exists();
             });
         } else {
-            return Cache::remember($cacheKey, 3600, function() use ($role) {
+            return Cache::remember($cacheKey, 3600, function () use ($role) {
                 return $this->roles()->whereIn('name', $role)->exists();
             });
-
         }
     }
 
@@ -112,7 +111,7 @@ class User extends Authenticatable implements MustVerifyEmail
     public function syncRoles(...$roles)
     {
         parent::syncRoles($roles);
-        
+
         // Hapus semua cache yang berkaitan dengan user ini
         $cacheKeys = [
             "user_{$this->id}_role_admin",
@@ -120,11 +119,11 @@ class User extends Authenticatable implements MustVerifyEmail
             "user_{$this->id}_role_special_role",
             // Tambahkan semua role yang mungkin
         ];
-        
+
         foreach ($cacheKeys as $key) {
             Cache::forget($key);
         }
-        
+
         // Atau lebih simple: flush semua cache user
         // Cache::forget("user_{$this->id}_role_*"); // Tidak support wildcard
     }
@@ -142,11 +141,23 @@ class User extends Authenticatable implements MustVerifyEmail
             'origin_role'   => $role,
         ]);
         session()->put('role_ids', $roles->pluck('id'));
-    } 
-    public function isMale()     { return $this->sex == "L"; }
-    public function isFemale()   { return $this->sex == "P"; }
-    public function gender()     { return $this->sex == "P" ? "Perempuan" : "Laki-laki"; }
-    public function whatsapp()   { return $this->cellphone; }
+    }
+    public function isMale()
+    {
+        return $this->sex == "L";
+    }
+    public function isFemale()
+    {
+        return $this->sex == "P";
+    }
+    public function gender()
+    {
+        return $this->sex == "P" ? "Perempuan" : "Laki-laki";
+    }
+    public function whatsapp()
+    {
+        return $this->cellphone;
+    }
 
     protected function email(): Attribute
     {
@@ -156,7 +167,7 @@ class User extends Authenticatable implements MustVerifyEmail
         );
     }
 
-     protected static function booted()
+    protected static function booted()
     {
         static::deleted(function ($user) {
             $user->clearRoleCache();
@@ -174,15 +185,12 @@ class User extends Authenticatable implements MustVerifyEmail
         });
     }
 
-    public function sendEmailVerificationNotification() { $this->notify(new VerifyEmail); }
-    public function sendPasswordResetNotification($token) { $this->notify(new ResetPasswordNotification($token)); }
-
     public function organizations()
-    { 
+    {
         return $this->belongsToMany(\Models\Organization::class, 'organization_user')
-                    ->withPivot('is_default', 'is_active')
-                    ->wherePivot('is_active', 1)
-                    ->withTimestamps();       
+            ->withPivot('is_default', 'is_active')
+            ->wherePivot('is_active', 1)
+            ->withTimestamps();
     }
 
     public function organizationIds(): array
