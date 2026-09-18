@@ -253,6 +253,8 @@ sidebar.querySelectorAll('.bnsp-nav-link:not(.bnsp-nav-parent)').forEach(link =>
     });
 }); 
 document.querySelectorAll('button, a').forEach(el => {
+     // Skip dropdown toggle & item dropdown
+    if (el.closest('.dropdown') || el.hasAttribute('data-bs-toggle')) return;
     el.addEventListener('click', function () {
         const ripple = document.createElement('div');
         ripple.style.position = 'absolute';
@@ -282,22 +284,19 @@ function updateNotificationBadge(change) {
     badge.textContent = current;
     if (current === 0) badge.style.display = 'none';
 }
- 
-// document.addEventListener('click', (e) => {
-//     if (!e.target.closest('.dropdown')) {
-//         document.querySelectorAll('.dropdown-menu.show').forEach(menu => {
-//             menu.classList.remove('show');
-//         });
-//     }
-//     if (!e.target.closest('.bnsp-nav-item')) {
-//         document.querySelectorAll('.bnsp-nav-item.open').forEach(item => {
-//             item.classList.remove('open');
-//         });
-//     }
-// }); 
-
+  
 document.addEventListener('click', (e) => {
     if (!e.target || typeof e.target.closest !== 'function') return;
+
+    // ✅ Skip kalau klik di dropdown topbar — biar Bootstrap handle
+    if (e.target.closest('.dropdown')) {
+        // tetap boleh tutup nav-item
+        document.querySelectorAll('.bnsp-nav-item.open').forEach(item => {
+            item.classList.remove('open');
+        });
+        return;
+    }
+
     // JANGAN tutup kalau klik di dalam nav-item — biarkan toggle() berjalan dulu
     if (!e.target.closest('.bnsp-nav-item')) {
         document.querySelectorAll('.bnsp-nav-item.open').forEach(item => {
@@ -755,3 +754,48 @@ document.addEventListener('mousemove', (e) => {
 
     console.log('✅ Tooltip portal initialized');
 })();
+
+document.querySelector('#profileDropdown')?.addEventListener('click', () => {
+    console.log('Profile dropdown clicked');
+});
+
+document.querySelectorAll('.bnsp-topbar .dropdown').forEach(function (dropdown) {
+    let hoverTimeout = null;
+    const toggle = dropdown.querySelector('[data-bs-toggle="dropdown"]');
+    const menu = dropdown.querySelector('.dropdown-menu');
+    if (!toggle || !menu) return;
+
+    // Buat instance Bootstrap Dropdown manual (biar konsisten)
+    const bsDropdown = bootstrap.Dropdown.getOrCreateInstance(toggle);
+
+    function openDropdown() {
+        clearTimeout(hoverTimeout);
+        bsDropdown.show();
+    }
+
+    function closeDropdown() {
+        hoverTimeout = setTimeout(function () {
+            bsDropdown.hide();
+        }, 150); // delay 150ms
+    }
+
+    // Hover di tombol
+    dropdown.addEventListener('mouseenter', openDropdown);
+    dropdown.addEventListener('mouseleave', closeDropdown);
+
+    // Kalau mouse masuk lagi sebelum delay habis, batalkan close
+    dropdown.addEventListener('mouseenter', function () {
+        clearTimeout(hoverTimeout);
+    });
+
+    // Klik tetap jalan (untuk mobile / aksesibilitas)
+    toggle.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (menu.classList.contains('show')) {
+            bsDropdown.hide();
+        } else {
+            bsDropdown.show();
+        }
+    });
+});

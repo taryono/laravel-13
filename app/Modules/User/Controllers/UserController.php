@@ -19,9 +19,10 @@ use App\Rules\StrongPassword;
 class UserController extends MainController
 {
 
-    public function __construct(){
+    public function __construct()
+    {
         parent::__construct(new User());
-         // Otomatis hubungkan semua method ke UserPolicy
+        // Otomatis hubungkan semua method ke UserPolicy
         // index, show, create, update, delete akan otomatis cek ke policy 
     }
 
@@ -55,15 +56,15 @@ class UserController extends MainController
      * Show the form for creating a new resource.
      */
     public function create(): View
-    {   
+    {
         $user = new User();
-        $result = $this->getForm($user); 
+        $result = $this->getForm($user);
         $forms = $result['forms'];
         $groupedForms = $result['grouped'];
         return view(
             'User::create',
-            compact('user', 'forms','groupedForms')
-        ); 
+            compact('user', 'forms', 'groupedForms')
+        );
     }
 
     /**
@@ -77,8 +78,10 @@ class UserController extends MainController
                 'string',
                 'max:255',
             ],
-            'password'              => ['required', 'string', 'min:8', 'confirmed', new StrongPassword()],
-            'password_confirmation' => 'required', 'same:password', 'min:8',
+            'password' => ['required', 'string', 'min:8', 'confirmed', new StrongPassword()],
+            'password_confirmation' => 'required',
+            'same:password',
+            'min:8',
         ]);
         try {
             $model = DB::transaction(function () use ($validated) {
@@ -113,12 +116,12 @@ class UserController extends MainController
      * Show the form for editing the specified resource.
      */
     public function edit($id): View
-    {   
+    {
         $user = $this->model->findOrFail($id);
-        $result = $this->getForm($user); 
+        $result = $this->getForm($user);
         $forms = $result['forms'];
         $groupedForms = $result['grouped'];
-        return view('User::edit', compact('user', 'forms', 'groupedForms')); 
+        return view('User::edit', compact('user', 'forms', 'groupedForms'));
     }
 
     /**
@@ -143,7 +146,7 @@ class UserController extends MainController
         // null / string kosong -- buang saja dari payload.
         if (empty($validated['password'])) {
             unset($validated['password']);
-        } 
+        }
 
         // FIX: pindahkan findOrFail() ke luar try, atau tangkap ModelNotFoundException
         // secara terpisah, supaya $user selalu terdefinisi sebelum dipakai di catch.
@@ -182,11 +185,12 @@ class UserController extends MainController
     /**
      * Remove the specified resource.
      */
-    public function destroy(Request $request,$id): JsonResponse|RedirectResponse {
+    public function destroy(Request $request, $id): JsonResponse|RedirectResponse
+    {
         try {
-            
+
             $user = $this->model->find($id);
-            if(!$user){
+            if (!$user) {
                 return $this->errorResponse(
                     $request,
                     'Data User tidak ditemukan.'
@@ -217,5 +221,5 @@ class UserController extends MainController
                 'Data User gagal dihapus.'
             );
         }
-    } 
+    }
 }

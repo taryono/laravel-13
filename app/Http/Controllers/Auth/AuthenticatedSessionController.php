@@ -27,10 +27,10 @@ class AuthenticatedSessionController extends Controller
     {
         $request->authenticate();
 
-         // ==== TARUH KODE KAMU DISINI ====
+        // ==== TARUH KODE KAMU DISINI ====
         $user = auth()->user(); // Mendapatkan user yang sedang login
         Log::info('User ' . $user->email . ' logged in.');
-        
+
         $request->session()->regenerate();
 
         return redirect()->intended(route('dashboard', absolute: false));

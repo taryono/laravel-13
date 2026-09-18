@@ -2950,6 +2950,7 @@ CREATE TABLE `menus` (
     `sort_order` INT NOT NULL DEFAULT 0,
     `sequence` INT NULL,
     `is_active` TINYINT(1) NOT NULL DEFAULT 1,
+    `is_publish` tinyint(1) NOT NULL DEFAULT 1,
     `en_text` VARCHAR(50) NULL,
     `id_text` VARCHAR(50) NULL,
     `created_at` TIMESTAMP NULL,

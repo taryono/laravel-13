@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 use Throwable;
-
+use Illuminate\Support\Facades\Auth;
 class ShiftSwapController extends MainController
 {
     public function __construct()
@@ -53,9 +53,9 @@ class ShiftSwapController extends MainController
         $params = [
             'action' => 'shift_swap.store',
             'method' => 'POST',
-            'swap'   => new ShiftSwap(),
-            'employees' => Employee::orderBy('full_name')->get(['id','full_name']),
-            'shifts'    => Shift::where('is_active', 1)->get(),
+            'swap' => new ShiftSwap(),
+            'employees' => Employee::orderBy('full_name')->get(['id', 'full_name']),
+            'shifts' => Shift::where('is_active', 1)->get(),
         ];
         return view('ShiftSwap::create', $params);
     }
@@ -86,9 +86,9 @@ class ShiftSwapController extends MainController
         $params = [
             'action' => ['shift_swap.update', $shiftSwap->id],
             'method' => 'PUT',
-            'swap'   => $shiftSwap,
-            'employees' => Employee::orderBy('full_name')->get(['id','full_name']),
-            'shifts'    => Shift::where('is_active', 1)->get(),
+            'swap' => $shiftSwap,
+            'employees' => Employee::orderBy('full_name')->get(['id', 'full_name']),
+            'shifts' => Shift::where('is_active', 1)->get(),
         ];
         return view('ShiftSwap::edit', $params);
     }
@@ -105,7 +105,7 @@ class ShiftSwapController extends MainController
             DB::transaction(function () use ($validated, $shiftSwap) {
                 $shiftSwap->update($validated);
             });
-             return $this->successResponse($request, 'Data Pertukaran shift berhasil update.', $shiftSwap);
+            return $this->successResponse($request, 'Data Pertukaran shift berhasil update.', $shiftSwap);
         } catch (Throwable $e) {
             Log::error('Gagal menambahkan Pertukaran shift.', ['exception' => $e, 'data' => $validated]);
             return $this->errorResponse($request, 'Data Pertukaran shift gagal update: ' . $e->getMessage());
@@ -115,18 +115,18 @@ class ShiftSwapController extends MainController
     protected function validateSwap(Request $request): array
     {
         return $request->validate([
-            'date'              => 'required|date',
-            'employee_id_a'     => 'required|exists:employees,id',
-            'original_shift_a'  => 'required|exists:shifts,id',
-            'target_shift_a'    => 'required|exists:shifts,id|different:original_shift_a',
-            'employee_id_b'     => 'required|exists:employees,id|different:employee_id_a',
-            'original_shift_b'  => 'required|exists:shifts,id',
-            'target_shift_b'    => 'required|exists:shifts,id|different:original_shift_b',
-            'status'            => 'required|in:pending,approved,rejected,cancelled',
-            'notes'             => 'nullable|string',
+            'date' => 'required|date',
+            'employee_id_a' => 'required|exists:employees,id',
+            'original_shift_a' => 'required|exists:shifts,id',
+            'target_shift_a' => 'required|exists:shifts,id|different:original_shift_a',
+            'employee_id_b' => 'required|exists:employees,id|different:employee_id_a',
+            'original_shift_b' => 'required|exists:shifts,id',
+            'target_shift_b' => 'required|exists:shifts,id|different:original_shift_b',
+            'status' => 'required|in:pending,approved,rejected,cancelled',
+            'notes' => 'nullable|string',
         ], [
             'target_shift_a.different' => 'Shift tujuan A harus berbeda dari shift asli.',
-            'employee_id_b.different'  => 'Karyawan B harus berbeda dari Karyawan A.',
+            'employee_id_b.different' => 'Karyawan B harus berbeda dari Karyawan A.',
         ]);
     }
 
@@ -147,7 +147,7 @@ class ShiftSwapController extends MainController
                 'Data ShiftSwap berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $shiftSwap->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus ShiftSwap.',
@@ -163,5 +163,5 @@ class ShiftSwapController extends MainController
                 'Data ShiftSwap gagal dihapus.'
             );
         }
-    } 
+    }
 }

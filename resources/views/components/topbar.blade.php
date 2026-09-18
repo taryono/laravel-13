@@ -105,12 +105,12 @@
                     <li>
                         <hr class="dropdown-divider">
                     </li>
-                    <li><a class="profile-dropdown-item" href="#"><span
-                                class="material-symbols-outlined">person</span> Profil Saya</a></li>
+                    <li><a class="profile-dropdown-item" href="#"><span class="material-symbols-outlined">person</span>
+                            Profil Saya</a></li>
                     <li><a class="profile-dropdown-item" href="#"><span
                                 class="material-symbols-outlined">verified_user</span> Sertifikasi Saya</a></li>
-                    <li><a class="profile-dropdown-item" href="#"><span
-                                class="material-symbols-outlined">settings</span> Pengaturan Akun</a></li>
+                    <li><a class="profile-dropdown-item" href="#"><span class="material-symbols-outlined">settings</span>
+                            Pengaturan Akun</a></li>
                     <li>
                         <hr class="dropdown-divider">
                     </li>
@@ -131,8 +131,7 @@
                         <li>
                             <a class="profile-dropdown-item text-danger" href="{{ route('logout') }}"
                                 onclick="event.preventDefault();
-                                                    document.getElementById('logout-form').submit();"><span
-                                    class="material-symbols-outlined">logout</span> Keluar
+                                                                                    document.getElementById('logout-form').submit();"><span class="material-symbols-outlined">logout</span> Keluar
                             </a>
                             <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
                                 @csrf

@@ -20,12 +20,12 @@ class MainController extends Controller implements HasMiddleware
     // dan controller yang tidak butuh $model tidak wajib pass argumen.
     public function __construct($model = null, $controller = null)
     {
-        $this->model = $model; 
-        if($controller){
+        $this->model = $model;
+        if ($controller) {
             $this->controller = $controller;
-        }else{
-            $this->controller = Str::snake($model?$model->getModel()->getTable():'');
-        } 
+        } else {
+            $this->controller = Str::snake($model ? $model->getModel()->getTable() : '');
+        }
         // $this->authorizeResource(\App\Models\User::class, 'user');
     }
 
@@ -89,7 +89,7 @@ class MainController extends Controller implements HasMiddleware
         }
 
         return redirect()
-            ->route($this->controller.'.index')
+            ->route($this->controller . '.index')
             ->with('success', $message);
     }
 
@@ -129,11 +129,11 @@ class MainController extends Controller implements HasMiddleware
         $result = [];
         foreach ($tree as $item) {
             $result[] = [
-                'id'    => $item->id,
+                'id' => $item->id,
                 'label' => str_repeat('— ', $depth) . $item->title,
                 'icon' => $item->icon,
                 'icon_type' => $item->iconType,
-                'depth'     => $depth, 
+                'depth' => $depth,
             ];
             if (!empty($item->children)) {
                 $result = array_merge($result, $this->flattenForSelect($item->children, $depth + 1));

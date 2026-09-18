@@ -5097,6 +5097,7 @@ CREATE TABLE `menus`  (
   `sort_order` int NOT NULL DEFAULT 0,
   `sequence` int NULL DEFAULT NULL,
   `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `is_publish` tinyint(1) NOT NULL DEFAULT 1,
   `en_text` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
   `id_text` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
