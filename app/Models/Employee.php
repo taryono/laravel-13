@@ -1,12 +1,13 @@
 <?php
 
-namespace Models; 
+namespace Models;
+
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Employee extends BasedModel
-{ 
+{
     protected $fillable = [
         'employee_id',
         'user_id',
@@ -223,7 +224,7 @@ class Employee extends BasedModel
         return $labels[$this->gender] ?? '-';
     }
 
-     /**
+    /**
      * Relasi ke SalaryStructure
      * Satu karyawan memiliki satu struktur gaji
      */
@@ -243,5 +244,15 @@ class Employee extends BasedModel
 
         $baseSalary = $this->base_salary ?? 0;
         return $this->salaryStructure->calculateNetSalary($baseSalary);
+    }
+
+    public function teacher()
+    {
+        return $this->hasOne(Teacher::class);
+    }
+
+    public function isTeacher(): bool
+    {
+        return $this->teacher()->exists();
     }
 }

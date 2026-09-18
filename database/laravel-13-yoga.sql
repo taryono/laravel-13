@@ -3,15 +3,15 @@
 
  Source Server         : localhost
  Source Server Type    : MySQL
- Source Server Version : 80031 (8.0.31)
+ Source Server Version : 80200 (8.2.0)
  Source Host           : localhost:3306
  Source Schema         : laravel
 
  Target Server Type    : MySQL
- Target Server Version : 80031 (8.0.31)
+ Target Server Version : 80200 (8.2.0)
  File Encoding         : 65001
 
- Date: 15/09/2026 19:28:06
+ Date: 17/09/2026 23:47:40
 */
 
 SET NAMES utf8mb4;
@@ -546,7 +546,7 @@ CREATE TABLE `actions`  (
 -- ----------------------------
 INSERT INTO `actions` VALUES (1, 1, 3, 'user-view', 'Lihat Daftar Pengguna', 'Melihat daftar pengguna', 1, '2026-09-09 17:07:41', '2026-09-09 17:07:41', NULL, NULL, NULL);
 INSERT INTO `actions` VALUES (2, 1, 3, 'user-manage', 'Kelola Pengguna', 'Membuat, mengedit, dan menghapus pengguna', 1, '2026-09-09 17:07:41', '2026-09-09 17:07:41', NULL, NULL, NULL);
-INSERT INTO `actions` VALUES (3, 1, 4, 'roles-manage', 'Kelola Peran', 'Mengelola peran dan izin', 1, '2026-09-09 17:07:41', '2026-09-09 17:07:41', NULL, NULL, NULL);
+INSERT INTO `actions` VALUES (3, 1, 4, 'role-manage', 'Kelola Peran', 'Mengelola peran dan izin', 1, '2026-09-09 17:07:41', '2026-09-09 17:07:41', NULL, NULL, NULL);
 INSERT INTO `actions` VALUES (4, 1, 5, 'profile-view', 'Lihat Profil', 'Melihat profil pengguna', 1, '2026-09-09 17:07:41', '2026-09-09 17:07:41', NULL, NULL, NULL);
 INSERT INTO `actions` VALUES (5, 1, 5, 'profile-edit', 'Edit Profil', 'Mengedit profil pengguna', 1, '2026-09-09 17:07:41', '2026-09-09 17:07:41', NULL, NULL, NULL);
 
@@ -1533,7 +1533,7 @@ CREATE TABLE `bos_components`  (
   INDEX `bos_components_deleted_at_index`(`deleted_at` ASC) USING BTREE,
   INDEX `bos_components_created_by_index`(`created_by` ASC) USING BTREE,
   INDEX `bos_components_updated_by_index`(`updated_by` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of bos_components
@@ -1925,7 +1925,14 @@ CREATE TABLE `cache`  (
   `expiration` int NOT NULL,
   PRIMARY KEY (`key`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
--- ---------------------------- 
+
+-- ----------------------------
+-- Records of cache
+-- ----------------------------
+INSERT INTO `cache` VALUES ('laravel-cache-acl-all-actions', 'O:29:\"Illuminate\\Support\\Collection\":2:{s:8:\"\0*\0items\";a:5:{i:1;s:9:\"user-view\";i:2;s:11:\"user-manage\";i:3;s:11:\"role-manage\";i:4;s:12:\"profile-view\";i:5;s:12:\"profile-edit\";}s:28:\"\0*\0escapeWhenCastingToString\";b:0;}', 1789667126);
+INSERT INTO `cache` VALUES ('laravel-cache-acl-all-menus', 'O:29:\"Illuminate\\Support\\Collection\":2:{s:8:\"\0*\0items\";a:49:{i:1;s:9:\"dashboard\";i:2;s:6:\"master\";i:3;s:4:\"user\";i:4;s:5:\"roles\";i:5;s:7:\"profile\";i:6;s:4:\"menu\";i:7;s:16:\"module-generator\";i:9;s:23:\"academic-calendar-event\";i:10;s:15:\"account-mapping\";i:11;s:8:\"academic\";i:12;s:8:\"students\";i:13;s:13:\"academic-year\";i:14;s:14:\"reference-type\";i:15;s:15:\"reference-value\";i:16;s:6:\"period\";i:17;s:7:\"account\";i:18;s:11:\"tax-setting\";i:19;s:10:\"shift-swap\";i:20;s:9:\"referensi\";i:21;s:10:\"accounting\";i:22;s:16:\"expense-category\";i:23;s:16:\"account-category\";i:24;s:8:\"tax-type\";i:25;s:11:\"cbt-session\";i:26;s:16:\"cbt-activity-log\";i:27;s:14:\"cbt-proctoring\";i:28;s:9:\"classroom\";i:29;s:16:\"homeroom-teacher\";i:30;s:7:\"teacher\";i:31;s:15:\"menu-management\";i:32;s:7:\"student\";i:33;s:18:\"Pendaftaran (PPDB)\";i:34;s:9:\"applicant\";i:35;s:9:\"admission\";i:36;s:19:\"admission-selection\";i:37;s:18:\"admission-timeline\";i:38;s:20:\"application-document\";i:39;s:11:\"class-level\";i:40;s:9:\"test-type\";i:41;s:13:\"test-schedule\";i:42;s:5:\"class\";i:43;s:18:\"student-attendance\";i:44;s:15:\"promotion-batch\";i:45;s:17:\"student-classroom\";i:46;s:17:\"student-promotion\";i:47;s:19:\"promotion-criterion\";i:48;s:23:\"student-extracurricular\";i:49;s:14:\"student-parent\";i:50;s:15:\"extracurricular\";}s:28:\"\0*\0escapeWhenCastingToString\";b:0;}', 1789667126);
+INSERT INTO `cache` VALUES ('laravel-cache-user_1_role_manager', 'b:0;', 1789667128);
+INSERT INTO `cache` VALUES ('laravel-cache-user_1_role_special_role', 'b:0;', 1789667128);
 
 -- ----------------------------
 -- Table structure for cache_locks
@@ -2015,7 +2022,7 @@ CREATE TABLE `cbt_sessions`  (
   `exam_package_id` bigint UNSIGNED NOT NULL,
   `student_id` bigint UNSIGNED NOT NULL,
   `schedule_id` bigint UNSIGNED NULL DEFAULT NULL,
-  `class_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `classroom_id` bigint UNSIGNED NULL DEFAULT NULL,
   `start_time` timestamp NULL DEFAULT NULL,
   `end_time` timestamp NULL DEFAULT NULL,
   `duration_seconds` int NULL DEFAULT NULL,
@@ -2038,13 +2045,13 @@ CREATE TABLE `cbt_sessions`  (
   INDEX `cbt_sessions_exam_package_index`(`exam_package_id` ASC) USING BTREE,
   INDEX `cbt_sessions_student_index`(`student_id` ASC) USING BTREE,
   INDEX `cbt_sessions_schedule_index`(`schedule_id` ASC) USING BTREE,
-  INDEX `cbt_sessions_class_index`(`class_id` ASC) USING BTREE,
+  INDEX `cbt_sessions_class_index`(`classroom_id` ASC) USING BTREE,
   INDEX `cbt_sessions_status_index`(`status` ASC) USING BTREE,
   INDEX `cbt_sessions_is_submitted_index`(`is_submitted` ASC) USING BTREE,
   INDEX `cbt_sessions_deleted_at_index`(`deleted_at` ASC) USING BTREE,
   INDEX `cbt_sessions_created_by_index`(`created_by` ASC) USING BTREE,
   INDEX `cbt_sessions_updated_by_index`(`updated_by` ASC) USING BTREE,
-  CONSTRAINT `cbt_sessions_class_id_foreign` FOREIGN KEY (`class_id`) REFERENCES `classrooms` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `cbt_sessions_class_id_foreign` FOREIGN KEY (`classroom_id`) REFERENCES `classrooms` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `cbt_sessions_exam_package_id_foreign` FOREIGN KEY (`exam_package_id`) REFERENCES `exam_packages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `cbt_sessions_schedule_id_foreign` FOREIGN KEY (`schedule_id`) REFERENCES `schedules` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `cbt_sessions_student_id_foreign` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -2061,7 +2068,6 @@ DROP TABLE IF EXISTS `class_levels`;
 CREATE TABLE `class_levels`  (
   `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `organization_id` bigint UNSIGNED NOT NULL,
-  `education_level_id` bigint UNSIGNED NOT NULL,
   `code` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `level_order` int NOT NULL,
@@ -2074,17 +2080,35 @@ CREATE TABLE `class_levels`  (
   `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `class_levels_org_code_unique`(`organization_id` ASC, `code` ASC) USING BTREE,
-  INDEX `idx_class_levels_education`(`education_level_id` ASC) USING BTREE,
   INDEX `idx_class_levels_order`(`level_order` ASC) USING BTREE,
   INDEX `idx_class_levels_is_active`(`is_active` ASC) USING BTREE,
   INDEX `idx_class_levels_deleted_at`(`deleted_at` ASC) USING BTREE,
-  CONSTRAINT `class_levels_education_fk` FOREIGN KEY (`education_level_id`) REFERENCES `education_levels` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `class_levels_org_fk` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 23 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of class_levels
 -- ----------------------------
+INSERT INTO `class_levels` VALUES (1, 1, 'PAUD', 'Pendidikan Anak Usia Dini', 10, 'Jenjang pendidikan anak usia dini sebelum memasuki pendidikan dasar.', 1, NULL, '2026-09-16 12:24:57', NULL, NULL, NULL);
+INSERT INTO `class_levels` VALUES (2, 1, 'TK', 'Taman Kanak-Kanak', 20, 'Jenjang pendidikan anak usia dini yang ditujukan untuk anak sebelum memasuki sekolah dasar.', 1, NULL, '2026-09-16 12:24:57', NULL, NULL, NULL);
+INSERT INTO `class_levels` VALUES (3, 1, 'SD', 'Sekolah Dasar', 30, 'Jenjang pendidikan dasar tingkat pertama yang umumnya ditempuh selama enam tahun.', 1, NULL, '2026-09-16 12:24:57', NULL, NULL, NULL);
+INSERT INTO `class_levels` VALUES (4, 1, 'MI', 'Madrasah Ibtidaiyah', 40, 'Jenjang pendidikan dasar yang setara dengan Sekolah Dasar dan berciri khas pendidikan Islam.', 1, NULL, '2026-09-16 12:24:57', NULL, NULL, NULL);
+INSERT INTO `class_levels` VALUES (5, 1, 'SMP', 'Sekolah Menengah Pertama', 50, 'Jenjang pendidikan dasar tingkat lanjutan setelah Sekolah Dasar.', 1, NULL, '2026-09-16 12:24:57', NULL, NULL, NULL);
+INSERT INTO `class_levels` VALUES (6, 1, 'MTs', 'Madrasah Tsanawiyah', 60, 'Jenjang pendidikan dasar tingkat lanjutan yang setara dengan Sekolah Menengah Pertama dan berciri khas pendidikan Islam.', 1, NULL, '2026-09-16 12:24:57', NULL, NULL, NULL);
+INSERT INTO `class_levels` VALUES (7, 1, 'SMA', 'Sekolah Menengah Atas', 70, 'Jenjang pendidikan menengah umum setelah pendidikan dasar.', 1, NULL, '2026-09-16 12:24:57', NULL, NULL, NULL);
+INSERT INTO `class_levels` VALUES (8, 1, 'MA', 'Madrasah Aliyah', 80, 'Jenjang pendidikan menengah yang setara dengan Sekolah Menengah Atas dan berciri khas pendidikan Islam.', 1, NULL, '2026-09-16 12:24:57', NULL, NULL, NULL);
+INSERT INTO `class_levels` VALUES (9, 1, 'SMK', 'Sekolah Menengah Kejuruan', 90, 'Jenjang pendidikan menengah yang berfokus pada pendidikan dan keterampilan kejuruan.', 1, NULL, '2026-09-16 12:24:57', NULL, NULL, NULL);
+INSERT INTO `class_levels` VALUES (10, 1, 'MAK', 'Madrasah Aliyah Kejuruan', 100, 'Jenjang pendidikan menengah kejuruan yang setara dengan Sekolah Menengah Kejuruan dan berciri khas pendidikan Islam.', 1, NULL, '2026-09-16 12:24:57', NULL, NULL, NULL);
+INSERT INTO `class_levels` VALUES (11, 1, 'D1', 'Diploma I', 110, 'Jenjang pendidikan tinggi program diploma dengan masa studi umumnya satu tahun.', 1, NULL, '2026-09-16 12:24:57', NULL, NULL, NULL);
+INSERT INTO `class_levels` VALUES (12, 1, 'D2', 'Diploma II', 120, 'Jenjang pendidikan tinggi program diploma dengan masa studi umumnya dua tahun.', 1, NULL, '2026-09-16 12:24:57', NULL, NULL, NULL);
+INSERT INTO `class_levels` VALUES (13, 1, 'D3', 'Diploma III', 130, 'Jenjang pendidikan tinggi program diploma dengan masa studi umumnya tiga tahun.', 1, NULL, '2026-09-16 12:24:57', NULL, NULL, NULL);
+INSERT INTO `class_levels` VALUES (14, 1, 'D4', 'Diploma IV / Sarjana Terapan', 140, 'Jenjang pendidikan tinggi vokasi yang setara dengan program sarjana.', 1, NULL, '2026-09-16 12:24:57', NULL, NULL, NULL);
+INSERT INTO `class_levels` VALUES (15, 1, 'S1', 'Sarjana', 150, 'Jenjang pendidikan tinggi program akademik tingkat sarjana.', 1, NULL, '2026-09-16 12:24:57', NULL, NULL, NULL);
+INSERT INTO `class_levels` VALUES (16, 1, 'PROF', 'Profesi', 160, 'Program pendidikan tinggi setelah program sarjana untuk memperoleh keahlian profesi tertentu.', 1, NULL, '2026-09-16 12:24:57', NULL, NULL, NULL);
+INSERT INTO `class_levels` VALUES (17, 1, 'S2', 'Magister', 170, 'Jenjang pendidikan tinggi program akademik tingkat magister.', 1, NULL, '2026-09-16 12:24:57', NULL, NULL, NULL);
+INSERT INTO `class_levels` VALUES (18, 1, 'SP1', 'Spesialis I', 180, 'Jenjang pendidikan profesi spesialis tingkat pertama.', 1, NULL, '2026-09-16 12:24:57', NULL, NULL, NULL);
+INSERT INTO `class_levels` VALUES (19, 1, 'S3', 'Doktor', 190, 'Jenjang pendidikan tinggi program akademik tingkat doktoral.', 1, NULL, '2026-09-16 12:24:57', NULL, NULL, NULL);
+INSERT INTO `class_levels` VALUES (20, 1, 'SP2', 'Spesialis II', 200, 'Jenjang pendidikan profesi spesialis tingkat lanjutan.', 1, NULL, '2026-09-16 12:24:57', NULL, NULL, NULL);
 
 -- ----------------------------
 -- Table structure for classrooms
@@ -2107,17 +2131,31 @@ CREATE TABLE `classrooms`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `classrooms_org_code_unique`(`organization_id` ASC, `code` ASC) USING BTREE,
   INDEX `idx_classrooms_level`(`class_level_id` ASC) USING BTREE,
-  INDEX `idx_classrooms_academic_year`(`academic_year_id` ASC) USING BTREE, 
+  INDEX `idx_classrooms_academic_year`(`academic_year_id` ASC) USING BTREE,
   INDEX `idx_classrooms_is_active`(`is_active` ASC) USING BTREE,
   INDEX `idx_classrooms_deleted_at`(`deleted_at` ASC) USING BTREE,
   CONSTRAINT `classrooms_academic_year_fk` FOREIGN KEY (`academic_year_id`) REFERENCES `academic_years` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `classrooms_level_fk` FOREIGN KEY (`class_level_id`) REFERENCES `class_levels` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `classrooms_org_fk` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 25 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of classrooms
 -- ----------------------------
+INSERT INTO `classrooms` VALUES (1, 1, 20, 'Kelas 6 A', 'SD-A', 30, 5, 1, NULL, '2026-09-16 12:41:37', NULL, NULL, NULL);
+INSERT INTO `classrooms` VALUES (2, 1, 20, 'Kelas 6 B', 'SD-B', 30, 5, 1, NULL, '2026-09-16 12:41:37', NULL, NULL, NULL);
+INSERT INTO `classrooms` VALUES (3, 1, 20, 'Kelas 7 A', 'SMP7-A', 32, 5, 1, NULL, '2026-09-16 12:41:37', NULL, NULL, NULL);
+INSERT INTO `classrooms` VALUES (4, 1, 20, 'Kelas 7 B', 'SMP7-B', 32, 5, 1, NULL, '2026-09-16 12:41:37', NULL, NULL, NULL);
+INSERT INTO `classrooms` VALUES (5, 1, 20, 'Kelas 8 A', 'SMP8-A', 32, 5, 1, NULL, '2026-09-16 12:41:37', NULL, NULL, NULL);
+INSERT INTO `classrooms` VALUES (6, 1, 20, 'Kelas 8 B', 'SMP8-B', 32, 5, 1, NULL, '2026-09-16 12:41:37', NULL, NULL, NULL);
+INSERT INTO `classrooms` VALUES (7, 1, 20, 'Kelas 9 A', 'SMP9-A', 32, 5, 1, NULL, '2026-09-16 12:41:37', NULL, NULL, NULL);
+INSERT INTO `classrooms` VALUES (8, 1, 20, 'Kelas 9 B', 'SMP9-B', 32, 5, 1, NULL, '2026-09-16 12:41:37', NULL, NULL, NULL);
+INSERT INTO `classrooms` VALUES (9, 1, 20, 'Kelas 10 A', 'SMA10-A', 36, 5, 1, NULL, '2026-09-16 12:41:37', NULL, NULL, NULL);
+INSERT INTO `classrooms` VALUES (10, 1, 20, 'Kelas 10 B', 'SMA10-B', 36, 5, 1, NULL, '2026-09-16 12:41:37', NULL, NULL, NULL);
+INSERT INTO `classrooms` VALUES (11, 1, 20, 'Kelas 11 A', 'SMA11-A', 36, 5, 1, NULL, '2026-09-16 12:41:37', NULL, NULL, NULL);
+INSERT INTO `classrooms` VALUES (12, 1, 20, 'Kelas 11 B', 'SMA11-B', 36, 5, 1, NULL, '2026-09-16 12:41:37', NULL, NULL, NULL);
+INSERT INTO `classrooms` VALUES (13, 1, 20, 'Kelas 12 A', 'SMA12-A', 36, 5, 1, NULL, '2026-09-16 12:41:37', NULL, NULL, NULL);
+INSERT INTO `classrooms` VALUES (14, 1, 20, 'Kelas 12 B', 'SMA12-B', 36, 5, 1, NULL, '2026-09-16 12:41:37', NULL, NULL, NULL);
 
 -- ----------------------------
 -- Table structure for cost_centers
@@ -2260,7 +2298,7 @@ CREATE TABLE `currencies`  (
   INDEX `currencies_deleted_at_index`(`deleted_at` ASC) USING BTREE,
   INDEX `currencies_created_by_index`(`created_by` ASC) USING BTREE,
   INDEX `currencies_updated_by_index`(`updated_by` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of currencies
@@ -2706,8 +2744,8 @@ CREATE TABLE `education_levels`  (
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
   `sort_order` int NOT NULL DEFAULT 0,
-  `level` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `level` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
@@ -2718,11 +2756,22 @@ CREATE TABLE `education_levels`  (
   INDEX `education_levels_is_active_index`(`is_active` ASC) USING BTREE,
   INDEX `education_levels_deleted_at_index`(`deleted_at` ASC) USING BTREE,
   CONSTRAINT `education_levels_org_fk` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 12 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of education_levels
 -- ----------------------------
+INSERT INTO `education_levels` VALUES (1, 1, 'TK', 'Taman Kanak-kanak', NULL, 1, 1, '1', NULL, '2026-09-16 12:13:56', NULL, NULL, NULL);
+INSERT INTO `education_levels` VALUES (2, 1, 'SD', 'Sekolah Dasar / Sederajat', NULL, 2, 1, '2', '2026-09-16 12:15:49', '2026-09-16 12:15:49', NULL, NULL, NULL);
+INSERT INTO `education_levels` VALUES (3, 1, 'SMP', 'Sekolah Menengah Pertama / Sederajat', NULL, 3, 1, '3', '2026-09-16 12:15:49', '2026-09-16 12:15:49', NULL, NULL, NULL);
+INSERT INTO `education_levels` VALUES (4, 1, 'SMA', 'Sekolah Menengah Atas / Sederajat', NULL, 4, 1, '4', '2026-09-16 12:15:49', '2026-09-16 12:15:49', NULL, NULL, NULL);
+INSERT INTO `education_levels` VALUES (5, 1, 'D1', 'Diploma I', NULL, 5, 1, '5', '2026-09-16 12:15:49', '2026-09-16 12:15:49', NULL, NULL, NULL);
+INSERT INTO `education_levels` VALUES (6, 1, 'D2', 'Diploma II', NULL, 6, 1, '6', '2026-09-16 12:15:49', '2026-09-16 12:15:49', NULL, NULL, NULL);
+INSERT INTO `education_levels` VALUES (7, 1, 'D3', 'Diploma III', NULL, 7, 1, '7', '2026-09-16 12:15:49', '2026-09-16 12:15:49', NULL, NULL, NULL);
+INSERT INTO `education_levels` VALUES (8, 1, 'D4', 'Diploma IV / Sarjana Terapan', NULL, 8, 1, '8', '2026-09-16 12:15:49', '2026-09-16 12:15:49', NULL, NULL, NULL);
+INSERT INTO `education_levels` VALUES (9, 1, 'S1', 'Sarjana (S1)', NULL, 9, 1, '9', '2026-09-16 12:15:49', '2026-09-16 12:15:49', NULL, NULL, NULL);
+INSERT INTO `education_levels` VALUES (10, 1, 'S2', 'Magister (S2)', NULL, 10, 1, '10', '2026-09-16 12:15:49', '2026-09-16 12:15:49', NULL, NULL, NULL);
+INSERT INTO `education_levels` VALUES (11, 1, 'S3', 'Doktor (S3)', NULL, 11, 1, '11', '2026-09-16 12:15:49', '2026-09-16 12:15:49', NULL, NULL, NULL);
 
 -- ----------------------------
 -- Table structure for employee_bonuses
@@ -3183,7 +3232,7 @@ CREATE TABLE `exchange_rates`  (
   INDEX `exchange_rates_updated_by_index`(`updated_by` ASC) USING BTREE,
   CONSTRAINT `exchange_rates_base_currency_id_foreign` FOREIGN KEY (`base_currency_id`) REFERENCES `currencies` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `exchange_rates_currency_id_foreign` FOREIGN KEY (`currency_id`) REFERENCES `currencies` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of exchange_rates
@@ -3479,7 +3528,7 @@ CREATE TABLE `failed_jobs`  (
   `failed_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `failed_jobs_uuid_unique`(`uuid` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of failed_jobs
@@ -3794,7 +3843,7 @@ CREATE TABLE `genders`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `genders_code_unique`(`code` ASC) USING BTREE,
   INDEX `genders_deleted_at_index`(`deleted_at` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of genders
@@ -4087,45 +4136,56 @@ CREATE TABLE `holidays`  (
 -- Records of holidays
 -- ----------------------------
 
-CREATE TABLE `homeroom_teachers` (
-    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `organization_id` BIGINT UNSIGNED NOT NULL,
-    `teacher_id` BIGINT UNSIGNED NOT NULL COMMENT 'Merujuk ke tabel teachers',
-    `classroom_id` BIGINT UNSIGNED NOT NULL COMMENT 'Merujuk ke tabel classrooms',
-    `academic_year_id` BIGINT UNSIGNED NOT NULL COMMENT 'Tahun ajaran penugasan',
-    `is_active` TINYINT(1) NOT NULL DEFAULT 1,
-    `assignment_date` DATE NULL COMMENT 'Tanggal ditunjuk sebagai wali kelas',
-    `end_date` DATE NULL COMMENT 'Tanggal berakhirnya tugas (jika diganti)',
-    `notes` VARCHAR(255) NULL COMMENT 'Catatan tambahan',
-    `created_at` TIMESTAMP NULL,
-    `updated_at` TIMESTAMP NULL,
-    `deleted_at` TIMESTAMP NULL,
-    `created_by` BIGINT UNSIGNED NULL,
-    `updated_by` BIGINT UNSIGNED NULL,
-    PRIMARY KEY (`id`),
-    -- Satu kelas dalam satu tahun ajaran hanya punya 1 wali kelas
-    UNIQUE INDEX `homeroom_class_year_unique` (`classroom_id`, `academic_year_id`),
-    -- Satu guru dalam satu tahun ajaran tidak duplikat di kelas yang sama
-    UNIQUE INDEX `homeroom_teacher_class_unique` (`teacher_id`, `classroom_id`, `academic_year_id`),
-    INDEX `idx_teacher_id` (`teacher_id`),
-    INDEX `idx_classroom_id` (`classroom_id`),
-    INDEX `idx_academic_year` (`academic_year_id`),
-    INDEX `idx_organization` (`organization_id`),
-    INDEX `idx_is_active` (`is_active`),
-    CONSTRAINT `hr_org_fk` 
-        FOREIGN KEY (`organization_id`) 
-        REFERENCES `organizations` (`id`) ON DELETE CASCADE,
-    CONSTRAINT `hr_teacher_fk` 
-        FOREIGN KEY (`teacher_id`) 
-        REFERENCES `teachers` (`id`) ON DELETE CASCADE,
-    CONSTRAINT `hr_classroom_fk` 
-        FOREIGN KEY (`classroom_id`) 
-        REFERENCES `classrooms` (`id`) ON DELETE CASCADE,
-    CONSTRAINT `hr_academic_year_fk` 
-        FOREIGN KEY (`academic_year_id`) 
-        REFERENCES `academic_years` (`id`) ON DELETE RESTRICT
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT='Penugasan wali kelas per tahun ajaran';
+-- ----------------------------
+-- Table structure for homeroom_teachers
+-- ----------------------------
+DROP TABLE IF EXISTS `homeroom_teachers`;
+CREATE TABLE `homeroom_teachers`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `organization_id` bigint UNSIGNED NOT NULL,
+  `teacher_id` bigint UNSIGNED NOT NULL COMMENT 'Merujuk ke tabel teachers',
+  `classroom_id` bigint UNSIGNED NOT NULL COMMENT 'Merujuk ke tabel classrooms',
+  `academic_year_id` bigint UNSIGNED NOT NULL COMMENT 'Tahun ajaran penugasan',
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `assignment_date` date NULL DEFAULT NULL COMMENT 'Tanggal ditunjuk sebagai wali kelas',
+  `end_date` date NULL DEFAULT NULL COMMENT 'Tanggal berakhirnya tugas (jika diganti)',
+  `notes` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT 'Catatan tambahan',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `homeroom_class_year_unique`(`classroom_id` ASC, `academic_year_id` ASC) USING BTREE,
+  UNIQUE INDEX `homeroom_teacher_class_unique`(`teacher_id` ASC, `classroom_id` ASC, `academic_year_id` ASC) USING BTREE,
+  INDEX `idx_teacher_id`(`teacher_id` ASC) USING BTREE,
+  INDEX `idx_classroom_id`(`classroom_id` ASC) USING BTREE,
+  INDEX `idx_academic_year`(`academic_year_id` ASC) USING BTREE,
+  INDEX `idx_organization`(`organization_id` ASC) USING BTREE,
+  INDEX `idx_is_active`(`is_active` ASC) USING BTREE,
+  CONSTRAINT `hr_academic_year_fk` FOREIGN KEY (`academic_year_id`) REFERENCES `academic_years` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `hr_classroom_fk` FOREIGN KEY (`classroom_id`) REFERENCES `classrooms` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `hr_org_fk` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `hr_teacher_fk` FOREIGN KEY (`teacher_id`) REFERENCES `teachers` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 15 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'Penugasan wali kelas per tahun ajaran' ROW_FORMAT = DYNAMIC;
 
+-- ----------------------------
+-- Records of homeroom_teachers
+-- ----------------------------
+INSERT INTO `homeroom_teachers` VALUES (1, 1, 1, 1, 5, 1, '2026-09-16', '2026-09-16', NULL, '2026-09-16 13:14:08', '2026-09-16 13:14:08', NULL, NULL, NULL);
+INSERT INTO `homeroom_teachers` VALUES (2, 1, 2, 2, 5, 1, '2026-09-16', '2026-09-16', NULL, '2026-09-16 13:14:08', '2026-09-16 13:14:08', NULL, NULL, NULL);
+INSERT INTO `homeroom_teachers` VALUES (3, 1, 1, 3, 5, 1, '2026-09-16', '2026-09-16', NULL, '2026-09-16 13:14:08', '2026-09-16 13:14:08', NULL, NULL, NULL);
+INSERT INTO `homeroom_teachers` VALUES (4, 1, 2, 4, 5, 1, '2026-09-16', '2026-09-16', NULL, '2026-09-16 13:14:08', '2026-09-16 13:14:08', NULL, NULL, NULL);
+INSERT INTO `homeroom_teachers` VALUES (5, 1, 1, 5, 5, 1, '2026-09-16', '2026-09-16', NULL, '2026-09-16 13:14:08', '2026-09-16 13:14:08', NULL, NULL, NULL);
+INSERT INTO `homeroom_teachers` VALUES (6, 1, 2, 6, 5, 1, '2026-09-16', '2026-09-16', NULL, '2026-09-16 13:14:08', '2026-09-16 13:14:08', NULL, NULL, NULL);
+INSERT INTO `homeroom_teachers` VALUES (7, 1, 1, 7, 5, 1, '2026-09-16', '2026-09-16', NULL, '2026-09-16 13:14:08', '2026-09-16 13:14:08', NULL, NULL, NULL);
+INSERT INTO `homeroom_teachers` VALUES (8, 1, 2, 8, 5, 1, '2026-09-16', '2026-09-16', NULL, '2026-09-16 13:14:08', '2026-09-16 13:14:08', NULL, NULL, NULL);
+INSERT INTO `homeroom_teachers` VALUES (9, 1, 1, 9, 5, 1, '2026-09-16', '2026-09-16', NULL, '2026-09-16 13:14:08', '2026-09-16 13:14:08', NULL, NULL, NULL);
+INSERT INTO `homeroom_teachers` VALUES (10, 1, 2, 10, 5, 1, '2026-09-16', '2026-09-16', NULL, '2026-09-16 13:14:08', '2026-09-16 13:14:08', NULL, NULL, NULL);
+INSERT INTO `homeroom_teachers` VALUES (11, 1, 1, 11, 5, 1, '2026-09-16', '2026-09-16', NULL, '2026-09-16 13:14:08', '2026-09-16 13:14:08', NULL, NULL, NULL);
+INSERT INTO `homeroom_teachers` VALUES (12, 1, 2, 12, 5, 1, '2026-09-16', '2026-09-16', NULL, '2026-09-16 13:14:08', '2026-09-16 13:14:08', NULL, NULL, NULL);
+INSERT INTO `homeroom_teachers` VALUES (13, 1, 1, 13, 5, 1, '2026-09-16', '2026-09-16', NULL, '2026-09-16 13:14:08', '2026-09-16 13:14:08', NULL, NULL, NULL);
+INSERT INTO `homeroom_teachers` VALUES (14, 1, 2, 14, 5, 1, '2026-09-16', '2026-09-16', NULL, '2026-09-16 13:14:08', '2026-09-16 13:14:08', NULL, NULL, NULL);
 
 -- ----------------------------
 -- Table structure for identity_types
@@ -4147,7 +4207,7 @@ CREATE TABLE `identity_types`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `identity_types_code_unique`(`code` ASC) USING BTREE,
   INDEX `identity_types_deleted_at_index`(`deleted_at` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of identity_types
@@ -4926,7 +4986,7 @@ CREATE TABLE `menu_role`  (
   INDEX `menu_role_deleted_at_index`(`deleted_at` ASC) USING BTREE,
   CONSTRAINT `menu_role_menu_id_foreign` FOREIGN KEY (`menu_id`) REFERENCES `menus` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
   CONSTRAINT `menu_role_role_id_foreign` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 52 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 102 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of menu_role
@@ -4975,7 +5035,57 @@ INSERT INTO `menu_role` VALUES (41, 21, 3, 1, 1, 1, 1, '2026-09-13 16:29:10', '2
 INSERT INTO `menu_role` VALUES (43, 11, 2, 1, 1, 1, 1, '2026-09-13 16:49:59', '2026-09-13 16:49:59', NULL, NULL, NULL);
 INSERT INTO `menu_role` VALUES (44, 11, 1, 1, 1, 1, 1, '2026-09-13 16:49:59', '2026-09-13 16:49:59', NULL, NULL, NULL);
 INSERT INTO `menu_role` VALUES (45, 11, 3, 1, 1, 1, 1, '2026-09-13 16:49:59', '2026-09-13 16:49:59', NULL, NULL, NULL);
-INSERT INTO `menu_role` VALUES (47, 24, 1, 1, 1, 1, 1, '2026-09-14 15:30:46', '2026-09-14 15:30:46', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (47, 24, 1, 1, 1, 1, 1, '2026-09-16 18:42:27', '2026-09-16 18:42:27', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (52, 25, 1, 1, 1, 1, 1, '2026-09-16 02:49:45', '2026-09-16 02:49:45', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (53, 26, 1, 1, 1, 1, 1, '2026-09-16 02:51:41', '2026-09-16 02:51:41', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (54, 27, 1, 1, 1, 1, 1, '2026-09-16 02:54:03', '2026-09-16 02:54:03', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (55, 28, 1, 1, 1, 1, 1, '2026-09-16 05:49:42', '2026-09-16 05:49:42', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (56, 29, 1, 1, 1, 1, 1, '2026-09-16 05:52:19', '2026-09-16 05:52:19', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (57, 30, 1, 1, 1, 1, 1, '2026-09-16 05:58:00', '2026-09-16 05:58:00', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (58, 31, 2, 1, 0, 0, 0, '2026-09-16 16:52:10', '2026-09-16 16:52:10', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (59, 31, 1, 1, 0, 0, 0, '2026-09-16 16:52:10', '2026-09-16 16:52:10', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (60, 31, 3, 1, 0, 0, 0, '2026-09-16 16:52:10', '2026-09-16 16:52:10', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (61, 32, 2, 1, 1, 1, 1, '2026-09-16 17:24:47', '2026-09-16 17:24:47', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (62, 32, 1, 1, 1, 1, 1, '2026-09-16 17:24:47', '2026-09-16 17:24:47', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (63, 32, 3, 1, 1, 1, 1, '2026-09-16 17:24:47', '2026-09-16 17:24:47', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (64, 33, 2, 1, 1, 1, 1, '2026-09-16 17:24:59', '2026-09-16 17:24:59', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (65, 33, 1, 1, 1, 1, 1, '2026-09-16 17:24:59', '2026-09-16 17:24:59', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (66, 33, 3, 1, 1, 1, 1, '2026-09-16 17:24:59', '2026-09-16 17:24:59', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (67, 34, 1, 1, 1, 1, 1, '2026-09-16 17:50:15', '2026-09-16 17:50:15', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (68, 35, 1, 1, 1, 1, 1, '2026-09-16 17:50:45', '2026-09-16 17:50:45', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (69, 36, 1, 1, 1, 1, 1, '2026-09-16 17:50:35', '2026-09-16 17:50:35', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (70, 37, 1, 1, 1, 1, 1, '2026-09-16 17:50:23', '2026-09-16 17:50:23', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (71, 34, 2, 1, 1, 1, 1, '2026-09-16 17:50:15', '2026-09-16 17:50:15', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (72, 34, 3, 1, 1, 1, 1, '2026-09-16 17:50:15', '2026-09-16 17:50:15', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (73, 37, 2, 1, 1, 1, 1, '2026-09-16 17:50:23', '2026-09-16 17:50:23', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (74, 37, 3, 1, 1, 1, 1, '2026-09-16 17:50:23', '2026-09-16 17:50:23', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (75, 36, 2, 1, 1, 1, 1, '2026-09-16 17:50:35', '2026-09-16 17:50:35', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (76, 36, 3, 1, 1, 1, 1, '2026-09-16 17:50:35', '2026-09-16 17:50:35', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (77, 35, 2, 1, 1, 1, 1, '2026-09-16 17:50:45', '2026-09-16 17:50:45', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (78, 35, 3, 1, 1, 1, 1, '2026-09-16 17:50:45', '2026-09-16 17:50:45', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (79, 38, 1, 1, 1, 1, 1, '2026-09-16 17:52:44', '2026-09-16 17:52:44', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (80, 38, 2, 1, 1, 1, 1, '2026-09-16 17:52:44', '2026-09-16 17:52:44', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (81, 38, 3, 1, 1, 1, 1, '2026-09-16 17:52:44', '2026-09-16 17:52:44', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (82, 39, 1, 1, 1, 1, 1, '2026-09-17 14:26:24', '2026-09-17 14:26:24', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (83, 40, 1, 1, 1, 1, 1, '2026-09-17 16:45:24', '2026-09-17 16:45:24', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (84, 41, 1, 1, 1, 1, 1, '2026-09-16 18:16:34', '2026-09-16 18:16:34', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (85, 24, 2, 1, 1, 1, 1, '2026-09-16 18:42:27', '2026-09-16 18:42:27', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (86, 24, 3, 1, 1, 1, 1, '2026-09-16 18:42:27', '2026-09-16 18:42:27', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (87, 42, 2, 1, 1, 1, 1, '2026-09-17 14:26:02', '2026-09-17 14:26:02', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (88, 42, 1, 1, 1, 1, 1, '2026-09-17 14:26:02', '2026-09-17 14:26:02', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (89, 42, 3, 1, 1, 1, 1, '2026-09-17 14:26:02', '2026-09-17 14:26:02', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (90, 39, 2, 1, 1, 1, 1, '2026-09-17 14:26:24', '2026-09-17 14:26:24', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (91, 39, 3, 1, 1, 1, 1, '2026-09-17 14:26:24', '2026-09-17 14:26:24', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (92, 43, 1, 1, 1, 1, 1, '2026-09-17 14:48:25', '2026-09-17 14:48:25', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (93, 44, 1, 1, 1, 1, 1, '2026-09-17 14:54:37', '2026-09-17 14:54:37', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (94, 45, 1, 1, 1, 1, 1, '2026-09-17 14:58:41', '2026-09-17 14:58:41', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (95, 46, 1, 1, 1, 1, 1, '2026-09-17 15:00:24', '2026-09-17 15:00:24', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (96, 47, 1, 1, 1, 1, 1, '2026-09-17 15:07:30', '2026-09-17 15:07:30', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (97, 48, 1, 1, 1, 1, 1, '2026-09-17 15:35:03', '2026-09-17 15:35:03', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (98, 49, 1, 1, 1, 1, 1, '2026-09-17 15:39:49', '2026-09-17 15:39:49', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (99, 50, 1, 1, 1, 1, 1, '2026-09-17 15:49:05', '2026-09-17 15:49:05', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (100, 40, 2, 1, 1, 1, 1, '2026-09-17 16:45:24', '2026-09-17 16:45:24', NULL, NULL, NULL);
+INSERT INTO `menu_role` VALUES (101, 40, 3, 1, 1, 1, 1, '2026-09-17 16:45:24', '2026-09-17 16:45:24', NULL, NULL, NULL);
 
 -- ----------------------------
 -- Table structure for menus
@@ -5011,7 +5121,7 @@ CREATE TABLE `menus`  (
   INDEX `menus_is_active_index`(`is_active` ASC) USING BTREE,
   INDEX `menus_deleted_at_index`(`deleted_at` ASC) USING BTREE,
   CONSTRAINT `menus_parent_id_foreign` FOREIGN KEY (`parent_id`) REFERENCES `menus` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 25 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 51 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of menus
@@ -5023,10 +5133,10 @@ INSERT INTO `menus` VALUES (4, 1, 2, 'role', 'Peran & Izin', 'Peran & Izin', 'ro
 INSERT INTO `menus` VALUES (5, 1, NULL, 'profile', 'Profil', 'Profil', 'profile', 'fas fa-user-circle', 'fa', 'profile.edit', 'profile', 'topbar', 1, NULL, 1, NULL, NULL, '2026-09-09 17:07:41', '2026-09-09 17:07:41', NULL, NULL, NULL);
 INSERT INTO `menus` VALUES (6, 1, 2, 'menu management', 'Manage Menu', 'Manage Menu', 'menu', 'fas fa-user-circle', 'fa', 'menu_management.index', 'menu_management', 'sidebar', 1, NULL, 1, NULL, NULL, '2026-09-09 17:07:41', '2026-09-09 17:07:41', NULL, NULL, NULL);
 INSERT INTO `menus` VALUES (7, 1, 2, 'module-generator', 'Module Generator', 'Module Generator', 'module-generator', 'fas fa-user-circle', 'fa', 'crud_generator.index', 'crud-generator', 'sidebar', 1, NULL, 1, NULL, NULL, '2026-09-09 17:07:41', '2026-09-09 17:07:41', NULL, NULL, NULL);
-INSERT INTO `menus` VALUES (9, 1, 11, NULL, 'Academic Calendar Event', 'Academic Calendar Event', 'academic-calendar-event', 'fas fa-calendar', 'fa', 'academic_calendar_event.index', 'academic_calendar_event', 'sidebar', 0, NULL, 1, NULL, NULL, '2026-09-12 06:56:01', '2026-09-13 00:24:09', NULL, NULL, NULL);
+INSERT INTO `menus` VALUES (9, 1, 11, 'Event', 'Event', 'Event', 'academic-calendar-event', 'fas fa-calendar', 'fa', 'academic_calendar_event.index', 'academic_calendar_event', 'sidebar', 0, NULL, 1, NULL, NULL, '2026-09-12 06:56:01', '2026-09-16 18:39:36', NULL, NULL, NULL);
 INSERT INTO `menus` VALUES (10, 1, 21, 'Account Mapping', 'COA Mapping', 'ACOA Mapping', 'account-mapping', 'fas fa-th-large', 'fa', 'account_mapping.index', 'account-mapping', 'sidebar', 0, NULL, 1, NULL, NULL, '2026-09-12 07:00:11', '2026-09-13 02:59:13', NULL, NULL, NULL);
 INSERT INTO `menus` VALUES (11, 1, NULL, NULL, 'Academic', 'Academic', 'academic', 'fas fa-box', 'fa', NULL, 'academic', 'sidebar', 3, NULL, 1, NULL, NULL, '2026-09-12 07:04:21', '2026-09-12 07:04:21', NULL, NULL, NULL);
-INSERT INTO `menus` VALUES (12, 1, NULL, NULL, 'Kesiswaan', 'Kesiswaan', 'student', 'fas fa-user', 'fa', NULL, 'student', 'sidebar', 4, NULL, 1, NULL, NULL, '2026-09-12 07:05:17', '2026-09-12 07:06:16', NULL, NULL, NULL);
+INSERT INTO `menus` VALUES (12, 1, NULL, 'Kesiswaan', 'Kesiswaan', 'Kesiswaan', 'students', 'fas fa-user', 'fa', NULL, 'student', 'sidebar', 4, NULL, 1, NULL, NULL, '2026-09-12 07:05:17', '2026-09-16 17:22:32', NULL, NULL, NULL);
 INSERT INTO `menus` VALUES (13, 1, 11, NULL, 'Academic Year', 'Academic Year', 'academic-year', 'fas fa-th-large', 'fa', 'academic_year.index', 'academic-year', 'sidebar', 0, NULL, 1, NULL, NULL, '2026-09-12 07:29:52', '2026-09-13 00:34:43', NULL, NULL, NULL);
 INSERT INTO `menus` VALUES (14, 1, 20, NULL, 'Reference Type', NULL, 'reference-type', 'list_alt', 'material', 'reference-type.index', 'reference-type', 'sidebar', 5, NULL, 1, NULL, NULL, '2026-09-12 07:33:13', '2026-09-12 23:59:59', NULL, NULL, NULL);
 INSERT INTO `menus` VALUES (15, 1, 20, NULL, 'Reference Value', NULL, 'reference-value', 'list_alt', 'material', 'reference-value.index', 'reference-value', 'sidebar', 6, NULL, 1, NULL, NULL, '2026-09-12 07:35:16', '2026-09-13 00:00:27', NULL, NULL, NULL);
@@ -5037,8 +5147,34 @@ INSERT INTO `menus` VALUES (19, 1, NULL, NULL, 'Shift Swap', 'Shift Swap', 'shif
 INSERT INTO `menus` VALUES (20, 1, NULL, NULL, 'Referensi', 'Reference', 'referensi', 'fas fa-chart-pie', 'fa', NULL, 'reference', 'sidebar', 8, NULL, 1, NULL, NULL, '2026-09-12 23:58:17', '2026-09-13 00:01:41', NULL, NULL, NULL);
 INSERT INTO `menus` VALUES (21, 1, NULL, 'Accounting', 'Accounting', 'Accounting', 'accounting', 'dashboard', 'material', NULL, NULL, 'sidebar', 9, NULL, 1, NULL, NULL, '2026-09-13 00:04:55', '2026-09-13 16:37:53', NULL, NULL, NULL);
 INSERT INTO `menus` VALUES (22, 1, 21, NULL, 'Expense Category', 'Expense Category', 'expense-category', 'fas fa-th-large', 'fa', 'expense_category.index', 'expense-category', 'sidebar', 0, NULL, 1, NULL, NULL, '2026-09-13 10:24:58', '2026-09-13 10:24:58', NULL, NULL, NULL);
-INSERT INTO `menus` VALUES (23, 1, 21, NULL, 'Account Category', 'Account Category', 'account-category', 'fas fa-th-large', 'fa', 'account_category.index', 'account-category', 'sidebar', 0, NULL, 1, NULL, NULL, '2026-09-13 10:29:58', '2026-09-13 10:29:58', NULL, NULL, NULL);
+INSERT INTO `menus` VALUES (23, 1, 21, 'COA Category', 'COA Category', 'COA Category', 'account-category', 'fas fa-th-large', 'fa', 'account_category.index', 'account-category', 'sidebar', 0, NULL, 1, NULL, NULL, '2026-09-13 10:29:58', '2026-09-16 18:40:22', NULL, NULL, NULL);
 INSERT INTO `menus` VALUES (24, 1, 21, NULL, 'Tax Type', 'Tax Type', 'tax-type', 'list_alt', 'material', 'tax-type.index', 'tax-type', 'sidebar', 10, NULL, 1, NULL, NULL, '2026-09-13 10:29:58', '2026-09-13 10:29:58', NULL, NULL, NULL);
+INSERT INTO `menus` VALUES (25, NULL, NULL, NULL, 'Cbt Session', NULL, 'cbt-session', 'list_alt', 'material', 'cbt-session.index', 'cbt-session', 'sidebar', 11, NULL, 1, NULL, NULL, '2026-09-16 02:49:45', '2026-09-16 02:49:45', NULL, NULL, NULL);
+INSERT INTO `menus` VALUES (26, NULL, NULL, NULL, 'Cbt Activity Log', NULL, 'cbt-activity-log', 'list_alt', 'material', 'cbt-activity-log.index', 'cbt-activity-log', 'sidebar', 12, NULL, 1, NULL, NULL, '2026-09-16 02:51:41', '2026-09-16 02:51:41', NULL, NULL, NULL);
+INSERT INTO `menus` VALUES (27, NULL, NULL, NULL, 'Cbt Proctoring', NULL, 'cbt-proctoring', 'list_alt', 'material', 'cbt-proctoring.index', 'cbt-proctoring', 'sidebar', 13, NULL, 1, NULL, NULL, '2026-09-16 02:54:03', '2026-09-16 02:54:03', NULL, NULL, NULL);
+INSERT INTO `menus` VALUES (28, NULL, NULL, NULL, 'Classroom', NULL, 'classroom', 'list_alt', 'material', 'classroom.index', 'classroom', 'sidebar', 14, NULL, 1, NULL, NULL, '2026-09-16 05:49:42', '2026-09-16 05:49:42', NULL, NULL, NULL);
+INSERT INTO `menus` VALUES (29, NULL, NULL, NULL, 'Homeroom Teacher', NULL, 'homeroom-teacher', 'list_alt', 'material', 'homeroom-teacher.index', 'homeroom-teacher', 'sidebar', 15, NULL, 1, NULL, NULL, '2026-09-16 05:52:19', '2026-09-16 05:52:19', NULL, NULL, NULL);
+INSERT INTO `menus` VALUES (30, NULL, NULL, NULL, 'Teacher', NULL, 'teacher', 'list_alt', 'material', 'teacher.index', 'teacher', 'sidebar', 16, NULL, 1, NULL, NULL, '2026-09-16 05:58:00', '2026-09-16 05:58:00', NULL, NULL, NULL);
+INSERT INTO `menus` VALUES (31, 1, 2, 'Menu Management', 'Menu Management', 'Menu Management', 'menu-management', 'fas fa-th-large', 'fa', 'menu_management.index', 'menu-management', 'sidebar', 0, NULL, 1, NULL, NULL, '2026-09-16 16:52:10', '2026-09-16 16:52:10', NULL, NULL, NULL);
+INSERT INTO `menus` VALUES (32, 1, 12, 'Students', 'Data Siswa', 'Students', 'student', 'fas fa-user', 'fa', 'student.index', 'student', 'sidebar', 11, NULL, 1, NULL, NULL, '2026-09-16 17:23:28', '2026-09-16 17:23:28', NULL, NULL, NULL);
+INSERT INTO `menus` VALUES (33, 1, 12, 'Pendaftaran (PPDB)', 'Pendaftaran (PPDB)', 'Pendaftaran (PPDB)', 'Pendaftaran (PPDB)', 'edit', 'material', NULL, NULL, 'sidebar', 12, NULL, 1, NULL, NULL, '2026-09-16 17:24:36', '2026-09-16 18:24:02', NULL, NULL, NULL);
+INSERT INTO `menus` VALUES (34, 1, 33, 'Pendaftar', 'Pendaftar', 'Applicant', 'applicant', 'list_alt', 'material', 'applicant.index', 'applicant', 'sidebar', 13, NULL, 1, NULL, NULL, '2026-09-16 17:39:34', '2026-09-16 17:42:20', NULL, NULL, NULL);
+INSERT INTO `menus` VALUES (35, 1, 33, 'Admission', 'Admission', 'Admission', 'admission', 'list_alt', 'material', 'admission.index', 'admission', 'sidebar', 14, NULL, 1, NULL, NULL, '2026-09-16 17:43:12', '2026-09-16 17:48:01', NULL, NULL, NULL);
+INSERT INTO `menus` VALUES (36, 1, 33, 'Admission Selection', 'Admission Selection', 'Admission Selection', 'admission-selection', 'list_alt', 'material', 'admission-selection.index', 'admission-selection', 'sidebar', 15, NULL, 1, NULL, NULL, '2026-09-16 17:44:23', '2026-09-16 17:48:43', NULL, NULL, NULL);
+INSERT INTO `menus` VALUES (37, 1, 33, 'Admission Timeline', 'Admission Timeline', 'Admission Timeline', 'admission-timeline', 'list_alt', 'material', 'admission-timeline.index', 'admission-timeline', 'sidebar', 16, NULL, 1, NULL, NULL, '2026-09-16 17:45:11', '2026-09-16 17:49:53', NULL, NULL, NULL);
+INSERT INTO `menus` VALUES (38, 1, 33, 'Application Document', 'Application Document', 'Application Document', 'application-document', 'list_alt', 'material', 'application-document.index', 'application-document', 'sidebar', 17, NULL, 1, NULL, NULL, '2026-09-16 17:51:18', '2026-09-16 17:52:37', NULL, NULL, NULL);
+INSERT INTO `menus` VALUES (39, 1, 42, 'Class Level', 'Class Level', NULL, 'class-level', 'list_alt', 'material', 'class-level.index', 'class-level', 'sidebar', 18, NULL, 1, NULL, NULL, '2026-09-16 17:57:39', '2026-09-17 14:26:37', NULL, NULL, NULL);
+INSERT INTO `menus` VALUES (40, 1, 33, 'Test Type', 'Test Type', 'Test Type', 'test-type', 'list_alt', 'material', 'test-type.index', 'test-type', 'sidebar', 19, NULL, 1, NULL, NULL, '2026-09-16 18:13:52', '2026-09-16 18:21:38', NULL, NULL, NULL);
+INSERT INTO `menus` VALUES (41, 1, 33, 'Test Schedule', 'Test Schedule', 'Test Schedule', 'test-schedule', 'list_alt', 'material', 'test-schedule.index', 'test-schedule', 'sidebar', 20, NULL, 1, NULL, NULL, '2026-09-16 18:16:34', '2026-09-16 18:21:07', NULL, NULL, NULL);
+INSERT INTO `menus` VALUES (42, 1, 12, NULL, 'Kelas & Rombel', 'Kelas & Rombel', 'class', 'fas fa-th-large', 'material', NULL, NULL, 'sidebar', 21, NULL, 1, NULL, NULL, '2026-09-17 14:23:07', '2026-09-17 14:23:07', NULL, NULL, NULL);
+INSERT INTO `menus` VALUES (43, 1, NULL, NULL, 'Student Attendance', NULL, 'student-attendance', 'list_alt', 'material', 'student-attendance.index', 'student-attendance', 'sidebar', 22, NULL, 1, NULL, NULL, '2026-09-17 14:48:25', '2026-09-17 14:48:25', NULL, NULL, NULL);
+INSERT INTO `menus` VALUES (44, 1, NULL, NULL, 'Promotion Batch', NULL, 'promotion-batch', 'list_alt', 'material', 'promotion-batch.index', 'promotion-batch', 'sidebar', 23, NULL, 1, NULL, NULL, '2026-09-17 14:54:37', '2026-09-17 14:54:37', NULL, NULL, NULL);
+INSERT INTO `menus` VALUES (45, 1, NULL, NULL, 'Student Classroom', NULL, 'student-classroom', 'list_alt', 'material', 'student-classroom.index', 'student-classroom', 'sidebar', 24, NULL, 1, NULL, NULL, '2026-09-17 14:58:41', '2026-09-17 14:58:41', NULL, NULL, NULL);
+INSERT INTO `menus` VALUES (46, 1, NULL, NULL, 'Student Promotion', NULL, 'student-promotion', 'list_alt', 'material', 'student-promotion.index', 'student-promotion', 'sidebar', 25, NULL, 1, NULL, NULL, '2026-09-17 15:00:24', '2026-09-17 15:00:24', NULL, NULL, NULL);
+INSERT INTO `menus` VALUES (47, 1, NULL, NULL, 'Promotion Criterion', NULL, 'promotion-criterion', 'list_alt', 'material', 'promotion-criterion.index', 'promotion-criterion', 'sidebar', 26, NULL, 1, NULL, NULL, '2026-09-17 15:07:30', '2026-09-17 15:07:30', NULL, NULL, NULL);
+INSERT INTO `menus` VALUES (48, 1, NULL, NULL, 'Student Extracurricular', NULL, 'student-extracurricular', 'list_alt', 'material', 'student-extracurricular.index', 'student-extracurricular', 'sidebar', 27, NULL, 1, NULL, NULL, '2026-09-17 15:35:03', '2026-09-17 15:35:03', NULL, NULL, NULL);
+INSERT INTO `menus` VALUES (49, 1, NULL, NULL, 'Student Parent', NULL, 'student-parent', 'list_alt', 'material', 'student-parent.index', 'student-parent', 'sidebar', 28, NULL, 1, NULL, NULL, '2026-09-17 15:39:49', '2026-09-17 15:39:49', NULL, NULL, NULL);
+INSERT INTO `menus` VALUES (50, 1, NULL, NULL, 'Extracurricular', NULL, 'extracurricular', 'list_alt', 'material', 'extracurricular.index', 'extracurricular', 'sidebar', 29, NULL, 1, NULL, NULL, '2026-09-17 15:49:05', '2026-09-17 15:49:05', NULL, NULL, NULL);
 
 -- ----------------------------
 -- Table structure for messages
@@ -5141,7 +5277,7 @@ CREATE TABLE `navigation`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `navigation_parent_id_index`(`parent_id` ASC) USING BTREE,
   INDEX `navigation_deleted_at_index`(`deleted_at` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of navigation
@@ -6220,7 +6356,7 @@ CREATE TABLE `permissions`  (
   INDEX `permissions_deleted_at_index`(`deleted_at` ASC) USING BTREE,
   INDEX `permissions_created_by_index`(`created_by` ASC) USING BTREE,
   INDEX `permissions_updated_by_index`(`updated_by` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of permissions
@@ -6279,6 +6415,92 @@ CREATE TABLE `positions`  (
 
 -- ----------------------------
 -- Records of positions
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for promotion_approvals
+-- ----------------------------
+DROP TABLE IF EXISTS `promotion_approvals`;
+CREATE TABLE `promotion_approvals`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `promotion_id` bigint UNSIGNED NOT NULL,
+  `approver_id` bigint UNSIGNED NOT NULL,
+  `approver_role` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `approval_level` int UNSIGNED NULL DEFAULT 1,
+  `status` enum('pending','approved','rejected') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
+  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `approved_at` datetime NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `promotion_id`(`promotion_id` ASC) USING BTREE,
+  CONSTRAINT `promotion_approvals_ibfk_1` FOREIGN KEY (`promotion_id`) REFERENCES `student_promotions` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of promotion_approvals
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for promotion_batches
+-- ----------------------------
+DROP TABLE IF EXISTS `promotion_batches`;
+CREATE TABLE `promotion_batches`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `from_academic_year_id` bigint UNSIGNED NOT NULL,
+  `to_academic_year_id` bigint UNSIGNED NOT NULL,
+  `total_students` int UNSIGNED NULL DEFAULT 0,
+  `processed_count` int UNSIGNED NULL DEFAULT 0,
+  `promoted_count` int UNSIGNED NULL DEFAULT 0,
+  `retained_count` int UNSIGNED NULL DEFAULT 0,
+  `graduated_count` int UNSIGNED NULL DEFAULT 0,
+  `status` enum('draft','processing','completed','cancelled') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'draft',
+  `started_at` datetime NULL DEFAULT NULL,
+  `completed_at` datetime NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `code`(`code` ASC) USING BTREE,
+  INDEX `from_academic_year_id`(`from_academic_year_id` ASC) USING BTREE,
+  INDEX `to_academic_year_id`(`to_academic_year_id` ASC) USING BTREE,
+  CONSTRAINT `promotion_batches_ibfk_1` FOREIGN KEY (`from_academic_year_id`) REFERENCES `academic_years` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `promotion_batches_ibfk_2` FOREIGN KEY (`to_academic_year_id`) REFERENCES `academic_years` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of promotion_batches
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for promotion_criteria
+-- ----------------------------
+DROP TABLE IF EXISTS `promotion_criteria`;
+CREATE TABLE `promotion_criteria`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `academic_year_id` bigint UNSIGNED NOT NULL,
+  `class_level_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `min_final_score` decimal(5, 2) NULL DEFAULT NULL,
+  `min_attendance_rate` decimal(5, 2) NULL DEFAULT NULL,
+  `min_behavior_score` decimal(5, 2) NULL DEFAULT NULL,
+  `max_failed_subjects` int UNSIGNED NULL DEFAULT 0,
+  `auto_promote` tinyint(1) NULL DEFAULT 1,
+  `allow_manual_override` tinyint(1) NULL DEFAULT 1,
+  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `is_active` tinyint(1) NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `academic_year_id`(`academic_year_id` ASC) USING BTREE,
+  INDEX `class_level_id`(`class_level_id` ASC) USING BTREE,
+  CONSTRAINT `promotion_criteria_ibfk_1` FOREIGN KEY (`academic_year_id`) REFERENCES `academic_years` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `promotion_criteria_ibfk_2` FOREIGN KEY (`class_level_id`) REFERENCES `class_levels` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of promotion_criteria
 -- ----------------------------
 
 -- ----------------------------
@@ -7355,7 +7577,7 @@ CREATE TABLE `rkas_standards`  (
   INDEX `rkas_standards_deleted_at_index`(`deleted_at` ASC) USING BTREE,
   INDEX `rkas_standards_created_by_index`(`created_by` ASC) USING BTREE,
   INDEX `rkas_standards_updated_by_index`(`updated_by` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of rkas_standards
@@ -7443,11 +7665,12 @@ CREATE TABLE `role_user`  (
   CONSTRAINT `role_user_org_fk` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
   CONSTRAINT `role_user_role_id_foreign` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
   CONSTRAINT `role_user_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 8 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of role_user
 -- ----------------------------
+INSERT INTO `role_user` VALUES (7, 1, 1, 1, 1, NULL, NULL, NULL, NULL, NULL);
 
 -- ----------------------------
 -- Table structure for roles
@@ -7757,6 +7980,7 @@ CREATE TABLE `sessions`  (
 -- ----------------------------
 -- Records of sessions
 -- ----------------------------
+INSERT INTO `sessions` VALUES ('9XHTbC1uYLYmwYFcQpPQocO6ntNyr5Axvn0Lqk2m', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36', 'YToxNDp7czo2OiJfdG9rZW4iO3M6NDA6IkhIczhnUzc4MUdhSHJWSjBUWVl0TlVMR1dtaW1lMkZGZms1WUQ4VHkiO3M6OToiX3ByZXZpb3VzIjthOjI6e3M6MzoidXJsIjtzOjI5OiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvc3R1ZGVudCI7czo1OiJyb3V0ZSI7czoxMzoic3R1ZGVudC5pbmRleCI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fXM6NTA6ImxvZ2luX3dlYl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjtpOjE7czo5OiJ1c2VyX2F1dGgiO2E6Nzp7czo4OiJsb2dpbl9hcyI7czoxMToic3VwZXItYWRtaW4iO3M6MTQ6ImFjdGl2ZV9yb2xlX2lkIjtpOjE7czoxMzoiYXV0aF9yb2xlX2lkcyI7TzoyOToiSWxsdW1pbmF0ZVxTdXBwb3J0XENvbGxlY3Rpb24iOjI6e3M6ODoiACoAaXRlbXMiO2E6MTp7aTowO2k6MTt9czoyODoiACoAZXNjYXBlV2hlbkNhc3RpbmdUb1N0cmluZyI7YjowO31zOjEwOiJhdXRoX3JvbGVzIjtPOjI5OiJJbGx1bWluYXRlXFN1cHBvcnRcQ29sbGVjdGlvbiI6Mjp7czo4OiIAKgBpdGVtcyI7YToxOntpOjA7czoxMToic3VwZXItYWRtaW4iO31zOjI4OiIAKgBlc2NhcGVXaGVuQ2FzdGluZ1RvU3RyaW5nIjtiOjA7fXM6OToiYXV0aF9yb2xlIjtPOjExOiJNb2RlbHNcUm9sZSI6MzY6e3M6MTM6IgAqAGNvbm5lY3Rpb24iO3M6NToibXlzcWwiO3M6ODoiACoAdGFibGUiO3M6NToicm9sZXMiO3M6MTM6IgAqAHByaW1hcnlLZXkiO3M6MjoiaWQiO3M6MTA6IgAqAGtleVR5cGUiO3M6MzoiaW50IjtzOjEyOiJpbmNyZW1lbnRpbmciO2I6MTtzOjc6IgAqAHdpdGgiO2E6MDp7fXM6MTI6IgAqAHdpdGhDb3VudCI7YTowOnt9czoxOToicHJldmVudHNMYXp5TG9hZGluZyI7YjowO3M6MTA6IgAqAHBlclBhZ2UiO2k6MTU7czo2OiJleGlzdHMiO2I6MTtzOjE4OiJ3YXNSZWNlbnRseUNyZWF0ZWQiO2I6MDtzOjI4OiIAKgBlc2NhcGVXaGVuQ2FzdGluZ1RvU3RyaW5nIjtiOjA7czoxMzoiACoAYXR0cmlidXRlcyI7YToxMjp7czoyOiJpZCI7aToxO3M6MTU6Im9yZ2FuaXphdGlvbl9pZCI7aToxO3M6NDoibmFtZSI7czoxMToic3VwZXItYWRtaW4iO3M6MTI6ImRpc3BsYXlfbmFtZSI7czoxOToiU3VwZXIgQWRtaW5pc3RyYXRvciI7czoxMToiZGVzY3JpcHRpb24iO3M6Mzg6Ik1lbWlsaWtpIGFrc2VzIHBlbnVoIGtlIHNlbHVydWggc2lzdGVtIjtzOjk6ImlzX3N5c3RlbSI7aToxO3M6OToiaXNfYWN0aXZlIjtpOjE7czoxMDoiY3JlYXRlZF9hdCI7czoxOToiMjAyNi0wOS0wOSAxNzowNzo0MSI7czoxMDoidXBkYXRlZF9hdCI7czoxOToiMjAyNi0wOS0wOSAxNzowNzo0MSI7czoxMDoiZGVsZXRlZF9hdCI7TjtzOjEwOiJjcmVhdGVkX2J5IjtOO3M6MTA6InVwZGF0ZWRfYnkiO047fXM6MTE6IgAqAG9yaWdpbmFsIjthOjE3OntzOjI6ImlkIjtpOjE7czoxNToib3JnYW5pemF0aW9uX2lkIjtpOjE7czo0OiJuYW1lIjtzOjExOiJzdXBlci1hZG1pbiI7czoxMjoiZGlzcGxheV9uYW1lIjtzOjE5OiJTdXBlciBBZG1pbmlzdHJhdG9yIjtzOjExOiJkZXNjcmlwdGlvbiI7czozODoiTWVtaWxpa2kgYWtzZXMgcGVudWgga2Ugc2VsdXJ1aCBzaXN0ZW0iO3M6OToiaXNfc3lzdGVtIjtpOjE7czo5OiJpc19hY3RpdmUiO2k6MTtzOjEwOiJjcmVhdGVkX2F0IjtzOjE5OiIyMDI2LTA5LTA5IDE3OjA3OjQxIjtzOjEwOiJ1cGRhdGVkX2F0IjtzOjE5OiIyMDI2LTA5LTA5IDE3OjA3OjQxIjtzOjEwOiJkZWxldGVkX2F0IjtOO3M6MTA6ImNyZWF0ZWRfYnkiO047czoxMDoidXBkYXRlZF9ieSI7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e3M6NzoiY29tbWFuZCI7czoyMjA6Im1ha2U6Y3J1ZC15YWpyYSBTdHVkZW50QXR0ZW5kYW5jZSAtLWNvbHVtbnM9aWQsc3R1ZGVudF9pZCxzY2hlZHVsZV9pZCxjbGFzc3Jvb21faWQsZGF0ZSxzdGF0dXMsY2hlY2tfaW5fdGltZSxjaGVja19vdXRfdGltZSxsYXRlX21pbnV0ZXMscmVhc29uLHZlcmlmaWVkX2J5LGlzX2FjdGl2ZSxjcmVhdGVkX2F0LHVwZGF0ZWRfYXQsZGVsZXRlZF9hdCxjcmVhdGVkX2J5LHVwZGF0ZWRfYnkiO3M6Njoic3RhdHVzIjtzOjc6InJ1bm5pbmciO3M6MTA6InN0YXJ0ZWRfYXQiO086MjU6IklsbHVtaW5hdGVcU3VwcG9ydFxDYXJib24iOjM6e3M6NDoiZGF0ZSI7czoyNjoiMjAyNi0wOS0xNyAxNDo0ODoyNS4xODMzMTIiO3M6MTM6InRpbWV6b25lX3R5cGUiO2k6MztzOjg6InRpbWV6b25lIjtzOjM6IlVUQyI7fX19czozMjoiY3J1ZF9wcm9jZXNzX2NydWRfNmFhYmZmMmQ0NDJjZTQiO2E6MTp7aTo3MDU0MTI1ODthOjM6e3M6NzoiY29tbWFuZCI7czoyMzY6Im1ha2U6Y3J1ZC15YWpyYSBQcm9tb3Rpb25CYXRjaCAtLWNvbHVtbnM9aWQsY29kZSxuYW1lLGZyb21fYWNhZGVtaWNfeWVhcl9pZCx0b19hY2FkZW1pY195ZWFyX2lkLHRvdGFsX3N0dWRlbnRzLHByb2Nlc3NlZF9jb3VudCxwcm9tb3RlZF9jb3VudCxyZXRhaW5lZF9jb3VudCxncmFkdWF0ZWRfY291bnQsc3RhdHVzLHN0YXJ0ZWRfYXQsY29tcGxldGVkX2F0LGNyZWF0ZWRfYnksY3JlYXRlZF9hdCx1cGRhdGVkX2F0IjtzOjY6InN0YXR1cyI7czo3OiJydW5uaW5nIjtzOjEwOiJzdGFydGVkX2F0IjtPOjI1OiJJbGx1bWluYXRlXFN1cHBvcnRcQ2FyYm9uIjozOntzOjQ6ImRhdGUiO3M6MjY6IjIwMjYtMDktMTcgMTQ6NTQ6MzcuMjc5MzM5IjtzOjEzOiJ0aW1lem9uZV90eXBlIjtpOjM7czo4OiJ0aW1lem9uZSI7czozOiJVVEMiO319fXM6MzI6ImNydWRfcHJvY2Vzc19jcnVkXzZhYWMwMDIwYThhMWU5IjthOjE6e3M6ODoiMDY2MDUwNTUiO2E6Mzp7czo3OiJjb21tYW5kIjtzOjE2NDoibWFrZTpjcnVkLXlhanJhIFN0dWRlbnRDbGFzc3Jvb20gLS1jb2x1bW5zPWlkLHN0dWRlbnRfaWQsY2xhc3Nyb29tX2lkLGFjYWRlbWljX3llYXJfaWQsZW5yb2xsbWVudF9kYXRlLHN0YXR1cyxjcmVhdGVkX2F0LHVwZGF0ZWRfYXQsZGVsZXRlZF9hdCxjcmVhdGVkX2J5LHVwZGF0ZWRfYnkiO3M6Njoic3RhdHVzIjtzOjc6InJ1bm5pbmciO3M6MTA6InN0YXJ0ZWRfYXQiO086MjU6IklsbHVtaW5hdGVcU3VwcG9ydFxDYXJib24iOjM6e3M6NDoiZGF0ZSI7czoyNjoiMjAyNi0wOS0xNyAxNDo1ODo0MC42OTA4MDkiO3M6MTM6InRpbWV6b25lX3R5cGUiO2k6MztzOjg6InRpbWV6b25lIjtzOjM6IlVUQyI7fX19czozMjoiY3J1ZF9wcm9jZXNzX2NydWRfNmFhYzAwODgyMTQ0ZTYiO2E6MTp7aToxMjUxMTMwMzthOjM6e3M6NzoiY29tbWFuZCI7czoyNzI6Im1ha2U6Y3J1ZC15YWpyYSBTdHVkZW50UHJvbW90aW9uIC0tY29sdW1ucz1pZCxzdHVkZW50X2lkLHNjaG9vbF9pZCxmcm9tX2NsYXNzcm9vbV9pZCx0b19jbGFzc3Jvb21faWQsYWNhZGVtaWNfeWVhcl9pZCxkZWNpc2lvbixkZWNpc2lvbl9kYXRlLG1lZXRpbmdfbm90ZXMsZmluYWxfc2NvcmVfYXZlcmFnZSxhdHRlbmRhbmNlX3BlcmNlbnRhZ2UsZGVjaWRlZF9ieSxpc19hY3RpdmUsY3JlYXRlZF9hdCx1cGRhdGVkX2F0LGRlbGV0ZWRfYXQsY3JlYXRlZF9ieSx1cGRhdGVkX2J5IjtzOjY6InN0YXR1cyI7czo3OiJydW5uaW5nIjtzOjEwOiJzdGFydGVkX2F0IjtPOjI1OiJJbGx1bWluYXRlXFN1cHBvcnRcQ2FyYm9uIjozOntzOjQ6ImRhdGUiO3M6MjY6IjIwMjYtMDktMTcgMTU6MDA6MjQuMTM2NDE0IjtzOjEzOiJ0aW1lem9uZV90eXBlIjtpOjM7czo4OiJ0aW1lem9uZSI7czozOiJVVEMiO319fXM6MzI6ImNydWRfcHJvY2Vzc19jcnVkXzZhYWMwMjMxY2JkMmMwIjthOjE6e2k6MjI5MjgxMDg7YTozOntzOjc6ImNvbW1hbmQiO3M6MjI3OiJtYWtlOmNydWQteWFqcmEgUHJvbW90aW9uQ3JpdGVyaW9uIC0tY29sdW1ucz1pZCxhY2FkZW1pY195ZWFyX2lkLGNsYXNzX2xldmVsX2lkLG1pbl9maW5hbF9zY29yZSxtaW5fYXR0ZW5kYW5jZV9yYXRlLG1pbl9iZWhhdmlvcl9zY29yZSxtYXhfZmFpbGVkX3N1YmplY3RzLGF1dG9fcHJvbW90ZSxhbGxvd19tYW51YWxfb3ZlcnJpZGUsbm90ZXMsaXNfYWN0aXZlLGNyZWF0ZWRfYXQsdXBkYXRlZF9hdCI7czo2OiJzdGF0dXMiO3M6NzoicnVubmluZyI7czoxMDoic3RhcnRlZF9hdCI7TzoyNToiSWxsdW1pbmF0ZVxTdXBwb3J0XENhcmJvbiI6Mzp7czo0OiJkYXRlIjtzOjI2OiIyMDI2LTA5LTE3IDE1OjA3OjI5LjgzNDkxOSI7czoxMzoidGltZXpvbmVfdHlwZSI7aTozO3M6ODoidGltZXpvbmUiO3M6MzoiVVRDIjt9fX1zOjMyOiJjcnVkX3Byb2Nlc3NfY3J1ZF82YWFjMDhhNzQ1MjkwNyI7YToxOntpOjM0ODIwNjE3O2E6Mzp7czo3OiJjb21tYW5kIjtzOjI2NDoibWFrZTpjcnVkLXlhanJhIFN0dWRlbnRFeHRyYWN1cnJpY3VsYXIgLS1jb2x1bW5zPWlkLHN0dWRlbnRfaWQsZXh0cmFjdXJyaWN1bGFyX2lkLGVucm9sbG1lbnRfZGF0ZSxzdGF0dXMsZ3JhZGVfbGV0dGVyLHByZWRpY2F0ZSxkZXNjcmlwdGlvbixjZXJ0aWZpY2F0ZV91cmwsYWNoaWV2ZW1lbnRfbm90ZXMsZXZhbHVhdGVkX2J5LGV2YWx1YXRlZF9hdCxpc19hY3RpdmUsY3JlYXRlZF9hdCx1cGRhdGVkX2F0LGRlbGV0ZWRfYXQsY3JlYXRlZF9ieSx1cGRhdGVkX2J5IjtzOjY6InN0YXR1cyI7czo3OiJydW5uaW5nIjtzOjEwOiJzdGFydGVkX2F0IjtPOjI1OiJJbGx1bWluYXRlXFN1cHBvcnRcQ2FyYm9uIjozOntzOjQ6ImRhdGUiO3M6MjY6IjIwMjYtMDktMTcgMTU6MzU6MDMuMjgzMzQyIjtzOjEzOiJ0aW1lem9uZV90eXBlIjtpOjM7czo4OiJ0aW1lem9uZSI7czozOiJVVEMiO319fXM6MzI6ImNydWRfcHJvY2Vzc19jcnVkXzZhYWMwOWM0ZDhhMzk2IjthOjE6e2k6MjgwNDk1MjI7YTozOntzOjc6ImNvbW1hbmQiO3M6MTI2OiJtYWtlOmNydWQteWFqcmEgU3R1ZGVudFBhcmVudCAtLWNvbHVtbnM9c3R1ZGVudF9pZCxwYXJlbnRfaWQsaXNfcHJpbWFyeSxjcmVhdGVkX2F0LHVwZGF0ZWRfYXQsZGVsZXRlZF9hdCxjcmVhdGVkX2J5LHVwZGF0ZWRfYnkiO3M6Njoic3RhdHVzIjtzOjc6InJ1bm5pbmciO3M6MTA6InN0YXJ0ZWRfYXQiO086MjU6IklsbHVtaW5hdGVcU3VwcG9ydFxDYXJib24iOjM6e3M6NDoiZGF0ZSI7czoyNjoiMjAyNi0wOS0xNyAxNTozOTo0OC44ODc0MjUiO3M6MTM6InRpbWV6b25lX3R5cGUiO2k6MztzOjg6InRpbWV6b25lIjtzOjM6IlVUQyI7fX19czozMjoiY3J1ZF9wcm9jZXNzX2NydWRfNmFhYzBiZjE1ODk0NDMiO2E6MTp7aTo0NDgyMzQ0NjthOjM6e3M6NzoiY29tbWFuZCI7czoxOTc6Im1ha2U6Y3J1ZC15YWpyYSBFeHRyYWN1cnJpY3VsYXIgLS1jb2x1bW5zPWlkLHNjaG9vbF9pZCxuYW1lLGNvZGUsZGVzY3JpcHRpb24sdGVhY2hlcl9pZCxkYXlfb2Zfd2VlayxzdGFydF90aW1lLGVuZF90aW1lLG1heF9zdHVkZW50cyxpc19hY3RpdmUsY3JlYXRlZF9hdCx1cGRhdGVkX2F0LGRlbGV0ZWRfYXQsY3JlYXRlZF9ieSx1cGRhdGVkX2J5IjtzOjY6InN0YXR1cyI7czo3OiJydW5uaW5nIjtzOjEwOiJzdGFydGVkX2F0IjtPOjI1OiJJbGx1bWluYXRlXFN1cHBvcnRcQ2FyYm9uIjozOntzOjQ6ImRhdGUiO3M6MjY6IjIwMjYtMDktMTcgMTU6NDk6MDUuMzYyOTE0IjtzOjEzOiJ0aW1lem9uZV90eXBlIjtpOjM7czo4OiJ0aW1lem9uZSI7czozOiJVVEMiO319fX0=', 1789663565);
 
 -- ----------------------------
 -- Table structure for shift_rates
@@ -8554,7 +8778,7 @@ CREATE TABLE `system_logs`  (
   INDEX `idx_system_logs_level`(`level` ASC) USING BTREE,
   INDEX `idx_system_logs_created`(`created_at` ASC) USING BTREE,
   INDEX `idx_system_logs_org`(`organization_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of system_logs
@@ -8567,7 +8791,7 @@ DROP TABLE IF EXISTS `tax_liabilities`;
 CREATE TABLE `tax_liabilities`  (
   `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `organization_id` bigint UNSIGNED NOT NULL,
-  `tax_type_id` bigint UNSIGNED NOT NULL,
+  `tax_type` enum('pph21','pph23','pph25','ppn','ppnbm','other') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `tax_period` varchar(7) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `tax_amount` decimal(15, 2) NOT NULL DEFAULT 0.00,
   `paid_amount` decimal(15, 2) NOT NULL DEFAULT 0.00,
@@ -8641,6 +8865,7 @@ CREATE TABLE `tax_settings`  (
   `organization_id` bigint UNSIGNED NOT NULL,
   `tax_code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `tax_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `tax_type` enum('pph21','pph23','pph25','ppn','ppnbm','other') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `tax_type_id` bigint UNSIGNED NOT NULL,
   `tax_rate` decimal(12, 4) NOT NULL DEFAULT 0.0000,
   `min_amount` decimal(15, 2) NULL DEFAULT NULL,
@@ -8758,9 +8983,12 @@ CREATE TABLE `teachers`  (
   `nip` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
   `name` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `specialization` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `education_level_id` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `education_level_id` bigint NULL DEFAULT NULL,
   `join_date` date NULL DEFAULT NULL,
   `status` enum('ACTIVE','RESIGNED','RETIRED') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT 'ACTIVE',
+  `subject` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `is_active` tinyint(1) NULL DEFAULT NULL,
+  `employee_id` bigint NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
@@ -8772,11 +9000,26 @@ CREATE TABLE `teachers`  (
   INDEX `idx_teachers_status`(`status` ASC) USING BTREE,
   INDEX `idx_teachers_deleted_at`(`deleted_at` ASC) USING BTREE,
   CONSTRAINT `teachers_org_fk` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 71 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of teachers
 -- ----------------------------
+INSERT INTO `teachers` VALUES (1, 1, NULL, '198501012010011001', 'Ahmad Fauzi, S.Pd.', 'Pendidikan Agama Islam', NULL, '2010-01-04', 'ACTIVE', NULL, NULL, NULL, '2026-09-16 12:51:16', '2026-09-16 12:51:16', NULL, NULL, NULL);
+INSERT INTO `teachers` VALUES (2, 1, NULL, '198603152011012002', 'Siti Aminah, S.Pd.', 'Bahasa Indonesia', NULL, '2011-07-01', 'ACTIVE', NULL, NULL, NULL, '2026-09-16 12:51:16', '2026-09-16 12:51:16', NULL, NULL, NULL);
+INSERT INTO `teachers` VALUES (3, 1, NULL, '198709202012011003', 'Budi Santoso, S.Pd.', 'Matematika', NULL, '2012-01-02', 'ACTIVE', NULL, NULL, NULL, '2026-09-16 12:51:16', '2026-09-16 12:51:16', NULL, NULL, NULL);
+INSERT INTO `teachers` VALUES (4, 1, NULL, '198804102013012004', 'Dewi Lestari, S.Pd.', 'Bahasa Inggris', NULL, '2013-07-01', 'ACTIVE', NULL, NULL, NULL, '2026-09-16 12:51:16', '2026-09-16 12:51:16', NULL, NULL, NULL);
+INSERT INTO `teachers` VALUES (5, 1, NULL, '198902252014011005', 'Rizky Hidayat, S.Pd.', 'Ilmu Pengetahuan Alam', NULL, '2014-01-06', 'ACTIVE', NULL, NULL, NULL, '2026-09-16 12:51:16', '2026-09-16 12:51:16', NULL, NULL, NULL);
+INSERT INTO `teachers` VALUES (6, 1, NULL, '198905122015012006', 'Nurul Hidayah, S.Pd.', 'Ilmu Pengetahuan Sosial', NULL, '2015-07-01', 'ACTIVE', NULL, NULL, NULL, '2026-09-16 12:51:16', '2026-09-16 12:51:16', NULL, NULL, NULL);
+INSERT INTO `teachers` VALUES (7, 1, NULL, '199001182016011007', 'Agus Setiawan, S.Pd.', 'Pendidikan Jasmani', NULL, '2016-01-04', 'ACTIVE', NULL, NULL, NULL, '2026-09-16 12:51:16', '2026-09-16 12:51:16', NULL, NULL, NULL);
+INSERT INTO `teachers` VALUES (8, 1, NULL, '199102052017012008', 'Maya Sari, S.Pd.', 'Seni Budaya', NULL, '2017-07-03', 'ACTIVE', NULL, NULL, NULL, '2026-09-16 12:51:16', '2026-09-16 12:51:16', NULL, NULL, NULL);
+INSERT INTO `teachers` VALUES (9, 1, NULL, '199203102018011009', 'Fajar Nugroho, S.Pd.', 'Teknologi Informasi', NULL, '2018-01-08', 'ACTIVE', NULL, NULL, NULL, '2026-09-16 12:51:16', '2026-09-16 12:51:16', NULL, NULL, NULL);
+INSERT INTO `teachers` VALUES (10, 1, NULL, '199305202019012010', 'Rina Wulandari, S.Pd.', 'Bahasa Indonesia', NULL, '2019-07-01', 'ACTIVE', NULL, NULL, NULL, '2026-09-16 12:51:16', '2026-09-16 12:51:16', NULL, NULL, NULL);
+INSERT INTO `teachers` VALUES (11, 1, NULL, '199407152020011011', 'Dedi Kurniawan, S.Pd.', 'Matematika', NULL, '2020-01-06', 'ACTIVE', NULL, NULL, NULL, '2026-09-16 12:51:16', '2026-09-16 12:51:16', NULL, NULL, NULL);
+INSERT INTO `teachers` VALUES (12, 1, NULL, '199508122021012012', 'Ayu Pratiwi, S.Pd.', 'Bahasa Inggris', NULL, '2021-07-01', 'ACTIVE', NULL, NULL, NULL, '2026-09-16 12:51:16', '2026-09-16 12:51:16', NULL, NULL, NULL);
+INSERT INTO `teachers` VALUES (13, 1, NULL, '199609252022011013', 'Hendra Wijaya, S.Pd.', 'Ilmu Pengetahuan Alam', NULL, '2022-01-03', 'ACTIVE', NULL, NULL, NULL, '2026-09-16 12:51:16', '2026-09-16 12:51:16', NULL, NULL, NULL);
+INSERT INTO `teachers` VALUES (14, 1, NULL, '199701182023012014', 'Lina Marlina, S.Pd.', 'Pendidikan Agama Islam', NULL, '2023-07-03', 'ACTIVE', NULL, NULL, NULL, '2026-09-16 12:51:16', '2026-09-16 12:51:16', NULL, NULL, NULL);
+INSERT INTO `teachers` VALUES (15, 1, NULL, '199802052024011015', 'Andi Pratama, S.Pd.', 'Pendidikan Jasmani', NULL, '2024-01-08', 'ACTIVE', NULL, NULL, NULL, '2026-09-16 12:51:16', '2026-09-16 12:51:16', NULL, NULL, NULL);
 
 -- ----------------------------
 -- Table structure for teaching_loads
@@ -8813,176 +9056,123 @@ CREATE TABLE `teaching_loads`  (
 -- Records of teaching_loads
 -- ----------------------------
 
-CREATE TABLE test_schedules (
-    id                  BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    
-    -- Relasi
-    admission_id        BIGINT UNSIGNED NOT NULL,          -- FK ke admissions (gelombang PPDB)
-    admission_selection_id BIGINT UNSIGNED NULL,           -- FK opsional ke admission_selections
-    academic_year_id    BIGINT UNSIGNED NOT NULL,          -- FK ke academic_years
-    school_id           BIGINT UNSIGNED NULL,              -- kalau multi-tenant
-    
-    -- Info Dasar
-    code                VARCHAR(50) NOT NULL UNIQUE,       -- "TES-TULIS-2025-01"
-    name                VARCHAR(150) NOT NULL,             -- "Tes Tulis Gelombang 1 - Sesi A"
-    description         TEXT NULL,
-    
-    -- Jenis & Metode Tes
-    test_type           ENUM('tulis','wawancara','praktek','kesehatan','psikotes','lainnya') 
-                        NOT NULL DEFAULT 'tulis',
-    test_method         ENUM('offline','online','hybrid') 
-                        NOT NULL DEFAULT 'offline',
-    
-    -- Jadwal & Waktu
-    test_date           DATE NOT NULL,                     -- tanggal pelaksanaan
-    start_time          TIME NOT NULL,                     -- jam mulai
-    end_time            TIME NOT NULL,                     -- jam selesai
-    duration_minutes    INT UNSIGNED NULL,                 -- durasi (auto dari start-end)
-    registration_start  DATETIME NULL,                     -- kapan pendaftaran slot dibuka
-    registration_end    DATETIME NULL,                     -- kapan pendaftaran slot ditutup
-    
-    -- Lokasi
-    room_id             BIGINT UNSIGNED NULL,              -- FK ke rooms (kalau offline)
-    building_id         BIGINT UNSIGNED NULL,              -- FK ke buildings
-    location_detail     VARCHAR(255) NULL,                 -- "Gedung A Lt. 2 Ruang 201"
-    online_meeting_url  VARCHAR(500) NULL,                 -- Zoom/Meet (kalau online)
-    online_meeting_id   VARCHAR(100) NULL,
-    online_password     VARCHAR(100) NULL,
-    
-    -- CBT Integration (kalau tes online via CBT)
-    cbt_session_id      BIGINT UNSIGNED NULL,              -- FK ke cbt_sessions
-    exam_package_id     BIGINT UNSIGNED NULL,              -- FK ke exam_packages
-    
-    -- Kapasitas & Kuota
-    quota               INT UNSIGNED NOT NULL DEFAULT 0,   -- 0 = unlimited
-    booked_count        INT UNSIGNED NOT NULL DEFAULT 0,   -- cached count
-    min_participants    INT UNSIGNED DEFAULT 0,            -- minimal peserta agar tes jalan
-    
-    -- Pengawas & Panitia
-    supervisor_id       BIGINT UNSIGNED NULL,              -- FK ke employees/users
-    coordinator_id      BIGINT UNSIGNED NULL,              -- penanggung jawab
-    proctor_ids         JSON NULL,                         -- array ID pengawas tambahan
-    
-    -- Pengaturan Peserta
-    allow_self_register BOOLEAN NOT NULL DEFAULT FALSE,    -- peserta pilih sendiri?
-    allow_reschedule    BOOLEAN NOT NULL DEFAULT FALSE,    -- boleh reschedule?
-    late_tolerance_min  INT UNSIGNED DEFAULT 15,           -- toleransi keterlambatan (menit)
-    
-    -- Status
-    status              ENUM('draft','published','ongoing','completed','cancelled') 
-                        NOT NULL DEFAULT 'draft',
-    is_active           BOOLEAN NOT NULL DEFAULT TRUE,
-    
-    -- Hasil & Nilai
-    passing_score       DECIMAL(5,2) NULL,                 -- nilai minimum lulus
-    max_score           DECIMAL(5,2) NULL,                 -- nilai maksimum
-    score_input_deadline DATETIME NULL,                    -- batas input nilai
-    result_announcement DATETIME NULL,                     -- kapan hasil diumumkan
-    
-    -- Metadata
-    notes               TEXT NULL,                         -- catatan internal
-    attachments         JSON NULL,                         -- file pendukung (prosedur, dll)
-    settings            JSON NULL,                         -- konfigurasi fleksibel
-    
-    -- Audit
-    created_by          BIGINT UNSIGNED NULL,
-    updated_by          BIGINT UNSIGNED NULL,
-    created_at          TIMESTAMP NULL,
-    updated_at          TIMESTAMP NULL,
-    deleted_at          TIMESTAMP NULL,                    -- soft delete
-    
-    -- Indexes
-    INDEX idx_admission (admission_id),
-    INDEX idx_selection (admission_selection_id),
-    INDEX idx_academic_year (academic_year_id),
-    INDEX idx_test_date (test_date, start_time),
-    INDEX idx_status (status, is_active),
-    INDEX idx_test_type (test_type),
-    INDEX idx_cbt_session (cbt_session_id),
-    
-    -- Foreign Keys
-    CONSTRAINT fk_test_schedules_admission 
-        FOREIGN KEY (admission_id) REFERENCES admissions(id) ON DELETE CASCADE,
-    CONSTRAINT fk_test_schedules_selection 
-        FOREIGN KEY (admission_selection_id) REFERENCES admission_selections(id) ON DELETE SET NULL,
-    CONSTRAINT fk_test_schedules_academic_year 
-        FOREIGN KEY (academic_year_id) REFERENCES academic_years(id) ON DELETE RESTRICT,
-    CONSTRAINT fk_test_schedules_room 
-        FOREIGN KEY (room_id) REFERENCES rooms(id) ON DELETE SET NULL,
-    CONSTRAINT fk_test_schedules_cbt_session 
-        FOREIGN KEY (cbt_session_id) REFERENCES cbt_sessions(id) ON DELETE SET NULL,
-    CONSTRAINT fk_test_schedules_exam_package 
-        FOREIGN KEY (exam_package_id) REFERENCES exam_packages(id) ON DELETE SET NULL
-);
+-- ----------------------------
+-- Table structure for test_schedules
+-- ----------------------------
+DROP TABLE IF EXISTS `test_schedules`;
+CREATE TABLE `test_schedules`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `admission_id` bigint UNSIGNED NOT NULL,
+  `admission_selection_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `academic_year_id` bigint UNSIGNED NOT NULL,
+  `school_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `name` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
+  `test_type` enum('tulis','wawancara','praktek','kesehatan','psikotes','lainnya') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'tulis',
+  `test_method` enum('offline','online','hybrid') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'offline',
+  `test_date` date NOT NULL,
+  `start_time` time NOT NULL,
+  `end_time` time NOT NULL,
+  `duration_minutes` int UNSIGNED NULL DEFAULT NULL,
+  `registration_start` datetime NULL DEFAULT NULL,
+  `registration_end` datetime NULL DEFAULT NULL,
+  `room_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `building_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `location_detail` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `online_meeting_url` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `online_meeting_id` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `online_password` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `cbt_session_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `exam_package_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `quota` int UNSIGNED NOT NULL DEFAULT 0,
+  `booked_count` int UNSIGNED NOT NULL DEFAULT 0,
+  `min_participants` int UNSIGNED NULL DEFAULT 0,
+  `supervisor_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `coordinator_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `proctor_ids` json NULL,
+  `allow_self_register` tinyint(1) NOT NULL DEFAULT 0,
+  `allow_reschedule` tinyint(1) NOT NULL DEFAULT 0,
+  `late_tolerance_min` int UNSIGNED NULL DEFAULT 15,
+  `status` enum('draft','published','ongoing','completed','cancelled') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'draft',
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `passing_score` decimal(5, 2) NULL DEFAULT NULL,
+  `max_score` decimal(5, 2) NULL DEFAULT NULL,
+  `score_input_deadline` datetime NULL DEFAULT NULL,
+  `result_announcement` datetime NULL DEFAULT NULL,
+  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
+  `attachments` json NULL,
+  `settings` json NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `code`(`code`) USING BTREE,
+  INDEX `idx_admission`(`admission_id`) USING BTREE,
+  INDEX `idx_selection`(`admission_selection_id`) USING BTREE,
+  INDEX `idx_academic_year`(`academic_year_id`) USING BTREE,
+  INDEX `idx_test_date`(`test_date`, `start_time`) USING BTREE,
+  INDEX `idx_status`(`status`, `is_active`) USING BTREE,
+  INDEX `idx_test_type`(`test_type`) USING BTREE,
+  INDEX `idx_cbt_session`(`cbt_session_id`) USING BTREE,
+  INDEX `fk_test_schedules_room`(`room_id`) USING BTREE,
+  INDEX `fk_test_schedules_exam_package`(`exam_package_id`) USING BTREE
+) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
-CREATE TABLE test_types (
-    id                  BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    
-    -- Identitas
-    code                VARCHAR(50) NOT NULL UNIQUE,       -- "tulis", "wawancara", "psikotes"
-    name                VARCHAR(150) NOT NULL,             -- "Tes Tulis"
-    name_en             VARCHAR(150) NULL,                 -- "Written Test" (opsional)
-    slug                VARCHAR(150) NOT NULL UNIQUE,      -- "tes-tulis"
-    description         TEXT NULL,
-    
-    -- Kategorisasi
-    category            ENUM('akademik','non_akademik','kesehatan','administrasi','lainnya')
-                        NOT NULL DEFAULT 'akademik',
-    parent_id           BIGINT UNSIGNED NULL,              -- untuk sub-jenis (hierarchical)
-    
-    -- Visual
-    icon                VARCHAR(100) NULL,                 -- "bi-pencil-square"
-    color               VARCHAR(20) NULL,                  -- "#3b82f6" (hex)
-    badge_class         VARCHAR(50) NULL,                  -- "badge-primary" (Bootstrap)
-    
-    -- Pengaturan Default
-    default_duration_minutes INT UNSIGNED NULL,            -- 90 menit
-    default_passing_score    DECIMAL(5,2) NULL,            -- 70.00
-    default_max_score        DECIMAL(5,2) NULL,            -- 100.00
-    default_weight           DECIMAL(5,2) DEFAULT 100.00,  -- bobot dalam seleksi
-    
-    -- Mode Pelaksanaan
-    default_method      ENUM('offline','online','hybrid') 
-                        NOT NULL DEFAULT 'offline',
-    requires_room       BOOLEAN NOT NULL DEFAULT TRUE,     -- butuh ruangan?
-    requires_supervisor BOOLEAN NOT NULL DEFAULT TRUE,     -- butuh pengawas?
-    requires_cbt        BOOLEAN NOT NULL DEFAULT FALSE,    -- pakai CBT?
-    
-    -- Komponen Penilaian (JSON fleksibel)
-    -- Contoh: {"komponen": ["pengetahuan", "logika", "bahasa"], "skala": "0-100"}
-    scoring_components  JSON NULL,
-    
-    -- Konfigurasi tambahan
-    settings            JSON NULL,
-    
-    -- Status & Urutan
-    order               INT UNSIGNED DEFAULT 0,
-    is_active           BOOLEAN NOT NULL DEFAULT TRUE,
-    is_system           BOOLEAN NOT NULL DEFAULT FALSE,    -- TRUE = tidak bisa dihapus user
-    
-    -- Multi-tenant (kalau ada)
-    school_id           BIGINT UNSIGNED NULL,
-    
-    -- Audit
-    created_by          BIGINT UNSIGNED NULL,
-    updated_by          BIGINT UNSIGNED NULL,
-    created_at          TIMESTAMP NULL,
-    updated_at          TIMESTAMP NULL,
-    deleted_at          TIMESTAMP NULL,                    -- soft delete
-    
-    -- Indexes
-    INDEX idx_code (code),
-    INDEX idx_category (category, is_active),
-    INDEX idx_parent (parent_id),
-    INDEX idx_order (order),
-    INDEX idx_school (school_id),
-    
-    -- Foreign Keys
-    CONSTRAINT fk_test_types_parent 
-        FOREIGN KEY (parent_id) REFERENCES test_types(id) ON DELETE SET NULL,
-    CONSTRAINT fk_test_types_school 
-        FOREIGN KEY (school_id) REFERENCES schools(id) ON DELETE CASCADE
-);
+-- ----------------------------
+-- Records of test_schedules
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for test_types
+-- ----------------------------
+DROP TABLE IF EXISTS `test_types`;
+CREATE TABLE `test_types`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `name` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `name_en` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `slug` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
+  `category` enum('akademik','non_akademik','kesehatan','administrasi','lainnya') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'akademik',
+  `parent_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `icon` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `color` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `badge_class` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `default_duration_minutes` int UNSIGNED NULL DEFAULT NULL,
+  `default_passing_score` decimal(5, 2) NULL DEFAULT NULL,
+  `default_max_score` decimal(5, 2) NULL DEFAULT NULL,
+  `default_weight` decimal(5, 2) NULL DEFAULT 100.00,
+  `default_method` enum('offline','online','hybrid') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'offline',
+  `requires_room` tinyint(1) NOT NULL DEFAULT 1,
+  `requires_supervisor` tinyint(1) NOT NULL DEFAULT 1,
+  `requires_cbt` tinyint(1) NOT NULL DEFAULT 0,
+  `scoring_components` json NULL,
+  `settings` json NULL,
+  `order` int UNSIGNED NULL DEFAULT 0,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `is_system` tinyint(1) NOT NULL DEFAULT 0,
+  `school_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `code`(`code`) USING BTREE,
+  UNIQUE INDEX `slug`(`slug`) USING BTREE,
+  INDEX `idx_code`(`code`) USING BTREE,
+  INDEX `idx_category`(`category`, `is_active`) USING BTREE,
+  INDEX `idx_parent`(`parent_id`) USING BTREE,
+  INDEX `idx_order`(`order`) USING BTREE,
+  INDEX `idx_school`(`school_id`) USING BTREE
+) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of test_types
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for timetable_constraints
