@@ -11,8 +11,9 @@ class MakeCrudYajraCommand extends Command
     protected $signature = 'make:crud-yajra
                             {name : Nama Model (contoh: Product)}
                             {--columns= : Daftar kolom untuk DataTable & validasi, pisahkan dengan koma (contoh: id,name,email)}
-                            {--namespace=Models : Namespace kustom untuk Model, mis. Models atau App\\Models}
-                            {--no-menu : Jangan buat menu otomatis untuk super-admin}';
+                            {--namespace=\App\Models : Namespace kustom untuk Model, mis. Models atau App\\Models}
+                            {--no-menu : Jangan buat menu otomatis untuk super-admin}
+                            {--parent_id : Jangan buat menu otomatis untuk super-admin}';
 
     protected $description = 'Otomatis membuat CRUD lengkap dengan Yajra DataTables dan struktur Modular';
 
@@ -25,9 +26,9 @@ class MakeCrudYajraCommand extends Command
      * 
      */
     protected const COLUMN_TYPE_RULES = [
-        'date'  => ['required', 'date'],
+        'date' => ['required', 'date'],
         'start' => ['required', 'date_format:H:i'],
-        'end'   => ['required', 'date_format:H:i', 'after:start'],
+        'end' => ['required', 'date_format:H:i', 'after:start'],
     ];
 
     /**
@@ -43,6 +44,7 @@ class MakeCrudYajraCommand extends Command
         // tidak terdaftar di $signature -> InvalidArgumentException.
         // Sekarang pakai opsi --namespace yang sudah didaftarkan, default 'Models'.
         $modelNamespace = $this->option('namespace') ?: 'App\\Models';
+        $parent_id = $this->option('parent_id') ?: null;
 
         // FIX: sanitasi kolom dari --columns (trim, buang kosong, snake_case,
         // buang karakter selain huruf/angka/underscore) supaya tidak ada
@@ -123,19 +125,19 @@ class MakeCrudYajraCommand extends Command
         $validationRules = $this->buildValidationRules($columnsArray);
 
         $replacements = [
-            '{{modelName}}'           => $name,
-            '{{modelVariable}}'       => $modelVariable,
+            '{{modelName}}' => $name,
+            '{{modelVariable}}' => $modelVariable,
             '{{controllerNamespace}}' => $controllerNamespace,
-            '{{modelViewFolder}}'     => $viewFolderKebab,
-            '{{modelRoutePrefix}}'    => $modelRoutePrefix,
-            '{{modelTableId}}'        => $modelTableId,
-            '{{title}}'               => $title,
-            '{{columnsArray}}'        => $columnsPhpArray,
-            '{{columnsList}}'         => $columnsListHtml,
-            '{{validationRules}}'     => $validationRules,
-            '{{namespace}}'           => $modelNamespace,
-            '{{tableName}}'           => $tableName,
-            '{{routePrefix}}'         => $routePrefix,
+            '{{modelViewFolder}}' => $viewFolderKebab,
+            '{{modelRoutePrefix}}' => $modelRoutePrefix,
+            '{{modelTableId}}' => $modelTableId,
+            '{{title}}' => $title,
+            '{{columnsArray}}' => $columnsPhpArray,
+            '{{columnsList}}' => $columnsListHtml,
+            '{{validationRules}}' => $validationRules,
+            '{{namespace}}' => $modelNamespace,
+            '{{tableName}}' => $tableName,
+            '{{routePrefix}}' => $routePrefix,
         ];
 
         $this->newLine();
@@ -177,18 +179,18 @@ class MakeCrudYajraCommand extends Command
         $this->newLine();
         $this->generateRoutes($modulePath, $replacements);
 
-         // ============= TAMBAHKAN INI =============
+        // ============= TAMBAHKAN INI =============
         // Register menu untuk super-admin
         $this->newLine();
-        $this->info('Mendaftarkan menu untuk super-admin...'); 
+        $this->info('Mendaftarkan menu untuk super-admin...');
         if (!$this->option('no-menu')) {
             $this->newLine();
             $this->info('Mendaftarkan menu untuk super-admin...');
-            $this->registerMenuForSuperAdmin($name, $replacements);
+            $this->registerMenuForSuperAdmin($name, $replacements, $parent_id);
         }
 
         // =========================================
- 
+
         $this->newLine();
         $this->info("✨ CRUD Yajra {$name} berhasil dibuat!");
         $this->line('');
@@ -241,7 +243,8 @@ class MakeCrudYajraCommand extends Command
         $lines = [];
 
         foreach ($columnsArray as $column) {
-            if ($column === 'id') continue;
+            if ($column === 'id')
+                continue;
 
             $rules = self::COLUMN_TYPE_RULES[$column]
                 ?? (Str::endsWith($column, '_id')
@@ -319,9 +322,9 @@ class MakeCrudYajraCommand extends Command
         }
 
         $views = [
-            'index.yajra.stub'  => 'index.blade.php',
+            'index.yajra.stub' => 'index.blade.php',
             'create.yajra.stub' => 'create.blade.php',
-            'edit.yajra.stub'   => 'edit.blade.php',
+            'edit.yajra.stub' => 'edit.blade.php',
         ];
 
         foreach ($views as $stubName => $fileName) {
@@ -364,7 +367,7 @@ class MakeCrudYajraCommand extends Command
     /**
      * Register menu untuk module yang baru dibuat
      */
-    protected function registerMenuForSuperAdmin(string $name, array $replacements): void
+    protected function registerMenuForSuperAdmin(string $name, array $replacements, $parent_id): void
     {
         $superAdminRoleName = 'super-admin'; // Sesuaikan dengan role name Anda
 
@@ -384,7 +387,7 @@ class MakeCrudYajraCommand extends Command
         // Data menu dari command
         $menuData = [
             'slug' => $replacements['{{modelRoutePrefix}}'],
-            'parent_id' => null,
+            'parent_id' => $parent_id,
             'title' => $replacements['{{title}}'],
             'flyout_title' => null,
             'icon' => $this->getIconForModel($name),

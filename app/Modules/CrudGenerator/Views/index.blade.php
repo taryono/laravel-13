@@ -28,8 +28,8 @@
                                 {{ session('success') }}
                                 @if (session('output'))
                                     <pre class="mt-3 p-2 bg-dark text-light" style="max-height:300px;overflow:auto;">
-                                    {{ session('output') }}
-                                </pre>
+                                                                                                                                                                                                                                                                                                {{ session('output') }}
+                                                                                                                                                                                                                                                                                            </pre>
                                 @endif
                             </div>
                         @endif
@@ -60,8 +60,8 @@
 
                             <div class="form-group">
                                 <label for="columns">Kolom <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control @error('columns') is-invalid @enderror"
-                                    id="columns" name="columns" placeholder="Contoh: id,name,email,price,stock"
+                                <input type="text" class="form-control @error('columns') is-invalid @enderror" id="columns"
+                                    name="columns" placeholder="Contoh: id,name,email,price,stock"
                                     value="{{ old('columns', 'id,name') }}" required>
                                 <small class="form-text text-muted">
                                     Pisahkan dengan koma. Kolom 'id' secara default akan ditampilkan.
@@ -70,6 +70,16 @@
                                 @error('columns')
                                     <span class="invalid-feedback">{{ $message }}</span>
                                 @enderror
+                            </div>
+                            <div class="form-group" id="parentMenuGroup">
+                                <label for="parent_menu">Parent Menu</label>
+                                <select class="form-control" name="parent_menu">
+                                    <option value="">Tanpa Parent (Root)</option>
+                                    @foreach ($parentOptions ?? [] as $menu)
+                                        <option value="{{ $menu['id'] }}">{{ $menu['label'] }}</option>
+                                    @endforeach
+                                </select>
+                                <small class="form-text text-muted">Jadikan sub-menu dari menu yang dipilih.</small>
                             </div>
 
                             <!-- ===== ICON PICKER CRUD ===== -->
@@ -87,18 +97,6 @@
                                 <small class="form-text text-muted">Otomatis mendaftarkan menu di sidebar untuk role
                                     super-admin.</small>
                             </div>
-
-                            <div class="form-group" id="parentMenuGroup" style="display:none;">
-                                <label for="parent_menu">Parent Menu</label>
-                                <select class="form-control" id="parent_menu" name="parent_menu">
-                                    <option value="">Tanpa Parent (Root)</option>
-                                    @foreach ($existingMenus ?? [] as $menu)
-                                        <option value="{{ $menu->slug }}">{{ $menu->title }}</option>
-                                    @endforeach
-                                </select>
-                                <small class="form-text text-muted">Jadikan sub-menu dari menu yang dipilih.</small>
-                            </div>
-
                             <div class="row mt-4">
                                 <div class="col-md-6">
                                     <button type="submit" class="btn btn-primary btn-block">
@@ -184,8 +182,7 @@
                             {{-- Beri wrapper pada daftar tombol agar mudah difilter --}}
                             <div id="table-list">
                                 @foreach ($tables as $table)
-                                    <button type="button"
-                                        class="btn btn-sm btn-outline-primary btn-block mb-2 table-example"
+                                    <button type="button" class="btn btn-sm btn-outline-primary btn-block mb-2 table-example"
                                         data-table="{{ $table['name'] }}" data-label="{{ $table['label'] }}"
                                         data-columns="{{ implode(',', $table['columns']) }}">
                                         📋 {{ $table['label'] }}
@@ -213,12 +210,10 @@
                         <div id="menu-list">
                             @if (!empty($filtered))
                                 @foreach ($filtered as $module)
-                                    <button type="button"
-                                        class="btn btn-sm btn-outline-primary btn-block mb-2 menu-example"
+                                    <button type="button" class="btn btn-sm btn-outline-primary btn-block mb-2 menu-example"
                                         data-table="{{ $module }}" data-label="{{ \Str::headline($module) }}"
                                         data-flyout_title="{{ $module }}" data-slug="{{ \Str::kebab($module) }}"
-                                        data-route="{{ \Str::snake($module) }}.index"
-                                        data-url="{{ \Str::kebab($module) }}">
+                                        data-route="{{ \Str::snake($module) }}.index" data-url="{{ \Str::kebab($module) }}">
                                         📋 {{ $module }}
                                     </button>
                                 @endforeach
@@ -242,11 +237,11 @@
         <script src="{{ asset('assets/js/crud_generator.js') }}?v={{ time() }}"></script>
         <script>
             // Filter untuk Menu Ready
-            $('#search_menu').on('keyup', function() {
+            $('#search_menu').on('keyup', function () {
                 let value = $(this).val().toLowerCase();
                 let $list = $('#menu-list').find('.menu-example');
 
-                $list.each(function() {
+                $list.each(function () {
                     let text = $(this).text().toLowerCase();
                     if (text.includes(value)) {
                         $(this).show();

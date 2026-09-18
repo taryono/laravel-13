@@ -59,7 +59,7 @@ class CrudGeneratorController extends MainController
             ->get();
 
         $items = (new MenuRepository())->allForAdmin();
-        $tree  = (new MenuTreeBuilder())->build($items);
+        $tree = (new MenuTreeBuilder())->build($items);
         $organizations = Organization::all();
         $parentOptions = $this->flattenForSelect($tree);
 
@@ -89,6 +89,9 @@ class CrudGeneratorController extends MainController
         // Tambahkan opsi no-menu jika tidak ingin membuat menu
         if (!$request->boolean('create_menu')) {
             $command .= " --no-menu --model=\App\{$modelName}";
+        }
+        if ($parent_menu = $request->input('parent_menu')) {
+            $command .= " --parent_id=" . $parent_menu;
         }
         try {
 
@@ -341,25 +344,25 @@ class CrudGeneratorController extends MainController
                 // Create new role assignments
                 foreach ($request->role_ids as $roleId) {
                     // 🔍 Cari dulu barisnya
-                    $menuRole = MenuRole::where('menu_id', (int)$menu->id)
-                        ->where('role_id', (int)$roleId)
+                    $menuRole = MenuRole::where('menu_id', (int) $menu->id)
+                        ->where('role_id', (int) $roleId)
                         ->first();
                     if ($menuRole) {
                         // ✅ SUDAH ADA → UPDATE saja
                         $menuRole->update([
-                            'is_view'   => 1,
+                            'is_view' => 1,
                             'is_create' => 0,
-                            'is_edit'   => 0,
+                            'is_edit' => 0,
                             'is_delete' => 0,
                         ]);
                     } else {
                         //✅ BELUM ADA → BUAT BARU
                         MenuRole::create([
-                            'menu_id'   => (int)$menu->id,
-                            'role_id'   => (int)$roleId,
-                            'is_view'   => 1,
+                            'menu_id' => (int) $menu->id,
+                            'role_id' => (int) $roleId,
+                            'is_view' => 1,
                             'is_create' => 0,
-                            'is_edit'   => 0,
+                            'is_edit' => 0,
                             'is_delete' => 0,
                         ]);
                     }
