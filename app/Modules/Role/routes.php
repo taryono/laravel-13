@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Route;
 | and give it the controller to call when that URI is requested.
 |
  */
+
 Route::group(['prefix' => 'role', 'namespace' => 'App\Modules\Role\Controllers', 'middleware' => ['web', 'auth']], function () {
     Route::get('/', ['as' => 'role.index', 'uses' => 'RoleController@index']);
     Route::any('/search', ['as' => 'role.search', 'uses' => 'RoleController@search']);
@@ -21,5 +22,5 @@ Route::group(['prefix' => 'role', 'namespace' => 'App\Modules\Role\Controllers',
     Route::post('/store', ['as' => 'role.store', 'uses' => 'RoleController@store']);
     Route::get('/edit/{id}', ['as' => 'role.edit', 'uses' => 'RoleController@edit']);
     Route::put('/update/{id}', ['as' => 'role.update', 'uses' => 'RoleController@update']);
-    Route::delete('/delete/{id}', ['as' => 'role.destroy', 'uses' => 'RoleController@destroy']); 
+    Route::delete('/delete/{id}', ['as' => 'role.destroy', 'uses' => 'RoleController@destroy']);
 });

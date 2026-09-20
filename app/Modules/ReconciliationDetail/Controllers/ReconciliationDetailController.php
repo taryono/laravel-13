@@ -12,33 +12,31 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 use Throwable;
-use Models\Reconciliation;
-use Models\BankTransaction;
-use Models\FiscalYear; 
-class FiscalYearController extends MainController
+
+class ReconciliationDetailController extends MainController
 {
     public function __construct()
     {
-        parent::__construct(new FiscalYear());
+        parent::__construct(new ReconciliationDetail());
     }
 
-    public function index(Request $request, FiscalYearDataTable $dataTable)
+    public function index(Request $request, ReconciliationDetailDataTable $dataTable)
     {
         if ($request->filled('draw')) {
             return $dataTable->ajax();
         }
 
-        return $dataTable->render('Finance::fiscal_year.index');
+        return $dataTable->render('ReconciliationDetail::index');
     }
 
     public function create(): View
     {
-        $fiscalYear = new FiscalYear();
-        $result = $this->getForm($fiscalYear);
+        $reconciliationDetail = new ReconciliationDetail();
+        $result = $this->getForm($reconciliationDetail);
         $forms = $result['forms'];
         $groupedForms = $result['grouped'];
 
-        return view('Finance::fiscal_year.edit', compact('fiscalYear', 'forms', 'groupedForms'));
+        return view('ReconciliationDetail::edit', compact('reconciliationDetail', 'forms', 'groupedForms'));
     }
 
     public function store(Request $request)
@@ -52,11 +50,11 @@ class FiscalYearController extends MainController
         ]);
 
         try {
-            $fiscalYear = DB::transaction(function () use ($validated) {
-                return FiscalYear::create($validated);
+            $reconciliationDetail = DB::transaction(function () use ($validated) {
+                return ReconciliationDetail::create($validated);
             });
 
-            return $this->successResponse($request, 'Data tahun buku berhasil ditambahkan.', $fiscalYear);
+            return $this->successResponse($request, 'Data tahun buku berhasil ditambahkan.', $reconciliationDetail);
         } catch (Throwable $e) {
             Log::error('Gagal menambahkan tahun buku.', ['exception' => $e, 'data' => $validated]);
             return $this->errorResponse($request, 'Data tahun buku gagal ditambahkan.');
@@ -143,12 +141,12 @@ class FiscalYearController extends MainController
     public function getCurrent(): JsonResponse
     {
         try {
-            $fiscalYear = FiscalYear::where('is_closed', 0)
+            $reconciliationDetail = ReconciliationDetail::where('is_closed', 0)
                 ->where('start_date', '<=', now())
                 ->where('end_date', '>=', now())
                 ->first();
 
-            return response()->json(['success' => true, 'data' => $fiscalYear]);
+            return response()->json(['success' => true, 'data' => $reconciliationDetail]);
         } catch (Throwable $e) {
             Log::error('Gagal mengambil tahun buku aktif.', ['exception' => $e]);
             return response()->json(['success' => false, 'message' => 'Gagal mengambil data.'], 500);

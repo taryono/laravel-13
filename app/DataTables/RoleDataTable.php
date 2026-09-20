@@ -8,93 +8,128 @@ use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
-use Yajra\DataTables\Html\Editor\Editor;
-use Yajra\DataTables\Html\Editor\Fields;
 use Yajra\DataTables\Services\DataTable;
 
 class RoleDataTable extends DataTable
 {
     /**
-     * Build the DataTable class.
-     *
-     * @param QueryBuilder<Role> $query Results from query() method.
+     * Kolom yang ditampilkan di tabel (selain DT_RowIndex & action).
+     * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
+     * opsi --columns.
+     */
+    protected array $columns = ['code', 'name', 'display_name', 'description', 'is_system', 'is_active', 'parent'];
+
+    /**
+     * Build DataTable response.
      */
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
             ->addColumn('action', function ($row) {
-                return '
-                    <div class="d-flex justify-content-center gap-1">
-
-                        <button
-                            type="button"
-                            class="btn btn-sm btn-primary"
-                            data-toggle="ajax-modal"
-                            data-size="lg"
-                            data-method="GET"
-                            data-title="Detail Role '.$row->name.'"
-                            data-url="'. route('role.edit', $row->id).'"
-                            data-datatable-context=\'{"executeDraw":true,"tableId":"role-table","reloadDelay":500}\'
-                            data-submit=\'<button class="btn btn-primary modal-submit" type="button" data-datatable-id="role-table">Simpan</button>\'
-                            data-cancel=\'<button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Batal</button>\'>
-                            <span class="material-symbols-outlined">edit</span>
-                        </button>
-
-                        <button
-                            type="button"
-                            class="btn btn-sm btn-danger delete-button"
-                            data-confirm-delete="true"
-                            data-is_execute_drawer="true"
-                            data-url="' . route('role.destroy', $row->id) . '"
-                            title="Hapus"
-                        >
-                            <span class="material-symbols-outlined">delete</span>
-                        </button>
-
-                    </div>
-                ';
+                return $this->renderActionButtons($row);
+            })->addColumn('is_system', function ($row) {
+                return $row->is_system ? '<span class="badge bg-success">Ya</span>' : '<span class="badge bg-secondary">Tidak</span>';
+            })->addColumn('is_active', function ($row) {
+                return $row->is_active ? '<span class="badge bg-success">Ya</span>' : '<span class="badge bg-secondary">Tidak</span>';
+            })->addColumn('parent', function ($row) {
+                return $row->parent ? $row->parent->name : '-';
             })
             ->addIndexColumn()
-            ->rawColumns(['action']) // ✅ Tetap wajib ada!
+            ->rawColumns(['action', 'is_system', 'is_active']) // ✅ Tetap wajib ada!
             ->setRowId('id');
     }
 
     /**
-     * Get the query source of dataTable.
+     * Render tombol aksi (edit & delete) untuk satu baris.
      *
-     * @return QueryBuilder<Role>
+     * - $row->name di-escape dengan e() untuk mencegah XSS/attribute
+     *   breakout jika nilainya mengandung karakter " atau <script>.
+     * - Payload data-datatable-context dibangun via json_encode() lalu
+     *   di-escape dengan htmlspecialchars() supaya valid ditaruh di
+     *   dalam attribute HTML (bukan concat string manual yang rawan
+     *   attribute-nya terpotong).
+     * - Class tombol delete WAJIB "delete-button" (bukan "delete") supaya
+     *   cocok dengan selector di public/assets/js/button.js:
+     *   .on('click', '.delete-button', this.handleDeleteButton)
      */
-    public function query(Role $model): QueryBuilder
+    protected function renderActionButtons($row): string
     {
-        return $model->newQuery();
+        $title = e('Detail Role ' . $row->name);
+
+        $context = htmlspecialchars(
+            json_encode([
+                'executeDraw' => true,
+                'tableId'     => 'role-table',
+                'reloadDelay' => 500,
+            ]),
+            ENT_QUOTES,
+            'UTF-8'
+        );
+
+        $editUrl   = e(route('role.edit', $row->id));
+        $deleteUrl = e(route('role.destroy', $row->id));
+
+        return <<<HTML
+            <div class="d-flex justify-content-center gap-1"> 
+                <button
+                    type="button"
+                    class="btn btn-sm btn-primary"
+                    data-toggle="ajax-modal"
+                    data-size="lg"
+                    data-method="GET"
+                    data-title="{$title}"
+                    data-url="{$editUrl}"
+                    data-datatable-context='{$context}'
+                    data-submit='<button class="btn btn-primary modal-submit" type="button" data-is_execute_drawer="true" data-datatable-id="role-table">Simpan</button>'
+                    data-cancel='<button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Batal</button>'>
+                    <span class="material-symbols-outlined">edit</span>
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-sm btn-danger delete-button"
+                    data-confirm-delete="true"
+                    data-is_execute_drawer="true"
+                    data-url="{$deleteUrl}"
+                    title="Hapus"
+                >
+                    <span class="material-symbols-outlined">delete</span>
+                </button>
+
+            </div>
+        HTML;
     }
 
     /**
-     * Optional method if you want to use the html builder.
+     * Get query source of DataTable.
      */
-     public function html(): HtmlBuilder
+    public function query(Role $model): QueryBuilder
+    {
+        return $model->newQuery()->where('organization_id', auth()->user()->active_organization_id)
+            ->with('parent'); // Eager load untuk kolom relasi nanti
+
+    }
+
+    /**
+     * Configure DataTable HTML builder.
+     */
+    public function html(): HtmlBuilder
     {
         return $this->builder()
 
             /*
              * Example:
-             * role -> role-table
-             * Sertifikasi -> role-table
+             * Asesi -> asesi-table
+             * Asesor -> asesor-table
              */
-            ->setTableId(
-                'role-table'
-            )
+            ->setTableId('role-table')
 
-            ->columns(
-                $this->getColumns()
-            )
+            ->columns($this->getColumns())
 
             /*
              * Server-side AJAX endpoint.
              */
-            ->minifiedAjax(
-                route('role.index')
-            )
+            ->minifiedAjax(route('role.index'))
 
             /*
              * Default sorting:
@@ -110,14 +145,14 @@ class RoleDataTable extends DataTable
                  * Custom Bootstrap 5 layout.
                  */
                 'dom' =>
-                    '<"row mb-3"' .
-                        '<"col-md-6 d-flex align-items-center"B>' .
-                        '<"col-md-6"f>' .
+                '<"row mb-3"' .
+                    '<"col-md-6 d-flex align-items-center"B>' .
+                    '<"col-md-6"f>' .
                     '>' .
                     'rt' .
                     '<"row mt-3"' .
-                        '<"col-md-6"i>' .
-                        '<"col-md-6 d-flex justify-content-md-end"p>' .
+                    '<"col-md-6"i>' .
+                    '<"col-md-6 d-flex justify-content-md-end"p>' .
                     '>',
 
                 /*
@@ -162,20 +197,15 @@ class RoleDataTable extends DataTable
 
                     'search' => 'Cari:',
 
-                    'lengthrole' =>
-                        'Tampilkan _MENU_ data',
+                    'lengthMenu' => 'Tampilkan _MENU_ data',
 
-                    'info' =>
-                        'Menampilkan _START_ sampai _END_ dari _TOTAL_ data',
+                    'info' => 'Menampilkan _START_ sampai _END_ dari _TOTAL_ data',
 
-                    'infoEmpty' =>
-                        'Tidak ada data',
+                    'infoEmpty' => 'Tidak ada data',
 
-                    'zeroRecords' =>
-                        'Data tidak ditemukan',
+                    'zeroRecords' => 'Data tidak ditemukan',
 
-                    'emptyTable' =>
-                        'Belum ada data',
+                    'emptyTable' => 'Belum ada data',
 
                     'paginate' => [
                         'first' => 'Awal',
@@ -197,9 +227,7 @@ class RoleDataTable extends DataTable
                             download
                         </span> Excel'
                     )
-                    ->className(
-                        'btn btn-success btn-sm'
-                    ),
+                    ->className('btn btn-success btn-sm'),
 
                 Button::make('csv')
                     ->text(
@@ -207,9 +235,7 @@ class RoleDataTable extends DataTable
                             description
                         </span> CSV'
                     )
-                    ->className(
-                        'btn  btn-sm'
-                    ),
+                    ->className('btn btn-primary btn-sm'),
 
                 Button::make('pdf')
                     ->text(
@@ -217,9 +243,7 @@ class RoleDataTable extends DataTable
                             picture_as_pdf
                         </span> PDF'
                     )
-                    ->className(
-                        'btn btn-danger btn-sm'
-                    ),
+                    ->className('btn btn-danger btn-sm'),
 
                 Button::make('print')
                     ->text(
@@ -227,9 +251,7 @@ class RoleDataTable extends DataTable
                             print
                         </span> Print'
                     )
-                    ->className(
-                        'btn btn-primary btn-sm'
-                    ),
+                    ->className('btn btn-primary btn-sm'),
 
                 Button::make([
                     'text' => '<span class="material-symbols-outlined align-middle">refresh</span>',
@@ -242,32 +264,41 @@ class RoleDataTable extends DataTable
     }
 
     /**
-     * Get the dataTable columns definition.
+     * Get DataTable columns.
+     *
+     * Dibangun langsung dari property $columns (array literal yang sudah
+     * digenerate di atas oleh make:crud-yajra) -- tidak lagi pakai
+     * explode() dari string literal seperti versi lama, yang rapuh
+     * terhadap karakter khusus pada nama kolom.
      */
-    public function getColumns(): array
+
+    protected function getColumns(): array
     {
-        return [
-
-            Column::make('DT_RowIndex')
-            ->title('No')
-                ->width(80)
-                ->addClass('text-center'),
-
-            Column::make('name')
-                ->title('Nama'),
-
-            Column::computed('action')
-                ->title('Aksi')
-                ->width(100)
-                ->addClass('text-center')
-                ->orderable(false)
-                ->searchable(false),
-
-        ];
+        return collect($this->columns)
+            ->map(fn(string $kolom) => Column::make($kolom)
+                ->title(ucwords(str_replace(['_', "."], [' ', ' '], $kolom))))
+            ->prepend(
+                Column::make('DT_RowIndex')
+                    ->title('No')
+                    ->orderable(false)
+                    ->searchable(false)
+                    ->width(80)
+                    ->addClass('text-center')
+            )
+            // 2. PUSH: Masukkan kolom Aksi di posisi PALING AKHIR
+            ->push(
+                Column::computed('action')
+                    ->exportable(false)
+                    ->printable(false)
+                    ->width(120)
+                    ->addClass('text-center')
+                    ->title('Aksi')
+            )
+            ->all(); // Konversi collection kembali menjadi array di akhir
     }
 
     /**
-     * Get the filename for export.
+     * Get filename for export.
      */
     protected function filename(): string
     {

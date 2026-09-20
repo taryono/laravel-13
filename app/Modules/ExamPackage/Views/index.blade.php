@@ -4,10 +4,10 @@
 <div class="container">
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">Daftar PromotionCriterion</h5> 
+            <h5 class="mb-0">Daftar ExamPackage</h5> 
             <button type="button" class="btn btn-primary btn-sm" data-toggle="ajax-modal" data-size="lg" data-method="GET"
-                data-title="Tambah Data PromotionCriterion Baru" data-url="{{ route('promotion_criterion.create') }}"
-                data-submit='<button class="btn btn-primary" type="submit" form="formPromotionCriterion">Simpan</button>'
+                data-title="Tambah Data ExamPackage Baru" data-url="{{ route('exam_package.create') }}"
+                data-submit='<button class="btn btn-primary" type="submit" form="formExamPackage">Simpan</button>'
                 data-cancel='<button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Batal</button>'>
                 <i class="bi bi-plus-circle"></i> Tambah Baru
             </button>

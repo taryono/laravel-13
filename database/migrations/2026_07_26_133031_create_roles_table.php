@@ -14,9 +14,23 @@ return new class extends Migration
         Schema::create('roles', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('role_id')->constrained();
+            $table->string('code', 50)
+                ->nullable() // isi dulu data lama, lalu ubah jadi tidak boleh null
+                ->unique()
+                ->after('id'); // posisi strategis
+            $table->string('name');
+            $table->string('display_name');
+            $table->string('description');
+            $table->foreignId('parent_id')
+                ->nullable()
+                ->constrained('roles')
+                ->onDelete('set null');
+
+            // Indeks untuk pencarian cepat
+            $table->index('parent_id');
+
             $table->timestamps();
-            $table->unique(['user_id', 'role_id']);
+            $table->unique(['user_id', 'name']);
             $table->softDeletes();
         });
     }
@@ -27,5 +41,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('roles');
+        Schema::table('roles', function (Blueprint $table) {
+            $table->dropForeign(['parent_id']);
+            $table->dropColumn('parent_id');
+        });
     }
 };

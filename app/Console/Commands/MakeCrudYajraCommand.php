@@ -13,7 +13,7 @@ class MakeCrudYajraCommand extends Command
                             {--columns= : Daftar kolom untuk DataTable & validasi, pisahkan dengan koma (contoh: id,name,email)}
                             {--namespace=\App\Models : Namespace kustom untuk Model, mis. Models atau App\\Models}
                             {--no-menu : Jangan buat menu otomatis untuk super-admin}
-                            {--parent_id : Jangan buat menu otomatis untuk super-admin}';
+                            {--parent_id= : Jangan buat menu otomatis untuk super-admin}';
 
     protected $description = 'Otomatis membuat CRUD lengkap dengan Yajra DataTables dan struktur Modular';
 

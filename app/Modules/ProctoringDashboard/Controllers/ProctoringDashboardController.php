@@ -1,5 +1,6 @@
-<?php // app/Http/Controllers/ProctoringDashboardController.php
-namespace App\Modules\ProctoringApi\Controllers;
+<?php
+// app/Http/Controllers/ProctoringDashboardController.php
+namespace App\Modules\ProctoringDashboard\Controllers;
 
 use App\Http\Controllers\Controller;
 use Models\CbtSession;

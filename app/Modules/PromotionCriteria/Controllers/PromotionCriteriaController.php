@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Modules\PromotionCriterion\Controllers;
+namespace App\Modules\PromotionCriteria\Controllers;
 
-use App\DataTables\PromotionCriterionDataTable;
+use App\DataTables\PromotionCriteriaDataTable;
 use App\Http\Controllers\MainController;
-use Models\PromotionCriterion;
+use Models\PromotionCriteria;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -13,11 +13,11 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 use Throwable;
 
-class PromotionCriterionController extends MainController
+class PromotionCriteriaController extends MainController
 {
     public function __construct()
     {
-        parent::__construct(new PromotionCriterion());
+        parent::__construct(new PromotionCriteria());
     }
 
     /**
@@ -29,7 +29,7 @@ class PromotionCriterionController extends MainController
      */
     public function index(
         Request $request,
-        PromotionCriterionDataTable $dataTable
+        PromotionCriteriaDataTable $dataTable
     ) {
         /*
          * Yajra DataTables request contains "draw".
@@ -42,7 +42,7 @@ class PromotionCriterionController extends MainController
         }
 
         return $dataTable->render(
-            'PromotionCriterion::index'
+            'PromotionCriteria::index'
         );
     }
 
@@ -51,13 +51,13 @@ class PromotionCriterionController extends MainController
      */
     public function create(): View
     {
-        $promotionCriterion = new PromotionCriterion();
+        $promotionCriterion = new PromotionCriteria();
         $result = $this->getForm($promotionCriterion);
         $forms = $result['forms'];
         $groupedForms = $result['grouped'];
 
         return view(
-            'PromotionCriterion::create',
+            'PromotionCriteria::create',
             compact('promotionCriterion', 'forms', 'groupedForms')
         );
     }
@@ -68,7 +68,7 @@ class PromotionCriterionController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'academic_year_id' => ['required', 'integer'],
+            'academic_year_id' => ['required', 'integer'],
             'class_level_id' => ['required', 'integer'],
             'min_final_score' => ['required', 'string', 'max:255'],
             'min_attendance_rate' => ['required', 'string', 'max:255'],
@@ -84,19 +84,18 @@ class PromotionCriterionController extends MainController
 
         try {
             $model = DB::transaction(function () use ($validated) {
-                return PromotionCriterion::create($validated);
+                return PromotionCriteria::create($validated);
             });
 
             return $this->successResponse(
                 $request,
-                'Data PromotionCriterion berhasil ditambahkan.',
+                'Data PromotionCriteria berhasil ditambahkan.',
                 $model
             );
-
         } catch (Throwable $e) {
 
             Log::error(
-                'Gagal menambahkan PromotionCriterion.',
+                'Gagal menambahkan PromotionCriteria.',
                 [
                     'exception' => $e,
                     'data' => $validated,
@@ -106,7 +105,7 @@ class PromotionCriterionController extends MainController
 
             return $this->errorResponse(
                 $request,
-                'Data PromotionCriterion gagal ditambahkan.'
+                'Data PromotionCriteria gagal ditambahkan.'
             );
         }
     }
@@ -122,7 +121,7 @@ class PromotionCriterionController extends MainController
         $groupedForms = $result['grouped'];
 
         return view(
-            'PromotionCriterion::edit',
+            'PromotionCriteria::edit',
             compact('promotionCriterion', 'forms', 'groupedForms')
         );
     }
@@ -133,7 +132,7 @@ class PromotionCriterionController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'academic_year_id' => ['required', 'integer'],
+            'academic_year_id' => ['required', 'integer'],
             'class_level_id' => ['required', 'integer'],
             'min_final_score' => ['required', 'string', 'max:255'],
             'min_attendance_rate' => ['required', 'string', 'max:255'],
@@ -158,16 +157,15 @@ class PromotionCriterionController extends MainController
 
             return $this->successResponse(
                 $request,
-                'Data PromotionCriterion berhasil diperbarui.',
+                'Data PromotionCriteria berhasil diperbarui.',
                 $promotionCriterion
             );
-
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
-                'Gagal memperbarui PromotionCriterion.',
+                'Gagal memperbarui PromotionCriteria.',
                 [
                     'exception' => $e,
-                    'PromotionCriterion_id' => $id,
+                    'PromotionCriteria_id' => $id,
                     'data' => $validated,
                     'user_id' => auth()->id(),
                 ]
@@ -175,7 +173,7 @@ class PromotionCriterionController extends MainController
 
             return $this->errorResponse(
                 $request,
-                'Data PromotionCriterion gagal diperbarui.'
+                'Data PromotionCriteria gagal diperbarui.'
             );
         }
     }
@@ -194,24 +192,23 @@ class PromotionCriterionController extends MainController
 
             return $this->successResponse(
                 $request,
-                'Data PromotionCriterion berhasil dihapus.'
+                'Data PromotionCriteria berhasil dihapus.'
             );
-
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $promotionCriterion->getKey() yang bisa undefined.
             Log::error(
-                'Gagal menghapus PromotionCriterion.',
+                'Gagal menghapus PromotionCriteria.',
                 [
                     'exception' => $e,
-                    'PromotionCriterion_id' => $id,
+                    'PromotionCriteria_id' => $id,
                     'user_id' => auth()->id(),
                 ]
             );
 
             return $this->errorResponse(
                 $request,
-                'Data PromotionCriterion gagal dihapus.'
+                'Data PromotionCriteria gagal dihapus.'
             );
         }
-    } 
+    }
 }

@@ -7,18 +7,28 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Http\JsonResponse;
 use Illuminate\View\View;
 use Models\TrialRegistration;
+use App\Services\SliderService;
+use Models\EducationLevel;
 use Models\Module;
 use Models\Role;
 use Models\User;
-use Models\School; 
-use Models\Position; 
-use Models\Package; 
-use Str;
+use Models\School;
+use Models\Position;
+use Models\Package;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 
 class WelcomeController extends Controller
 {
+    public function index(SliderService $sliderService)
+    {
+        $sliders = $sliderService->getActive();
+        return view('welcome', compact('sliders'));
+    }
     public function trialSignup(Request $request): View
     {
         $token = $request->session()->get('trial_token');
@@ -34,64 +44,64 @@ class WelcomeController extends Controller
             $request->session()->put('trial_token', $registration->token);
         }
 
-        $modules = Module::where('is_active', true)->pluck('id','name')->toArray();
-        $student_ranges = \Models\StudentRange::where('is_active', true)->pluck('id','name')->toArray();
+        $modules = Module::where('is_active', true)->pluck('id', 'name')->toArray();
+        $student_ranges = \Models\StudentRange::where('is_active', true)->pluck('id', 'name')->toArray();
         $roles = Role::all();
-        $positions = Position::where('is_active', true)->pluck('id','name')->toArray();
-        $packages = Package::where('is_active', true)->pluck('id','name')->toArray();
-        return view('trial_signup', compact('registration', 'modules', 'roles','student_ranges'));
+        $positions = Position::where('is_active', true)->pluck('id', 'name')->toArray();
+        $packages = Package::where('is_active', true)->pluck('id', 'name')->toArray();
+        return view('trial_signup', compact('registration', 'modules', 'roles', 'student_ranges', 'positions', 'packages'));
     }
 
     public function saveStep(Request $request, int $step): JsonResponse
-{
-    $registration = $this->currentRegistration($request);
+    {
+        $registration = $this->currentRegistration($request);
 
-    $data = match ($step) {
-        1 => $request->validate([
-            'nama_sekolah' => 'required|string|max:255',
-            'npsn' => 'nullable|string|max:20',
-            'education_level_id' => 'required|array|min:1',
-            'education_level_id.*' => 'exists:education_levels,code',
-            'total_student' => 'required|string',
-            'address' => 'nullable|string|max:255',
-            'nama_user' => 'required|string|max:255',
-            'position_id' => 'required|in:kepala_sekolah,wakil_kepala_sekolah,guru,tata_usaha,admin_it,lainnya',
-        ]),
-        2 => $request->validate([
-            'modul' => 'required|array|min:1',
-            'modul.*' => 'exists:modules,code',
-        ]),
-        3 => $request->validate([
-            'role' => 'required|array|min:1',
-            'role.*' => 'exists:roles,code',
-        ]),
-        4 => $request->validate([
-            'notif_whatsapp' => 'boolean',
-            'notif_email' => 'boolean',
-            'notif_sms' => 'boolean',
-        ]),
-        default => abort(422, 'Step tidak valid'),
-    };
+        $data = match ($step) {
+            1 => $request->validate([
+                'nama_sekolah' => 'required|string|max:255',
+                'npsn' => 'nullable|string|max:20',
+                'education_level_id' => 'required|array|min:1',
+                'education_level_id.*' => 'exists:education_levels,code',
+                'total_student' => 'required|string',
+                'address' => 'nullable|string|max:255',
+                'nama_user' => 'required|string|max:255',
+                'position_id' => 'required|in:kepala_sekolah,wakil_kepala_sekolah,guru,tata_usaha,admin_it,lainnya',
+            ]),
+            2 => $request->validate([
+                'modul' => 'required|array|min:1',
+                'modul.*' => 'exists:modules,code',
+            ]),
+            3 => $request->validate([
+                'role' => 'required|array|min:1',
+                'role.*' => 'exists:roles,code',
+            ]),
+            4 => $request->validate([
+                'notif_whatsapp' => 'boolean',
+                'notif_email' => 'boolean',
+                'notif_sms' => 'boolean',
+            ]),
+            default => abort(422, 'Step tidak valid'),
+        };
 
-    match ($step) {
-        1 => tap($registration)->fill(collect($data)->except('education_level_id')->toArray())
-            ->modules() && $registration->education_level_ids()->sync(
-                education_level_id::whereIn('code', $data['education_level_id'])->pluck('id')
+        match ($step) {
+            1 => tap($registration)->fill(collect($data)->except('education_level_id')->toArray())
+                ->modules() && $registration->education_level_ids()->sync(
+                    EducationLevel::whereIn('code', $data['education_level_id'])->pluck('id')
+                ),
+            2 => $registration->modules()->sync(
+                Module::whereIn('code', $data['modul'])->pluck('id')
             ),
-        2 => $registration->modules()->sync(
-            Module::whereIn('code', $data['modul'])->pluck('id')
-        ),
-        3 => $registration->roles()->sync(
-            Role::whereIn('code', $data['role'])->pluck('id')
-        ),
-        default => $registration->fill($data),
-    };
+            3 => $registration->roles()->sync(
+                Role::whereIn('code', $data['role'])->pluck('id')
+            ),
+            default => $registration->fill($data),
+        };
 
-    $registration->current_step = max($registration->current_step, $step + 1);
-    $registration->save();
+        $registration->current_step = max($registration->current_step, $step + 1);
+        $registration->save();
 
-    return response()->json(['success' => true, 'next_step' => $step + 1]);
-}
+        return response()->json(['success' => true, 'next_step' => $step + 1]);
+    }
 
     public function completeSignup(Request $request): JsonResponse
     {
@@ -118,11 +128,11 @@ class WelcomeController extends Controller
             $school->education_levels()->sync($registration->education_levels()->pluck('education_levels.id'));
             $school->modules()->sync(
                 $registration->modules()->pluck('modules.id')->mapWithKeys(
-                    fn ($id) => [$id => ['activated_at' => now()]]
+                    fn($id) => [$id => ['activated_at' => now()]]
                 )
             );
 
-            $user = User::create([
+            $user = \App\Models\User::create([
                 'school_id' => $school->id,
                 'role_id' => $registration->role_id,
                 'name' => $registration->nama_user,
@@ -152,7 +162,7 @@ class WelcomeController extends Controller
             return $user;
         });
 
-        auth()->login($result);
+        Auth::login($result);
         session()->forget('trial_token');
 
         return response()->json(['success' => true, 'redirect' => route('dashboard')]);
@@ -168,8 +178,8 @@ class WelcomeController extends Controller
     public function requestDemo()
     {
         $roles = Role::all();
-        $positions = Position::where('is_active', true)->pluck('id','name')->toArray();
-        $packages = Package::where('is_active', true)->pluck('id','name')->toArray();
+        $positions = Position::where('is_active', true)->pluck('id', 'name')->toArray();
+        $packages = Package::where('is_active', true)->pluck('id', 'name')->toArray();
         return view('request-demo', compact('roles', 'positions', 'packages'));
     }
 }

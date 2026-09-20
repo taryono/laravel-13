@@ -21,6 +21,7 @@ use Models\MenuRole;
 use Models\Organization;
 use App\Core\Menu\MenuRepository;
 use App\Core\Menu\MenuTreeBuilder;
+use Illuminate\Support\Facades\Auth;
 
 class CrudGeneratorController extends MainController
 {
@@ -71,7 +72,6 @@ class CrudGeneratorController extends MainController
      */
     public function generate(Request $request)
     {
-
         $request->validate([
             'model_name' => 'required|string|max:100|regex:/^[a-zA-Z]+$/',
             'columns' => 'required|string|max:1000',
@@ -81,71 +81,50 @@ class CrudGeneratorController extends MainController
         ]);
 
         $modelName = Str::studly($request->model_name);
-        $columns = $request->columns;
 
-        // Bangun command
-        $command = "make:crud-yajra {$modelName} --columns={$columns}";
+        // Siapkan parameter sebagai ARRAY — lebih aman & benar
+        $parameters = [
+            'name' => $modelName,
+            '--columns' => $request->columns,
+        ];
 
-        // Tambahkan opsi no-menu jika tidak ingin membuat menu
         if (!$request->boolean('create_menu')) {
-            $command .= " --no-menu --model=\App\{$modelName}";
+            $parameters['--no-menu'] = true;
+            $parameters['--model'] = '\App\\' . $modelName;
         }
+
+        // ⚠️ Cek dulu opsi apa yang DITERIMA perintah
+        // Kemungkinan namanya berbeda, misalnya --parent bukan --parent_id
         if ($parent_menu = $request->input('parent_menu')) {
-            $command .= " --parent_id=" . $parent_menu;
+            $parameters['--parent_id'] = $parent_menu;
         }
+
         try {
-
-            // Simpan ke session untuk tracking
             $processId = uniqid('crud_', true);
-            session()->put("crud_process_{$processId}", [
-                'command' => $command,
-                'status' => 'running',
-                'started_at' => now(),
-            ]);
-            // Eksekusi command dengan output capture
-            $output = new \Symfony\Component\Console\Output\BufferedOutput();
 
-            Artisan::call($command, [], $output);
+            // Panggil dengan array parameter
+            $exitCode = Artisan::call('make:crud-yajra', $parameters);
+
+            $output = Artisan::output();
 
             $result = [
-                'success' => true,
-                'message' => "CRUD {$modelName} berhasil dibuat!",
-                'output' => $output->fetch(),
-                'command' => $command,
+                'success' => $exitCode === 0,
+                'message' => $exitCode === 0
+                    ? "CRUD {$modelName} berhasil dibuat!"
+                    : "CRUD {$modelName} gagal dibuat!",
+                'output' => $output,
             ];
 
-            // Update session
             session()->put("crud_process_{$processId}", [
-                'command' => $command,
-                'status' => 'completed',
-                'completed_at' => now(),
+                'command' => $parameters,
+                'status' => $exitCode === 0 ? 'completed' : 'failed',
                 'result' => $result,
             ]);
 
-            Log::info("CRUD Generated via Web", [
-                'model' => $modelName,
-                'columns' => $columns,
-                'user' => auth()->user()->email ?? 'system',
-                'command' => $command,
-            ]);
-
             return redirect()->route('crud_generator.index')
-                ->with('success', $result['message'])
-                ->with('output', $result['output']);
+                ->with($exitCode === 0 ? 'success' : 'error', $result['message'])
+                ->with('output', $output);
         } catch (\Exception $e) {
-            Log::error("CRUD Generator Error", [
-                'error' => $e->getMessage(),
-                'command' => $command,
-                'trace' => $e->getTraceAsString(),
-            ]);
-
-            session()->put("crud_process_{$processId}", [
-                'command' => $command,
-                'status' => 'failed',
-                'error' => $e->getMessage(),
-                'completed_at' => now(),
-            ]);
-
             return redirect()->route('crud_generator.index')
                 ->with('error', "Gagal generate CRUD: " . $e->getMessage());
         }
@@ -279,6 +258,7 @@ class CrudGeneratorController extends MainController
             // 1. Validate request
             $validated = $request->validate([
                 'id' => 'nullable|exists:menus,id',
+                'organization_id' => 'nullable|exists:organizations,id',
                 'title' => 'required|string|max:191',
                 'flyout_title' => 'nullable|string|max:255',
                 'id_text' => 'nullable|string|max:50',

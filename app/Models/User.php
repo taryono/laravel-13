@@ -188,13 +188,49 @@ class User extends Authenticatable implements MustVerifyEmail
     public function organizations()
     {
         return $this->belongsToMany(\Models\Organization::class, 'organization_user')
-            ->withPivot('is_default', 'is_active')
+            ->withPivot('is_default', 'is_active', 'id')
             ->wherePivot('is_active', 1)
             ->withTimestamps();
     }
 
+    // Ambil organisasi yang sedang aktif/default
+    public function currentOrganization()
+    {
+        return $this->organizations()
+            ->wherePivot('is_active', 1)
+            ->wherePivot('is_default', 1)
+            ->first();
+    }
+
+    public function getCurrentOrganizationIdAttribute()
+    {
+        return $this->currentOrganization()?->id;
+    }
+
+
+
     public function organizationIds(): array
     {
         return $this->organizations()->pluck('organizations.id')->toArray();
+    }
+
+    // Ambil organisasi yang sedang aktif
+    public function activeOrganization()
+    {
+        $orgId = session('active_organization_id');
+
+        return $this->organizations()
+            ->when($orgId, function ($q) use ($orgId) {
+                $q->where('organizations.id', $orgId);
+            })
+            ->wherePivot('is_active', 1)
+            ->orderByRaw('is_default DESC, id ASC')
+            ->first();
+    }
+
+    // Helper ambil ID langsung
+    public function getActiveOrganizationIdAttribute()
+    {
+        return session('active_organization_id');
     }
 }

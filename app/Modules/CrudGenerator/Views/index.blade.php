@@ -4,11 +4,9 @@
 @push('styles')
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined" rel="stylesheet">
-    <!-- Di bagian HEAD atau awal content -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css"
         rel="stylesheet" />
-
     <link href="{{ asset('assets/css/crud_generator.css') }}" rel="stylesheet">
 @endpush
 @section('content')
@@ -60,8 +58,8 @@
 
                             <div class="form-group">
                                 <label for="columns">Kolom <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control @error('columns') is-invalid @enderror" id="columns"
-                                    name="columns" placeholder="Contoh: id,name,email,price,stock"
+                                <input type="text" class="form-control @error('columns') is-invalid @enderror"
+                                    id="columns" name="columns" placeholder="Contoh: id,name,email,price,stock"
                                     value="{{ old('columns', 'id,name') }}" required>
                                 <small class="form-text text-muted">
                                     Pisahkan dengan koma. Kolom 'id' secara default akan ditampilkan.
@@ -182,7 +180,8 @@
                             {{-- Beri wrapper pada daftar tombol agar mudah difilter --}}
                             <div id="table-list">
                                 @foreach ($tables as $table)
-                                    <button type="button" class="btn btn-sm btn-outline-primary btn-block mb-2 table-example"
+                                    <button type="button"
+                                        class="btn btn-sm btn-outline-primary btn-block mb-2 table-example"
                                         data-table="{{ $table['name'] }}" data-label="{{ $table['label'] }}"
                                         data-columns="{{ implode(',', $table['columns']) }}">
                                         📋 {{ $table['label'] }}
@@ -210,10 +209,12 @@
                         <div id="menu-list">
                             @if (!empty($filtered))
                                 @foreach ($filtered as $module)
-                                    <button type="button" class="btn btn-sm btn-outline-primary btn-block mb-2 menu-example"
+                                    <button type="button"
+                                        class="btn btn-sm btn-outline-primary btn-block mb-2 menu-example"
                                         data-table="{{ $module }}" data-label="{{ \Str::headline($module) }}"
                                         data-flyout_title="{{ $module }}" data-slug="{{ \Str::kebab($module) }}"
-                                        data-route="{{ \Str::snake($module) }}.index" data-url="{{ \Str::kebab($module) }}">
+                                        data-route="{{ \Str::snake($module) }}.index"
+                                        data-url="{{ \Str::kebab($module) }}">
                                         📋 {{ $module }}
                                     </button>
                                 @endforeach
@@ -237,11 +238,11 @@
         <script src="{{ asset('assets/js/crud_generator.js') }}?v={{ time() }}"></script>
         <script>
             // Filter untuk Menu Ready
-            $('#search_menu').on('keyup', function () {
+            $('#search_menu').on('keyup', function() {
                 let value = $(this).val().toLowerCase();
                 let $list = $('#menu-list').find('.menu-example');
 
-                $list.each(function () {
+                $list.each(function() {
                     let text = $(this).text().toLowerCase();
                     if (text.includes(value)) {
                         $(this).show();

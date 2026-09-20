@@ -48,6 +48,33 @@
                     </li>
                 </ul>
             </div>
+            @if (isset($activeOrganization))
+                {{-- Pemilih Organisasi --}}
+                <div class="dropdown">
+                    <button class="btn btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        {{ $activeOrganization?->name ?? 'Pilih Organisasi' }}
+                    </button>
+                    <ul class="dropdown-menu">
+                        @foreach (auth()->user()->organizations as $org)
+                            @if ($org->pivot->is_active)
+                                <li>
+                                    <form action="{{ route('organization.switch') }}" method="POST">
+                                        @csrf
+                                        <input type="hidden" name="organization_id" value="{{ $org->id }}">
+                                        <button type="submit"
+                                            class="dropdown-item {{ $activeOrganization?->id == $org->id ? 'active' : '' }}">
+                                            {{ $org->name }}
+                                            @if ($org->pivot->is_default)
+                                                <span class="badge bg-info ms-1">Utama</span>
+                                            @endif
+                                        </button>
+                                    </form>
+                                </li>
+                            @endif
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
             <!-- Pengaturan Cepat -->
             <div class="dropdown">
                 <button class="bnsp-icon-btn" type="button" id="settingsDropdown" data-bs-toggle="dropdown"
@@ -105,11 +132,13 @@
                     <li>
                         <hr class="dropdown-divider">
                     </li>
-                    <li><a class="profile-dropdown-item" href="#"><span class="material-symbols-outlined">person</span>
+                    <li><a class="profile-dropdown-item" href="#"><span
+                                class="material-symbols-outlined">person</span>
                             Profil Saya</a></li>
                     <li><a class="profile-dropdown-item" href="#"><span
                                 class="material-symbols-outlined">verified_user</span> Sertifikasi Saya</a></li>
-                    <li><a class="profile-dropdown-item" href="#"><span class="material-symbols-outlined">settings</span>
+                    <li><a class="profile-dropdown-item" href="#"><span
+                                class="material-symbols-outlined">settings</span>
                             Pengaturan Akun</a></li>
                     <li>
                         <hr class="dropdown-divider">
@@ -131,7 +160,8 @@
                         <li>
                             <a class="profile-dropdown-item text-danger" href="{{ route('logout') }}"
                                 onclick="event.preventDefault();
-                                                                                    document.getElementById('logout-form').submit();"><span class="material-symbols-outlined">logout</span> Keluar
+                                                                                    document.getElementById('logout-form').submit();"><span
+                                    class="material-symbols-outlined">logout</span> Keluar
                             </a>
                             <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
                                 @csrf

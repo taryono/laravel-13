@@ -92,3 +92,17 @@ if (!function_exists('generateExpenseNumber')) {
         return "EXP-{$year}{$month}-{$sequence}";
     }
 }
+
+if (!function_exists('active_organization')) {
+    function active_organization()
+    {
+        return auth()->user()?->activeOrganization();
+    }
+}
+
+if (!function_exists('active_organization_id')) {
+    function active_organization_id()
+    {
+        return session('active_organization_id');
+    }
+}

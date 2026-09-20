@@ -45,3 +45,7 @@ php artisan make:crud-yajra Product --columns=id,name,price --namespace=App\\Mod
 
 # Tanpa membuat menu
 php artisan make:crud-yajra Product --columns=id,name,price --no-menu
+
+#### Kalau migration lain bermasalah, jalankan spesifik file ini:
+
+$ php artisan migrate --path=database/migrations/2026_09_19_154734_create_sliders_table.php
