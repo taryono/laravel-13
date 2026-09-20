@@ -24,7 +24,6 @@ class RoleController extends MainController
         if ($request->filled('draw')) {
             return $dataTable->ajax();
         }
-
         // Menggunakan namespace kustom modul untuk Blade view
         return $dataTable->render('Role::index', ['title' => 'Data Role']);
     }

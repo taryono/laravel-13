@@ -5494,40 +5494,38 @@ SET
 -- ============================================
 -- 40. QUESTION_BANKS (Bank Soal)
 -- ============================================
+DROP TABLE IF EXISTS `question_banks`;
 CREATE TABLE `question_banks` (
-    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `school_id` BIGINT UNSIGNED NOT NULL,
-    `subject_id` BIGINT UNSIGNED NOT NULL,
-    `question_type` VARCHAR(30) NULL,
-    `difficulty_level` VARCHAR(20) NULL,
-    `cognitive_level` VARCHAR(20) NULL,
-    `question_text` TEXT NOT NULL,
-    `options` JSON NULL,
-    `correct_answer` JSON NULL,
-    `explanation` TEXT NULL,
-    `tags` JSON NULL,
-    `points` INTEGER NOT NULL DEFAULT 10,
-    `is_public` TINYINT(1) NOT NULL DEFAULT 0,
-    `is_active` TINYINT(1) NOT NULL DEFAULT 1,
-    `created_at` TIMESTAMP NULL,
-    `updated_at` TIMESTAMP NULL,
-    `deleted_at` TIMESTAMP NULL,
-    `created_by` BIGINT UNSIGNED NULL,
-    `updated_by` BIGINT UNSIGNED NULL,
-    PRIMARY KEY (`id`),
-    INDEX `question_banks_school_index` (`school_id`),
-    INDEX `question_banks_subject_index` (`subject_id`),
-    INDEX `question_banks_type_index` (`question_type`),
-    INDEX `question_banks_difficulty_index` (`difficulty_level`),
-    INDEX `question_banks_cognitive_index` (`cognitive_level`),
-    INDEX `question_banks_is_public_index` (`is_public`),
-    INDEX `question_banks_is_active_index` (`is_active`),
-    INDEX `question_banks_deleted_at_index` (`deleted_at`),
-    INDEX `question_banks_created_by_index` (`created_by`),
-    INDEX `question_banks_updated_by_index` (`updated_by`),
-    CONSTRAINT `question_banks_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT `question_banks_subject_id_foreign` FOREIGN KEY (`subject_id`) REFERENCES `subjects` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `school_id` bigint UNSIGNED NOT NULL,
+  `subject_id` bigint UNSIGNED NOT NULL,
+  `question_type_id` bigint UNSIGNED NOT NULL,
+  `difficulty_level_id` bigint UNSIGNED NOT NULL,
+  `cognitive_level_id` bigint UNSIGNED NOT NULL,
+  `stimulus_id` bigint UNSIGNED NULL DEFAULT NULL COMMENT 'FK ke question_stimuli, untuk soal berkelompok',
+  `question_text` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `correct_answer_text` json NULL COMMENT 'Khusus tipe isian singkat: array alias jawaban benar, contoh ["jakarta","dki jakarta"]',
+  `explanation` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `tags` json NULL COMMENT 'Tag bebas untuk pencarian cepat, filter presisi pakai tabel question_bank_tag_pivot',
+  `points` int NOT NULL DEFAULT 10 COMMENT 'Poin default, bisa dioverride per paket ujian di exam_package_questions',
+  `partial_scoring` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Berlaku utk tipe multi-select/menjodohkan: beri nilai sebagian jika jawaban sebagian benar',
+  `scoring_type` varchar(20) NOT NULL DEFAULT 'auto' COMMENT 'auto | manual (esai wajib manual)',
+  `is_public` tinyint(1) NOT NULL DEFAULT 0,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_qb_school` (`school_id`),
+  KEY `idx_qb_subject` (`subject_id`),
+  KEY `idx_qb_type` (`question_type_id`),
+  KEY `idx_qb_difficulty` (`difficulty_level_id`),
+  KEY `idx_qb_cognitive` (`cognitive_level_id`),
+  KEY `idx_qb_stimulus` (`stimulus_id`),
+  CONSTRAINT `fk_qb_stimulus` FOREIGN KEY (`stimulus_id`) REFERENCES `question_stimuli` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================
 -- 41. EXAM_PACKAGES (Paket Soal)
@@ -5565,23 +5563,26 @@ CREATE TABLE `exam_packages` (
 -- 42. EXAM_PACKAGE_QUESTIONS (Pivot)
 -- ============================================
 CREATE TABLE `exam_package_questions` (
-    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `package_id` BIGINT UNSIGNED NOT NULL,
-    `question_id` BIGINT UNSIGNED NOT NULL,
-    `question_order` INTEGER NOT NULL DEFAULT 0,
-    `points` INTEGER NOT NULL DEFAULT 10,
-    `is_active` TINYINT(1) NOT NULL DEFAULT 1,
-    `created_at` TIMESTAMP NULL,
-    `updated_at` TIMESTAMP NULL,
-    `deleted_at` TIMESTAMP NULL,
-    PRIMARY KEY (`id`),
-    UNIQUE INDEX `exam_package_questions_unique` (`package_id`, `question_id`),
-    INDEX `exam_package_questions_package_index` (`package_id`),
-    INDEX `exam_package_questions_question_index` (`question_id`),
-    INDEX `exam_package_questions_deleted_at_index` (`deleted_at`),
-    CONSTRAINT `exam_package_questions_package_id_foreign` FOREIGN KEY (`package_id`) REFERENCES `exam_packages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT `exam_package_questions_question_id_foreign` FOREIGN KEY (`question_id`) REFERENCES `question_banks` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `exam_package_id` bigint UNSIGNED NOT NULL,
+  `question_bank_id` bigint UNSIGNED NULL DEFAULT NULL COMMENT 'Referensi asal soal, null-able karena soal sumber bisa dihapus',
+  `question_type_id` bigint UNSIGNED NOT NULL,
+  `question_text_snapshot` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `options_snapshot` json NULL COMMENT 'Salinan beku opsi jawaban saat soal dimasukkan ke paket',
+  `correct_answer_snapshot` json NULL COMMENT 'Salinan beku kunci jawaban',
+  `stimulus_snapshot` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `points` int NOT NULL DEFAULT 10 COMMENT 'Bisa override poin default dari question_banks',
+  `partial_scoring` tinyint(1) NOT NULL DEFAULT 0,
+  `question_order` int NOT NULL DEFAULT 0,
+	`is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_epq_exam_package` (`exam_package_id`),
+  KEY `idx_epq_question_bank` (`question_bank_id`),
+  CONSTRAINT `fk_epq_exam_package` FOREIGN KEY (`exam_package_id`) REFERENCES `exam_packages` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_epq_question_bank` FOREIGN KEY (`question_bank_id`) REFERENCES `question_banks` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================
 -- 43. CBT_SESSIONS (Sesi Ujian)

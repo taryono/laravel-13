@@ -106,3 +106,10 @@ if (!function_exists('active_organization_id')) {
         return session('active_organization_id');
     }
 }
+
+if (!function_exists('dateFormat')) {
+    function dateFormat($date)
+    {
+        return date('Y-m-d', strtotime($date));
+    }
+}

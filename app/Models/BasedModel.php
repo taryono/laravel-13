@@ -5,13 +5,11 @@ namespace Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Builder; 
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\BelongsTo; 
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 // use App\Traits\HasUniqueCode;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Http\Request;
 use ReflectionClass;
 use ReflectionMethod;
 use Illuminate\Support\Facades\Cache;
@@ -23,7 +21,7 @@ class BasedModel extends Model
     use HasFactory, SoftDeletes;
     protected static array $relationsCache = [];
     // use HasUniqueCode;
-   
+
     protected $guarded = ['id'];
     protected $casts = [
         'created_at' => 'datetime',
@@ -38,38 +36,79 @@ class BasedModel extends Model
     ];
 
     protected $exceptions = ['_method', '_token', 'id', 'password_confirmation', 'image', 'photo', 'file', 'logo', 'thumb'];
-    protected $ignored = []; 
-  
+    protected $ignored = [];
+
     protected static function boot()
     {
         parent::boot();
 
         static::addGlobalScope('organization_id', function (Builder $builder) {
-            // Pastikan user login
-            if (auth()->check()) {
-                $user = auth()->user();
+            // 🔑 CEGAH LOOP: Lewati jika sedang memuat user itu sendiri atau relasi sistem
+            if (Auth::guard('web')->guest()) {
+                return;
+            }
 
-                // Jika bukan super admin dan tabel punya kolom organization_id
-                // if (!$user->hasRole('super-admin')) {
-                // }
+            // Dapatkan user TANPA memicu muat ulang relasi
+            $user = Auth::user();
+
+            // Jika belum terisi atau sedang dalam proses pengecekan → lewati
+            if (!$user || $user->isCheckingRole ?? false) {
+                return;
+            }
+
+            // Tandai sedang mengecek untuk mencegah loop
+            $user->isCheckingRole = true;
+
+            try {
                 $table = $builder->getModel()->getTable();
-                if (Schema::hasColumn($table, 'organization_id')) {
-                    $builder->where($table.'.organization_id', $user->organizations()->first()->id);
+
+                // Hanya terapkan pada tabel yang punya kolom ini
+                if (!Schema::hasColumn($table, 'organization_id')) {
+                    return;
                 }
+
+                // Cek role TANPA lewat method yang memicu query berulang
+                $isSuperAdmin = $user->roles()->where('name', 'super_admin')->exists();
+
+                if (!$isSuperAdmin) {
+                    $org = $user->organizations()->first();
+                    if ($org) {
+                        $builder->where($table . '.organization_id', $org->id);
+                    }
+                }
+            } finally {
+                // Lepas tanda setelah selesai
+                $user->isCheckingRole = false;
             }
         });
 
         static::saving(function ($model) {
-            if (auth()->check()) {
-                $user = auth()->user();
+            if (Auth::guest()) {
+                return;
+            }
 
-                // Auto set organization_id hanya jika bukan super admin
-                if (!$user->hasRole('super_admin') && Schema::hasColumn($model->getTable(), 'organization_id')) {
-                    $organization = $user->organizations()->first();
-                    if ($organization) {
-                        $model->organization_id = $organization->id;
+            $user = Auth::user();
+            if (!$user || ($user->isCheckingRole ?? false)) {
+                return;
+            }
+
+            $user->isCheckingRole = true;
+
+            try {
+                if (!Schema::hasColumn($model->getTable(), 'organization_id')) {
+                    return;
+                }
+
+                $isSuperAdmin = $user->roles()->where('name', 'super_admin')->exists();
+
+                if (!$isSuperAdmin) {
+                    $org = $user->organizations()->first();
+                    if ($org) {
+                        $model->organization_id = $org->id;
                     }
                 }
+            } finally {
+                $user->isCheckingRole = false;
             }
         });
     }
@@ -78,7 +117,7 @@ class BasedModel extends Model
     protected function _getFields($model)
     {
         return $model->getConnection()->getSchemaBuilder()->getColumnListing($model->getTable());
-    } 
+    }
     /**
      * Create a new model instance with automatic request serialization
      */
@@ -86,7 +125,7 @@ class BasedModel extends Model
     {
         $instance = new static;
         $serializedData = $instance->serializeRequest($request, $ignored);
-        
+
         if (count($serializedData) == 0) {
             throw new \InvalidArgumentException('No valid data to create record');
         }
@@ -100,7 +139,7 @@ class BasedModel extends Model
     public function updateFromRequest(Request $request, array $ignored = [])
     {
         $serializedData = $this->serializeRequest($request, $ignored);
-        
+
         if (count($serializedData) == 0) {
             throw new \InvalidArgumentException('No valid data to update record');
         }
@@ -124,10 +163,10 @@ class BasedModel extends Model
     {
         // Merge class-level ignored fields with method-level ignored fields
         $allIgnored = array_merge($this->ignored, $ignored);
-        
+
         // Get data from request, excluding standard exceptions
         $data = $request->except($this->exceptions);
-        
+
         try {
             // Remove ignored fields
             if ($allIgnored) {
@@ -138,14 +177,14 @@ class BasedModel extends Model
 
             // Get model fields
             $fields = $this->getTableColumns();
-            
+
             $result = [];
             foreach ($data as $key => $val) {
                 // Skip empty password
                 if ($key == "password" && empty($val)) {
                     continue;
                 }
-                
+
                 // Only include fields that exist in table
                 if (in_array($key, $fields)) {
                     if ($key == "publish_date" && !empty($val)) {
@@ -154,9 +193,8 @@ class BasedModel extends Model
                         $result[$key] = $val;
                     }
                 }
-            } 
+            }
             $result = array_filter($result);
-
         } catch (\Exception $e) {
             throw new \RuntimeException('Error serializing request: ' . $e->getMessage());
         }
@@ -263,5 +301,4 @@ class BasedModel extends Model
         unset(static::$relationsCache[$class]);
         Cache::forget('model_relations:' . $class);
     }
-
 }

@@ -26,7 +26,9 @@ class MainController extends Controller implements HasMiddleware
         } else {
             $this->controller = Str::snake($model ? $model->getModel()->getTable() : '');
         }
-        // $this->authorizeResource(\App\Models\User::class, 'user');
+        $activeOrganization = session()->get('active_organization');
+        // Bagikan ke tampilan
+        view()->share('activeOrganization', $activeOrganization);
     }
 
     public static function middleware(): array

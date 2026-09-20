@@ -49,31 +49,35 @@
                 </ul>
             </div>
             @if (isset($activeOrganization))
-                {{-- Pemilih Organisasi --}}
-                <div class="dropdown">
-                    <button class="btn btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                        {{ $activeOrganization?->name ?? 'Pilih Organisasi' }}
-                    </button>
-                    <ul class="dropdown-menu">
-                        @foreach (auth()->user()->organizations as $org)
-                            @if ($org->pivot->is_active)
-                                <li>
-                                    <form action="{{ route('organization.switch') }}" method="POST">
-                                        @csrf
-                                        <input type="hidden" name="organization_id" value="{{ $org->id }}">
-                                        <button type="submit"
-                                            class="dropdown-item {{ $activeOrganization?->id == $org->id ? 'active' : '' }}">
-                                            {{ $org->name }}
-                                            @if ($org->pivot->is_default)
-                                                <span class="badge bg-info ms-1">Utama</span>
-                                            @endif
-                                        </button>
-                                    </form>
-                                </li>
-                            @endif
-                        @endforeach
-                    </ul>
-                </div>
+                @if (auth()->user()->organizations->count() > 1)
+                    {{-- Pemilih Organisasi --}}
+                    <div class="dropdown">
+                        <button class="btn btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            {{ $activeOrganization?->name ?? 'Pilih Organisasi' }}
+                        </button>
+                        <ul class="dropdown-menu">
+                            @foreach (auth()->user()->organizations as $org)
+                                @if ($org->pivot->is_active)
+                                    <li>
+                                        <form action="{{ route('organization.switch') }}" method="POST">
+                                            @csrf
+                                            <input type="hidden" name="organization_id" value="{{ $org->id }}">
+                                            <button type="submit"
+                                                class="dropdown-item {{ $activeOrganization?->id == $org->id ? 'active' : '' }}">
+                                                {{ $org->name }}
+                                                @if ($org->pivot->is_default)
+                                                    <span class="badge bg-info ms-1">Utama</span>
+                                                @endif
+                                            </button>
+                                        </form>
+                                    </li>
+                                @endif
+                            @endforeach
+                        </ul>
+                    </div>
+                @else
+                    <span class="badge bg-primary ms-1">{{ $activeOrganization?->name }}</span>
+                @endif
             @endif
             <!-- Pengaturan Cepat -->
             <div class="dropdown">

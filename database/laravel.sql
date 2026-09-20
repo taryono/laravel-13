@@ -1926,18 +1926,7 @@ CREATE TABLE `cache`  (
   `expiration` int NOT NULL,
   PRIMARY KEY (`key`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
-
--- ----------------------------
--- Records of cache
--- ----------------------------
-INSERT INTO `cache` VALUES ('laravel-cache-acl-all-actions', 'O:29:\"Illuminate\\Support\\Collection\":2:{s:8:\"\0*\0items\";a:5:{i:1;s:9:\"user-view\";i:2;s:11:\"user-manage\";i:3;s:12:\"roles-manage\";i:4;s:12:\"profile-view\";i:5;s:12:\"profile-edit\";}s:28:\"\0*\0escapeWhenCastingToString\";b:0;}', 1789587759);
-INSERT INTO `cache` VALUES ('laravel-cache-acl-all-menus', 'O:29:\"Illuminate\\Support\\Collection\":2:{s:8:\"\0*\0items\";a:40:{i:1;s:9:\"dashboard\";i:2;s:6:\"master\";i:3;s:4:\"user\";i:4;s:5:\"roles\";i:5;s:7:\"profile\";i:6;s:4:\"menu\";i:7;s:16:\"module-generator\";i:9;s:23:\"academic-calendar-event\";i:10;s:15:\"account-mapping\";i:11;s:8:\"academic\";i:12;s:8:\"students\";i:13;s:13:\"academic-year\";i:14;s:14:\"reference-type\";i:15;s:15:\"reference-value\";i:16;s:6:\"period\";i:17;s:7:\"account\";i:18;s:11:\"tax-setting\";i:19;s:10:\"shift-swap\";i:20;s:9:\"referensi\";i:21;s:10:\"accounting\";i:22;s:16:\"expense-category\";i:23;s:16:\"account-category\";i:24;s:8:\"tax-type\";i:25;s:11:\"cbt-session\";i:26;s:16:\"cbt-activity-log\";i:27;s:14:\"cbt-proctoring\";i:28;s:9:\"classroom\";i:29;s:16:\"homeroom-teacher\";i:30;s:7:\"teacher\";i:31;s:15:\"menu-management\";i:32;s:7:\"student\";i:33;s:18:\"Pendaftaran (PPDB)\";i:34;s:9:\"applicant\";i:35;s:9:\"admission\";i:36;s:19:\"admission-selection\";i:37;s:18:\"admission-timeline\";i:38;s:20:\"application-document\";i:39;s:11:\"class-level\";i:40;s:9:\"test-type\";i:41;s:13:\"test-schedule\";}s:28:\"\0*\0escapeWhenCastingToString\";b:0;}', 1789587759);
-INSERT INTO `cache` VALUES ('laravel-cache-formlib_cols_tax_types', 'O:8:\"stdClass\":6:{s:2:\"id\";O:8:\"stdClass\":7:{s:4:\"type\";s:15:\"bigint unsigned\";s:7:\"is_null\";s:2:\"NO\";s:3:\"key\";s:3:\"PRI\";s:7:\"default\";N;s:5:\"extra\";s:14:\"auto_increment\";s:10:\"privileges\";s:31:\"select,insert,update,references\";s:7:\"comment\";s:0:\"\";}s:15:\"organization_id\";O:8:\"stdClass\":7:{s:4:\"type\";s:6:\"bigint\";s:7:\"is_null\";s:3:\"YES\";s:3:\"key\";s:0:\"\";s:7:\"default\";N;s:5:\"extra\";s:0:\"\";s:10:\"privileges\";s:31:\"select,insert,update,references\";s:7:\"comment\";s:0:\"\";}s:4:\"code\";O:8:\"stdClass\":7:{s:4:\"type\";s:11:\"varchar(20)\";s:7:\"is_null\";s:2:\"NO\";s:3:\"key\";s:3:\"UNI\";s:7:\"default\";N;s:5:\"extra\";s:0:\"\";s:10:\"privileges\";s:31:\"select,insert,update,references\";s:7:\"comment\";s:0:\"\";}s:4:\"name\";O:8:\"stdClass\":7:{s:4:\"type\";s:12:\"varchar(191)\";s:7:\"is_null\";s:2:\"NO\";s:3:\"key\";s:0:\"\";s:7:\"default\";N;s:5:\"extra\";s:0:\"\";s:10:\"privileges\";s:31:\"select,insert,update,references\";s:7:\"comment\";s:0:\"\";}s:11:\"description\";O:8:\"stdClass\":7:{s:4:\"type\";s:12:\"varchar(191)\";s:7:\"is_null\";s:3:\"YES\";s:3:\"key\";s:0:\"\";s:7:\"default\";N;s:5:\"extra\";s:0:\"\";s:10:\"privileges\";s:31:\"select,insert,update,references\";s:7:\"comment\";s:0:\"\";}s:9:\"is_active\";O:8:\"stdClass\":7:{s:4:\"type\";s:10:\"tinyint(1)\";s:7:\"is_null\";s:2:\"NO\";s:3:\"key\";s:0:\"\";s:7:\"default\";s:1:\"1\";s:5:\"extra\";s:0:\"\";s:10:\"privileges\";s:31:\"select,insert,update,references\";s:7:\"comment\";s:0:\"\";}}', 1789587771);
-INSERT INTO `cache` VALUES ('laravel-cache-formlib_fields_tax_types', 'a:6:{i:0;s:2:\"id\";i:1;s:15:\"organization_id\";i:2;s:4:\"code\";i:3;s:4:\"name\";i:4;s:11:\"description\";i:5;s:9:\"is_active\";}', 1789587771);
-INSERT INTO `cache` VALUES ('laravel-cache-formlib_rel_organization', 'a:7:{i:1;s:16:\"Perusahaan Utama\";i:2;s:21:\"Kantor Cabang Jakarta\";i:3;s:22:\"Kantor Cabang Surabaya\";i:4;s:19:\"Kantor Cabang Medan\";i:5;s:12:\"Divisi Pusat\";i:6;s:18:\"Divisi Operasional\";i:7;s:29:\"Divisi Ekspor / Internasional\";}', 1789587771);
-INSERT INTO `cache` VALUES ('laravel-cache-user_1_role_manager', 'b:0;', 1789587759);
-INSERT INTO `cache` VALUES ('laravel-cache-user_1_role_special_role', 'b:0;', 1789587759);
-
+ 
 -- ----------------------------
 -- Table structure for cache_locks
 -- ----------------------------
@@ -3148,25 +3137,27 @@ CREATE TABLE `enrollment_conversions`  (
 -- Table structure for exam_package_questions
 -- ----------------------------
 DROP TABLE IF EXISTS `exam_package_questions`;
-CREATE TABLE `exam_package_questions`  (
+CREATE TABLE `exam_package_questions` (
   `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
-  `package_id` bigint UNSIGNED NOT NULL,
-  `question_id` bigint UNSIGNED NOT NULL,
+  `exam_package_id` bigint UNSIGNED NOT NULL,
+  `question_bank_id` bigint UNSIGNED NULL DEFAULT NULL COMMENT 'Referensi asal soal, null-able karena soal sumber bisa dihapus',
+  `question_type_id` bigint UNSIGNED NOT NULL,
+  `question_text_snapshot` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `options_snapshot` json NULL COMMENT 'Salinan beku opsi jawaban saat soal dimasukkan ke paket',
+  `correct_answer_snapshot` json NULL COMMENT 'Salinan beku kunci jawaban',
+  `stimulus_snapshot` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `points` int NOT NULL DEFAULT 10 COMMENT 'Bisa override poin default dari question_banks',
+  `partial_scoring` tinyint(1) NOT NULL DEFAULT 0,
   `question_order` int NOT NULL DEFAULT 0,
-  `points` int NOT NULL DEFAULT 10,
-  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+	`is_active` tinyint(1) NOT NULL DEFAULT 1,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `exam_package_questions_unique`(`package_id` ASC, `question_id` ASC) USING BTREE,
-  INDEX `exam_package_questions_package_index`(`package_id` ASC) USING BTREE,
-  INDEX `exam_package_questions_question_index`(`question_id` ASC) USING BTREE,
-  INDEX `exam_package_questions_deleted_at_index`(`deleted_at` ASC) USING BTREE,
-  CONSTRAINT `exam_package_questions_package_id_foreign` FOREIGN KEY (`package_id`) REFERENCES `exam_packages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `exam_package_questions_question_id_foreign` FOREIGN KEY (`question_id`) REFERENCES `question_banks` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  PRIMARY KEY (`id`),
+  KEY `idx_epq_exam_package` (`exam_package_id`),
+  KEY `idx_epq_question_bank` (`question_bank_id`),
+  CONSTRAINT `fk_epq_exam_package` FOREIGN KEY (`exam_package_id`) REFERENCES `exam_packages` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_epq_question_bank` FOREIGN KEY (`question_bank_id`) REFERENCES `question_banks` (`id`) ON DELETE SET NULL
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
-
 -- ----------------------------
 -- Records of exam_package_questions
 -- ----------------------------
@@ -5511,30 +5502,30 @@ CREATE TABLE `packages`  (
 -- ----------------------------
 -- Table structure for parents
 -- ----------------------------
-DROP TABLE IF EXISTS `parents`;
+DROP TABLE IF EXISTS `parents`; 
 CREATE TABLE `parents`  (
   `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `organization_id` bigint UNSIGNED NOT NULL,
   `user_id` bigint UNSIGNED NULL DEFAULT NULL,
-  `full_name` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `phone` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `email` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `address` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
-  `relationship` enum('FATHER','MOTHER','GUARDIAN') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `work` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `is_primary` tinyint(1) NULL DEFAULT 0,
+  `name` varchar(150) NOT NULL,
+  `phone` varchar(20) NOT NULL,
+  `email` varchar(100) NULL DEFAULT NULL,
+  `address` text NULL,
+  `work` varchar(100) NULL DEFAULT NULL,
+  -- HAPUS `is_primary` dan `relationship` dari sini
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
   `created_by` bigint UNSIGNED NULL DEFAULT NULL,
   `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
-  PRIMARY KEY (`id`) USING BTREE,
-  INDEX `idx_parents_organization_id`(`organization_id` ASC) USING BTREE,
-  INDEX `idx_parents_user_id`(`user_id` ASC) USING BTREE,
-  INDEX `idx_parents_phone`(`phone` ASC) USING BTREE,
-  INDEX `idx_parents_deleted_at`(`deleted_at` ASC) USING BTREE,
-  CONSTRAINT `parents_org_fk` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `idx_parents_user_id_unique`(`user_id`),
+  INDEX `idx_parents_organization_id`(`organization_id`),
+  INDEX `idx_parents_phone`(`phone`),
+  INDEX `idx_parents_deleted_at`(`deleted_at`),
+  CONSTRAINT `parents_org_fk` FOREIGN KEY (`organization_id`) 
+    REFERENCES `organizations` (`id`) ON DELETE CASCADE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of parents
@@ -6673,9 +6664,9 @@ CREATE TABLE `question_banks`  (
   `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `school_id` bigint UNSIGNED NOT NULL,
   `subject_id` bigint UNSIGNED NOT NULL,
-  `question_type` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `difficulty_level` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `cognitive_level` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `question_type_id` bigint UNSIGNED NOT NULL,
+  `difficulty_level_id` bigint UNSIGNED NOT NULL,
+  `cognitive_level_id` bigint UNSIGNED NOT NULL,
   `question_text` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `options` json NULL,
   `correct_answer` json NULL,
@@ -6706,6 +6697,99 @@ CREATE TABLE `question_banks`  (
 
 -- ----------------------------
 -- Records of question_banks
+-- ----------------------------
+
+
+-- ----------------------------
+-- Table structure for question_types
+-- ----------------------------
+DROP TABLE IF EXISTS `question_types`;
+CREATE TABLE `question_types` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `code` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Kunci unik dipakai di logic backend & frontend, contoh: single_choice',
+  `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Nama tampilan, contoh: Pilihan Ganda',
+  `description` varchar(255) NULL DEFAULT NULL,
+  `has_options` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'True jika tipe ini pakai tabel question_options (PG, B-S, urutkan)',
+  `has_matching_pairs` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'True khusus tipe menjodohkan',
+  `is_auto_gradable` tinyint(1) NOT NULL DEFAULT 1 COMMENT 'False untuk esai (wajib dikoreksi manual)',
+  `allow_multiple_correct` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'True untuk pilihan ganda kompleks (multi_choice)',
+  `icon` varchar(50) NULL DEFAULT NULL COMMENT 'Nama icon untuk UI, contoh: list-check',
+  `order_index` int NOT NULL DEFAULT 0 COMMENT 'Urutan tampil di dropdown',
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq_question_type_code` (`code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT INTO `question_types`
+(`code`, `name`, `description`, `has_options`, `has_matching_pairs`, `is_auto_gradable`, `allow_multiple_correct`, `icon`, `order_index`, `is_active`, `created_at`, `updated_at`)
+VALUES
+('single_choice', 'Pilihan Ganda',            'Satu jawaban benar dari beberapa opsi',        1, 0, 1, 0, 'list-radio',   1, 1, NOW(), NOW()),
+('multi_choice',  'Pilihan Ganda Kompleks',   'Lebih dari satu jawaban benar',                1, 0, 1, 1, 'list-check',   2, 1, NOW(), NOW()),
+('true_false',    'Benar / Salah',            'Pernyataan benar atau salah',                  1, 0, 1, 0, 'toggle-left',  3, 1, NOW(), NOW()),
+('matching',      'Menjodohkan',              'Mencocokkan item kiri dengan item kanan',      0, 1, 1, 0, 'arrows-left-right', 4, 1, NOW(), NOW()),
+('ordering',      'Urutkan',                  'Menyusun item sesuai urutan yang benar',       1, 0, 1, 0, 'sort-ascending', 5, 1, NOW(), NOW()),
+('short_answer',  'Isian Singkat',            'Jawaban singkat berupa kata/frasa',            0, 0, 1, 0, 'text-size',    6, 1, NOW(), NOW()),
+('essay',         'Esai',                     'Jawaban panjang, dikoreksi manual oleh guru',  0, 0, 0, 0, 'file-text',    7, 1, NOW(), NOW());
+
+
+-- ---------------------------------------------------------------------
+-- 2. DIFFICULTY_LEVELS
+-- ---------------------------------------------------------------------
+DROP TABLE IF EXISTS `difficulty_levels`;
+CREATE TABLE `difficulty_levels` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `code` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'easy | medium | hard',
+  `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Mudah, Sedang, Sulit',
+  `level_order` int NOT NULL DEFAULT 0 COMMENT 'Urutan dari termudah (1) ke tersulit',
+  `score_weight` decimal(3,2) NOT NULL DEFAULT 1.00 COMMENT 'Opsional: pengali bobot nilai, contoh sulit = 1.50',
+  `color` varchar(20) NULL DEFAULT NULL COMMENT 'Kode warna badge UI, contoh: success/warning/danger atau hex',
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq_difficulty_code` (`code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT INTO `difficulty_levels`
+(`code`, `name`, `level_order`, `score_weight`, `color`, `is_active`, `created_at`, `updated_at`)
+VALUES
+('easy',   'Mudah', 1, 1.00, 'success', 1, NOW(), NOW()),
+('medium', 'Sedang', 2, 1.25, 'warning', 1, NOW(), NOW()),
+('hard',   'Sulit', 3, 1.50, 'danger',  1, NOW(), NOW());
+
+
+-- ---------------------------------------------------------------------
+-- 3. COGNITIVE_LEVELS
+--    Mengikuti Taksonomi Bloom Revisi (C1-C6), standar dipakai di
+--    kisi-kisi soal kurikulum Indonesia.
+-- ---------------------------------------------------------------------
+DROP TABLE IF EXISTS `cognitive_levels`;
+CREATE TABLE `cognitive_levels` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `code` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'C1 s.d. C6',
+  `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Mengingat, Memahami, dst',
+  `description` varchar(255) NULL DEFAULT NULL,
+  `level_order` int NOT NULL DEFAULT 0 COMMENT 'Urutan dari C1 (rendah) ke C6 (tinggi)',
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq_cognitive_code` (`code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT INTO `cognitive_levels`
+(`code`, `name`, `description`, `level_order`, `is_active`, `created_at`, `updated_at`)
+VALUES
+('C1', 'Mengingat',    'Mengenali dan mengingat kembali fakta/konsep dasar', 1, 1, NOW(), NOW()),
+('C2', 'Memahami',     'Menjelaskan ide/konsep dengan kata sendiri',         2, 1, NOW(), NOW()),
+('C3', 'Menerapkan',   'Menggunakan konsep dalam situasi baru',              3, 1, NOW(), NOW()),
+('C4', 'Menganalisis', 'Menguraikan informasi menjadi bagian-bagian',        4, 1, NOW(), NOW()),
+('C5', 'Mengevaluasi', 'Menilai berdasarkan kriteria/standar tertentu',      5, 1, NOW(), NOW()),
+('C6', 'Mencipta',     'Menghasilkan sesuatu yang baru dan orisinal',        6, 1, NOW(), NOW());
+-- ----------------------------
+-- Records of question_types
 -- ----------------------------
 
 -- ----------------------------
@@ -8357,19 +8441,24 @@ DROP TABLE IF EXISTS `student_parents`;
 CREATE TABLE `student_parents`  (
   `student_id` bigint UNSIGNED NOT NULL,
   `parent_id` bigint UNSIGNED NOT NULL,
+  `relationship` enum('FATHER','MOTHER','GUARDIAN') NULL DEFAULT NULL, -- PINDAH KE SINI
   `is_primary` tinyint(1) NULL DEFAULT 0,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
   `created_by` bigint UNSIGNED NULL DEFAULT NULL,
   `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
-  PRIMARY KEY (`student_id`, `parent_id`) USING BTREE,
-  INDEX `idx_student_parents_student`(`student_id` ASC) USING BTREE,
-  INDEX `idx_student_parents_parent`(`parent_id` ASC) USING BTREE,
-  INDEX `idx_student_parents_deleted_at`(`deleted_at` ASC) USING BTREE,
-  CONSTRAINT `student_parents_parent_fk` FOREIGN KEY (`parent_id`) REFERENCES `parents` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
-  CONSTRAINT `student_parents_student_fk` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+  PRIMARY KEY (`student_id`, `parent_id`),
+  -- Cegah lebih dari satu orang tua utama per siswa
+  UNIQUE INDEX `idx_unique_primary` (`student_id`, `is_primary`),
+  INDEX `idx_student_parents_student`(`student_id`),
+  INDEX `idx_student_parents_parent`(`parent_id`),
+  INDEX `idx_student_parents_deleted_at`(`deleted_at`),
+  CONSTRAINT `sp_parent_fk` FOREIGN KEY (`parent_id`) 
+    REFERENCES `parents` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `sp_student_fk` FOREIGN KEY (`student_id`) 
+    REFERENCES `students` (`id`) ON DELETE CASCADE
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
 -- ----------------------------
 -- Records of student_parents

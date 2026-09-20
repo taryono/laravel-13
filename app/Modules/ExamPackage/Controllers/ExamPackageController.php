@@ -68,7 +68,7 @@ class ExamPackageController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'subject_id' => ['required', 'integer'],
             'name' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string', 'max:255'],
@@ -96,7 +96,6 @@ class ExamPackageController extends MainController
                 'Data ExamPackage berhasil ditambahkan.',
                 $model
             );
-
         } catch (Throwable $e) {
 
             Log::error(
@@ -137,7 +136,7 @@ class ExamPackageController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'subject_id' => ['required', 'integer'],
             'name' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string', 'max:255'],
@@ -169,8 +168,7 @@ class ExamPackageController extends MainController
                 'Data ExamPackage berhasil diperbarui.',
                 $examPackage
             );
-
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui ExamPackage.',
                 [
@@ -204,8 +202,7 @@ class ExamPackageController extends MainController
                 $request,
                 'Data ExamPackage berhasil dihapus.'
             );
-
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $examPackage->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus ExamPackage.',
@@ -221,5 +218,5 @@ class ExamPackageController extends MainController
                 'Data ExamPackage gagal dihapus.'
             );
         }
-    } 
+    }
 }

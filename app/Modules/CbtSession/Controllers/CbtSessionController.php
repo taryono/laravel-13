@@ -5,6 +5,10 @@ namespace App\Modules\CbtSession\Controllers;
 use App\DataTables\CbtSessionDataTable;
 use App\Http\Controllers\MainController;
 use Models\CbtSession;
+use Models\ExamPackage;
+use Models\Student;
+use Models\Classroom;
+use Models\Schedule;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -41,9 +45,7 @@ class CbtSessionController extends MainController
             return $dataTable->ajax();
         }
 
-        return $dataTable->render(
-            'CbtSession::index'
-        );
+        return $dataTable->render('CbtSession::index');
     }
 
     /**
@@ -52,13 +54,14 @@ class CbtSessionController extends MainController
     public function create(): View
     {
         $cbtSession = new CbtSession();
-        $result = $this->getForm($cbtSession);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
+        $examPackages = ExamPackage::select('id', 'name')->get();
+        $students     = Student::select('id', 'name', 'nis')->get();
+        $schedules    = Schedule::select('id', 'name')->get();
+        $classrooms   = Classroom::select('id', 'name')->get();
 
         return view(
             'CbtSession::create',
-            compact('cbtSession', 'forms', 'groupedForms')
+            compact('cbtSession', 'examPackages', 'students', 'schedules', 'classrooms')
         );
     }
 
@@ -68,7 +71,7 @@ class CbtSessionController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'exam_package_id' => ['required', 'integer'],
+            'exam_package_id' => ['required', 'integer'],
             'student_id' => ['required', 'integer'],
             'schedule_id' => ['required', 'integer'],
             'class_id' => ['required', 'integer'],
@@ -87,7 +90,6 @@ class CbtSessionController extends MainController
                 'Data CbtSession berhasil ditambahkan.',
                 $model
             );
-
         } catch (Throwable $e) {
 
             Log::error(
@@ -112,14 +114,18 @@ class CbtSessionController extends MainController
     public function edit($id): View
     {
         $cbtSession = $this->model->findOrFail($id);
-        $result = $this->getForm($cbtSession);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
+        $examPackages = ExamPackage::select('id', 'name')->get();
+        $students     = Student::select('id', 'name', 'nis')->get();
+        $schedules    = Schedule::select('id', 'name')->get();
+        $classrooms   = Classroom::select('id', 'name')->get();
 
-        return view(
-            'CbtSession::edit',
-            compact('cbtSession', 'forms', 'groupedForms')
-        );
+        return view('CbtSession::edit', [
+            'session'      => $cbtSession,
+            'examPackages' => $examPackages,
+            'students'     => $students,
+            'schedules'    => $schedules,
+            'classrooms'   => $classrooms,
+        ]);
     }
 
     /**
@@ -127,18 +133,16 @@ class CbtSessionController extends MainController
      */
     public function update(Request $request, $id)
     {
-        $validated = $request->validate([
-                        'exam_package_id' => ['required', 'integer'],
-            'student_id' => ['required', 'integer'],
-            'schedule_id' => ['required', 'integer'],
-            'class_id' => ['required', 'integer'],
-            'start_time' => ['required', 'string', 'max:255'],
-            'end_time' => ['required', 'string', 'max:255'],
-            'duration_seconds' => ['required', 'string', 'max:255'],
-        ]);
+        $validated = $this->validateData($request, $id);
 
         try {
             $cbtSession = $this->model->findOrFail($id);
+            if ($request->filled('final_score')) {
+                $validated['final_score'] = $request->final_score;
+            }
+
+            $validated['updated_by'] = auth()->id();
+
             DB::transaction(function () use (
                 $cbtSession,
                 $validated
@@ -151,8 +155,7 @@ class CbtSessionController extends MainController
                 'Data CbtSession berhasil diperbarui.',
                 $cbtSession
             );
-
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui CbtSession.',
                 [
@@ -186,8 +189,7 @@ class CbtSessionController extends MainController
                 $request,
                 'Data CbtSession berhasil dihapus.'
             );
-
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $cbtSession->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus CbtSession.',
@@ -203,5 +205,25 @@ class CbtSessionController extends MainController
                 'Data CbtSession gagal dihapus.'
             );
         }
-    } 
+    }
+
+    private function validateData(Request $request, $id = null): array
+    {
+        $data = $request->validate([
+            'exam_package_id'  => ['required', 'exists:exam_packages,id'],
+            'student_id'       => ['required', 'exists:students,id'],
+            'schedule_id'      => ['nullable', 'exists:schedules,id'],
+            'classroom_id'     => ['nullable', 'exists:classrooms,id'],
+            'start_time'       => ['nullable', 'date'],
+            'end_time'         => ['nullable', 'date', 'after_or_equal:start_time'],
+            'duration_seconds' => ['nullable', 'integer', 'min:0'],
+            'status'           => ['nullable', 'in:pending,ongoing,submitted,expired'],
+            'proctor_notes'    => ['nullable', 'string'],
+        ]);
+
+        // checkbox is_active tidak terkirim kalau tidak dicentang
+        $data['is_active'] = $request->boolean('is_active');
+
+        return $data;
+    }
 }

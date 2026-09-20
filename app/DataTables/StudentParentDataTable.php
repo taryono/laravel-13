@@ -17,7 +17,7 @@ class StudentParentDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['student_id', 'parent_id', 'is_primary', 'created_at', 'updated_at', 'deleted_at', 'created_by', 'updated_by'];
+    protected array $columns = ['student.name', 'name', 'is_primary'];
 
     /**
      * Build DataTable response.
@@ -100,7 +100,7 @@ class StudentParentDataTable extends DataTable
      */
     public function query(StudentParent $model): QueryBuilder
     {
-        return $model->newQuery();
+        return $model->newQuery()->with(['student:id,name', 'parent:id,name']);
     }
 
     /**
@@ -138,14 +138,14 @@ class StudentParentDataTable extends DataTable
                  * Custom Bootstrap 5 layout.
                  */
                 'dom' =>
-                    '<"row mb-3"' .
-                        '<"col-md-6 d-flex align-items-center"B>' .
-                        '<"col-md-6"f>' .
+                '<"row mb-3"' .
+                    '<"col-md-6 d-flex align-items-center"B>' .
+                    '<"col-md-6"f>' .
                     '>' .
                     'rt' .
                     '<"row mt-3"' .
-                        '<"col-md-6"i>' .
-                        '<"col-md-6 d-flex justify-content-md-end"p>' .
+                    '<"col-md-6"i>' .
+                    '<"col-md-6 d-flex justify-content-md-end"p>' .
                     '>',
 
                 /*
@@ -264,13 +264,12 @@ class StudentParentDataTable extends DataTable
      * explode() dari string literal seperti versi lama, yang rapuh
      * terhadap karakter khusus pada nama kolom.
      */
-     
+
     protected function getColumns(): array
     {
         return collect($this->columns)
-            ->map(fn (string $kolom) => Column::make($kolom)
-                ->title(ucwords(str_replace(['_',"."], [' ',' '], $kolom))))
-            // 1. PREPEND: Masukkan kolom No di posisi PALING AWAL (indeks 0)
+            ->map(fn(string $kolom) => Column::make($kolom)
+                ->title(ucwords(str_replace(['_', "."], [' ', ' '], $kolom))))
             ->prepend(
                 Column::make('DT_RowIndex')
                     ->title('No')
@@ -279,7 +278,6 @@ class StudentParentDataTable extends DataTable
                     ->width(80)
                     ->addClass('text-center')
             )
-            // 2. PUSH: Masukkan kolom Aksi di posisi PALING AKHIR
             ->push(
                 Column::computed('action')
                     ->exportable(false)
@@ -288,7 +286,7 @@ class StudentParentDataTable extends DataTable
                     ->addClass('text-center')
                     ->title('Aksi')
             )
-            ->all(); // Konversi collection kembali menjadi array di akhir
+            ->all();
     }
 
     /**

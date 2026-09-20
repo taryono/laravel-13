@@ -95,16 +95,18 @@ class User extends Authenticatable implements MustVerifyEmail
     // Atau pakai cache dengan tag (Redis/Memcached)
     public function hasRole($role)
     {
-        $cacheKey = "user_{$this->id}_role_{$role}";
-        if (!is_array($role)) {
-            return Cache::remember($cacheKey, 3600, function () use ($role) {
-                return $this->roles()->where('name', $role)->exists();
-            });
-        } else {
-            return Cache::remember($cacheKey, 3600, function () use ($role) {
-                return $this->roles()->whereIn('name', $role)->exists();
-            });
-        }
+        // Buat cache key yang benar untuk array
+        $roleKey = is_array($role) ? implode('_', $role) : $role;
+        $cacheKey = "user_{$this->id}_role_{$roleKey}";
+
+        return Cache::remember($cacheKey, 3600, function () use ($role) {
+            $roles = is_array($role) ? $role : [$role];
+
+            // Gunakan getQuery() agar tidak memicu event/model boot lain
+            return $this->roles()
+                ->whereIn('name', $roles)
+                ->exists();
+        });
     }
 
     // Panggil saat role berubah
