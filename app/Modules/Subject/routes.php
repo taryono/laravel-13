@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Route;
 | and give it the controller to call when that URI is requested.
 |
  */
+
 Route::group(['prefix' => 'subject', 'namespace' => 'App\Modules\Subject\Controllers', 'middleware' => ['web']], function () {
     Route::get('/', ['as' => 'subject.index', 'uses' => 'SubjectController@index']);
     Route::any('/search', ['as' => 'subject.search', 'uses' => 'SubjectController@search']);
@@ -23,5 +24,5 @@ Route::group(['prefix' => 'subject', 'namespace' => 'App\Modules\Subject\Control
     Route::get('/edit/{id}', ['as' => 'subject.edit', 'uses' => 'SubjectController@edit']);
     Route::put('/update/{id}', ['as' => 'subject.update', 'uses' => 'SubjectController@update']);
     Route::delete('/delete/{id}', ['as' => 'subject.destroy', 'uses' => 'SubjectController@destroy']);
-    
+    Route::get('/tree-data', ['as' => 'subject.tree-data', 'uses' => 'SubjectController@treeData']);
 });

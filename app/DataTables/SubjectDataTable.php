@@ -2,7 +2,7 @@
 
 namespace App\DataTables;
 
-use \App\Models\Subject;
+use Models\Subject;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
@@ -17,7 +17,7 @@ class SubjectDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['organization_id', 'code', 'name', 'abbreviation', 'description', 'category', 'is_active', 'created_at', 'updated_at', 'deleted_at', 'created_by', 'updated_by'];
+    protected array $columns = ['code', 'name', 'abbreviation', 'description', 'subject_category.name', 'status'];
 
     /**
      * Build DataTable response.
@@ -28,24 +28,20 @@ class SubjectDataTable extends DataTable
             ->addColumn('action', function ($row) {
                 return $this->renderActionButtons($row);
             })
+            ->addColumn('name', function ($row) {
+                $level = $row->level ?? 0;
+                $indent = str_repeat('&nbsp;&nbsp;&nbsp;&nbsp;', $level);
+                $prefix = $level > 0 ? '└─ ' : '';
+                return $indent . $prefix . e($row->name);
+            })
+            ->addColumn('status', function ($row) {
+                return $row->is_active ? '<span class="badge bg-success">Aktif</span>' : '<span class="badge bg-secondary">Tidak Aktif</span>';
+            })
             ->addIndexColumn()
-            ->rawColumns(['action']) // ✅ Tetap wajib ada!
+            ->rawColumns(['action', 'name', 'status']) // ✅ Tetap wajib ada!
             ->setRowId('id');
     }
 
-    /**
-     * Render tombol aksi (edit & delete) untuk satu baris.
-     *
-     * - $row->name di-escape dengan e() untuk mencegah XSS/attribute
-     *   breakout jika nilainya mengandung karakter " atau <script>.
-     * - Payload data-datatable-context dibangun via json_encode() lalu
-     *   di-escape dengan htmlspecialchars() supaya valid ditaruh di
-     *   dalam attribute HTML (bukan concat string manual yang rawan
-     *   attribute-nya terpotong).
-     * - Class tombol delete WAJIB "delete-button" (bukan "delete") supaya
-     *   cocok dengan selector di public/assets/js/button.js:
-     *   .on('click', '.delete-button', this.handleDeleteButton)
-     */
     protected function renderActionButtons($row): string
     {
         $title = e('Detail Subject ' . $row->name);
@@ -100,7 +96,7 @@ class SubjectDataTable extends DataTable
      */
     public function query(Subject $model): QueryBuilder
     {
-        return $model->newQuery();
+        return $model->newQuery()->with(['subject_category']);
     }
 
     /**
@@ -138,14 +134,14 @@ class SubjectDataTable extends DataTable
                  * Custom Bootstrap 5 layout.
                  */
                 'dom' =>
-                    '<"row mb-3"' .
-                        '<"col-md-6 d-flex align-items-center"B>' .
-                        '<"col-md-6"f>' .
+                '<"row mb-3"' .
+                    '<"col-md-6 d-flex align-items-center"B>' .
+                    '<"col-md-6"f>' .
                     '>' .
                     'rt' .
                     '<"row mt-3"' .
-                        '<"col-md-6"i>' .
-                        '<"col-md-6 d-flex justify-content-md-end"p>' .
+                    '<"col-md-6"i>' .
+                    '<"col-md-6 d-flex justify-content-md-end"p>' .
                     '>',
 
                 /*
@@ -264,12 +260,12 @@ class SubjectDataTable extends DataTable
      * explode() dari string literal seperti versi lama, yang rapuh
      * terhadap karakter khusus pada nama kolom.
      */
-     
+
     protected function getColumns(): array
     {
         return collect($this->columns)
-            ->map(fn (string $kolom) => Column::make($kolom)
-                ->title(ucwords(str_replace(['_',"."], [' ',' '], $kolom))))
+            ->map(fn(string $kolom) => Column::make($kolom)
+                ->title(ucwords(str_replace(['_', "."], [' ', ' '], $kolom))))
             // 1. PREPEND: Masukkan kolom No di posisi PALING AWAL (indeks 0)
             ->prepend(
                 Column::make('DT_RowIndex')

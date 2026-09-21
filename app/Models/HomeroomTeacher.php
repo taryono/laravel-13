@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
 class HomeroomTeacher extends BasedModel
-{ 
+{
     // Relasi
     protected $fillable = [
         'organization_id',
@@ -24,6 +24,11 @@ class HomeroomTeacher extends BasedModel
         'end_date' => 'date',
     ];
 
+    public function organization()
+    {
+        return $this->belongsTo(Organization::class);
+    }
+
     public function teacher()
     {
         return $this->belongsTo(Teacher::class);
@@ -32,6 +37,11 @@ class HomeroomTeacher extends BasedModel
     public function classroom()
     {
         return $this->belongsTo(Classroom::class);
+    }
+
+    public function academic_year()
+    {
+        return $this->belongsTo(AcademicYear::class);
     }
 
     // Scope

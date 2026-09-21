@@ -8757,31 +8757,90 @@ CREATE TABLE `students`  (
 -- Table structure for subjects
 -- ----------------------------
 DROP TABLE IF EXISTS `subjects`;
-CREATE TABLE `subjects`  (
+CREATE TABLE `subjects` (
   `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `organization_id` bigint UNSIGNED NOT NULL,
-  `code` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `abbreviation` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
-  `category` enum('CORE','ELECTIVE','EXTRACURRICULAR','RELIGION','LOCAL_CONTENT') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `parent_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `subject_category_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `code` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `abbreviation` varchar(20) COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci NULL,
   `is_active` tinyint(1) NULL DEFAULT 1,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
   `created_by` bigint UNSIGNED NULL DEFAULT NULL,
   `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
-  PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `subjects_org_code_unique`(`organization_id` ASC, `code` ASC) USING BTREE,
-  INDEX `idx_subjects_category`(`category` ASC) USING BTREE,
-  INDEX `idx_subjects_is_active`(`is_active` ASC) USING BTREE,
-  INDEX `idx_subjects_deleted_at`(`deleted_at` ASC) USING BTREE,
-  CONSTRAINT `subjects_org_fk` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `subjects_org_code_unique` (`organization_id`, `code`),
+  KEY `idx_subjects_parent_id` (`parent_id`),
+  KEY `idx_subjects_category_id` (`subject_category_id`),
+  KEY `idx_subjects_is_active` (`is_active`),
+  KEY `idx_subjects_deleted_at` (`deleted_at`),
+  CONSTRAINT `subjects_org_fk` FOREIGN KEY (`organization_id`) 
+    REFERENCES `organizations` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `subj_parent_fk` FOREIGN KEY (`parent_id`) 
+    REFERENCES `subjects` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `subj_subject_category_id_fk` FOREIGN KEY (`subject_category_id`) 
+    REFERENCES `subject_categories` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of subjects
 -- ----------------------------
+-- Induk
+INSERT INTO `subjects` (`organization_id`, `parent_id`, `subject_category_id`, `code`, `name`, `is_active`) VALUES
+(1, NULL, 4, 'PAI', 'Pendidikan Agama Islam', 1),
+(1, NULL, 1, 'IPA', 'IPA', 1);
+
+-- Anak-anak PAI (misal id PAI = 1)
+INSERT INTO `subjects` (`organization_id`, `parent_id`, `subject_category_id`, `code`, `name`, `is_active`) VALUES
+(1, 1, 4, 'PAI-SKJ', 'SKJ', 1),
+(1, 1, 4, 'PAI-FIQ', 'Fiqih', 1),
+(1, 1, 4, 'PAI-AKID', 'Akidah Akhlaq', 1);
+
+-- Anak-anak IPA (misal id IPA = 2)
+INSERT INTO `subjects` (`organization_id`, `parent_id`, `subject_category_id`, `code`, `name`, `is_active`) VALUES
+(1, 2, 1, 'IPA-FIS', 'Fisika', 1),
+(1, 2, 1, 'IPA-KIM', 'Kimia', 1),
+(1, 2, 1, 'IPA-BIO', 'Biologi', 1);
+-- ----------------------------
+-- Table structure for subject_categories
+-- ----------------------------
+
+DROP TABLE IF EXISTS `subject_categories`;
+CREATE TABLE `subject_categories` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `organization_id` bigint UNSIGNED NOT NULL,
+  `code` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `is_active` tinyint(1) NULL DEFAULT 1,
+  `sort_order` int UNSIGNED NOT NULL DEFAULT 0,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `subj_cats_org_code_unique` (`organization_id` ASC, `code` ASC) USING BTREE,
+  INDEX `idx_subj_cats_is_active` (`is_active` ASC) USING BTREE,
+  INDEX `idx_subj_cats_deleted_at` (`deleted_at` ASC) USING BTREE,
+  CONSTRAINT `subj_cats_org_fk` FOREIGN KEY (`organization_id`) 
+    REFERENCES `organizations` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 1   CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci  ROW_FORMAT = DYNAMIC;
+
+  -- ----------------------------
+-- Records of subject_categories
+-- ----------------------------
+INSERT INTO `subject_categories` (`organization_id`, `code`, `name`, `sort_order`, `is_active`) VALUES
+(1, 'CORE', 'Mata Pelajaran Inti', 1, 1),
+(1, 'ELECTIVE', 'Mata Pelajaran Pilihan', 2, 1),
+(1, 'EXTRACURRICULAR', 'Kegiatan Ekstrakurikuler', 3, 1),
+(1, 'RELIGION', 'Pendidikan Agama', 4, 1),
+(1, 'LOCAL_CONTENT', 'Muatan Lokal', 5, 1);
+
 
 -- ----------------------------
 -- Table structure for submissions

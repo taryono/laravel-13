@@ -2,6 +2,7 @@
 
 namespace App\DataTables;
 
+use Carbon\Carbon;
 use Models\HomeroomTeacher;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
@@ -9,6 +10,7 @@ use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
 use Yajra\DataTables\Services\DataTable;
+use Illuminate\Support\Str;
 
 class HomeroomTeacherDataTable extends DataTable
 {
@@ -17,7 +19,7 @@ class HomeroomTeacherDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['organization_id', 'classroom_id', 'teacher_id', 'academic_year_id', 'is_active', 'assignment_date', 'end_date', 'notes'];
+    protected array $columns = ['organization.name', 'classroom.name', 'teacher.name', 'academic_year.name', 'status', 'assignment_date', 'end_date', 'notes'];
 
     /**
      * Build DataTable response.
@@ -28,8 +30,20 @@ class HomeroomTeacherDataTable extends DataTable
             ->addColumn('action', function ($row) {
                 return $this->renderActionButtons($row);
             })
+            ->editColumn('status', function ($row) {
+                return $row->is_active ? '<span class="badge badge-success">Aktif</span>' : '<span class="badge badge-danger">Tidak Aktif</span>';
+            })
+            ->editColumn('assignment_date', function ($row) {
+                return $row->assignment_date ? Carbon::parse($row->assignment_date)->format('d M Y') : '-';
+            })
+            ->editColumn('end_date', function ($row) {
+                return $row->end_date ? Carbon::parse($row->end_date)->format('d M Y') : '-';
+            })
+            ->editColumn('notes', function ($row) {
+                return $row->notes ? '<span title="' . e($row->notes) . '">' . e(Str::limit($row->notes, 30)) . '</span>' : '-';
+            })
             ->addIndexColumn()
-            ->rawColumns(['action']) // ✅ Tetap wajib ada!
+            ->rawColumns(['action', 'status', 'assignment_date', 'end_date', 'notes']) // ✅ Tetap wajib ada!
             ->setRowId('id');
     }
 
@@ -100,7 +114,7 @@ class HomeroomTeacherDataTable extends DataTable
      */
     public function query(HomeroomTeacher $model): QueryBuilder
     {
-        return $model->newQuery();
+        return $model->newQuery()->with(['organization', 'classroom', 'teacher', 'academic_year']);
     }
 
     /**
@@ -138,14 +152,14 @@ class HomeroomTeacherDataTable extends DataTable
                  * Custom Bootstrap 5 layout.
                  */
                 'dom' =>
-                    '<"row mb-3"' .
-                        '<"col-md-6 d-flex align-items-center"B>' .
-                        '<"col-md-6"f>' .
+                '<"row mb-3"' .
+                    '<"col-md-6 d-flex align-items-center"B>' .
+                    '<"col-md-6"f>' .
                     '>' .
                     'rt' .
                     '<"row mt-3"' .
-                        '<"col-md-6"i>' .
-                        '<"col-md-6 d-flex justify-content-md-end"p>' .
+                    '<"col-md-6"i>' .
+                    '<"col-md-6 d-flex justify-content-md-end"p>' .
                     '>',
 
                 /*
@@ -264,12 +278,12 @@ class HomeroomTeacherDataTable extends DataTable
      * explode() dari string literal seperti versi lama, yang rapuh
      * terhadap karakter khusus pada nama kolom.
      */
-     
+
     protected function getColumns(): array
     {
         return collect($this->columns)
-            ->map(fn (string $kolom) => Column::make($kolom)
-                ->title(ucwords(str_replace(['_',"."], [' ',' '], $kolom))))
+            ->map(fn(string $kolom) => Column::make($kolom)
+                ->title(ucwords(str_replace(['_', "."], [' ', ' '], $kolom))))
             // 1. PREPEND: Masukkan kolom No di posisi PALING AWAL (indeks 0)
             ->prepend(
                 Column::make('DT_RowIndex')

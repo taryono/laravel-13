@@ -5,8 +5,8 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('assets/css/menu_mangement.css') }}">
-
-    <div class="d-flex justify-content-between align-items-center mb-3">
+    {{-- always on top and disabled browser scroll --}}
+    <div class="d-flex justify-content-between align-items-center mb-3 sticky-top bg-white" style="top: -10px;">
         <h4 class="mb-0">Manajemen Menu</h4>
         <button class="btn btn-primary" onclick="openMenuModal('create')">
             <span class="material-symbols-outlined align-middle">add</span> Tambah Menu
@@ -14,7 +14,7 @@
     </div>
 
     <div class="card">
-        <div class="card-body">
+        <div class="card-body" style="height: 400px;max-height:400px;overflow-y:scroll;">
             <ul id="menu-tree" class="menu-tree list-unstyled mb-0">
                 @include('MenuManagement::partials.tree-item', ['items' => $tree])
             </ul>

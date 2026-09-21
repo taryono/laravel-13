@@ -165,8 +165,8 @@
                     <template x-for="(opt, i) in options" :key="i">
                         <div class="row g-2 align-items-center mb-2">
                             <div class="col-auto">
-                                <input type="radio" name="correct_single" class="form-check-input mt-0"
-                                    :checked="opt.is_correct" @change="setSingleCorrect(i)">
+                                <input type="radio" :name="'correct_single_' + i" :checked="opt.is_correct"
+                                    @change="setSingleCorrect(i)">
                             </div>
                             <div class="col-1">
                                 <input type="text" class="form-control text-center" placeholder="A"
@@ -451,9 +451,10 @@
                     this.options.splice(i, 1);
                 },
                 moveOption(i, dir) {
-                    const target = i + dir;
-                    if (target < 0 || target >= this.options.length) return;
-                    [this.options[i], this.options[target]] = [this.options[target], this.options[i]];
+                    const t = i + dir;
+                    if (t < 0 || t >= this.options.length) return;
+                    [this.options[i], this.options[t]] = [this.options[t], this.options[i]];
+                    this.options.forEach((o, idx) => o.order_index = idx);
                 },
                 setSingleCorrect(i) {
                     this.options.forEach((o, idx) => o.is_correct = (idx === i));
