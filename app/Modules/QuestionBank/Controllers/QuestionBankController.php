@@ -5,9 +5,15 @@ namespace App\Modules\QuestionBank\Controllers;
 use App\DataTables\QuestionBankDataTable;
 use App\Http\Controllers\MainController;
 use Models\QuestionBank;
+use Models\QuestionType;
+use Models\DifficultyLevel;
+use Models\CognitiveLevel;
+use Models\QuestionStimuli;
+use Models\Subject;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
@@ -51,11 +57,11 @@ class QuestionBankController extends MainController
      */
     public function create(): View
     {
-        $questionBank = new QuestionBank();
         $forms = $this->formData();
+        $forms['questionBank'] = new QuestionBank();
         return view(
             'QuestionBank::create',
-            compact('questionBank', 'forms')
+            $forms
         );
     }
 
@@ -80,7 +86,7 @@ class QuestionBankController extends MainController
                 'Gagal menambahkan QuestionBank.',
                 [
                     'exception' => $e,
-                    'user_id' => auth()->id(),
+                    'user_id' => Auth::id(),
                 ]
             );
 
@@ -126,7 +132,7 @@ class QuestionBankController extends MainController
                 [
                     'exception' => $e,
                     'QuestionBank_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => Auth::id(),
                 ]
             );
 
@@ -160,7 +166,7 @@ class QuestionBankController extends MainController
                 [
                     'exception' => $e,
                     'QuestionBank_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => Auth::id(),
                 ]
             );
 
@@ -178,7 +184,7 @@ class QuestionBankController extends MainController
             'questionTypes'    => QuestionType::select('id', 'name', 'code')->get(),
             'difficultyLevels' => DifficultyLevel::select('id', 'name')->get(),
             'cognitiveLevels'  => CognitiveLevel::select('id', 'name', 'code')->get(),
-            'stimuli'          => QuestionStimulus::select('id', 'title')->get(),
+            'stimuli'          => QuestionStimuli::select('id', 'title')->get(),
         ];
     }
 
@@ -247,7 +253,7 @@ class QuestionBankController extends MainController
                 : null;
 
             $data = [
-                'school_id'            => auth()->user()->school_id,
+                'school_id'            => Auth::user()->school_id,
                 'subject_id'           => $validated['subject_id'],
                 'question_type_id'     => $validated['question_type_id'],
                 'difficulty_level_id'  => $validated['difficulty_level_id'],
@@ -262,7 +268,7 @@ class QuestionBankController extends MainController
                 'is_public'            => $request->boolean('is_public'),
                 'is_active'            => $request->boolean('is_active'),
                 'correct_answer_text'  => $typeCode === 'short_answer' ? array_values($request->aliases) : null,
-                'updated_by'           => auth()->id(),
+                'updated_by'           => Auth::id(),
             ];
 
             if ($questionBank) {
@@ -274,14 +280,14 @@ class QuestionBankController extends MainController
                         'correct_answer_text',
                         'explanation',
                     ]) + ['options' => $questionBank->options->toArray()],
-                    'changed_by' => auth()->id(),
+                    'changed_by' => Auth::id(),
                 ]);
 
                 $questionBank->update($data);
                 $questionBank->options()->delete();
                 $questionBank->matchingPairs()->delete();
             } else {
-                $data['created_by'] = auth()->id();
+                $data['created_by'] = Auth::id();
                 $questionBank = QuestionBank::create($data);
             }
 
