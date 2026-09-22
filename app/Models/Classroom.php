@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
 class Classroom extends BasedModel
-{ 
+{
     protected $fillable = [
         'organization_id',
         'class_level_id',
@@ -19,6 +19,21 @@ class Classroom extends BasedModel
     protected $casts = [
         'is_active' => 'boolean',
     ];
+
+    public function organization()
+    {
+        return $this->belongsTo(Organization::class);
+    }
+
+    public function class_level()
+    {
+        return $this->belongsTo(ClassLevel::class);
+    }
+
+    public function academic_year()
+    {
+        return $this->belongsTo(AcademicYear::class);
+    }
 
     public function homeroomAssignments()
     {

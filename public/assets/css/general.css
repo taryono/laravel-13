@@ -391,6 +391,12 @@ body.dark-mode {
     z-index: 9999 !important;
 }
 
-.material-symbols-outlined {
+.bnsp-nav-item .material-symbols-outlined,
+.btn-sm .material-symbols-outlined {
     font-size: 10px !important;
+}
+
+.bnsp-flyout-title-item::before,
+.bnsp-flyout-title-item::after {
+    content: none !important;
 }

@@ -4,6 +4,16 @@ namespace Models;
 
 class ClassLevel extends BasedModel
 {
+    public function organization()
+    {
+        return $this->belongsTo(Organization::class);
+    }
+
+    public function class_level()
+    {
+        return $this->belongsTo(ClassLevel::class);
+    }
+
     // Relasi
     public function admission()
     {

@@ -1,17 +1,3 @@
-{{ Form::model($class-level, ['method' => 'PUT', 'route' => ['class_level.update', $class-level->id], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
-    <div class="row">
-        <div class="col-md-6 mb-3">
-            @forelse ($forms as $key => $form)
-                <div class="row">
-                    <div class="col-md-12 mb-3">
-                        <label>{{ say($form['label']) }}</label>
-                        {!! $form['content'] !!}
-                    </div>
-                </div>
-            @empty
-                <p>{{ say('Data Tidak Ditemukan') }}</p>
-            @endforelse
-        </div> 
-    </div> 
+{{ Form::model($class_level, ['method' => 'PUT', 'route' => ['class_level.update', $class_level->id], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
+
 {{ Form::close() }}
-<!-- /.row -->

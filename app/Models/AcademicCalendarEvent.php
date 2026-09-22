@@ -1,14 +1,24 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
 class AcademicCalendarEvent extends BasedModel
-{ 
+{
     // Relasi
-    // public function user()
-    // {
-    //     return $this->belongsTo(User::class);
-    // }
+    public function organization()
+    {
+        return $this->belongsTo(Organization::class);
+    }
+
+    public function academic_year()
+    {
+        return $this->belongsTo(AcademicYear::class);
+    }
+
+    public function school()
+    {
+        return $this->belongsTo(School::class);
+    }
 
     // Scope
     public function scopeActive($query)

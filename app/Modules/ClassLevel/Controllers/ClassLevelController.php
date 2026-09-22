@@ -51,14 +51,10 @@ class ClassLevelController extends MainController
      */
     public function create(): View
     {
-        $classLevel = new ClassLevel();
-        $result = $this->getForm($classLevel);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
-
+        $class_level = new ClassLevel();
         return view(
             'ClassLevel::create',
-            compact('classLevel', 'forms', 'groupedForms')
+            compact('class_level')
         );
     }
 
@@ -68,7 +64,7 @@ class ClassLevelController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'level_order' => ['required', 'string', 'max:255'],
@@ -91,7 +87,6 @@ class ClassLevelController extends MainController
                 'Data ClassLevel berhasil ditambahkan.',
                 $model
             );
-
         } catch (Throwable $e) {
 
             Log::error(
@@ -115,14 +110,10 @@ class ClassLevelController extends MainController
      */
     public function edit($id): View
     {
-        $classLevel = $this->model->findOrFail($id);
-        $result = $this->getForm($classLevel);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
-
+        $class_level = $this->model->findOrFail($id);
         return view(
             'ClassLevel::edit',
-            compact('classLevel', 'forms', 'groupedForms')
+            compact('class_level')
         );
     }
 
@@ -132,7 +123,7 @@ class ClassLevelController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'level_order' => ['required', 'string', 'max:255'],
@@ -159,8 +150,7 @@ class ClassLevelController extends MainController
                 'Data ClassLevel berhasil diperbarui.',
                 $classLevel
             );
-
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui ClassLevel.',
                 [
@@ -194,8 +184,7 @@ class ClassLevelController extends MainController
                 $request,
                 'Data ClassLevel berhasil dihapus.'
             );
-
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $classLevel->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus ClassLevel.',
@@ -211,5 +200,5 @@ class ClassLevelController extends MainController
                 'Data ClassLevel gagal dihapus.'
             );
         }
-    } 
+    }
 }
