@@ -8,6 +8,7 @@ use Models\EmployeeLeave;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
@@ -52,13 +53,17 @@ class EmployeeLeaveController extends MainController
     public function create(): View
     {
         $employeeLeave = new EmployeeLeave();
-        $result = $this->getForm($employeeLeave);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
+        $employees = \Models\Employee::where('organization_id', auth()->user()->current_organization_id)->get()->map(function ($employee) {
+            return [
+                'id' => $employee->id,
+                'name' => $employee->employee_name,
+            ];
+        });
+        $leave_types = \Models\LeaveType::where('is_active', 1)->pluck('name', 'id');
 
         return view(
             'EmployeeLeave::create',
-            compact('employeeLeave', 'forms', 'groupedForms')
+            compact('employeeLeave', 'employees', 'leave_types')
         );
     }
 
@@ -70,7 +75,7 @@ class EmployeeLeaveController extends MainController
         $validated = $request->validate([
             'start_date' => ['required', 'string', 'max:255'],
             'end_date' => ['required', 'string', 'max:255'],
-            'leave_type' => ['required', 'string', 'max:255'],
+            'leave_type_id' => ['required', 'integer'],
             'employee_id' => ['required', 'integer'],
         ]);
 
@@ -84,7 +89,6 @@ class EmployeeLeaveController extends MainController
                 'Data EmployeeLeave berhasil ditambahkan.',
                 $model
             );
-
         } catch (Throwable $e) {
 
             Log::error(
@@ -92,7 +96,7 @@ class EmployeeLeaveController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => Auth::id(),
                 ]
             );
 
@@ -109,13 +113,18 @@ class EmployeeLeaveController extends MainController
     public function edit($id): View
     {
         $employeeLeave = $this->model->findOrFail($id);
-        $result = $this->getForm($employeeLeave);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
+        $employees = \Models\Employee::where('organization_id', auth()->user()->current_organization_id)->get()->map(function ($employee) {
+            return [
+                'id' => $employee->id,
+                'name' => $employee->employee_name,
+            ];
+        });
+        $leave_types = \Models\LeaveType::where('is_active', 1)->pluck('name', 'id');
+
 
         return view(
             'EmployeeLeave::edit',
-            compact('employeeLeave', 'forms', 'groupedForms')
+            compact('employeeLeave', 'employees', 'leave_types')
         );
     }
 
@@ -146,7 +155,6 @@ class EmployeeLeaveController extends MainController
                 'Data EmployeeLeave berhasil diperbarui.',
                 $employeeLeave
             );
-
         } catch (Throwable $e) {
 
             // FIX: pakai $id mentah untuk logging, BUKAN
@@ -160,7 +168,7 @@ class EmployeeLeaveController extends MainController
                     'exception' => $e,
                     'EmployeeLeave_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => Auth::id(),
                 ]
             );
 
@@ -187,7 +195,6 @@ class EmployeeLeaveController extends MainController
                 $request,
                 'Data EmployeeLeave berhasil dihapus.'
             );
-
         } catch (Throwable $e) {
 
             // FIX: sama seperti update(), pakai $id mentah, bukan
@@ -197,7 +204,7 @@ class EmployeeLeaveController extends MainController
                 [
                     'exception' => $e,
                     'EmployeeLeave_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => Auth::id(),
                 ]
             );
 
@@ -206,5 +213,5 @@ class EmployeeLeaveController extends MainController
                 'Data EmployeeLeave gagal dihapus.'
             );
         }
-    } 
+    }
 }

@@ -17,7 +17,7 @@ class EmployeeLeaveDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['start_date', 'end_date', 'leave_type', 'employee_id'];
+    protected array $columns = ['start_date', 'end_date', 'leave_type.name', 'employee.name'];
 
     /**
      * Build DataTable response.
@@ -100,7 +100,7 @@ class EmployeeLeaveDataTable extends DataTable
      */
     public function query(EmployeeLeave $model): QueryBuilder
     {
-        return $model->newQuery();
+        return $model->newQuery()->with(['employee', 'leave_type']);
     }
 
     /**
@@ -122,7 +122,7 @@ class EmployeeLeaveDataTable extends DataTable
             /*
              * Server-side AJAX endpoint.
              */
-            ->minifiedAjax(route('employee-leave.index'))
+            ->minifiedAjax(route('employee_leave.index'))
 
             /*
              * Default sorting:
@@ -138,14 +138,14 @@ class EmployeeLeaveDataTable extends DataTable
                  * Custom Bootstrap 5 layout.
                  */
                 'dom' =>
-                    '<"row mb-3"' .
-                        '<"col-md-6 d-flex align-items-center"B>' .
-                        '<"col-md-6"f>' .
+                '<"row mb-3"' .
+                    '<"col-md-6 d-flex align-items-center"B>' .
+                    '<"col-md-6"f>' .
                     '>' .
                     'rt' .
                     '<"row mt-3"' .
-                        '<"col-md-6"i>' .
-                        '<"col-md-6 d-flex justify-content-md-end"p>' .
+                    '<"col-md-6"i>' .
+                    '<"col-md-6 d-flex justify-content-md-end"p>' .
                     '>',
 
                 /*
@@ -267,8 +267,8 @@ class EmployeeLeaveDataTable extends DataTable
     protected function getColumns(): array
     {
         return collect($this->columns)
-            ->map(fn (string $kolom) => Column::make($kolom)
-                ->title(ucwords(str_replace(['_',"."], [' ',' '], $kolom))))
+            ->map(fn(string $kolom) => Column::make($kolom)
+                ->title(ucwords(str_replace(['_', "."], [' ', ' '], $kolom))))
             // 1. PREPEND: Masukkan kolom No di posisi PALING AWAL (indeks 0)
             ->prepend(
                 Column::make('DT_RowIndex')

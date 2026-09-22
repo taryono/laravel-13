@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Route;
 | and give it the controller to call when that URI is requested.
 |
  */
+
 Route::group(['prefix' => 'employee-leave', 'namespace' => 'App\Modules\EmployeeLeave\Controllers', 'middleware' => ['web']], function () {
     Route::get('/', ['as' => 'employee_leave.index', 'uses' => 'EmployeeLeaveController@index']);
     Route::any('/search', ['as' => 'employee_leave.search', 'uses' => 'EmployeeLeaveController@search']);
@@ -23,5 +24,4 @@ Route::group(['prefix' => 'employee-leave', 'namespace' => 'App\Modules\Employee
     Route::get('/edit/{id}', ['as' => 'employee_leave.edit', 'uses' => 'EmployeeLeaveController@edit']);
     Route::put('/update/{id}', ['as' => 'employee_leave.update', 'uses' => 'EmployeeLeaveController@update']);
     Route::delete('/delete/{id}', ['as' => 'employee_leave.destroy', 'uses' => 'EmployeeLeaveController@destroy']);
-    
 });
