@@ -17,416 +17,131 @@ function initFlyoutTitles() {
 
 initFlyoutTitles();
 function bindNavParentClicks(container, respectSidebarCollapse) {
-    // Nav level teratas sidebar — dipakai untuk cek apakah sebuah
-    // .bnsp-nav-item ada di level 1 (langsung di dalam <nav>) atau
-    // nested (di dalam .bnsp-submenu)
     const topLevelNav = respectSidebarCollapse ? sidebar.querySelector(':scope > nav') : null;
 
+    // Tangani SEMUA .bnsp-nav-parent, tidak hanya level atas
     container.querySelectorAll('.bnsp-nav-parent').forEach(link => {
-        link.addEventListener('click', (e) => {
-            if (respectSidebarCollapse && sidebar.classList.contains('collapsed') && isDesktop()) return;
-            e.preventDefault();
-            const item = link.closest('.bnsp-nav-item');
-            item.classList.toggle('open');
-        });
-
         const item = link.closest('.bnsp-nav-item');
         const isTopLevelSidebarItem = !!topLevelNav && item.parentElement === topLevelNav;
 
-        // ✅ Saat hover di desktop collapsed → cek posisi
-        item.addEventListener('mouseenter', () => {
-            if (isDesktop() && sidebar.classList.contains('collapsed')) {
-                if (isTopLevelSidebarItem) {
-                    // Level teratas: pindahkan submenu ke <body> (portal)
-                    // supaya tidak ke-clip oleh <nav> yang overflow:auto
-                    console.log('📊 Pindah submenu ke portal...');
-                    openTopFlyout(item);
-                } else {
-                    requestAnimationFrame(() => {
-                        adjustSubmenuPosition(item);
-                    });
-                }
-            }
-        });
-
-        if (isTopLevelSidebarItem) {
-            item.addEventListener('mouseleave', () => {
-                scheduleCloseTopFlyout(item);
-            });
-
-            item.addEventListener('mouseleave', (e) => {
-
-                const related = e.relatedTarget;
-
-                /*
-                * Jika mouse berpindah ke sesuatu yang masih
-                * berada di dalam item, jangan close.
-                */
-                if (related && item.contains(related)) {
-                    return;
-                }
-
-                /*
-                * Kalau mouse berpindah langsung ke submenu portal,
-                * jangan close.
-                */
-                if (
-                    flyoutOpenSubmenu &&
-                    related &&
-                    flyoutOpenSubmenu.contains(related)
-                ) {
-                    clearTimeout(flyoutHideTimer);
-                    return;
-                }
-
-                scheduleCloseTopFlyout(item);
-            });
-        }
-    });
-}
-
-function bindNavParentClicksNew(container, respectSidebarCollapse) {
-    const topLevelNav = respectSidebarCollapse ? sidebar.querySelector(':scope > nav') : null;
-
-    container.querySelectorAll('.bnsp-nav-parent').forEach(link => {
-        // ===== EVENT CLICK =====
+        // ===== KLIK =====
         link.addEventListener('click', (e) => {
             if (respectSidebarCollapse && sidebar.classList.contains('collapsed') && isDesktop()) {
-                // HENTIKAN perilaku default di collapsed mode
-                // JANGAN toggle open
+                // Di mode collapsed, parent TIDAK mencegah default — biarkan submenu terbuka via hover
                 e.preventDefault();
                 return;
             }
+            // Mode expanded: klik untuk buka/tutup
             e.preventDefault();
-            const item = link.closest('.bnsp-nav-item');
             item.classList.toggle('open');
         });
 
-        const item = link.closest('.bnsp-nav-item');
-        const isTopLevelSidebarItem = !!topLevelNav && item.parentElement === topLevelNav;
+        // ===== HOVER =====
+        item.addEventListener('mouseenter', (e) => {
+            console.log('🟢 MOUSEENTER:', item.querySelector('.nav-label')?.textContent);
 
-        // ===== EVENT MOUSEENTER (HANYA SATU) =====
-        item.addEventListener('mouseenter', () => {
-            if (isDesktop() && sidebar.classList.contains('collapsed')) {
-                if (isTopLevelSidebarItem) {
-                    // HANYA untuk level teratas - pakai portal
-                    console.log('📊 Pindah submenu ke portal...');
-                    openTopFlyoutNew(item); // PAKAI YANG BARU
+            // ✅ Tutup menu lain yang sedang terbuka saat pindah ke menu baru
+            if (flyoutOpenItem && flyoutOpenItem !== item) {
+                closeTopFlyout();
+            }
+
+            if (isDesktop() && (sidebar.classList.contains('collapsed') || document.body.classList.contains('bnsp-layout-topbar'))) {
+                if (isTopLevelSidebarItem || document.body.classList.contains('bnsp-layout-topbar')) {
+                    openTopFlyoutNew(item);
                 } else {
-                    requestAnimationFrame(() => {
-                        adjustSubmenuPosition(item);
-                    });
+                    requestAnimationFrame(() => adjustNestedSubmenu(item));
                 }
+            } else {
+                item.classList.add('open');
             }
         });
 
-        // ===== EVENT MOUSELEAVE (HANYA SATU) =====
-        if (isTopLevelSidebarItem) {
-            item.addEventListener('mouseleave', (e) => {
-                const related = e.relatedTarget;
-                
-                // Jika mouse pindah ke dalam item sendiri
-                if (related && item.contains(related)) {
-                    return;
-                }
-                
-                // Jika mouse pindah ke submenu portal
-                if (flyoutOpenSubmenu && related && flyoutOpenSubmenu.contains(related)) {
-                    clearTimeout(flyoutHideTimer);
-                    return;
-                }
-                
-                scheduleCloseTopFlyout(item);
-            });
-        }
-    });
-}
-
-// ===== FLYOUT SUBMENU PORTAL untuk item level teratas =====
-let flyoutHideTimer = null;
-let flyoutOpenItem = null;
-let flyoutOpenSubmenu = null;
-
-function closeTopFlyout() {
-    if (flyoutOpenSubmenu && flyoutOpenItem) {
-        flyoutOpenSubmenu.classList.remove('bnsp-flyout-detached');
-        flyoutOpenSubmenu.style.position = '';
-        flyoutOpenSubmenu.style.top = '';
-        flyoutOpenSubmenu.style.left = '';
-        flyoutOpenSubmenu.style.bottom = '';
-        // Kembalikan submenu ke posisi asal di dalam nav-item-nya
-        const preBrowser = flyoutOpenItem.querySelector(':scope > .pre-browser');
-        if (preBrowser) {
-            flyoutOpenItem.insertBefore(flyoutOpenSubmenu, preBrowser);
-        } else {
-            flyoutOpenItem.appendChild(flyoutOpenSubmenu);
-        }
-    }
-    flyoutOpenItem = null;
-    flyoutOpenSubmenu = null;
-}
-
-function openTopFlyout(item) {
-    const submenu = item.querySelector(':scope > .bnsp-submenu');
-
-    console.log('📊 openTopFlyout Pindah submenu ke portal...',submenu);
-    if (!submenu) return;
-
-    clearTimeout(flyoutHideTimer);
-
-    if (flyoutOpenItem === item) return; // sudah kebuka untuk item ini
-    if (flyoutOpenItem && flyoutOpenItem !== item) closeTopFlyout();
-
-    flyoutOpenItem = item;
-    flyoutOpenSubmenu = submenu;
-
-    document.body.appendChild(submenu);
-    submenu.classList.add('bnsp-flyout-detached');
-
-    const gapVar = getComputedStyle(document.documentElement).getPropertyValue('--bnsp-flyout-gap');
-    const gap = parseFloat(gapVar) || 12;
-    const rect = item.getBoundingClientRect();
-
-    submenu.style.left = (rect.right + gap) + 'px';
-    submenu.style.top = (rect.top - 8) + 'px';
-    submenu.style.bottom = 'auto';
-
-    // Kalau ruang di bawah tidak cukup & ruang di atas lebih luas, flip ke atas
-    const submenuHeight = submenu.offsetHeight;
-    const spaceBelow = window.innerHeight - rect.top;
-    const spaceAbove = rect.bottom;
-    if (spaceBelow < submenuHeight && spaceAbove > spaceBelow) {
-        submenu.style.top = 'auto';
-        submenu.style.bottom = (window.innerHeight - rect.bottom - 8) + 'px';
-    }
-
-    // Bind sekali saja per elemen submenu, supaya listener tidak menumpuk
-    if (!submenu._flyoutBound) {
-        submenu.addEventListener('mouseenter', () => clearTimeout(flyoutHideTimer));
-        submenu.addEventListener('mouseleave', () => {
-            if (flyoutOpenItem) scheduleCloseTopFlyout(flyoutOpenItem);
-        });
-        submenu._flyoutBound = true;
-    }
-}
-
-function openTopFlyoutNew(item) {
-    // CEK: apakah item memiliki submenu?
-    const submenu = item.querySelector(':scope > .bnsp-submenu');
-    if (!submenu) return;
-
-    // CEK: apakah ini parent menu? (harusnya sudah dicek sebelumnya)
-    if (!item.querySelector('.bnsp-nav-parent')) return;
-
-    clearTimeout(flyoutHideTimer);
-
-    // Sudah terbuka untuk item ini
-    if (flyoutOpenItem === item && flyoutOpenSubmenu === submenu) {
-        return;
-    }
-
-    // Kalau ada flyout lain yang masih terbuka, tutup dulu
-    if (flyoutOpenItem && flyoutOpenItem !== item) {
-        closeTopFlyout();
-    }
-
-    // ===== PASTIKAN SUBMENU TIDAK TAMPIL DI CSS =====
-    // Hapus style inline yang mungkin tersisa
-    submenu.style.display = '';
-    submenu.style.maxHeight = '';
-
-    flyoutOpenItem = item;
-    flyoutOpenSubmenu = submenu;
-
-    /*
-     * Simpan posisi asli submenu supaya nanti
-     * bisa dikembalikan ke parent.
-     */
-    if (!submenu._originalParent) {
-        submenu._originalParent = submenu.parentElement;
-        submenu._originalNextSibling = submenu.nextSibling;
-    }
-
-    /*
-     * Pindahkan ke body.
-     * Ini membuat flyout bebas dari overflow:auto
-     * milik sidebar/nav.
-     */
-    document.body.appendChild(submenu);
-
-    submenu.classList.add('bnsp-flyout-detached');
-
-    const gapVar = getComputedStyle(document.documentElement)
-        .getPropertyValue('--bnsp-flyout-gap');
-
-    const gap = parseFloat(gapVar) || 12;
-
-    const rect = item.getBoundingClientRect();
-
-    /*
-     * Beri posisi awal.
-     */
-    submenu.style.left = `${rect.right + gap}px`;
-    submenu.style.top = `${rect.top - 8}px`;
-    submenu.style.bottom = 'auto';
-
-    /*
-     * Pastikan browser sudah menghitung ukuran submenu.
-     */
-    const submenuRect = submenu.getBoundingClientRect();
-
-    /*
-     * ===== VERTICAL POSITION =====
-     */
-
-    const spaceBelow = window.innerHeight - rect.top;
-    const spaceAbove = rect.bottom;
-
-    if (
-        spaceBelow < submenuRect.height &&
-        spaceAbove > spaceBelow
-    ) {
-        submenu.style.top = 'auto';
-
-        const bottom = window.innerHeight - rect.bottom - 8;
-
-        submenu.style.bottom = `${Math.max(8, bottom)}px`;
-    } else {
-        /*
-         * Jangan biarkan submenu keluar bawah layar.
-         */
-        const maxTop = window.innerHeight - submenuRect.height - 8;
-
-        const top = Math.min(
-            Math.max(8, rect.top - 8),
-            maxTop
-        );
-
-        submenu.style.top = `${top}px`;
-    }
-
-    /*
-     * ===== HORIZONTAL POSITION =====
-     *
-     * Kalau submenu terlalu ke kanan,
-     * tampilkan ke kiri parent.
-     */
-
-    const finalRect = submenu.getBoundingClientRect();
-
-    if (finalRect.right > window.innerWidth - 8) {
-        submenu.style.left = `${Math.max(
-            8,
-            rect.left - finalRect.width - gap
-        )}px`;
-
-        submenu.classList.add('bnsp-flyout-left');
-    } else {
-        submenu.classList.remove('bnsp-flyout-left');
-    }
-
-    /*
-     * Bind listener hanya sekali.
-     */
-    if (!submenu._flyoutBound) {
-
-        submenu.addEventListener('mouseenter', () => {
-            clearTimeout(flyoutHideTimer);
-        });
-
-        submenu.addEventListener('mouseleave', (e) => {
-            /*
-             * Kalau mouse berpindah ke element lain
-             * yang masih merupakan bagian dari submenu,
-             * jangan close.
-             */
+        item.addEventListener('mouseleave', (e) => {
             const related = e.relatedTarget;
 
-            if (related && submenu.contains(related)) {
-                return;
+            // ✅ Cek apakah masuk ke submenu manapun yang terhubung dengan item ini
+            const hasFlyout = item.querySelector(':scope > .bnsp-submenu') || flyoutOpenSubmenu;
+            const submenu = item.querySelector(':scope > .bnsp-submenu') || flyoutOpenSubmenu;
+
+            if (submenu && related) {
+                // Masuk ke submenu yang terpisah → JANGAN tutup
+                if (submenu.contains(related)) {
+                    console.log('⏭️ Masuk ke submenu portal, tetap buka');
+                    return;
+                }
+                // Masuk ke elemen lain di dalam area yang berhubungan
+                if (item.contains(related)) {
+                    return;
+                }
             }
 
-            scheduleCloseTopFlyout(item);
+            if (isTopLevelSidebarItem && isDesktop() && sidebar.classList.contains('collapsed')) {
+                scheduleCloseTopFlyout(item);
+            }
+            // ✅ Juga cek mode TOPBAR
+            else if (document.body.classList.contains('bnsp-layout-topbar') && isDesktop()) {
+                scheduleCloseTopFlyout(item);
+            }
+            else {
+                item.classList.remove('open');
+            }
         });
+    });
 
-        submenu._flyoutBound = true;
-    }
-}
-
-function scheduleCloseTopFlyoutOld(item) {
-    clearTimeout(flyoutHideTimer);
-    flyoutHideTimer = setTimeout(() => {
-        if (flyoutOpenItem === item) closeTopFlyout();
-    }, 200);
-}
-function scheduleCloseTopFlyout(item) {
-    clearTimeout(flyoutHideTimer);
-
-    flyoutHideTimer = setTimeout(() => {
-
-        if (flyoutOpenItem !== item) {
-            return;
-        }
-
-        /*
-         * Jangan tutup jika mouse sedang berada
-         * di parent atau submenu portal.
-         */
-        const submenu = flyoutOpenSubmenu;
-
-        if (!submenu) {
+    // ✅ PASTIKAN SEMUA LINK BIASA DI DALAM SUBMENU BISA DIKLIK
+    container.querySelectorAll('.bnsp-submenu .bnsp-nav-link:not(.bnsp-nav-parent)').forEach(link => {
+        link.addEventListener('click', (e) => {
+            // Tutup semua flyout setelah memilih
             closeTopFlyout();
-            return;
-        }
-
-        const parentRect = item.getBoundingClientRect();
-        const submenuRect = submenu.getBoundingClientRect();
-
-        const mouseX = window._bnspMouseX;
-        const mouseY = window._bnspMouseY;
-
-        const insideParent =
-            mouseX >= parentRect.left &&
-            mouseX <= parentRect.right &&
-            mouseY >= parentRect.top &&
-            mouseY <= parentRect.bottom;
-
-        const insideSubmenu =
-            mouseX >= submenuRect.left &&
-            mouseX <= submenuRect.right &&
-            mouseY >= submenuRect.top &&
-            mouseY <= submenuRect.bottom;
-
-        if (insideParent || insideSubmenu) {
-            return;
-        }
-
-        closeTopFlyout();
-
-    }, 250);
+            // Tutup sidebar di mobile
+            if (!isDesktop()) {
+                sidebar.classList.remove('mobile-open');
+                backdrop.classList.remove('show');
+            }
+        });
+    });
 }
+const LAYOUT_STORAGE_KEY = 'bnsp-layout-mode' + '-' + window.loginAs; // 'sidebar' | 'topbar'
+const COLLAPSED_STORAGE_KEY = 'sidebar-collapsed-mode' + '-' + window.loginAs; // 'collapsed' | 'expanded'
+const layoutToggleBtn = document.getElementById('bnspLayoutToggle');
+const layoutToggleIcon = layoutToggleBtn.querySelector('.material-symbols-outlined');
 
-document.addEventListener('mousemove', (e) => {
-    window._bnspMouseX = e.clientX;
-    window._bnspMouseY = e.clientY;
-});
-
-const LAYOUT_STORAGE_KEY = 'bnsp-layout-mode'; // 'sidebar' | 'topbar'
-const COLLAPSED_STORAGE_KEY = 'sidebar-collapsed-mode'; // 'collapsed' | 'expanded' 
-
+function updateToggleVisibility() {
+    layoutToggleBtn.style.display = isDesktop() ? '' : 'none';
+}
 
 function buildTopNav() {
     const topnav = document.getElementById('bnspTopnav');
     const sourceNav = sidebar.querySelector(':scope > nav');
-    if (!sourceNav) return; // tidak ada menu di sidebar
+    if (!sourceNav) return;
+
+    // Bersihkan dulu topnav
+    topnav.innerHTML = '';
+
     Array.from(sourceNav.children).forEach(child => {
         const clone = child.cloneNode(true);
+
+        // Hapus elemen judul flyout yang tidak perlu di topbar
         clone.querySelectorAll('.bnsp-flyout-title-item').forEach(li => li.remove());
+
         topnav.appendChild(clone);
     });
+
+    // ✅ Pasang listener ulang untuk SEMUA elemen di topbar
     bindNavParentClicks(topnav, false);
 
+    // Tambahan: pastikan semua link di submenu juga terikat
+    topnav.querySelectorAll('.bnsp-nav-link').forEach(link => {
+        link.addEventListener('click', () => {
+            closeTopFlyout();
+            // Tutup semua menu terbuka di topbar
+            topnav.querySelectorAll('.bnsp-nav-item.open').forEach(el => {
+                el.classList.remove('open');
+            });
+        });
+    });
 }
+
 function initTopnavOverflow() {
     const topnav = document.getElementById('bnspTopnav');
     if (!topnav) return;
@@ -508,15 +223,27 @@ function initTopnavOverflow() {
 buildTopNav();
 // Panggil SETELAH buildTopNav(), supaya menu sudah ter-clone semua
 initTopnavOverflow();
+
+updateToggleVisibility();
+
 // Pasang listener supaya reaktif terhadap perubahan ukuran window
 const desktopMql = window.matchMedia('(min-width: 992px)');
+desktopMql.addEventListener('change', updateToggleVisibility);
 
 function applyLayoutMode(mode) {
     const isTopbar = mode === 'topbar';
     document.body.classList.toggle('bnsp-layout-topbar', isTopbar);
+    layoutToggleIcon.textContent = isTopbar ? 'view_sidebar' : 'view_agenda';
+    layoutToggleBtn.title = isTopbar ? 'Ganti ke tampilan sidebar' : 'Ganti ke tampilan menu atas';
+
     if (isTopbar) {
         sidebar.classList.remove('mobile-open');
         backdrop.classList.remove('show');
+        // ✅ Reset semua status saat masuk mode topbar
+        closeTopFlyout();
+        document.querySelectorAll('.bnsp-nav-item.open').forEach(el => {
+            el.classList.remove('open');
+        });
     }
 }
 
@@ -526,11 +253,16 @@ function applySideBarMode(mode) {
     mainWrapper.classList.toggle('collapsed', isCollapsed);
 }
 
-const savedLayoutMode = localStorage.getItem('sidebar') || 'sidebar';
+const savedLayoutMode = localStorage.getItem(LAYOUT_STORAGE_KEY) || 'sidebar';
 applyLayoutMode(savedLayoutMode);
 const savedSidebarMode = localStorage.getItem(COLLAPSED_STORAGE_KEY) || 'expanded';
 applySideBarMode(savedSidebarMode);
-
+layoutToggleBtn.addEventListener('click', () => {
+    const nextMode = document.body.classList.contains('bnsp-layout-topbar') ? 'sidebar' : 'topbar';
+    applyLayoutMode(nextMode);
+    localStorage.setItem(LAYOUT_STORAGE_KEY, nextMode);
+    window.location.reload();
+});
 
 hamburger.addEventListener('click', () => {
     if (isDesktop()) {
@@ -559,7 +291,17 @@ window.addEventListener('resize', () => {
     }
 });
 bindNavParentClicks(sidebar, true);
+sidebar.querySelectorAll('.bnsp-nav-link:not(.bnsp-nav-parent)').forEach(link => {
+    link.addEventListener('click', () => {
+        if (!isDesktop()) {
+            sidebar.classList.remove('mobile-open');
+            backdrop.classList.remove('show');
+        }
+    });
+});
 document.querySelectorAll('button, a').forEach(el => {
+    // Skip dropdown toggle & item dropdown
+    if (el.closest('.dropdown') || el.hasAttribute('data-bs-toggle')) return;
     el.addEventListener('click', function () {
         const ripple = document.createElement('div');
         ripple.style.position = 'absolute';
@@ -589,8 +331,28 @@ function updateNotificationBadge(change) {
     badge.textContent = current;
     if (current === 0) badge.style.display = 'none';
 }
+
 document.addEventListener('click', (e) => {
     if (!e.target || typeof e.target.closest !== 'function') return;
+
+    // ✅ Jangan tutup jika klik di dalam submenu yang terbuka
+    if (e.target.closest('.bnsp-flyout-detached')) {
+        // Tapi kalau klik link biasa, tutup setelah navigasi
+        if (!e.target.closest('.bnsp-nav-parent')) {
+            setTimeout(() => closeTopFlyout(), 50);
+        }
+        return;
+    }
+
+    // ✅ Skip kalau klik di dropdown topbar — biar Bootstrap handle
+    if (e.target.closest('.dropdown')) {
+        // tetap boleh tutup nav-item
+        document.querySelectorAll('.bnsp-nav-item.open').forEach(item => {
+            item.classList.remove('open');
+        });
+        return;
+    }
+
     // JANGAN tutup kalau klik di dalam nav-item — biarkan toggle() berjalan dulu
     if (!e.target.closest('.bnsp-nav-item')) {
         document.querySelectorAll('.bnsp-nav-item.open').forEach(item => {
@@ -609,8 +371,119 @@ document.addEventListener('click', (e) => {
     // (bukan link parent yang cuma toggle submenu lagi)
     if (e.target.closest('.bnsp-nav-link') && !e.target.closest('.bnsp-nav-parent')) {
         closeTopFlyout();
+    } else {
+        console.log("tidak ada");
     }
 });
+
+// ===== DETEKSI & ATUR POSISI SUBMENU =====
+// function adjustSubmenuPosition(menuItem) {
+//     const submenu = menuItem.querySelector(':scope > .bnsp-submenu');
+//     if (!submenu) return;
+
+//     const parentRect = menuItem.getBoundingClientRect();
+
+//     // Sembunyikan sesaat, ukur, lalu tampilkan lagi
+//     const wasVisible = submenu.classList.contains('bnsp-flyout-up');
+//     submenu.style.display = 'block';
+//     const submenuHeight = submenu.offsetHeight;
+//     if (!wasVisible) submenu.style.display = '';
+
+//     const spaceBelow = window.innerHeight - parentRect.bottom;
+//     const spaceAbove = parentRect.top;
+
+//     if (spaceBelow < submenuHeight && spaceAbove > submenuHeight) {
+//         submenu.classList.add('bnsp-flyout-up');
+//     } else {
+//         submenu.classList.remove('bnsp-flyout-up');
+//     }
+// }
+
+// ===== SESUAIKAN POSISI SUBMENU JIKA MELEWATI BATAS LAYAR =====
+function adjustSubmenuPosition(menuItem) {
+    const submenu = menuItem.querySelector(':scope > .bnsp-submenu');
+    if (!submenu) return;
+
+    const parentRect = menuItem.getBoundingClientRect();
+
+    // Sembunyikan sebentar untuk ukur
+    const tempDisplay = submenu.style.display;
+    submenu.style.display = 'block';
+    const submenuHeight = submenu.offsetHeight;
+    submenu.style.display = tempDisplay;
+
+    const spaceBelow = window.innerHeight - parentRect.bottom;
+    const spaceAbove = parentRect.top;
+
+    if (spaceBelow < submenuHeight && spaceAbove > spaceBelow) {
+        submenu.classList.add('bnsp-flyout-up');
+    } else {
+        submenu.classList.remove('bnsp-flyout-up');
+    }
+}
+
+// ===== ATUR POSISI SUBMENU YANG BERTINGKAT =====
+function adjustNestedSubmenu(menuItem) {
+    const submenu = menuItem.querySelector(':scope > .bnsp-submenu');
+    if (!submenu) return;
+
+    // Simpan posisi asli jika belum
+    if (!submenu._originalParent) {
+        submenu._originalParent = submenu.parentElement;
+        submenu._originalNextSibling = submenu.nextSibling;
+    }
+
+    // Pindahkan ke body agar tidak terpotong container
+    if (submenu.parentElement !== document.body) {
+        document.body.appendChild(submenu);
+    }
+
+    submenu.classList.add('bnsp-flyout-detached');
+    submenu.style.display = 'block';
+    submenu.style.maxHeight = 'none';
+    submenu.style.visibility = 'visible';
+    submenu.style.opacity = '1';
+
+    const gap = 12;
+    const rect = menuItem.getBoundingClientRect();
+
+    // Tampilkan di sebelah KANAN item induk
+    let leftPos = rect.right + gap;
+    let topPos = rect.top - 8;
+
+    submenu.style.left = leftPos + 'px';
+    submenu.style.top = topPos + 'px';
+    submenu.style.bottom = 'auto';
+
+    // Cek jika keluar layar kanan → pindah ke kiri
+    requestAnimationFrame(() => {
+        const subRect = submenu.getBoundingClientRect();
+        if (subRect.right > window.innerWidth - 8) {
+            submenu.style.left = (rect.left - subRect.width - gap) + 'px';
+            submenu.classList.add('bnsp-flyout-left');
+        } else {
+            submenu.classList.remove('bnsp-flyout-left');
+        }
+
+        // Cek jika keluar layar bawah → pindah ke atas
+        if (subRect.bottom > window.innerHeight - 8) {
+            submenu.style.top = 'auto';
+            submenu.style.bottom = (window.innerHeight - rect.bottom - 8) + 'px';
+            submenu.classList.add('bnsp-flyout-up');
+        }
+    });
+
+    // Listener mouse masuk/keluar
+    if (!submenu._nestedBound) {
+        submenu.addEventListener('mouseenter', () => clearTimeout(flyoutHideTimer));
+        submenu.addEventListener('mouseleave', (e) => {
+            const related = e.relatedTarget;
+            if (related && (menuItem.contains(related) || submenu.contains(related))) return;
+            scheduleCloseTopFlyout(menuItem);
+        });
+        submenu._nestedBound = true;
+    }
+}
 
 // Tutup flyout portal saat nav collapsed di-scroll, sidebar
 // di-toggle collapse/expand, atau window di-resize — supaya
@@ -620,115 +493,473 @@ document.addEventListener('click', (e) => {
 // sidebar.addEventListener('transitionend', closeTopFlyout);
 window.addEventListener('resize', closeTopFlyout);
 
-// ===== SESUAIKAN POSISI SUBMENU JIKA MELEWATI BATAS LAYAR =====
-function adjustSubmenuPosition(menuItem) {
-    const submenu = menuItem.querySelector(':scope > .bnsp-submenu');
-    if (!submenu) return;
+// ===== FLYOUT SUBMENU PORTAL untuk item level teratas =====
+let flyoutHideTimer = null;
+let flyoutOpenItem = null;
+let flyoutOpenSubmenu = null;
 
-    // Ambil posisi menu parent relatif terhadap layar
-    const parentRect = menuItem.getBoundingClientRect();
+function closeTopFlyout() {
+    if (flyoutHideTimer) clearTimeout(flyoutHideTimer);
 
-    // Beri kesempatan submenu tampil sebentar untuk ukur tingginya
-    const tempDisplay = submenu.style.display;
-    const tempPosition = submenu.style.position;
-    const tempVisibility = submenu.style.visibility;
+    // Tutup SEMUA submenu portal
+    document.querySelectorAll('.bnsp-flyout-detached').forEach(submenu => {
+        restoreSubmenu(submenu);
+    });
 
-    submenu.style.display = 'block';
-    submenu.style.position = 'absolute';
-    submenu.style.visibility = 'hidden';
+    // Hapus status "open" dari semua item
+    document.querySelectorAll('.bnsp-nav-item.open').forEach(el => {
+        el.classList.remove('open');
+    });
 
-    const submenuHeight = submenu.offsetHeight;
+    flyoutOpenItem = null;
+    flyoutOpenSubmenu = null;
+}
 
-    // Kembalikan keadaan semula
-    submenu.style.display = tempDisplay;
-    submenu.style.position = tempPosition;
-    submenu.style.visibility = tempVisibility;
+// Bantu fungsi untuk mengembalikan submenu ke induknya
+function restoreSubmenu(submenu) {
+    submenu.classList.remove('bnsp-flyout-detached', 'bnsp-flyout-up', 'bnsp-flyout-left');
+    submenu.style.position = '';
+    submenu.style.top = '';
+    submenu.style.left = '';
+    submenu.style.bottom = '';
+    submenu.style.display = '';
+    submenu.style.maxHeight = '';
+    submenu.style.visibility = '';
+    submenu.style.opacity = '';
 
-    // Hitung ruang yang tersedia
-    const spaceBelow = window.innerHeight - parentRect.bottom;
-    const spaceAbove = parentRect.top;
-
-    // ✅ Logika: pilih arah yang punya ruang lebih besar
-    if (spaceBelow < submenuHeight && spaceAbove > spaceBelow) {
-        // Ruang di atas lebih banyak → tampilkan KE ATAS
-        submenu.classList.add('bnsp-flyout-up');
-    } else {
-        // Ruang di bawah cukup atau sama-sama sempit → tampilkan KE BAWAH
-        submenu.classList.remove('bnsp-flyout-up');
+    const parent = submenu._originalParent;
+    const nextSibling = submenu._originalNextSibling;
+    if (parent) {
+        if (nextSibling) parent.insertBefore(submenu, nextSibling);
+        else parent.appendChild(submenu);
     }
 }
+
+function openTopFlyout(item) {
+    const submenu = item.querySelector(':scope > .bnsp-submenu');
+    if (!submenu) return;
+    clearTimeout(flyoutHideTimer);
+    if (flyoutOpenItem === item) return; // sudah kebuka untuk item ini
+    if (flyoutOpenItem && flyoutOpenItem !== item) closeTopFlyout();
+
+    flyoutOpenItem = item;
+    flyoutOpenSubmenu = submenu;
+
+    document.body.appendChild(submenu);
+    submenu.classList.add('bnsp-flyout-detached');
+
+    const gapVar = getComputedStyle(document.documentElement).getPropertyValue('--bnsp-flyout-gap');
+    const gap = parseFloat(gapVar) || 12;
+    const rect = item.getBoundingClientRect();
+
+    submenu.style.left = (rect.right + gap) + 'px';
+    submenu.style.top = (rect.top - 8) + 'px';
+    submenu.style.bottom = 'auto';
+
+    // Kalau ruang di bawah tidak cukup & ruang di atas lebih luas, flip ke atas
+    const submenuHeight = submenu.offsetHeight;
+    const spaceBelow = window.innerHeight - rect.top;
+    const spaceAbove = rect.bottom;
+    if (spaceBelow < submenuHeight && spaceAbove > spaceBelow) {
+        submenu.style.top = 'auto';
+        submenu.style.bottom = (window.innerHeight - rect.bottom - 8) + 'px';
+    }
+    // Bind sekali saja per elemen submenu, supaya listener tidak menumpuk
+    if (!submenu._flyoutBound) {
+        submenu.addEventListener('mouseenter', () => clearTimeout(flyoutHideTimer));
+        submenu.addEventListener('mouseleave', () => {
+            if (flyoutOpenItem) scheduleCloseTopFlyout(flyoutOpenItem);
+        });
+        submenu._flyoutBound = true;
+    }
+}
+
+function openTopFlyoutNew(item) {
+    console.log('🚀 openTopFlyoutNew dipanggil untuk:', item.querySelector('.nav-label')?.textContent);
+
+    // CEK: apakah item memiliki submenu?
+    const submenu = item.querySelector(':scope > .bnsp-submenu');
+    if (!submenu) {
+        console.log('❌ Tidak ada submenu ditemukan');
+        return;
+    }
+
+    // CEK: apakah ini parent menu?
+    if (!item.querySelector('.bnsp-nav-parent')) {
+        console.log('❌ Bukan parent menu');
+        return;
+    }
+
+    clearTimeout(flyoutHideTimer);
+
+    // Sudah terbuka untuk item ini
+    if (flyoutOpenItem === item && flyoutOpenSubmenu === submenu) {
+        console.log('ℹ️ Sudah terbuka untuk item ini');
+        return;
+    }
+
+    // Kalau ada flyout lain yang masih terbuka, tutup dulu
+    if (flyoutOpenItem && flyoutOpenItem !== item) {
+        console.log('🔒 Menutup flyout sebelumnya');
+        closeTopFlyout();
+    }
+
+    // ===== PASTIKAN SUBMENU TIDAK TAMPIL DI CSS =====
+    submenu.style.display = 'block';
+    submenu.style.maxHeight = 'none';
+    submenu.style.visibility = 'visible';
+    submenu.style.opacity = '1';
+
+    // Simpan posisi asli
+    if (!submenu._originalParent) {
+        submenu._originalParent = submenu.parentElement;
+        submenu._originalNextSibling = submenu.nextSibling;
+    }
+
+    // Pindahkan ke body
+    document.body.appendChild(submenu);
+    submenu.classList.add('bnsp-flyout-detached');
+
+    flyoutOpenItem = item;
+    flyoutOpenSubmenu = submenu;
+
+    // ✅ Tambahkan referensi balik ke submenu
+    submenu._parentNavItem = item;
+
+    // ===== POSISIKAN =====
+    const gapVar = getComputedStyle(document.documentElement).getPropertyValue('--bnsp-flyout-gap');
+    const gap = parseFloat(gapVar) || 12;
+    const rect = item.getBoundingClientRect();
+
+    // Posisi default (ke kanan)
+    let leftPos = rect.right + gap;
+    let topPos = rect.top - 8;
+    let bottomPos = 'auto';
+
+    // Cek ruang horizontal
+    submenu.style.left = leftPos + 'px';
+    submenu.style.top = topPos + 'px';
+    submenu.style.bottom = bottomPos;
+
+    // Tunggu browser render
+    requestAnimationFrame(() => {
+        const submenuRect = submenu.getBoundingClientRect();
+
+        // ===== CEK VERTICAL =====
+        const spaceBelow = window.innerHeight - rect.top;
+        const spaceAbove = rect.bottom;
+
+        if (spaceBelow < submenuRect.height && spaceAbove > spaceBelow) {
+            // Tampilkan ke atas
+            submenu.style.top = 'auto';
+            const bottom = window.innerHeight - rect.bottom - 8;
+            submenu.style.bottom = Math.max(8, bottom) + 'px';
+            submenu.classList.add('bnsp-flyout-up');
+        } else {
+            // Tampilkan ke bawah dengan batas
+            const maxTop = window.innerHeight - submenuRect.height - 8;
+            const finalTop = Math.min(Math.max(8, rect.top - 8), maxTop);
+            submenu.style.top = finalTop + 'px';
+            submenu.classList.remove('bnsp-flyout-up');
+        }
+
+        // ===== CEK HORIZONTAL =====
+        const finalRect = submenu.getBoundingClientRect();
+        if (finalRect.right > window.innerWidth - 8) {
+            // Tampilkan ke kiri
+            submenu.style.left = Math.max(8, rect.left - finalRect.width - gap) + 'px';
+            submenu.classList.add('bnsp-flyout-left');
+        } else {
+            submenu.classList.remove('bnsp-flyout-left');
+        }
+    });
+
+    // ===== BIND LISTENER =====
+    if (!submenu._flyoutBound) {
+        submenu.addEventListener('mouseenter', () => {
+            console.log('🟢 Mouse masuk ke submenu portal');
+            clearTimeout(flyoutHideTimer);
+        });
+
+        submenu.addEventListener('mouseleave', (e) => {
+            console.log('🔴 Mouse keluar dari submenu portal');
+            const related = e.relatedTarget;
+            if (related && submenu.contains(related)) {
+                console.log('⏭️ Masih di dalam submenu');
+                return;
+            }
+            scheduleCloseTopFlyout(item);
+        });
+
+        submenu._flyoutBound = true;
+        console.log('✅ Listener submenu terpasang');
+    }
+}
+
+function scheduleCloseTopFlyout(item) {
+    clearTimeout(flyoutHideTimer);
+
+    flyoutHideTimer = setTimeout(() => {
+        // Tutup kalau bukan item yang sama atau tidak ada submenu
+        if (!flyoutOpenItem || flyoutOpenItem !== item) {
+            closeTopFlyout();
+            return;
+        }
+
+        const submenu = flyoutOpenSubmenu;
+        if (!submenu) {
+            closeTopFlyout();
+            return;
+        }
+
+        const mouseX = window._bnspMouseX;
+        const mouseY = window._bnspMouseY;
+        if (mouseX === undefined || mouseY === undefined) {
+            closeTopFlyout();
+            return;
+        }
+
+        const parentRect = item.getBoundingClientRect();
+        const submenuRect = submenu.getBoundingClientRect();
+
+        // === Cek area gabungan induk + submenu ===
+        const inParent = mouseX >= parentRect.left && mouseX <= parentRect.right &&
+            mouseY >= parentRect.top && mouseY <= parentRect.bottom;
+
+        const inSubmenu = mouseX >= submenuRect.left && mouseX <= submenuRect.right &&
+            mouseY >= submenuRect.top && mouseY <= submenuRect.bottom;
+
+        // === Cek submenu bertingkat lain ===
+        let inAnyNested = false;
+        document.querySelectorAll('.bnsp-flyout-detached').forEach(nested => {
+            if (nested === submenu) return; // sudah dicek di atas
+            const nr = nested.getBoundingClientRect();
+            if (mouseX >= nr.left && mouseX <= nr.right &&
+                mouseY >= nr.top && mouseY <= nr.bottom) {
+                inAnyNested = true;
+            }
+        });
+
+        // === TETAP BUKA jika masih di salah satu area ===
+        if (inParent || inSubmenu || inAnyNested) {
+            return; // ✅ batal tutup
+        }
+
+        // === BENAR-BENAR KELUAR ===
+        console.log('🔒 Tutup semua menu');
+        closeTopFlyout();
+    }, 350); // 350ms — seimbang antara responsif & mudah diarahkan
+}
+
+document.addEventListener('mousemove', (e) => {
+    window._bnspMouseX = e.clientX;
+    window._bnspMouseY = e.clientY;
+});
 
 // ===== TOOLTIP PORTAL =====
 // Menggantikan tooltip ::after lama. Elemen dibuat sekali lalu
 // di-append ke <body>, jadi posisinya lepas dari <nav> collapsed
 // yang sekarang overflow-nya "auto" (bisa discroll). Dengan begitu
 // tooltip tidak pernah ke-clip walau nav sedang dalam kondisi scroll.
+// ===== TOOLTIP PORTAL =====
 (function initTooltipPortal() {
     const portal = document.createElement('div');
     portal.className = 'bnsp-tooltip-portal';
     document.body.appendChild(portal);
 
     let currentTarget = null;
+    let tooltipTimeout = null;
 
     function showTooltip(el) {
-        clearTimeout(tooltipTimer);
-        // Hanya aktif saat sidebar collapsed & desktop, dan bukan
-        // item parent (item yang punya child pakai flyout submenu,
-        // bukan tooltip biasa)
-        if (!sidebar.classList.contains('collapsed') || !isDesktop()) return;
-        if (el.classList.contains('bnsp-nav-parent')) return;
-        // Tooltip untuk item DI DALAM flyout submenu (bnsp-submenu)
-        // tetap dimatikan, sama seperti perilaku lama
-        if (el.closest('.bnsp-submenu')) return;
+        clearTimeout(tooltipTimeout);
+
+        // Debug
+        console.log('🔵 SHOW TOOLTIP:', {
+            element: el,
+            text: el.getAttribute('data-tooltip'),
+            isParent: el.classList.contains('bnsp-nav-parent'),
+            isCollapsed: sidebar.classList.contains('collapsed'),
+            isDesktop: isDesktop()
+        });
+
+        // Hanya aktif saat sidebar collapsed & desktop
+        if (!sidebar.classList.contains('collapsed') || !isDesktop()) {
+            console.log('❌ Skip: sidebar tidak collapsed atau bukan desktop');
+            return;
+        }
+
+        // Skip parent menu (yang punya submenu)
+        if (el.classList.contains('bnsp-nav-parent')) {
+            console.log('❌ Skip: ini parent menu (punya submenu)');
+            return;
+        }
+
+        // Skip item di dalam submenu
+        if (el.closest('.bnsp-submenu')) {
+            console.log('❌ Skip: item di dalam submenu');
+            return;
+        }
 
         const text = el.getAttribute('data-tooltip');
-        if (!text) return;
+        if (!text) {
+            console.log('❌ Skip: tidak ada data-tooltip');
+            return;
+        }
 
         currentTarget = el;
         portal.textContent = text;
 
         const rect = el.getBoundingClientRect();
-        portal.style.top = (rect.top + rect.height / 2) + 'px';
-        portal.style.left = (rect.right + 10) + 'px';
+
+        // Posisi di sebelah kanan
+        let left = rect.right + 10;
+        let top = rect.top + rect.height / 2;
+
+        // Cek apakah tooltip keluar layar di kanan
+        const portalWidth = text.length * 8 + 24; // perkiraan lebar
+        if (left + portalWidth > window.innerWidth - 10) {
+            // Tampilkan di kiri
+            left = rect.left - portalWidth - 10;
+        }
+
+        // Cek apakah tooltip keluar layar di atas/bawah
+        if (top < 10) top = 10;
+        if (top > window.innerHeight - 10) top = window.innerHeight - 10;
+
+        portal.style.left = left + 'px';
+        portal.style.top = top + 'px';
         portal.style.transform = 'translateY(-50%)';
+
+        // Tampilkan tooltip
         portal.classList.add('show');
+        console.log('✅ Tooltip ditampilkan:', text);
     }
 
     function hideTooltip() {
-        clearTimeout(tooltipTimer);
-        tooltipTimer = setTimeout(() => {
-            currentTarget = null;
-            portal.classList.remove('show');
+        clearTimeout(tooltipTimeout);
+        tooltipTimeout = setTimeout(() => {
+            if (currentTarget) {
+                portal.classList.remove('show');
+                currentTarget = null;
+                console.log('🔴 Tooltip disembunyikan');
+            }
         }, 100);
     }
 
-    // Event delegation di document supaya tetap jalan untuk item
-    // yang dipindah/di-clone (mis. topnav "Lainnya")
+    // ===== EVENT LISTENER =====
     document.addEventListener('mouseenter', (e) => {
         if (!e.target || typeof e.target.closest !== 'function') return;
+
+        // Cari elemen dengan data-tooltip
         const el = e.target.closest('[data-tooltip]');
-        if (el) showTooltip(el);
+        if (el) {
+            showTooltip(el);
+        }
     }, true);
 
     document.addEventListener('mouseleave', (e) => {
         if (!e.target || typeof e.target.closest !== 'function') return;
+
         const el = e.target.closest('[data-tooltip]');
         if (!el || el !== currentTarget) return;
-        // PENTING: mouseenter/mouseleave tidak bubble dan trigger per
-        // elemen. Kalau kursor cuma pindah dari ikon ke label nav-link
-        // (masih anak dari elemen [data-tooltip] yang sama), relatedTarget
-        // masih ada DI DALAM el — jangan dianggap "keluar", supaya tooltip
-        // tidak langsung hilang sepersekian detik setelah muncul.
+
         const to = e.relatedTarget;
-        if (to && el.contains(to)) return;
-        clearTimeout(tooltipTimer);
-        tooltipTimer = setTimeout(hideTooltip, 100);
+        if (to && el.contains(to)) {
+            console.log('⏭️ Masih di dalam elemen, skip hide');
+            return;
+        }
+
+        hideTooltip();
     }, true);
 
-    // Sembunyikan tooltip saat nav di-scroll (posisi target berubah),
-    // saat sidebar toggle collapse/expand, atau saat window di-resize
-    document.querySelector('#bnspSidebar > nav')?.addEventListener('scroll', hideTooltip);
-    sidebar.addEventListener('scroll', hideTooltip, true);
-    sidebar.addEventListener('transitionend', hideTooltip);
-    window.addEventListener('resize', hideTooltip);
+    // ===== SEMBUNYIKAN SAAT SCROLL/RESIZE =====
+    document.querySelector('#bnspSidebar > nav')?.addEventListener('scroll', () => {
+        portal.classList.remove('show');
+        currentTarget = null;
+    });
+
+    sidebar.addEventListener('scroll', () => {
+        portal.classList.remove('show');
+        currentTarget = null;
+    }, true);
+
+    sidebar.addEventListener('transitionend', () => {
+        portal.classList.remove('show');
+        currentTarget = null;
+    });
+
+    window.addEventListener('resize', () => {
+        portal.classList.remove('show');
+        currentTarget = null;
+    });
+
+    console.log('✅ Tooltip portal initialized');
 })();
+
+document.querySelector('#profileDropdown')?.addEventListener('click', () => {
+    console.log('Profile dropdown clicked');
+});
+
+document.querySelectorAll('.bnsp-topbar .dropdown').forEach(function (dropdown) {
+    let hoverTimeout = null;
+    const toggle = dropdown.querySelector('[data-bs-toggle="dropdown"]');
+    const menu = dropdown.querySelector('.dropdown-menu');
+    if (!toggle || !menu) return;
+
+    // Buat instance Bootstrap Dropdown manual (biar konsisten)
+    const bsDropdown = bootstrap.Dropdown.getOrCreateInstance(toggle);
+
+    function openDropdown() {
+        clearTimeout(hoverTimeout);
+        bsDropdown.show();
+    }
+
+    function closeDropdown() {
+        hoverTimeout = setTimeout(function () {
+            bsDropdown.hide();
+        }, 150); // delay 150ms
+    }
+
+    // Hover di tombol
+    dropdown.addEventListener('mouseenter', openDropdown);
+    dropdown.addEventListener('mouseleave', closeDropdown);
+
+    // Kalau mouse masuk lagi sebelum delay habis, batalkan close
+    dropdown.addEventListener('mouseenter', function () {
+        clearTimeout(hoverTimeout);
+    });
+
+    // Klik tetap jalan (untuk mobile / aksesibilitas)
+    toggle.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (menu.classList.contains('show')) {
+            bsDropdown.hide();
+        } else {
+            bsDropdown.show();
+        }
+    });
+});
+
+if (!submenu._flyoutBound || submenu.closest('#bnspTopnav')) {
+    submenu.addEventListener('mouseenter', () => {
+        clearTimeout(flyoutHideTimer);
+    });
+    submenu.addEventListener('mouseleave', (e) => {
+        const related = e.relatedTarget;
+        if (related && (item.contains(related) || submenu.contains(related))) {
+            return;
+        }
+        scheduleCloseTopFlyout(item);
+    });
+    submenu._flyoutBound = true;
+}
+
+// Di bagian akhir file atau setelah bindNavParentClicks
+document.addEventListener('click', (e) => {
+    const link = e.target.closest('.bnsp-nav-link');
+    if (link && !link.classList.contains('bnsp-nav-parent')) {
+        // Klik link biasa → tutup semua menu
+        closeTopFlyout();
+    }
+});

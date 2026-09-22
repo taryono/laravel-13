@@ -18,7 +18,7 @@ function initFlyoutTitles() {
 initFlyoutTitles();
 function bindNavParentClicks(container, respectSidebarCollapse) {
     const topLevelNav = respectSidebarCollapse ? sidebar.querySelector(':scope > nav') : null;
-
+    console.log('bindNavParentClicks topLevelNav ', topLevelNav);
     // Tangani SEMUA .bnsp-nav-parent, tidak hanya level atas
     container.querySelectorAll('.bnsp-nav-parent').forEach(link => {
         const item = link.closest('.bnsp-nav-item');
@@ -37,35 +37,64 @@ function bindNavParentClicks(container, respectSidebarCollapse) {
         });
 
         // ===== HOVER =====
+        const submenuEl = item.querySelector(':scope > .bnsp-submenu');
+        let simpleCloseTimer = null;
+
+        function openSimpleSubmenu() {
+            clearTimeout(simpleCloseTimer);
+            item.classList.add('open');
+            if (!respectSidebarCollapse && submenuEl) {
+                adjustTopnavSubmenuPosition(item, submenuEl, isTopLevelTopnavItem);
+            }
+        }
+
+        function scheduleSimpleClose() {
+            clearTimeout(simpleCloseTimer);
+            simpleCloseTimer = setTimeout(() => {
+                item.classList.remove('open');
+                if (!respectSidebarCollapse && submenuEl) {
+                    submenuEl.style.position = '';
+                    submenuEl.style.left = '';
+                    submenuEl.style.top = '';
+                }
+            }, 200); // delay biar sempat pindah mouse ke submenu
+        }
+
         item.addEventListener('mouseenter', (e) => {
-            console.log('🟢 MOUSEENTER:', item.querySelector('.nav-label')?.textContent);
-            if (isDesktop() && sidebar.classList.contains('collapsed')) {
+            if (respectSidebarCollapse && isDesktop() && sidebar.classList.contains('collapsed')) {
                 if (isTopLevelSidebarItem) {
-                    // Level teratas → buka flyout portal
                     openTopFlyoutNew(item);
                 } else {
-                    // ✅ SUBMENU NESTED → posisikan ke kanan induknya
                     requestAnimationFrame(() => {
                         adjustNestedSubmenu(item);
                     });
                 }
             } else {
-                // Mode expanded: buka langsung
-                item.classList.add('open');
+                openSimpleSubmenu();
             }
         });
 
         item.addEventListener('mouseleave', (e) => {
             const related = e.relatedTarget;
-            if (related && item.contains(related)) return; // masih di dalam
+            if (related && item.contains(related)) return;
 
-            if (isTopLevelSidebarItem && isDesktop() && sidebar.classList.contains('collapsed')) {
+            if (respectSidebarCollapse && isTopLevelSidebarItem && isDesktop() && sidebar.classList.contains('collapsed')) {
                 scheduleCloseTopFlyout(item);
             } else {
-                // Mode expanded atau submenu nested → tutup
-                item.classList.remove('open');
+                scheduleSimpleClose();
             }
         });
+
+        // Supaya delay-close dibatalkan saat mouse berhasil masuk ke submenu,
+        // dan tetap tertutup benar saat mouse keluar dari item MAUPUN submenu
+        if (!respectSidebarCollapse && submenuEl) {
+            submenuEl.addEventListener('mouseenter', () => clearTimeout(simpleCloseTimer));
+            submenuEl.addEventListener('mouseleave', (e) => {
+                const related = e.relatedTarget;
+                if (related && (item.contains(related) || submenuEl.contains(related))) return;
+                scheduleSimpleClose();
+            });
+        }
     });
 
     // ✅ PASTIKAN SEMUA LINK BIASA DI DALAM SUBMENU BISA DIKLIK
@@ -428,6 +457,32 @@ function adjustNestedSubmenu(menuItem) {
         });
         submenu._nestedBound = true;
     }
+}
+
+// ===== REPOSISI SUBMENU TOPNAV AGAR TIDAK OVERFLOW KANAN =====
+// Beda dengan adjustNestedSubmenu: elemen TIDAK dipindah ke <body>,
+// jadi class 'open' di item tetap mengontrol tampil/sembunyi seperti biasa.
+function adjustTopnavSubmenuPosition(item, submenu, isTopLevelTopnavItem) {
+    // reset dulu supaya perhitungan lebar/posisi bersih
+    submenu.style.position = '';
+    submenu.style.left = '';
+    submenu.style.top = '';
+    console.log("isTopLevelTopnavItem: ", isTopLevelTopnavItem)
+    requestAnimationFrame(() => {
+        const itemRect = item.getBoundingClientRect();
+        const subRect = submenu.getBoundingClientRect();
+
+        submenu.style.position = 'fixed';
+        submenu.style.top = itemRect.bottom + 'px';
+
+        let left = itemRect.left;
+        if (left + subRect.width > window.innerWidth - 8) {
+            // geser ke kiri supaya rata dengan sisi kanan item, tidak keluar layar
+            left = itemRect.right - subRect.width;
+            if (left < 8) left = 8;
+        }
+        submenu.style.left = left + 'px';
+    });
 }
 
 // Tutup flyout portal saat nav collapsed di-scroll, sidebar
