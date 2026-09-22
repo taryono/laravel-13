@@ -918,27 +918,6 @@ body.bnsp-layout-topbar .bnsp-sidebar-brand {
     color: rgba(255, 255, 255, 0.8);
 }
 
-/* --- Tooltip Styling (Opsional) --- */
-/* [data-tooltip] {
-    position: relative;
-}
-
-[data-tooltip]:hover::after {
-    content: attr(data-tooltip);
-    position: absolute;
-    left: 100%;
-    top: 50%;
-    transform: translateY(-50%);
-    background: rgba(0, 0, 0, 0.9);
-    color: #ffffff;
-    padding: 4px 12px;
-    border-radius: 4px;
-    white-space: nowrap;
-    margin-left: 12px;
-    z-index: 1000;
-    pointer-events: none;
-} */
-
 /* ========================================
   PARENT MENU dengan SUBMENU (Tanda panah)
   ======================================== */
