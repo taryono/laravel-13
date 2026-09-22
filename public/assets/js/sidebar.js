@@ -19,74 +19,75 @@ initFlyoutTitles();
 function bindNavParentClicks(container, respectSidebarCollapse) {
     const topLevelNav = respectSidebarCollapse ? sidebar.querySelector(':scope > nav') : null;
 
+    // Tangani SEMUA .bnsp-nav-parent, tidak hanya level atas
     container.querySelectorAll('.bnsp-nav-parent').forEach(link => {
         const item = link.closest('.bnsp-nav-item');
         const isTopLevelSidebarItem = !!topLevelNav && item.parentElement === topLevelNav;
 
-        // ===== CLICK EVENT =====
+        // ===== KLIK =====
         link.addEventListener('click', (e) => {
-            // Di mode collapsed, parent click hanya untuk navigasi
             if (respectSidebarCollapse && sidebar.classList.contains('collapsed') && isDesktop()) {
+                // Di mode collapsed, parent TIDAK mencegah default — biarkan submenu terbuka via hover
                 e.preventDefault();
-                // JANGAN toggle open, biarkan JS yang handle via hover
                 return;
             }
+            // Mode expanded: klik untuk buka/tutup
             e.preventDefault();
             item.classList.toggle('open');
         });
 
-        // ===== MOUSEENTER (HANYA SATU) =====
+        // ===== HOVER =====
         item.addEventListener('mouseenter', (e) => {
             console.log('🟢 MOUSEENTER:', item.querySelector('.nav-label')?.textContent);
-            
             if (isDesktop() && sidebar.classList.contains('collapsed')) {
                 if (isTopLevelSidebarItem) {
-                    console.log('📊 Membuka flyout portal untuk:', item.querySelector('.nav-label')?.textContent);
-                    // PAKAI YANG BARU - openTopFlyoutNew
+                    // Level teratas → buka flyout portal
                     openTopFlyoutNew(item);
                 } else {
-                    console.log('📊 Menyesuaikan posisi submenu nested');
-                    
+                    // ✅ SUBMENU NESTED → posisikan ke kanan induknya
                     requestAnimationFrame(() => {
-                        adjustSubmenuPosition(item);
+                        adjustNestedSubmenu(item);
                     });
                 }
+            } else {
+                // Mode expanded: buka langsung
+                item.classList.add('open');
             }
         });
 
-        // ===== MOUSELEAVE (HANYA SATU) =====
-        if (isTopLevelSidebarItem) {
-            item.addEventListener('mouseleave', (e) => {
-                console.log('🔴 MOUSELEAVE:', item.querySelector('.nav-label')?.textContent);
-                
-                const related = e.relatedTarget;
-                
-                // Jika mouse pindah ke dalam item sendiri
-                if (related && item.contains(related)) {
-                    console.log('⏭️ Masih di dalam item, skip close');
-                    return;
-                }
-                
-                // Jika mouse pindah ke submenu portal
-                if (flyoutOpenSubmenu && related && flyoutOpenSubmenu.contains(related)) {
-                    console.log('⏭️ Masuk ke submenu portal, skip close');
-                    clearTimeout(flyoutHideTimer);
-                    return;
-                }
-                
+        item.addEventListener('mouseleave', (e) => {
+            const related = e.relatedTarget;
+            if (related && item.contains(related)) return; // masih di dalam
+
+            if (isTopLevelSidebarItem && isDesktop() && sidebar.classList.contains('collapsed')) {
                 scheduleCloseTopFlyout(item);
-            });
-        }
+            } else {
+                // Mode expanded atau submenu nested → tutup
+                item.classList.remove('open');
+            }
+        });
+    });
+
+    // ✅ PASTIKAN SEMUA LINK BIASA DI DALAM SUBMENU BISA DIKLIK
+    container.querySelectorAll('.bnsp-submenu .bnsp-nav-link:not(.bnsp-nav-parent)').forEach(link => {
+        link.addEventListener('click', (e) => {
+            // Tutup semua flyout setelah memilih
+            closeTopFlyout();
+            // Tutup sidebar di mobile
+            if (!isDesktop()) {
+                sidebar.classList.remove('mobile-open');
+                backdrop.classList.remove('show');
+            }
+        });
     });
 }
-
 const LAYOUT_STORAGE_KEY = 'bnsp-layout-mode' + '-' + window.loginAs; // 'sidebar' | 'topbar'
 const COLLAPSED_STORAGE_KEY = 'sidebar-collapsed-mode' + '-' + window.loginAs; // 'collapsed' | 'expanded'
 const layoutToggleBtn = document.getElementById('bnspLayoutToggle');
 const layoutToggleIcon = layoutToggleBtn.querySelector('.material-symbols-outlined');
 
 function updateToggleVisibility() {
-    layoutToggleBtn.style.display = isDesktop() ? '' : 'none'; 
+    layoutToggleBtn.style.display = isDesktop() ? '' : 'none';
 }
 
 function buildTopNav() {
@@ -97,10 +98,10 @@ function buildTopNav() {
         const clone = child.cloneNode(true);
         clone.querySelectorAll('.bnsp-flyout-title-item').forEach(li => li.remove());
         topnav.appendChild(clone);
-    }); 
+    });
     bindNavParentClicks(topnav, false);
 
-} 
+}
 function initTopnavOverflow() {
     const topnav = document.getElementById('bnspTopnav');
     if (!topnav) return;
@@ -161,7 +162,7 @@ function initTopnavOverflow() {
                 // sama seperti pola submenu nested yang sudah ada (Dit, Master)
                 const li = document.createElement('li');
                 li.appendChild(item); // pindahkan node asli, bukan clone,
-                                    // jadi semua data-ajax-url & submenu ikut terbawa
+                // jadi semua data-ajax-url & submenu ikut terbawa
                 moreMenu.appendChild(li);
             });
         }
@@ -193,7 +194,7 @@ function applyLayoutMode(mode) {
     const isTopbar = mode === 'topbar';
     document.body.classList.toggle('bnsp-layout-topbar', isTopbar);
     layoutToggleIcon.textContent = isTopbar ? 'view_sidebar' : 'view_agenda';
-    layoutToggleBtn.title = isTopbar ? 'Ganti ke tampilan sidebar' : 'Ganti ke tampilan menu atas'; 
+    layoutToggleBtn.title = isTopbar ? 'Ganti ke tampilan sidebar' : 'Ganti ke tampilan menu atas';
     if (isTopbar) {
         sidebar.classList.remove('mobile-open');
         backdrop.classList.remove('show');
@@ -224,7 +225,7 @@ hamburger.addEventListener('click', () => {
     } else {
         sidebar.classList.toggle('mobile-open');
         backdrop.classList.toggle('show');
-    } 
+    }
     let nextSidebarMode = sidebar.classList.contains('collapsed') ? 'collapsed' : 'expanded';
     applySideBarMode(nextSidebarMode);
     localStorage.setItem(COLLAPSED_STORAGE_KEY, nextSidebarMode);
@@ -242,8 +243,8 @@ window.addEventListener('resize', () => {
         sidebar.classList.remove('mobile-open');
         backdrop.classList.remove('show');
     }
-}); 
-bindNavParentClicks(sidebar, true); 
+});
+bindNavParentClicks(sidebar, true);
 sidebar.querySelectorAll('.bnsp-nav-link:not(.bnsp-nav-parent)').forEach(link => {
     link.addEventListener('click', () => {
         if (!isDesktop()) {
@@ -251,9 +252,9 @@ sidebar.querySelectorAll('.bnsp-nav-link:not(.bnsp-nav-parent)').forEach(link =>
             backdrop.classList.remove('show');
         }
     });
-}); 
+});
 document.querySelectorAll('button, a').forEach(el => {
-     // Skip dropdown toggle & item dropdown
+    // Skip dropdown toggle & item dropdown
     if (el.closest('.dropdown') || el.hasAttribute('data-bs-toggle')) return;
     el.addEventListener('click', function () {
         const ripple = document.createElement('div');
@@ -284,7 +285,7 @@ function updateNotificationBadge(change) {
     badge.textContent = current;
     if (current === 0) badge.style.display = 'none';
 }
-  
+
 document.addEventListener('click', (e) => {
     if (!e.target || typeof e.target.closest !== 'function') return;
 
@@ -315,7 +316,7 @@ document.addEventListener('click', (e) => {
     // (bukan link parent yang cuma toggle submenu lagi)
     if (e.target.closest('.bnsp-nav-link') && !e.target.closest('.bnsp-nav-parent')) {
         closeTopFlyout();
-    }else{
+    } else {
         console.log("tidak ada");
     }
 });
@@ -326,7 +327,7 @@ document.addEventListener('click', (e) => {
 //     if (!submenu) return;
 
 //     const parentRect = menuItem.getBoundingClientRect();
-    
+
 //     // Sembunyikan sesaat, ukur, lalu tampilkan lagi
 //     const wasVisible = submenu.classList.contains('bnsp-flyout-up');
 //     submenu.style.display = 'block';
@@ -349,7 +350,7 @@ function adjustSubmenuPosition(menuItem) {
     if (!submenu) return;
 
     const parentRect = menuItem.getBoundingClientRect();
-    
+
     // Sembunyikan sebentar untuk ukur
     const tempDisplay = submenu.style.display;
     submenu.style.display = 'block';
@@ -363,6 +364,69 @@ function adjustSubmenuPosition(menuItem) {
         submenu.classList.add('bnsp-flyout-up');
     } else {
         submenu.classList.remove('bnsp-flyout-up');
+    }
+}
+
+// ===== ATUR POSISI SUBMENU YANG BERTINGKAT =====
+function adjustNestedSubmenu(menuItem) {
+    const submenu = menuItem.querySelector(':scope > .bnsp-submenu');
+    if (!submenu) return;
+
+    // Simpan posisi asli jika belum
+    if (!submenu._originalParent) {
+        submenu._originalParent = submenu.parentElement;
+        submenu._originalNextSibling = submenu.nextSibling;
+    }
+
+    // Pindahkan ke body agar tidak terpotong container
+    if (submenu.parentElement !== document.body) {
+        document.body.appendChild(submenu);
+    }
+
+    submenu.classList.add('bnsp-flyout-detached');
+    submenu.style.display = 'block';
+    submenu.style.maxHeight = 'none';
+    submenu.style.visibility = 'visible';
+    submenu.style.opacity = '1';
+
+    const gap = 12;
+    const rect = menuItem.getBoundingClientRect();
+
+    // Tampilkan di sebelah KANAN item induk
+    let leftPos = rect.right + gap;
+    let topPos = rect.top - 8;
+
+    submenu.style.left = leftPos + 'px';
+    submenu.style.top = topPos + 'px';
+    submenu.style.bottom = 'auto';
+
+    // Cek jika keluar layar kanan → pindah ke kiri
+    requestAnimationFrame(() => {
+        const subRect = submenu.getBoundingClientRect();
+        if (subRect.right > window.innerWidth - 8) {
+            submenu.style.left = (rect.left - subRect.width - gap) + 'px';
+            submenu.classList.add('bnsp-flyout-left');
+        } else {
+            submenu.classList.remove('bnsp-flyout-left');
+        }
+
+        // Cek jika keluar layar bawah → pindah ke atas
+        if (subRect.bottom > window.innerHeight - 8) {
+            submenu.style.top = 'auto';
+            submenu.style.bottom = (window.innerHeight - rect.bottom - 8) + 'px';
+            submenu.classList.add('bnsp-flyout-up');
+        }
+    });
+
+    // Listener mouse masuk/keluar
+    if (!submenu._nestedBound) {
+        submenu.addEventListener('mouseenter', () => clearTimeout(flyoutHideTimer));
+        submenu.addEventListener('mouseleave', (e) => {
+            const related = e.relatedTarget;
+            if (related && (menuItem.contains(related) || submenu.contains(related))) return;
+            scheduleCloseTopFlyout(menuItem);
+        });
+        submenu._nestedBound = true;
     }
 }
 
@@ -381,34 +445,39 @@ let flyoutOpenSubmenu = null;
 
 function closeTopFlyout() {
     console.log('🔒 closeTopFlyout dipanggil');
-    
     if (flyoutOpenSubmenu && flyoutOpenItem) {
-        flyoutOpenSubmenu.classList.remove('bnsp-flyout-detached');
-        flyoutOpenSubmenu.classList.remove('bnsp-flyout-up');
-        flyoutOpenSubmenu.classList.remove('bnsp-flyout-left');
-        flyoutOpenSubmenu.style.position = '';
-        flyoutOpenSubmenu.style.top = '';
-        flyoutOpenSubmenu.style.left = '';
-        flyoutOpenSubmenu.style.bottom = '';
-        flyoutOpenSubmenu.style.display = '';
-        flyoutOpenSubmenu.style.maxHeight = '';
-        flyoutOpenSubmenu.style.visibility = '';
-        flyoutOpenSubmenu.style.opacity = '';
+        // Kembalikan submenu utama
+        restoreSubmenu(flyoutOpenSubmenu);
 
-        // Kembalikan ke parent asli
-        const parent = flyoutOpenSubmenu._originalParent || flyoutOpenItem;
-        const nextSibling = flyoutOpenSubmenu._originalNextSibling || null;
-        
-        if (nextSibling) {
-            parent.insertBefore(flyoutOpenSubmenu, nextSibling);
-        } else {
-            parent.appendChild(flyoutOpenSubmenu);
-        }
-        
-        console.log('✅ Submenu dikembalikan ke parent');
+        // ✅ Kembalikan SEMUA submenu nested yang terpisah
+        document.querySelectorAll('.bnsp-flyout-detached').forEach(sub => {
+            if (sub._originalParent) {
+                restoreSubmenu(sub);
+            }
+        });
     }
     flyoutOpenItem = null;
     flyoutOpenSubmenu = null;
+}
+
+// Bantu fungsi untuk mengembalikan submenu ke induknya
+function restoreSubmenu(submenu) {
+    submenu.classList.remove('bnsp-flyout-detached', 'bnsp-flyout-up', 'bnsp-flyout-left');
+    submenu.style.position = '';
+    submenu.style.top = '';
+    submenu.style.left = '';
+    submenu.style.bottom = '';
+    submenu.style.display = '';
+    submenu.style.maxHeight = '';
+    submenu.style.visibility = '';
+    submenu.style.opacity = '';
+
+    const parent = submenu._originalParent;
+    const nextSibling = submenu._originalNextSibling;
+    if (parent) {
+        if (nextSibling) parent.insertBefore(submenu, nextSibling);
+        else parent.appendChild(submenu);
+    }
 }
 
 function openTopFlyout(item) {
@@ -452,7 +521,7 @@ function openTopFlyout(item) {
 
 function openTopFlyoutNew(item) {
     console.log('🚀 openTopFlyoutNew dipanggil untuk:', item.querySelector('.nav-label')?.textContent);
-    
+
     // CEK: apakah item memiliki submenu?
     const submenu = item.querySelector(':scope > .bnsp-submenu');
     if (!submenu) {
@@ -517,11 +586,11 @@ function openTopFlyoutNew(item) {
     // Tunggu browser render
     requestAnimationFrame(() => {
         const submenuRect = submenu.getBoundingClientRect();
-        
+
         // ===== CEK VERTICAL =====
         const spaceBelow = window.innerHeight - rect.top;
         const spaceAbove = rect.bottom;
-        
+
         if (spaceBelow < submenuRect.height && spaceAbove > spaceBelow) {
             // Tampilkan ke atas
             submenu.style.top = 'auto';
@@ -586,7 +655,7 @@ function scheduleCloseTopFlyout(item) {
         // Cek posisi mouse terakhir
         const mouseX = window._bnspMouseX;
         const mouseY = window._bnspMouseY;
-        
+
         if (mouseX === undefined || mouseY === undefined) {
             console.log('❌ Posisi mouse tidak diketahui, close');
             closeTopFlyout();
@@ -597,9 +666,9 @@ function scheduleCloseTopFlyout(item) {
         const submenuRect = submenu.getBoundingClientRect();
 
         const insideParent = mouseX >= parentRect.left && mouseX <= parentRect.right &&
-                             mouseY >= parentRect.top && mouseY <= parentRect.bottom;
+            mouseY >= parentRect.top && mouseY <= parentRect.bottom;
         const insideSubmenu = mouseX >= submenuRect.left && mouseX <= submenuRect.right &&
-                              mouseY >= submenuRect.top && mouseY <= submenuRect.bottom;
+            mouseY >= submenuRect.top && mouseY <= submenuRect.bottom;
 
         if (insideParent || insideSubmenu) {
             console.log('⏭️ Mouse masih di area, skip close');
@@ -631,7 +700,7 @@ document.addEventListener('mousemove', (e) => {
 
     function showTooltip(el) {
         clearTimeout(tooltipTimeout);
-        
+
         // Debug
         console.log('🔵 SHOW TOOLTIP:', {
             element: el,
@@ -669,7 +738,7 @@ document.addEventListener('mousemove', (e) => {
         portal.textContent = text;
 
         const rect = el.getBoundingClientRect();
-        
+
         // Posisi di sebelah kanan
         let left = rect.right + 10;
         let top = rect.top + rect.height / 2;
@@ -688,7 +757,7 @@ document.addEventListener('mousemove', (e) => {
         portal.style.left = left + 'px';
         portal.style.top = top + 'px';
         portal.style.transform = 'translateY(-50%)';
-        
+
         // Tampilkan tooltip
         portal.classList.add('show');
         console.log('✅ Tooltip ditampilkan:', text);
@@ -708,7 +777,7 @@ document.addEventListener('mousemove', (e) => {
     // ===== EVENT LISTENER =====
     document.addEventListener('mouseenter', (e) => {
         if (!e.target || typeof e.target.closest !== 'function') return;
-        
+
         // Cari elemen dengan data-tooltip
         const el = e.target.closest('[data-tooltip]');
         if (el) {
@@ -718,16 +787,16 @@ document.addEventListener('mousemove', (e) => {
 
     document.addEventListener('mouseleave', (e) => {
         if (!e.target || typeof e.target.closest !== 'function') return;
-        
+
         const el = e.target.closest('[data-tooltip]');
         if (!el || el !== currentTarget) return;
-        
+
         const to = e.relatedTarget;
         if (to && el.contains(to)) {
             console.log('⏭️ Masih di dalam elemen, skip hide');
             return;
         }
-        
+
         hideTooltip();
     }, true);
 
@@ -736,17 +805,17 @@ document.addEventListener('mousemove', (e) => {
         portal.classList.remove('show');
         currentTarget = null;
     });
-    
+
     sidebar.addEventListener('scroll', () => {
         portal.classList.remove('show');
         currentTarget = null;
     }, true);
-    
+
     sidebar.addEventListener('transitionend', () => {
         portal.classList.remove('show');
         currentTarget = null;
     });
-    
+
     window.addEventListener('resize', () => {
         portal.classList.remove('show');
         currentTarget = null;
