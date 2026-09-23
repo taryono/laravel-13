@@ -3380,30 +3380,17 @@ CREATE TABLE `expenses`  (
 -- Table structure for extracurricular_attendances
 -- ----------------------------
 DROP TABLE IF EXISTS `extracurricular_attendances`;
-CREATE TABLE `extracurricular_attendances`  (
+-- Contoh tabel absensi (bisa dikembangkan nanti)
+CREATE TABLE `extracurricular_attendances` (
   `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
-  `student_extracurricular_id` bigint UNSIGNED NOT NULL,
-  `meeting_date` date NOT NULL,
-  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
-  `recorded_by` bigint UNSIGNED NULL DEFAULT NULL,
-  `is_active` tinyint(1) NOT NULL DEFAULT 1,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL,
-  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
-  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
-  PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `extracurricular_attendances_unique`(`student_extracurricular_id` ASC, `meeting_date` ASC) USING BTREE,
-  INDEX `extracurricular_attendances_student_extracurricular_index`(`student_extracurricular_id` ASC) USING BTREE,
-  INDEX `extracurricular_attendances_date_index`(`meeting_date` ASC) USING BTREE,
-  INDEX `extracurricular_attendances_status_index`(`status` ASC) USING BTREE,
-  INDEX `extracurricular_attendances_recorded_by_index`(`recorded_by` ASC) USING BTREE,
-  INDEX `extracurricular_attendances_deleted_at_index`(`deleted_at` ASC) USING BTREE,
-  INDEX `extracurricular_attendances_created_by_index`(`created_by` ASC) USING BTREE,
-  INDEX `extracurricular_attendances_updated_by_index`(`updated_by` ASC) USING BTREE,
-  CONSTRAINT `extracurricular_attendances_recorded_by_foreign` FOREIGN KEY (`recorded_by`) REFERENCES `teachers` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `extracurricular_attendances_student_extracurricular_id_foreign` FOREIGN KEY (`student_extracurricular_id`) REFERENCES `student_extracurriculars` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  `extracurricular_day_id` bigint UNSIGNED NOT NULL, -- ke extracurricular_days
+  `student_id` bigint UNSIGNED NOT NULL,
+  `attendance_date` date NOT NULL,
+  `status` enum('hadir','izin','sakit','alfa') NOT NULL,
+  `score` decimal(5,2) NULL, -- untuk penilaian
+  `notes` text NULL,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`extracurricular_day_id`) REFERENCES `extracurricular_days` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
@@ -3446,6 +3433,33 @@ CREATE TABLE `extracurriculars`  (
 -- ----------------------------
 -- Records of extracurriculars
 -- ----------------------------
+
+-- ----------------------------
+-- Table structure for extracurricular_days
+-- ----------------------------
+
+-- Tabel baru untuk hari kegiatan extracurricular_days
+-- Tabel induk (sudah ada)
+-- extracurriculars — tidak perlu diubah
+
+-- Tabel hari kegiatan (BARU)
+CREATE TABLE `extracurricular_days` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `extracurricular_id` bigint UNSIGNED NOT NULL,
+  `day_of_week` varchar(10) NOT NULL,
+  `start_time` time NULL DEFAULT NULL,
+  `end_time` time NULL DEFAULT NULL,
+  `location` varchar(255) NULL DEFAULT NULL,
+  `notes` text NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `ec_day_unique` (`extracurricular_id`, `day_of_week`),
+  KEY `ec_day_day_index` (`day_of_week`),
+  CONSTRAINT `ec_day_fk` 
+    FOREIGN KEY (`extracurricular_id`) 
+    REFERENCES `extracurriculars` (`id`) ON DELETE CASCADE
+)  ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Table structure for facilities

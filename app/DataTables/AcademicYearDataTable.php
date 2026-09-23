@@ -17,7 +17,7 @@ class AcademicYearDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['school.name', 'name', 'code', 'start_date', 'end_date', 'semester_start_date', 'semester_end_date', 'is_registration_open', 'registration_start_date', 'registration_end_date', 'is_active', 'is_current', 'created_at', 'updated_at', 'created_by', 'updated_by'];
+    protected array $columns = ['school_name', 'name', 'code', 'start_date', 'end_date', 'semester_start_date', 'semester_end_date', 'is_registration_open', 'registration_start_date', 'registration_end_date', 'is_active', 'is_current'];
 
     /**
      * Build DataTable response.
@@ -27,9 +27,18 @@ class AcademicYearDataTable extends DataTable
         return (new EloquentDataTable($query))
             ->addColumn('action', function ($row) {
                 return $this->renderActionButtons($row);
+            })->addColumn('is_registration_open', function ($row) {
+                return $this->renderIsRegistrationOpenButtons($row);
+            })->addColumn('is_active', function ($row) {
+                return $this->renderIsActiveButtons($row);
+            })->addColumn('is_current', function ($row) {
+                return $this->renderIsCurrentButtons($row);
+            })
+            ->addColumn('school_name', function ($row) {
+                return $row->school_name ?? $row->school?->name ?? '-';
             })
             ->addIndexColumn()
-            ->rawColumns(['action']) // ✅ Tetap wajib ada!
+            ->rawColumns(['action', 'is_registration_open', 'is_active', 'is_current']) // ✅ Tetap wajib ada!
             ->setRowId('id');
     }
 
@@ -59,9 +68,13 @@ class AcademicYearDataTable extends DataTable
             ENT_QUOTES,
             'UTF-8'
         );
-
-        $editUrl   = e(route('academic_year.edit', $row));
-        $deleteUrl = e(route('academic_year.destroy', $row));
+        if ($row->id) {
+            $editUrl   = e(route('academic_year.edit', $row));
+            $deleteUrl = e(route('academic_year.destroy', $row));
+        } else {
+            $editUrl   = "#";
+            $deleteUrl = "#";
+        }
 
         return <<<HTML
             <div class="d-flex justify-content-center gap-1">
@@ -100,7 +113,13 @@ class AcademicYearDataTable extends DataTable
      */
     public function query(AcademicYear $model): QueryBuilder
     {
-        return $model->newQuery()->with('school');
+        return $model->newQuery()
+            ->select([
+                'academic_years.*',
+                'schools.name as school_name' // Asumsikan relasi school ke tabel schools
+            ])
+            ->leftJoin('schools', 'academic_years.school_id', '=', 'schools.id')
+            ->with(['school', 'organization']);
     }
 
     /**
@@ -138,14 +157,14 @@ class AcademicYearDataTable extends DataTable
                  * Custom Bootstrap 5 layout.
                  */
                 'dom' =>
-                    '<"row mb-3"' .
-                        '<"col-md-6 d-flex align-items-center"B>' .
-                        '<"col-md-6"f>' .
+                '<"row mb-3"' .
+                    '<"col-md-6 d-flex align-items-center"B>' .
+                    '<"col-md-6"f>' .
                     '>' .
                     'rt' .
                     '<"row mt-3"' .
-                        '<"col-md-6"i>' .
-                        '<"col-md-6 d-flex justify-content-md-end"p>' .
+                    '<"col-md-6"i>' .
+                    '<"col-md-6 d-flex justify-content-md-end"p>' .
                     '>',
 
                 /*
@@ -264,12 +283,12 @@ class AcademicYearDataTable extends DataTable
      * explode() dari string literal seperti versi lama, yang rapuh
      * terhadap karakter khusus pada nama kolom.
      */
-     
+
     protected function getColumns(): array
     {
         return collect($this->columns)
-            ->map(fn (string $kolom) => Column::make($kolom)
-                ->title(ucwords(str_replace(['_',"."], [' ',' '], $kolom))))
+            ->map(fn(string $kolom) => Column::make($kolom)
+                ->title(ucwords(str_replace(['_', "."], [' ', ' '], $kolom))))
             // 1. PREPEND: Masukkan kolom No di posisi PALING AWAL (indeks 0)
             ->prepend(
                 Column::make('DT_RowIndex')
@@ -297,5 +316,92 @@ class AcademicYearDataTable extends DataTable
     protected function filename(): string
     {
         return 'AcademicYear_' . date('YmdHis');
+    }
+
+    protected function renderIsRegistrationOpenButtons($row): string
+    {
+        $status = $row->is_registration_open ? 'primary' : 'danger';
+        $text = $row->is_registration_open ? 'Buka' : 'Tutup';
+        $newStatus = $row->is_registration_open ? 0 : 1;
+
+        $context = htmlspecialchars(
+            json_encode([
+                'executeDraw' => true,
+                'tableId'     => 'academic-year-table',
+                'reloadDelay' => 500,
+            ]),
+            ENT_QUOTES,
+            'UTF-8'
+        );
+
+        if ($row->id) {
+            $url = e(route('academic_year.updateIsRegistrationOpen', ['academic_year' => $row, 'is_registration_open' => $newStatus]));
+        } else {
+            $url = "#";
+        }
+
+        return <<<HTML
+            <span class="badge bg-{$status} cursor-pointer update-registration-open" data-title="{$text} Pendaftaran" data-url="{$url}" data-datatable-context='{$context}'>
+                {$text}
+            </span> 
+        HTML;
+    }
+
+    protected function renderIsActiveButtons($row): string
+    {
+        $status = $row->is_active ? 'success' : 'danger';
+        $text = $row->is_active ? 'Aktif' : 'Tidak Aktif';
+        $newStatus = $row->is_active ? 0 : 1;
+
+        $context = htmlspecialchars(
+            json_encode([
+                'executeDraw' => true,
+                'tableId'     => 'academic-year-table',
+                'reloadDelay' => 500,
+            ]),
+            ENT_QUOTES,
+            'UTF-8'
+        );
+
+        if ($row->id) {
+            $url = e(route('academic_year.updateIsActive', ['academic_year' => $row, 'is_active' => $newStatus]));
+        } else {
+            $url = "#";
+        }
+
+        return <<<HTML
+            <span class="badge bg-{$status} cursor-pointer update-isactive" data-title="{$text} Tahun Akademik" data-url="{$url}" data-datatable-context='{$context}'>
+                {$text}
+            </span> 
+        HTML;
+    }
+
+    protected function renderIsCurrentButtons($row): string
+    {
+        $status = $row->is_current ? 'success' : 'secondary';
+        $text = $row->is_current ? 'Aktif' : 'Non-Aktif';
+        $newStatus = $row->is_current ? 0 : 1;
+
+        $context = htmlspecialchars(
+            json_encode([
+                'executeDraw' => true,
+                'tableId'     => 'academic-year-table',
+                'reloadDelay' => 500,
+            ]),
+            ENT_QUOTES,
+            'UTF-8'
+        );
+
+        if ($row->id) {
+            $url = e(route('academic_year.updateIsCurrent', ['academic_year' => $row, 'is_current' => $newStatus]));
+        } else {
+            $url = "#";
+        }
+
+        return <<<HTML
+            <span class="badge bg-{$status} cursor-pointer update-iscurrent" data-title="{$text} Tahun Akademik Saat Ini" data-url="{$url}" data-datatable-context='{$context}'>
+                {$text}
+            </span> 
+        HTML;
     }
 }

@@ -23,5 +23,7 @@ Route::group(['prefix' => 'academic-year', 'namespace' => 'App\Modules\AcademicY
     Route::get('/edit/{id}', ['as' => 'academic_year.edit', 'uses' => 'AcademicYearController@edit']);
     Route::put('/update/{id}', ['as' => 'academic_year.update', 'uses' => 'AcademicYearController@update']);
     Route::delete('/delete/{id}', ['as' => 'academic_year.destroy', 'uses' => 'AcademicYearController@destroy']);
-    
+    Route::post('/updateIsRegistrationOpen/{academic_year}/{is_registration_open}', ['as' => 'academic_year.updateIsRegistrationOpen', 'uses' => 'AcademicYearController@updateIsRegistrationOpen']);
+    Route::post('/updateIsActive/{academic_year}/{is_active}', ['as' => 'academic_year.updateIsActive', 'uses' => 'AcademicYearController@updateIsActive']);
+    Route::post('/updateIsCurrent/{academic_year}/{is_current}', ['as' => 'academic_year.updateIsCurrent', 'uses' => 'AcademicYearController@updateIsCurrent']);
 });

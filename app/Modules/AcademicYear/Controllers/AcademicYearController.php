@@ -222,4 +222,91 @@ class AcademicYearController extends MainController
             );
         }
     } 
+
+    public function updateRegistrationOpen(Request $request, $academic_year, $is_registration_open): JsonResponse
+    {
+        try {
+            $academicYear = $this->model->where('academic_year', $academic_year)->first();
+            $academicYear->update(['is_registration_open' => $is_registration_open]);
+            
+            return $this->successResponse(
+                $request,
+                'Data AcademicYear berhasil diperbarui.',
+                $academicYear
+            );
+        } catch (Throwable $e) {
+            Log::error(
+                'Gagal memperbarui AcademicYear.',
+                [
+                    'exception' => $e,
+                    'AcademicYear_id' => $academic_year,
+                    'data' => $request->all(),
+                    'user_id' => auth()->id(),
+                ]
+            );
+
+            return $this->errorResponse(
+                $request,
+                'Data AcademicYear gagal diperbarui.'
+            );
+        }
+    }
+
+    public function updateActive(Request $request, $academic_year, $is_active): JsonResponse
+    {
+        try {
+            $academicYear = $this->model->where('academic_year', $academic_year)->first();
+            $academicYear->update(['is_active' => $is_active]);
+            
+            return $this->successResponse(
+                $request,
+                'Data AcademicYear berhasil diperbarui.',
+                $academicYear
+            );
+        } catch (Throwable $e) {
+            Log::error(
+                'Gagal memperbarui AcademicYear.',
+                [
+                    'exception' => $e,
+                    'AcademicYear_id' => $academic_year,
+                    'data' => $request->all(),
+                    'user_id' => auth()->id(),
+                ]
+            );
+
+            return $this->errorResponse(
+                $request,
+                'Data AcademicYear gagal diperbarui.'
+            );
+        }
+    }
+
+    public function updateCurrent(Request $request, $academic_year, $is_current): JsonResponse
+    {
+        try {
+            $academicYear = $this->model->where('academic_year', $academic_year)->first();
+            $academicYear->update(['is_current' => $is_current]);
+            
+            return $this->successResponse(
+                $request,
+                'Data AcademicYear berhasil diperbarui.',
+                $academicYear
+            );
+        } catch (Throwable $e) {
+            Log::error(
+                'Gagal memperbarui AcademicYear.',
+                [
+                    'exception' => $e,
+                    'AcademicYear_id' => $academic_year,
+                    'data' => $request->all(),
+                    'user_id' => auth()->id(),
+                ]
+            );
+
+            return $this->errorResponse(
+                $request,
+                'Data AcademicYear gagal diperbarui.'
+            );
+        }
+    }
 }

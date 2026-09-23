@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Route;
 | and give it the controller to call when that URI is requested.
 |
  */
+
 Route::group(['prefix' => 'extracurricular', 'namespace' => 'App\Modules\Extracurricular\Controllers', 'middleware' => ['web']], function () {
     Route::get('/', ['as' => 'extracurricular.index', 'uses' => 'ExtracurricularController@index']);
     Route::any('/search', ['as' => 'extracurricular.search', 'uses' => 'ExtracurricularController@search']);
@@ -23,5 +24,4 @@ Route::group(['prefix' => 'extracurricular', 'namespace' => 'App\Modules\Extracu
     Route::get('/edit/{id}', ['as' => 'extracurricular.edit', 'uses' => 'ExtracurricularController@edit']);
     Route::put('/update/{id}', ['as' => 'extracurricular.update', 'uses' => 'ExtracurricularController@update']);
     Route::delete('/delete/{id}', ['as' => 'extracurricular.destroy', 'uses' => 'ExtracurricularController@destroy']);
-    
 });

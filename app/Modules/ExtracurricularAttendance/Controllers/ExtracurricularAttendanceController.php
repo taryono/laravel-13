@@ -10,7 +10,10 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
+use Models\Extracurricular;
+use Models\Student;
 use Throwable;
 
 class ExtracurricularAttendanceController extends MainController
@@ -51,14 +54,13 @@ class ExtracurricularAttendanceController extends MainController
      */
     public function create(): View
     {
-        $extracurricularAttendance = new ExtracurricularAttendance();
-        $result = $this->getForm($extracurricularAttendance);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
-
+        $attendance = new ExtracurricularAttendance();
         return view(
             'ExtracurricularAttendance::create',
-            compact('extracurricularAttendance', 'forms', 'groupedForms')
+            array_merge(
+                $this->formData(),
+                compact('attendance')
+            )
         );
     }
 
@@ -68,115 +70,83 @@ class ExtracurricularAttendanceController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'student_extracurricular_id' => ['required', 'integer'],
-            'meeting_date' => ['required', 'string', 'max:255'],
-            'status' => ['required', 'string', 'max:255'],
-            'notes' => ['required', 'string', 'max:255'],
-            'recorded_by' => ['required', 'string', 'max:255'],
-            'is_active' => ['required', 'string', 'max:255'],
-            'created_at' => ['required', 'string', 'max:255'],
-            'updated_at' => ['required', 'string', 'max:255'],
-            'deleted_at' => ['required', 'string', 'max:255'],
-            'created_by' => ['required', 'string', 'max:255'],
-            'updated_by' => ['required', 'string', 'max:255'],
+            'extracurricular_id'      => 'required|exists:extracurriculars,id',
+            'extracurricular_day_id'  => 'required|exists:extracurricular_days,id',
+            'student_id'              => 'required|exists:students,id',
+            'attendance_date'         => 'required|date',
+            'status'                  => ['required', Rule::in(['hadir', 'izin', 'sakit', 'alfa'])],
+            'score'                   => 'nullable|numeric|min:0|max:100',
+            'notes'                   => 'nullable|string',
         ]);
 
-        try {
-            $model = DB::transaction(function () use ($validated) {
-                return ExtracurricularAttendance::create($validated);
-            });
+        // Cek duplikasi: siswa + jadwal + tanggal sudah ada?
+        $exists = ExtracurricularAttendance::where([
+            ['extracurricular_day_id', $validated['extracurricular_day_id']],
+            ['student_id', $validated['student_id']],
+            ['attendance_date', $validated['attendance_date']],
+        ])->exists();
 
-            return $this->successResponse(
-                $request,
-                'Data ExtracurricularAttendance berhasil ditambahkan.',
-                $model
-            );
-
-        } catch (Throwable $e) {
-
-            Log::error(
-                'Gagal menambahkan ExtracurricularAttendance.',
-                [
-                    'exception' => $e,
-                    'data' => $validated,
-                    'user_id' => auth()->id(),
-                ]
-            );
-
-            return $this->errorResponse(
-                $request,
-                'Data ExtracurricularAttendance gagal ditambahkan.'
-            );
+        if ($exists) {
+            return response()->json([
+                'message' => 'Absensi untuk siswa ini pada tanggal tersebut sudah ada'
+            ], 422);
         }
+
+        $attendance = ExtracurricularAttendance::create(array_merge($validated, [
+            'created_by' => auth()->id(),
+        ]));
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Absensi berhasil disimpan',
+            'reload' => true,
+        ]);
     }
+
+
 
     /**
      * Show the form for editing the specified resource.
      */
     public function edit($id): View
     {
-        $extracurricularAttendance = $this->model->findOrFail($id);
-        $result = $this->getForm($extracurricularAttendance);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
+        $attendance = $this->model->findOrFail($id);
 
         return view(
             'ExtracurricularAttendance::edit',
-            compact('extracurricularAttendance', 'forms', 'groupedForms')
+            array_merge(
+                $this->formData(),
+                compact('attendance')
+            )
         );
     }
 
     /**
      * Update the specified resource.
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, ExtracurricularAttendance $attendance)
     {
         $validated = $request->validate([
-                        'student_extracurricular_id' => ['required', 'integer'],
-            'meeting_date' => ['required', 'string', 'max:255'],
-            'status' => ['required', 'string', 'max:255'],
-            'notes' => ['required', 'string', 'max:255'],
-            'recorded_by' => ['required', 'string', 'max:255'],
-            'is_active' => ['required', 'string', 'max:255'],
-            'created_at' => ['required', 'string', 'max:255'],
-            'updated_at' => ['required', 'string', 'max:255'],
-            'deleted_at' => ['required', 'string', 'max:255'],
-            'created_by' => ['required', 'string', 'max:255'],
-            'updated_by' => ['required', 'string', 'max:255'],
+            'extracurricular_id'      => 'required|exists:extracurriculars,id',
+            'extracurricular_day_id'  => 'required|exists:extracurricular_days,id',
+            'student_id'              => 'required|exists:students,id',
+            'attendance_date'         => 'required|date',
+            'status'                  => ['required', Rule::in(['hadir', 'izin', 'sakit', 'alfa'])],
+            'score'                   => 'nullable|numeric|min:0|max:100',
+            'notes'                   => 'nullable|string',
         ]);
 
-        try {
-            $extracurricularAttendance = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $extracurricularAttendance,
-                $validated
-            ) {
-                $extracurricularAttendance->update($validated);
-            });
+        $attendance->update(array_merge($validated, [
+            'updated_by' => auth()->id(),
+        ]));
 
-            return $this->successResponse(
-                $request,
-                'Data ExtracurricularAttendance berhasil diperbarui.',
-                $extracurricularAttendance
-            );
-
-        } catch (Throwable $e) { 
-            Log::error(
-                'Gagal memperbarui ExtracurricularAttendance.',
-                [
-                    'exception' => $e,
-                    'ExtracurricularAttendance_id' => $id,
-                    'data' => $validated,
-                    'user_id' => auth()->id(),
-                ]
-            );
-
-            return $this->errorResponse(
-                $request,
-                'Data ExtracurricularAttendance gagal diperbarui.'
-            );
-        }
+        return response()->json([
+            'success' => true,
+            'message' => 'Absensi berhasil diperbarui',
+            'reload' => true,
+        ]);
     }
+
 
     /**
      * Remove the specified resource.
@@ -194,8 +164,7 @@ class ExtracurricularAttendanceController extends MainController
                 $request,
                 'Data ExtracurricularAttendance berhasil dihapus.'
             );
-
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $extracurricularAttendance->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus ExtracurricularAttendance.',
@@ -211,5 +180,33 @@ class ExtracurricularAttendanceController extends MainController
                 'Data ExtracurricularAttendance gagal dihapus.'
             );
         }
-    } 
+    }
+
+    protected function formData(): array
+    {
+        $extracurriculars = Extracurricular::where('is_active', true)
+            ->orderBy('name')
+            ->pluck('name', 'id');
+
+        // Susun daftar jadwal per kegiatan untuk JS
+        $scheduleMapping = [];
+        Extracurricular::with('days')->get()->each(function ($ec) use (&$scheduleMapping) {
+            $scheduleMapping[$ec->id] = $ec->days->map(function ($day) {
+                return [
+                    'id' => $day->id,
+                    'label' => "{$day->day_of_week} " .
+                        ($day->start_time ? "({$day->start_time} - {$day->end_time})" : '') .
+                        ($day->location ? " — {$day->location}" : ''),
+                ];
+            });
+        });
+
+        $students = Student::orderBy('name')->pluck('name', 'id');
+
+        return [
+            'extracurriculars' => $extracurriculars,
+            'scheduleMapping' => $scheduleMapping,
+            'students' => $students,
+        ];
+    }
 }

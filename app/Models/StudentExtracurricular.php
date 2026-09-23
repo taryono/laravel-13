@@ -5,10 +5,20 @@ namespace Models;
 class StudentExtracurricular extends BasedModel
 {
     // Relasi
-    // public function user()
-    // {
-    //     return $this->belongsTo(User::class);
-    // }
+    public function student()
+    {
+        return $this->belongsTo(Student::class);
+    }
+
+    public function extracurricular()
+    {
+        return $this->belongsTo(Extracurricular::class);
+    }
+
+    public function studentAttendance()
+    {
+        return $this->hasMany(StudentAttendance::class);
+    }
 
     // Scope
     public function scopeActive($query)

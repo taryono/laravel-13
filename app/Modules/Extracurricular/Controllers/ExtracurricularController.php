@@ -5,12 +5,17 @@ namespace App\Modules\Extracurricular\Controllers;
 use App\DataTables\ExtracurricularDataTable;
 use App\Http\Controllers\MainController;
 use Models\Extracurricular;
+use Models\School;
+use Models\Teacher;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
+use Illuminate\Validation\Rule;
+use Models\ExtracurricularDay;
+use Models\Student;
 use Throwable;
 
 class ExtracurricularController extends MainController
@@ -52,13 +57,12 @@ class ExtracurricularController extends MainController
     public function create(): View
     {
         $extracurricular = new Extracurricular();
-        $result = $this->getForm($extracurricular);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
+        $schools = School::pluck('name', 'id');
+        $teachers = Teacher::pluck('name', 'id');
 
         return view(
             'Extracurricular::create',
-            compact('extracurricular', 'forms', 'groupedForms')
+            compact('extracurricular', 'schools', 'teachers')
         );
     }
 
@@ -68,45 +72,60 @@ class ExtracurricularController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'school_id' => ['required', 'integer'],
-            'name' => ['required', 'string', 'max:255'],
-            'code' => ['required', 'string', 'max:255'],
-            'description' => ['required', 'string', 'max:255'],
-            'teacher_id' => ['required', 'integer'],
-            'day_of_week' => ['required', 'string', 'max:255'],
-            'start_time' => ['required', 'string', 'max:255'],
-            'end_time' => ['required', 'string', 'max:255'],
-            'max_students' => ['required', 'string', 'max:255'],
-            'is_active' => ['required', 'string', 'max:255'],
-            'created_at' => ['required', 'string', 'max:255'],
-            'updated_at' => ['required', 'string', 'max:255'],
-            'deleted_at' => ['required', 'string', 'max:255'],
-            'created_by' => ['required', 'string', 'max:255'],
-            'updated_by' => ['required', 'string', 'max:255'],
+            'school_id'      => 'required|exists:schools,id',
+            'name'           => 'required|string|max:100',
+            'code'           => [
+                'required',
+                'string',
+                'max:20',
+                Rule::unique('extracurriculars')->where(
+                    fn($q) =>
+                    $q->where('school_id', $request->school_id)
+                )
+            ],
+            'teacher_id'     => 'nullable|exists:teachers,id',
+            'description'    => 'nullable|string',
+            'max_students'   => 'required|integer|min:1',
+            'is_active'      => 'boolean',
+            'days'           => 'required|array|min:1',
+            'days.*.selected' => 'accepted',
+            'days.*.day_of_week' => 'required|in:Senin,Selasa,Rabu,Kamis,Jumat,Sabtu,Minggu',
+            'days.*.start_time'  => 'nullable|date_format:H:i',
+            'days.*.end_time'    => 'nullable|date_format:H:i|after:days.*.start_time',
+            'days.*.location'    => 'nullable|string|max:255',
         ]);
 
+        DB::beginTransaction();
         try {
-            $model = DB::transaction(function () use ($validated) {
-                return Extracurricular::create($validated);
-            });
+            $ec = Extracurricular::create([
+                'school_id'    => $validated['school_id'],
+                'name'         => $validated['name'],
+                'code'         => $validated['code'],
+                'teacher_id'   => $validated['teacher_id'],
+                'description'  => $validated['description'],
+                'max_students' => $validated['max_students'],
+                'is_active'    => $validated['is_active'] ?? 1,
+                'created_by'   => auth()->id(),
+            ]);
 
+            foreach ($validated['days'] as $day) {
+                if (!empty($day['selected'])) {
+                    $ec->days()->create([
+                        'day_of_week' => $day['day_of_week'],
+                        'start_time'  => $day['start_time'] ?? null,
+                        'end_time'    => $day['end_time'] ?? null,
+                        'location'    => $day['location'] ?? null,
+                    ]);
+                }
+            }
+
+            DB::commit();
             return $this->successResponse(
                 $request,
                 'Data Extracurricular berhasil ditambahkan.',
-                $model
             );
-
-        } catch (Throwable $e) {
-
-            Log::error(
-                'Gagal menambahkan Extracurricular.',
-                [
-                    'exception' => $e,
-                    'data' => $validated,
-                    'user_id' => auth()->id(),
-                ]
-            );
-
+        } catch (\Exception $e) {
+            DB::rollBack();
             return $this->errorResponse(
                 $request,
                 'Data Extracurricular gagal ditambahkan.'
@@ -114,19 +133,19 @@ class ExtracurricularController extends MainController
         }
     }
 
+
     /**
      * Show the form for editing the specified resource.
      */
     public function edit($id): View
     {
         $extracurricular = $this->model->findOrFail($id);
-        $result = $this->getForm($extracurricular);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
+        $schools = School::pluck('name', 'id');
+        $teachers = Teacher::pluck('name', 'id');
 
         return view(
             'Extracurricular::edit',
-            compact('extracurricular', 'forms', 'groupedForms')
+            compact('extracurricular', 'schools', 'teachers')
         );
     }
 
@@ -135,56 +154,69 @@ class ExtracurricularController extends MainController
      */
     public function update(Request $request, $id)
     {
+        $extracurricular = $this->model->findOrFail($id);
         $validated = $request->validate([
-                        'school_id' => ['required', 'integer'],
-            'name' => ['required', 'string', 'max:255'],
-            'code' => ['required', 'string', 'max:255'],
-            'description' => ['required', 'string', 'max:255'],
-            'teacher_id' => ['required', 'integer'],
-            'day_of_week' => ['required', 'string', 'max:255'],
-            'start_time' => ['required', 'string', 'max:255'],
-            'end_time' => ['required', 'string', 'max:255'],
-            'max_students' => ['required', 'string', 'max:255'],
-            'is_active' => ['required', 'string', 'max:255'],
-            'created_at' => ['required', 'string', 'max:255'],
-            'updated_at' => ['required', 'string', 'max:255'],
-            'deleted_at' => ['required', 'string', 'max:255'],
-            'created_by' => ['required', 'string', 'max:255'],
-            'updated_by' => ['required', 'string', 'max:255'],
+            'school_id'      => 'required|exists:schools,id',
+            'name'           => 'required|string|max:100',
+            'code'           => [
+                'required',
+                'string',
+                'max:20',
+                Rule::unique('extracurriculars')->where(
+                    fn($q) =>
+                    $q->where('school_id', $request->school_id)
+                )->ignore($extracurricular->id)
+            ],
+            'teacher_id'     => 'nullable|exists:teachers,id',
+            'description'    => 'nullable|string',
+            'max_students'   => 'required|integer|min:1',
+            'is_active'      => 'boolean',
+            'days'           => 'required|array|min:1',
+            'days.*.start_time' => 'nullable|date_format:H:i',
+            'days.*.end_time'   => 'nullable|date_format:H:i|after:days.*.start_time',
+            'days.*.location'   => 'nullable|string|max:255',
         ]);
 
+        DB::beginTransaction();
         try {
-            $extracurricular = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $extracurricular,
-                $validated
-            ) {
-                $extracurricular->update($validated);
-            });
+            $extracurricular->update([
+                'school_id'    => $validated['school_id'],
+                'name'         => $validated['name'],
+                'code'         => $validated['code'],
+                'teacher_id'   => $validated['teacher_id'],
+                'description'  => $validated['description'],
+                'max_students' => $validated['max_students'],
+                'is_active'    => $validated['is_active'] ?? 1,
+                'updated_by'   => auth()->id(),
+            ]);
 
+            // Ganti semua jadwal — hapus lama, simpan baru
+            $extracurricular->days()->delete();
+            foreach ($validated['days'] as $day) {
+                if (!empty($day['selected'])) {
+                    $extracurricular->days()->create([
+                        'day_of_week' => $day['day_of_week'],
+                        'start_time'  => $day['start_time'],
+                        'end_time'    => $day['end_time'],
+                        'location'    => $day['location'],
+                    ]);
+                }
+            }
+
+            DB::commit();
             return $this->successResponse(
                 $request,
-                'Data Extracurricular berhasil diperbarui.',
-                $extracurricular
+                'Data Extracurricular berhasil diupdate.',
             );
-
-        } catch (Throwable $e) { 
-            Log::error(
-                'Gagal memperbarui Extracurricular.',
-                [
-                    'exception' => $e,
-                    'Extracurricular_id' => $id,
-                    'data' => $validated,
-                    'user_id' => auth()->id(),
-                ]
-            );
-
+        } catch (Throwable $e) {
+            DB::rollBack();
             return $this->errorResponse(
                 $request,
-                'Data Extracurricular gagal diperbarui.'
+                'Data Extracurricular gagal ditambahkan.'
             );
         }
     }
+
 
     /**
      * Remove the specified resource.
@@ -202,8 +234,7 @@ class ExtracurricularController extends MainController
                 $request,
                 'Data Extracurricular berhasil dihapus.'
             );
-
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $extracurricular->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus Extracurricular.',
@@ -219,5 +250,5 @@ class ExtracurricularController extends MainController
                 'Data Extracurricular gagal dihapus.'
             );
         }
-    } 
+    }
 }
