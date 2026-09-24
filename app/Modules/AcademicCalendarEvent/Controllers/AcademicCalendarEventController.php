@@ -51,15 +51,15 @@ class AcademicCalendarEventController extends MainController
      */
     public function create(): View
     {
-        $academicCalendarEvent = new AcademicCalendarEvent();
-        $result = $this->getForm($academicCalendarEvent);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
+        $organizationId = auth()->user()->organization_id; // sesuaikan logikamu
+        $schoolId = auth()->user()->school_id;
+        $academicYearId = session('academic_year_id'); // sesuaikan
 
-        return view(
-            'AcademicCalendarEvent::create',
-            compact('academicCalendarEvent', 'forms', 'groupedForms')
-        );
+        return view('AcademicCalendarEvent::create', compact(
+            'organizationId',
+            'schoolId',
+            'academicYearId'
+        ));
     }
 
     /**
@@ -68,7 +68,7 @@ class AcademicCalendarEventController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'academic_year_id' => ['required', 'integer'],
             'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string', 'max:255'],
@@ -122,13 +122,13 @@ class AcademicCalendarEventController extends MainController
     public function edit($id): View
     {
         $academicCalendarEvent = $this->model->findOrFail($id);
-        $result = $this->getForm($academicCalendarEvent);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
+        $organizationId = auth()->user()->organization_id;
+        $schoolId = auth()->user()->school_id;
+        $academicYearId = session('academic_year_id');
 
         return view(
             'AcademicCalendarEvent::edit',
-            compact('academicCalendarEvent', 'forms', 'groupedForms')
+            compact('academicCalendarEvent', 'organizationId', 'schoolId', 'academicYearId')
         );
     }
 
@@ -138,7 +138,7 @@ class AcademicCalendarEventController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'academic_year_id' => ['required', 'integer'],
             'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string', 'max:255'],
@@ -159,10 +159,7 @@ class AcademicCalendarEventController extends MainController
 
         try {
             $academicCalendarEvent = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $academicCalendarEvent,
-                $validated
-            ) {
+            DB::transaction(function () use ($academicCalendarEvent, $validated) {
                 $academicCalendarEvent->update($validated);
             });
 
@@ -172,7 +169,7 @@ class AcademicCalendarEventController extends MainController
                 $academicCalendarEvent
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui AcademicCalendarEvent.',
                 [
@@ -207,7 +204,7 @@ class AcademicCalendarEventController extends MainController
                 'Data AcademicCalendarEvent berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $academicCalendarEvent->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus AcademicCalendarEvent.',
@@ -223,5 +220,5 @@ class AcademicCalendarEventController extends MainController
                 'Data AcademicCalendarEvent gagal dihapus.'
             );
         }
-    } 
+    }
 }
