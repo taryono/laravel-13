@@ -85,7 +85,7 @@ class FormLib
                 }
 
                 $this->processRegularField($field, $columns, $darkModeClass, $group_fields);
-                if($field == "password"){
+                if ($field == "password") {
                     // add password confirmation field
                     $this->processRegularField("password_confirmation", $columns, $darkModeClass, $group_fields);
                 }
@@ -99,7 +99,6 @@ class FormLib
             $this->groupedForms = array_filter($group_fields);
 
             return $this;
-
         } catch (\Throwable $e) {
             // FIX: sebelumnya error di production tidak pernah di-log sama sekali.
             report($e);
@@ -203,26 +202,26 @@ class FormLib
 
     protected function processRegularField(string $field, $columns, string $darkMode, array &$group_fields): void
     {
-        if($field === "password_confirmation"){ 
+        if ($field === "password_confirmation") {
             $required = null;
             $label = "Password Confirmation";
             $comment = '';
             $originType = "text";
             $type = "password";
-        }elseif($field === "password"){
+        } elseif ($field === "password") {
             $required = null;
             $label = "Password";
             $comment = '';
             $originType = "text";
             $type = "password";
-        }else{
+        } else {
             $required = $columns->{$field}->is_null === 'NO' ? "required" : null;
             $label = !empty($columns->{$field}->comment) ? $columns->{$field}->comment : $field;
             $comment = !empty($columns->{$field}->comment) ? $columns->{$field}->comment : '';
             $originType = Schema::getColumnType($this->model->getTable(), $field);
             $type = Config::get("data_types.{$originType}", 'text');
         }
-        
+
 
         // FIX: sebelumnya $required (bisa null) dimasukkan sebagai elemen array
         // numerik mentah ("$required" langsung, tanpa key), yang berisiko
@@ -240,7 +239,7 @@ class FormLib
             $attributes['class'] .= ' comment';
         }
         $value = null;
-        if( !in_array($field, ['password', 'password_confirmation'])){
+        if (!in_array($field, ['password', 'password_confirmation'])) {
             $value = $this->object?->{$field};
         }
         $customRender = renderFields()[$field] ?? null;
@@ -261,8 +260,8 @@ class FormLib
             ]));
         } else {
             $content = in_array($field, ['password', 'password_confirmation'])
-            ? Form::password($field, $attributes)
-            : Form::{$type}($field, $value, $attributes);
+                ? Form::password($field, $attributes)
+                : Form::{$type}($field, $value, $attributes);
         }
 
         $fieldData = [
@@ -316,37 +315,152 @@ class FormLib
     }
 
     // --- Getter & Setter (dipertahankan agar kompatibel dengan kode lama) ---
-    public function getModel() { return $this->model; }
-    public function setModel($model): self { $this->model = $model; return $this; }
-    public function getEloquent() { return $this->model?->getRelations() ?? []; }
-    public function getRelations() { return $this->relations; }
-    public function setRelations($relations): self { $this->relations = $relations; return $this; }
-    public function getNames() { return $this->names; }
-    public function setNames($names): self { $this->names = $names; return $this; }
-    public function getForms() { return $this->forms; }
-    public function setForms($forms): self { $this->forms = $forms; return $this; }
-    public function getGroupedForms() { return $this->groupedForms; }
-    public function setGroupedForms($groupedForms): self { $this->groupedForms = $groupedForms; return $this; }
-    public function getComment() { return $this->comment; }
-    public function setComment($comment): self { $this->comment = $comment; return $this; }
-    public function getRequired() { return $this->required; }
-    public function setRequired($required): self { $this->required = $required; return $this; }
-    public function getArrayData() { return $this->array_data; }
-    public function setArrayData($array_data): self { $this->array_data = $array_data; return $this; }
-    public function getClasses() { return $this->classes; }
-    public function setClasses($classes): self { $this->classes = $classes; return $this; }
-    public function getDefault() { return $this->default; }
-    public function setDefault($default): self { $this->default = $default; return $this; }
-    public function getAttributes() { return $this->attributes; }
-    public function setAttributes($attributes): self { $this->attributes = $attributes; return $this; }
-    public function getDefaultClass() { return $this->default_class; }
-    public function setDefaultClass($default_class): self { $this->default_class = $default_class; return $this; }
-    public function getCustomFields() { return $this->custom_fields; }
-    public function setCustomFields($custom_fields): self { $this->custom_fields = $custom_fields; return $this; }
-    public function getGroups() { return $this->groups; }
-    public function setGroups($groups): self { $this->groups = $groups; return $this; }
-    public function getSetFields() { return $this->set_fields; }
-    public function setSetFields($set_fields): self { $this->set_fields = $set_fields; return $this; }
-    public function getExcludes() { return $this->excludes; }
-    public function setExcludes($excludes): self { $this->excludes = $excludes; return $this; }
+    public function getModel()
+    {
+        return $this->model;
+    }
+    public function setModel($model): self
+    {
+        $this->model = $model;
+        return $this;
+    }
+    public function getEloquent()
+    {
+        return $this->model?->getRelations() ?? [];
+    }
+    public function getRelations()
+    {
+        return $this->relations;
+    }
+    public function setRelations($relations): self
+    {
+        $this->relations = $relations;
+        return $this;
+    }
+    public function getNames()
+    {
+        return $this->names;
+    }
+    public function setNames($names): self
+    {
+        $this->names = $names;
+        return $this;
+    }
+    public function getForms()
+    {
+        return $this->forms;
+    }
+    public function setForms($forms): self
+    {
+        $this->forms = $forms;
+        return $this;
+    }
+    public function getGroupedForms()
+    {
+        return $this->groupedForms;
+    }
+    public function setGroupedForms($groupedForms): self
+    {
+        $this->groupedForms = $groupedForms;
+        return $this;
+    }
+    public function getComment()
+    {
+        return $this->comment;
+    }
+    public function setComment($comment): self
+    {
+        $this->comment = $comment;
+        return $this;
+    }
+    public function getRequired()
+    {
+        return $this->required;
+    }
+    public function setRequired($required): self
+    {
+        $this->required = $required;
+        return $this;
+    }
+    public function getArrayData()
+    {
+        return $this->array_data;
+    }
+    public function setArrayData($array_data): self
+    {
+        $this->array_data = $array_data;
+        return $this;
+    }
+    public function getClasses()
+    {
+        return $this->classes;
+    }
+    public function setClasses($classes): self
+    {
+        $this->classes = $classes;
+        return $this;
+    }
+    public function getDefault()
+    {
+        return $this->default;
+    }
+    public function setDefault($default): self
+    {
+        $this->default = $default;
+        return $this;
+    }
+    public function getAttributes()
+    {
+        return $this->attributes;
+    }
+    public function setAttributes($attributes): self
+    {
+        $this->attributes = $attributes;
+        return $this;
+    }
+    public function getDefaultClass()
+    {
+        return $this->default_class;
+    }
+    public function setDefaultClass($default_class): self
+    {
+        $this->default_class = $default_class;
+        return $this;
+    }
+    public function getCustomFields()
+    {
+        return $this->custom_fields;
+    }
+    public function setCustomFields($custom_fields): self
+    {
+        $this->custom_fields = $custom_fields;
+        return $this;
+    }
+    public function getGroups()
+    {
+        return $this->groups;
+    }
+    public function setGroups($groups): self
+    {
+        $this->groups = $groups;
+        return $this;
+    }
+    public function getSetFields()
+    {
+        return $this->set_fields;
+    }
+    public function setSetFields($set_fields): self
+    {
+        $this->set_fields = $set_fields;
+        return $this;
+    }
+    public function getExcludes()
+    {
+        return $this->excludes;
+    }
+    public function setExcludes($excludes): self
+    {
+        $this->excludes = $excludes;
+        return $this;
+    }
 }
