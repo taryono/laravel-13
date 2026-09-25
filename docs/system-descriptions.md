@@ -2951,3 +2951,1409 @@ Apakah Anda ingin saya bantu buatkan juga:
 - **Struktur tabel `memorization_records`** (yang sudah ada di list Anda) untuk integrasi dengan `kitab_references`?
 - **Query untuk generate laporan hafalan santri**?
 - **Query untuk generate laporan pelanggaran pesantren**?
+
+Baik, saya bantu buatkan **semua SQL query** untuk tabel yang belum Anda buat, dari **Modul Pesantren Lanjutan (1)** sampai **Konfigurasi Sistem (17)**.
+
+Karena jumlahnya sangat banyak, saya bagi menjadi **beberapa batch** agar tidak terpotong. Saya mulai dari **Batch 1: Modul Pesantren Lanjutan (7 tabel)**.
+
+---
+
+# 📦 BATCH 1: MODUL PESANTREN LANJUTAN
+
+## 📋 1. `kitab_references`
+
+```sql
+-- ----------------------------
+-- Table structure for kitab_references
+-- ----------------------------
+DROP TABLE IF EXISTS `kitab_references`;
+CREATE TABLE `kitab_references`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `organization_id` bigint UNSIGNED NULL COMMENT 'FK ke organizations',
+  `subject_id` bigint UNSIGNED NULL COMMENT 'FK ke subjects',
+  `course_id` bigint UNSIGNED NULL COMMENT 'FK ke courses',
+  `curriculum_id` bigint UNSIGNED NULL COMMENT 'FK ke curriculums',
+  `education_level_id` bigint UNSIGNED NULL COMMENT 'FK ke education_levels',
+  `code` varchar(50) NOT NULL COMMENT 'Kode kitab',
+  `title` varchar(255) NOT NULL COMMENT 'Judul kitab',
+  `arabic_title` varchar(255) NULL COMMENT 'Judul dalam bahasa Arab',
+  `slug` varchar(255) NOT NULL COMMENT 'Slug untuk URL',
+  `author` varchar(200) NULL COMMENT 'Pengarang',
+  `author_arabic` varchar(200) NULL COMMENT 'Pengarang (Arab)',
+  `publisher` varchar(200) NULL,
+  `publication_year` year NULL,
+  `edition` varchar(50) NULL,
+  `volume` varchar(50) NULL,
+  `language` varchar(10) NOT NULL DEFAULT 'ar' COMMENT 'Bahasa',
+  `category` enum('fiqih','tauhid','tafsir','hadits','akhlak','nahwu','sharaf','balaghah','manthiq','ushul_fiqih','tajwid','tarikh','tasawuf','doa','other') NOT NULL DEFAULT 'other' COMMENT 'Kategori kitab',
+  `level` enum('ibtidaiyah','tsanawiyah','aliyah','kuliah','umum') NOT NULL DEFAULT 'umum' COMMENT 'Jenjang',
+  `description` text NULL,
+  `summary` text NULL COMMENT 'Ringkasan isi',
+  `total_pages` int UNSIGNED NULL,
+  `total_chapters` int UNSIGNED NULL,
+  `file_path` varchar(255) NULL COMMENT 'File digital (PDF)',
+  `cover_path` varchar(255) NULL COMMENT 'Cover kitab',
+  `is_digital` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika tersedia digital',
+  `is_printed` tinyint(1) NOT NULL DEFAULT 1 COMMENT '1 jika tersedia cetak',
+  `stock` int UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Stok cetak',
+  `is_mandatory` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika wajib',
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `sort_order` int UNSIGNED NOT NULL DEFAULT 0,
+  `created_by` bigint UNSIGNED NULL,
+  `updated_by` bigint UNSIGNED NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uk_kitab_references_code`(`code` ASC, `organization_id` ASC) USING BTREE,
+  UNIQUE INDEX `uk_kitab_references_slug`(`slug` ASC) USING BTREE,
+  INDEX `idx_kitab_references_org`(`organization_id` ASC) USING BTREE,
+  INDEX `idx_kitab_references_subject`(`subject_id` ASC) USING BTREE,
+  INDEX `idx_kitab_references_course`(`course_id` ASC) USING BTREE,
+  INDEX `idx_kitab_references_curriculum`(`curriculum_id` ASC) USING BTREE,
+  INDEX `idx_kitab_references_level`(`education_level_id` ASC) USING BTREE,
+  INDEX `idx_kitab_references_category`(`category` ASC) USING BTREE,
+  INDEX `idx_kitab_references_level_kitab`(`level` ASC) USING BTREE,
+  INDEX `idx_kitab_references_active`(`is_active` ASC) USING BTREE,
+  FULLTEXT INDEX `ft_kitab_references_search`(`title`, `arabic_title`, `author`, `description`) USING BTREE,
+  CONSTRAINT `fk_kitab_references_org` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_kitab_references_subject` FOREIGN KEY (`subject_id`) REFERENCES `subjects` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_kitab_references_course` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_kitab_references_curriculum` FOREIGN KEY (`curriculum_id`) REFERENCES `curriculums` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_kitab_references_level` FOREIGN KEY (`education_level_id`) REFERENCES `education_levels` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_kitab_references_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_kitab_references_updated_by` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+```
+
+---
+
+## 📋 2. `sorogan_schedules`
+
+```sql
+-- ----------------------------
+-- Table structure for sorogan_schedules
+-- ----------------------------
+DROP TABLE IF EXISTS `sorogan_schedules`;
+CREATE TABLE `sorogan_schedules`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `organization_id` bigint UNSIGNED NULL COMMENT 'FK ke organizations',
+  `kitab_reference_id` bigint UNSIGNED NULL COMMENT 'FK ke kitab_references',
+  `teacher_id` bigint UNSIGNED NULL COMMENT 'FK ke teachers',
+  `employee_id` bigint UNSIGNED NULL COMMENT 'FK ke employees',
+  `dormitory_id` bigint UNSIGNED NULL COMMENT 'FK ke dormitories',
+  `room_id` bigint UNSIGNED NULL COMMENT 'FK ke rooms',
+  `academic_year_id` bigint UNSIGNED NULL COMMENT 'FK ke academic_years',
+  `academic_semester_id` bigint UNSIGNED NULL COMMENT 'FK ke academic_semesters',
+  `title` varchar(200) NOT NULL COMMENT 'Judul sesi sorogan',
+  `sorogan_type` enum('individual','group','classical','halaqah','talaqqi','musyawarah') NOT NULL DEFAULT 'individual' COMMENT 'Tipe sorogan',
+  `day_of_week` enum('monday','tuesday','wednesday','thursday','friday','saturday','sunday') NULL COMMENT 'Hari',
+  `specific_date` date NULL COMMENT 'Tanggal spesifik',
+  `start_time` time NOT NULL,
+  `end_time` time NOT NULL,
+  `duration_minutes` int UNSIGNED NULL,
+  `recurrence_type` enum('none','weekly','biweekly','monthly') NOT NULL DEFAULT 'weekly',
+  `recurrence_until` date NULL,
+  `quota` int UNSIGNED NOT NULL DEFAULT 0,
+  `registered` int UNSIGNED NOT NULL DEFAULT 0,
+  `location` varchar(255) NULL,
+  `is_mandatory` tinyint(1) NOT NULL DEFAULT 0,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `effective_from` date NULL,
+  `effective_until` date NULL,
+  `notes` text NULL,
+  `created_by` bigint UNSIGNED NULL,
+  `updated_by` bigint UNSIGNED NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_sorogan_sched_org`(`organization_id` ASC) USING BTREE,
+  INDEX `idx_sorogan_sched_kitab`(`kitab_reference_id` ASC) USING BTREE,
+  INDEX `idx_sorogan_sched_teacher`(`teacher_id` ASC) USING BTREE,
+  INDEX `idx_sorogan_sched_employee`(`employee_id` ASC) USING BTREE,
+  INDEX `idx_sorogan_sched_dormitory`(`dormitory_id` ASC) USING BTREE,
+  INDEX `idx_sorogan_sched_room`(`room_id` ASC) USING BTREE,
+  INDEX `idx_sorogan_sched_year`(`academic_year_id` ASC) USING BTREE,
+  INDEX `idx_sorogan_sched_semester`(`academic_semester_id` ASC) USING BTREE,
+  INDEX `idx_sorogan_sched_type`(`sorogan_type` ASC) USING BTREE,
+  INDEX `idx_sorogan_sched_day`(`day_of_week` ASC) USING BTREE,
+  INDEX `idx_sorogan_sched_active`(`is_active` ASC) USING BTREE,
+  CONSTRAINT `fk_sorogan_sched_org` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_sorogan_sched_kitab` FOREIGN KEY (`kitab_reference_id`) REFERENCES `kitab_references` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_sorogan_sched_teacher` FOREIGN KEY (`teacher_id`) REFERENCES `teachers` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_sorogan_sched_employee` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_sorogan_sched_dormitory` FOREIGN KEY (`dormitory_id`) REFERENCES `dormitories` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_sorogan_sched_room` FOREIGN KEY (`room_id`) REFERENCES `rooms` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_sorogan_sched_year` FOREIGN KEY (`academic_year_id`) REFERENCES `academic_years` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_sorogan_sched_semester` FOREIGN KEY (`academic_semester_id`) REFERENCES `academic_semesters` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_sorogan_sched_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_sorogan_sched_updated_by` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+```
+
+---
+
+## 📋 3. `sorogan_evaluations`
+
+```sql
+-- ----------------------------
+-- Table structure for sorogan_evaluations
+-- ----------------------------
+DROP TABLE IF EXISTS `sorogan_evaluations`;
+CREATE TABLE `sorogan_evaluations`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `sorogan_session_id` bigint UNSIGNED NULL COMMENT 'FK ke sorogan_sessions',
+  `sorogan_schedule_id` bigint UNSIGNED NULL COMMENT 'FK ke sorogan_schedules',
+  `student_id` bigint UNSIGNED NOT NULL COMMENT 'FK ke students',
+  `teacher_id` bigint UNSIGNED NULL COMMENT 'FK ke teachers',
+  `employee_id` bigint UNSIGNED NULL COMMENT 'FK ke employees',
+  `organization_id` bigint UNSIGNED NULL COMMENT 'FK ke organizations',
+  `kitab_reference_id` bigint UNSIGNED NULL COMMENT 'FK ke kitab_references',
+  `evaluation_date` date NOT NULL,
+  `chapter` varchar(100) NULL,
+  `page_from` int UNSIGNED NULL,
+  `page_to` int UNSIGNED NULL,
+  `content` text NULL,
+  `fluency_score` decimal(5,2) NULL,
+  `tajwid_score` decimal(5,2) NULL,
+  `makhraj_score` decimal(5,2) NULL,
+  `understanding_score` decimal(5,2) NULL,
+  `memorization_score` decimal(5,2) NULL,
+  `final_score` decimal(5,2) NULL,
+  `predicate` varchar(20) NULL,
+  `mastery_level` enum('beginner','intermediate','advanced','expert') NULL,
+  `attendance_status` enum('present','absent','late','sick','permission') NOT NULL DEFAULT 'present',
+  `teacher_notes` text NULL,
+  `recommendations` text NULL,
+  `next_target` text NULL,
+  `status` enum('draft','submitted','reviewed','finalized') NOT NULL DEFAULT 'draft',
+  `reviewed_by` bigint UNSIGNED NULL,
+  `reviewed_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL,
+  `updated_by` bigint UNSIGNED NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_sorogan_eval_session`(`sorogan_session_id` ASC) USING BTREE,
+  INDEX `idx_sorogan_eval_schedule`(`sorogan_schedule_id` ASC) USING BTREE,
+  INDEX `idx_sorogan_eval_student`(`student_id` ASC) USING BTREE,
+  INDEX `idx_sorogan_eval_teacher`(`teacher_id` ASC) USING BTREE,
+  INDEX `idx_sorogan_eval_employee`(`employee_id` ASC) USING BTREE,
+  INDEX `idx_sorogan_eval_org`(`organization_id` ASC) USING BTREE,
+  INDEX `idx_sorogan_eval_kitab`(`kitab_reference_id` ASC) USING BTREE,
+  INDEX `idx_sorogan_eval_date`(`evaluation_date` ASC) USING BTREE,
+  INDEX `idx_sorogan_eval_status`(`status` ASC) USING BTREE,
+  CONSTRAINT `fk_sorogan_eval_session` FOREIGN KEY (`sorogan_session_id`) REFERENCES `sorogan_sessions` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `fk_sorogan_eval_schedule` FOREIGN KEY (`sorogan_schedule_id`) REFERENCES `sorogan_schedules` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_sorogan_eval_student` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `fk_sorogan_eval_teacher` FOREIGN KEY (`teacher_id`) REFERENCES `teachers` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_sorogan_eval_employee` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_sorogan_eval_org` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_sorogan_eval_kitab` FOREIGN KEY (`kitab_reference_id`) REFERENCES `kitab_references` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_sorogan_eval_reviewed_by` FOREIGN KEY (`reviewed_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_sorogan_eval_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_sorogan_eval_updated_by` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+```
+
+---
+
+## 📋 4. `pesantren_activities`
+
+```sql
+-- ----------------------------
+-- Table structure for pesantren_activities
+-- ----------------------------
+DROP TABLE IF EXISTS `pesantren_activities`;
+CREATE TABLE `pesantren_activities`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `organization_id` bigint UNSIGNED NULL COMMENT 'FK ke organizations',
+  `dormitory_id` bigint UNSIGNED NULL COMMENT 'FK ke dormitories',
+  `room_id` bigint UNSIGNED NULL COMMENT 'FK ke rooms',
+  `kitab_reference_id` bigint UNSIGNED NULL COMMENT 'FK ke kitab_references',
+  `academic_year_id` bigint UNSIGNED NULL COMMENT 'FK ke academic_years',
+  `academic_semester_id` bigint UNSIGNED NULL COMMENT 'FK ke academic_semesters',
+  `code` varchar(50) NOT NULL COMMENT 'Kode kegiatan',
+  `name` varchar(200) NOT NULL COMMENT 'Nama kegiatan',
+  `slug` varchar(200) NOT NULL COMMENT 'Slug untuk URL',
+  `category` enum('kajian','halaqah','musyawarah','lomba','haul','wisuda','rihlah','olahraga','seni','sosial','lainnya') NOT NULL DEFAULT 'kajian',
+  `activity_type` enum('routine','special','annual','temporary') NOT NULL DEFAULT 'routine',
+  `description` text NULL,
+  `objectives` text NULL,
+  `start_date` date NOT NULL,
+  `end_date` date NULL,
+  `start_time` time NULL,
+  `end_time` time NULL,
+  `location` varchar(255) NULL,
+  `speaker_name` varchar(200) NULL,
+  `speaker_phone` varchar(30) NULL,
+  `quota` int UNSIGNED NOT NULL DEFAULT 0,
+  `registered` int UNSIGNED NOT NULL DEFAULT 0,
+  `attended` int UNSIGNED NOT NULL DEFAULT 0,
+  `is_mandatory` tinyint(1) NOT NULL DEFAULT 0,
+  `is_public` tinyint(1) NOT NULL DEFAULT 0,
+  `requires_registration` tinyint(1) NOT NULL DEFAULT 0,
+  `registration_open` date NULL,
+  `registration_close` date NULL,
+  `budget` decimal(15,2) NULL,
+  `actual_cost` decimal(15,2) NULL,
+  `currency_id` bigint UNSIGNED NULL,
+  `poster_path` varchar(255) NULL,
+  `documentation_paths` json NULL,
+  `status` enum('draft','published','ongoing','completed','cancelled','postponed') NOT NULL DEFAULT 'draft',
+  `created_by` bigint UNSIGNED NULL,
+  `updated_by` bigint UNSIGNED NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uk_pesantren_activities_code`(`code` ASC, `organization_id` ASC) USING BTREE,
+  UNIQUE INDEX `uk_pesantren_activities_slug`(`slug` ASC) USING BTREE,
+  INDEX `idx_pesantren_activities_org`(`organization_id` ASC) USING BTREE,
+  INDEX `idx_pesantren_activities_dormitory`(`dormitory_id` ASC) USING BTREE,
+  INDEX `idx_pesantren_activities_room`(`room_id` ASC) USING BTREE,
+  INDEX `idx_pesantren_activities_kitab`(`kitab_reference_id` ASC) USING BTREE,
+  INDEX `idx_pesantren_activities_year`(`academic_year_id` ASC) USING BTREE,
+  INDEX `idx_pesantren_activities_semester`(`academic_semester_id` ASC) USING BTREE,
+  INDEX `idx_pesantren_activities_category`(`category` ASC) USING BTREE,
+  INDEX `idx_pesantren_activities_type`(`activity_type` ASC) USING BTREE,
+  INDEX `idx_pesantren_activities_start`(`start_date` ASC) USING BTREE,
+  INDEX `idx_pesantren_activities_status`(`status` ASC) USING BTREE,
+  CONSTRAINT `fk_pesantren_activities_org` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_pesantren_activities_dormitory` FOREIGN KEY (`dormitory_id`) REFERENCES `dormitories` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_pesantren_activities_room` FOREIGN KEY (`room_id`) REFERENCES `rooms` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_pesantren_activities_kitab` FOREIGN KEY (`kitab_reference_id`) REFERENCES `kitab_references` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_pesantren_activities_year` FOREIGN KEY (`academic_year_id`) REFERENCES `academic_years` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_pesantren_activities_semester` FOREIGN KEY (`academic_semester_id`) REFERENCES `academic_semesters` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_pesantren_activities_currency` FOREIGN KEY (`currency_id`) REFERENCES `currencies` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_pesantren_activities_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_pesantren_activities_updated_by` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+```
+
+---
+
+## 📋 5. `pesantren_rules`
+
+```sql
+-- ----------------------------
+-- Table structure for pesantren_rules
+-- ----------------------------
+DROP TABLE IF EXISTS `pesantren_rules`;
+CREATE TABLE `pesantren_rules`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `organization_id` bigint UNSIGNED NULL COMMENT 'FK ke organizations',
+  `dormitory_id` bigint UNSIGNED NULL COMMENT 'FK ke dormitories',
+  `parent_id` bigint UNSIGNED NULL COMMENT 'FK ke pesantren_rules (hierarki)',
+  `code` varchar(50) NOT NULL COMMENT 'Kode peraturan',
+  `title` varchar(200) NOT NULL COMMENT 'Judul peraturan',
+  `slug` varchar(200) NOT NULL COMMENT 'Slug untuk URL',
+  `category` enum('discipline','worship','study','dormitory','health','security','ethics','uniform','technology','other') NOT NULL DEFAULT 'discipline',
+  `description` text NOT NULL,
+  `legal_basis` text NULL,
+  `severity` enum('light','medium','heavy','severe') NOT NULL DEFAULT 'light',
+  `sanction_type` enum('warning','point','detention','suspension','expulsion','community_service','other') NULL,
+  `sanction_points` int UNSIGNED NOT NULL DEFAULT 0,
+  `effective_date` date NULL,
+  `expiry_date` date NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `sort_order` int UNSIGNED NOT NULL DEFAULT 0,
+  `document_path` varchar(255) NULL,
+  `created_by` bigint UNSIGNED NULL,
+  `updated_by` bigint UNSIGNED NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uk_pesantren_rules_code`(`code` ASC, `organization_id` ASC) USING BTREE,
+  UNIQUE INDEX `uk_pesantren_rules_slug`(`slug` ASC) USING BTREE,
+  INDEX `idx_pesantren_rules_org`(`organization_id` ASC) USING BTREE,
+  INDEX `idx_pesantren_rules_dormitory`(`dormitory_id` ASC) USING BTREE,
+  INDEX `idx_pesantren_rules_parent`(`parent_id` ASC) USING BTREE,
+  INDEX `idx_pesantren_rules_category`(`category` ASC) USING BTREE,
+  INDEX `idx_pesantren_rules_severity`(`severity` ASC) USING BTREE,
+  INDEX `idx_pesantren_rules_active`(`is_active` ASC) USING BTREE,
+  CONSTRAINT `fk_pesantren_rules_org` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_pesantren_rules_dormitory` FOREIGN KEY (`dormitory_id`) REFERENCES `dormitories` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_pesantren_rules_parent` FOREIGN KEY (`parent_id`) REFERENCES `pesantren_rules` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_pesantren_rules_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_pesantren_rules_updated_by` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+```
+
+---
+
+## 📋 6. `pesantren_rule_violations`
+
+```sql
+-- ----------------------------
+-- Table structure for pesantren_rule_violations
+-- ----------------------------
+DROP TABLE IF EXISTS `pesantren_rule_violations`;
+CREATE TABLE `pesantren_rule_violations`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `pesantren_rule_id` bigint UNSIGNED NOT NULL COMMENT 'FK ke pesantren_rules',
+  `student_id` bigint UNSIGNED NOT NULL COMMENT 'FK ke students',
+  `organization_id` bigint UNSIGNED NULL COMMENT 'FK ke organizations',
+  `dormitory_id` bigint UNSIGNED NULL COMMENT 'FK ke dormitories',
+  `reporter_id` bigint UNSIGNED NULL COMMENT 'FK ke users yang melaporkan',
+  `handler_id` bigint UNSIGNED NULL COMMENT 'FK ke users yang menangani',
+  `violation_number` varchar(50) NOT NULL,
+  `violation_date` date NOT NULL,
+  `violation_time` time NULL,
+  `location` varchar(255) NULL,
+  `description` text NOT NULL,
+  `evidence_paths` json NULL,
+  `witnesses` text NULL,
+  `severity` enum('light','medium','heavy','severe') NOT NULL DEFAULT 'light',
+  `sanction_type` enum('warning','point','detention','suspension','expulsion','community_service','other') NULL,
+  `sanction_points` int UNSIGNED NOT NULL DEFAULT 0,
+  `sanction_description` text NULL,
+  `sanction_start_date` date NULL,
+  `sanction_end_date` date NULL,
+  `status` enum('reported','investigating','resolved','appealed','closed','cancelled') NOT NULL DEFAULT 'reported',
+  `student_statement` text NULL,
+  `parent_notified` tinyint(1) NOT NULL DEFAULT 0,
+  `parent_notified_at` timestamp NULL DEFAULT NULL,
+  `parent_response` text NULL,
+  `resolved_at` timestamp NULL DEFAULT NULL,
+  `resolution_notes` text NULL,
+  `appeal_reason` text NULL,
+  `appeal_status` enum('none','pending','accepted','rejected') NOT NULL DEFAULT 'none',
+  `appeal_decided_by` bigint UNSIGNED NULL,
+  `appeal_decided_at` timestamp NULL DEFAULT NULL,
+  `notes` text NULL,
+  `created_by` bigint UNSIGNED NULL,
+  `updated_by` bigint UNSIGNED NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uk_pesantren_violation_number`(`violation_number` ASC) USING BTREE,
+  INDEX `idx_pesantren_violation_rule`(`pesantren_rule_id` ASC) USING BTREE,
+  INDEX `idx_pesantren_violation_student`(`student_id` ASC) USING BTREE,
+  INDEX `idx_pesantren_violation_org`(`organization_id` ASC) USING BTREE,
+  INDEX `idx_pesantren_violation_dormitory`(`dormitory_id` ASC) USING BTREE,
+  INDEX `idx_pesantren_violation_reporter`(`reporter_id` ASC) USING BTREE,
+  INDEX `idx_pesantren_violation_handler`(`handler_id` ASC) USING BTREE,
+  INDEX `idx_pesantren_violation_date`(`violation_date` ASC) USING BTREE,
+  INDEX `idx_pesantren_violation_severity`(`severity` ASC) USING BTREE,
+  INDEX `idx_pesantren_violation_status`(`status` ASC) USING BTREE,
+  CONSTRAINT `fk_pesantren_violation_rule` FOREIGN KEY (`pesantren_rule_id`) REFERENCES `pesantren_rules` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `fk_pesantren_violation_student` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `fk_pesantren_violation_org` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_pesantren_violation_dormitory` FOREIGN KEY (`dormitory_id`) REFERENCES `dormitories` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_pesantren_violation_reporter` FOREIGN KEY (`reporter_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_pesantren_violation_handler` FOREIGN KEY (`handler_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_pesantren_violation_appeal_decided_by` FOREIGN KEY (`appeal_decided_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_pesantren_violation_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_pesantren_violation_updated_by` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+```
+
+---
+
+## 📋 7. `dormitory_permits`
+
+```sql
+-- ----------------------------
+-- Table structure for dormitory_permits
+-- ----------------------------
+DROP TABLE IF EXISTS `dormitory_permits`;
+CREATE TABLE `dormitory_permits`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `student_id` bigint UNSIGNED NOT NULL COMMENT 'FK ke students',
+  `dormitory_assignment_id` bigint UNSIGNED NULL COMMENT 'FK ke dormitory_assignments',
+  `organization_id` bigint UNSIGNED NULL COMMENT 'FK ke organizations',
+  `dormitory_id` bigint UNSIGNED NULL COMMENT 'FK ke dormitories',
+  `permit_number` varchar(50) NOT NULL,
+  `permit_type` enum('leave','overnight','sick','emergency','home_visit','medical','family','other') NOT NULL DEFAULT 'leave',
+  `reason` text NOT NULL,
+  `destination` varchar(255) NULL,
+  `start_datetime` datetime NOT NULL,
+  `end_datetime` datetime NOT NULL,
+  `actual_return_datetime` datetime NULL,
+  `duration_hours` int UNSIGNED NULL,
+  `status` enum('draft','pending','approved','rejected','ongoing','returned','late_return','overdue','cancelled') NOT NULL DEFAULT 'pending',
+  `approved_by` bigint UNSIGNED NULL,
+  `approved_at` timestamp NULL DEFAULT NULL,
+  `rejected_by` bigint UNSIGNED NULL,
+  `rejected_at` timestamp NULL DEFAULT NULL,
+  `rejection_reason` text NULL,
+  `guardian_name` varchar(150) NULL,
+  `guardian_phone` varchar(30) NULL,
+  `guardian_relationship` varchar(50) NULL,
+  `escort_name` varchar(150) NULL,
+  `escort_phone` varchar(30) NULL,
+  `contact_during_leave` varchar(30) NULL,
+  `address_during_leave` text NULL,
+  `return_notes` text NULL,
+  `late_return_reason` text NULL,
+  `sanction_applied` tinyint(1) NOT NULL DEFAULT 0,
+  `sanction_description` text NULL,
+  `attachment_path` varchar(255) NULL,
+  `notes` text NULL,
+  `created_by` bigint UNSIGNED NULL,
+  `updated_by` bigint UNSIGNED NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uk_dormitory_permit_number`(`permit_number` ASC) USING BTREE,
+  INDEX `idx_dormitory_permit_student`(`student_id` ASC) USING BTREE,
+  INDEX `idx_dormitory_permit_assignment`(`dormitory_assignment_id` ASC) USING BTREE,
+  INDEX `idx_dormitory_permit_org`(`organization_id` ASC) USING BTREE,
+  INDEX `idx_dormitory_permit_dormitory`(`dormitory_id` ASC) USING BTREE,
+  INDEX `idx_dormitory_permit_type`(`permit_type` ASC) USING BTREE,
+  INDEX `idx_dormitory_permit_status`(`status` ASC) USING BTREE,
+  INDEX `idx_dormitory_permit_start`(`start_datetime` ASC) USING BTREE,
+  INDEX `idx_dormitory_permit_end`(`end_datetime` ASC) USING BTREE,
+  CONSTRAINT `fk_dormitory_permit_student` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `fk_dormitory_permit_assignment` FOREIGN KEY (`dormitory_assignment_id`) REFERENCES `dormitory_assignments` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_dormitory_permit_org` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_dormitory_permit_dormitory` FOREIGN KEY (`dormitory_id`) REFERENCES `dormitories` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_dormitory_permit_approved_by` FOREIGN KEY (`approved_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_dormitory_permit_rejected_by` FOREIGN KEY (`rejected_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_dormitory_permit_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_dormitory_permit_updated_by` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+```
+
+---
+
+✅ **Batch 1 selesai — 7 tabel Pesantren Lanjutan.**
+
+Berikutnya saya akan lanjutkan ke **Batch 2: Komunikasi Lanjutan (8 tabel)**. Apakah saya lanjutkan sekarang? Atau Anda ingin saya kirim per batch agar lebih mudah di-copy?
+Baik, lanjut ke **Batch 2: Komunikasi Lanjutan (8 tabel)**.
+
+Saya asumsikan Anda sudah punya tabel `users`, `students`, `employees`, `organizations`, `announcements`, `messages`, dan `notifications` sebagai referensi FK.
+
+---
+
+## 📋 1. `notification_templates`
+
+Template notifikasi untuk berbagai channel (email, WA, SMS, push).
+
+```sql
+-- ----------------------------
+-- Table structure for notification_templates
+-- ----------------------------
+DROP TABLE IF EXISTS `notification_templates`;
+CREATE TABLE `notification_templates`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `organization_id` bigint UNSIGNED NULL COMMENT 'FK ke organizations, NULL untuk global',
+  `code` varchar(100) NOT NULL COMMENT 'Kode unik template, misal: INVOICE_PAID',
+  `name` varchar(200) NOT NULL COMMENT 'Nama template',
+  `category` enum('academic','finance','attendance','admission','announcement','reminder','alert','system','marketing','other') NOT NULL DEFAULT 'system' COMMENT 'Kategori notifikasi',
+  `channel` enum('email','whatsapp','sms','push','in_app','webhook','all') NOT NULL DEFAULT 'email' COMMENT 'Channel pengiriman',
+  `subject` varchar(255) NULL COMMENT 'Subjek (untuk email)',
+  `title` varchar(255) NULL COMMENT 'Judul (untuk push/in-app)',
+  `body` longtext NOT NULL COMMENT 'Isi template (bisa dengan placeholder {{name}})',
+  `body_html` longtext NULL COMMENT 'Isi HTML (untuk email)',
+  `variables` json NULL COMMENT 'Daftar variabel yang tersedia',
+  `language` varchar(10) NOT NULL DEFAULT 'id' COMMENT 'Kode bahasa',
+  `sender_name` varchar(150) NULL COMMENT 'Nama pengirim',
+  `sender_email` varchar(150) NULL,
+  `sender_phone` varchar(30) NULL,
+  `attachment_path` varchar(255) NULL COMMENT 'Lampiran default',
+  `priority` enum('low','normal','high','urgent') NOT NULL DEFAULT 'normal',
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `is_system` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika template sistem (tidak bisa dihapus)',
+  `version` int UNSIGNED NOT NULL DEFAULT 1,
+  `created_by` bigint UNSIGNED NULL,
+  `updated_by` bigint UNSIGNED NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uk_notification_templates_code`(`code` ASC, `organization_id` ASC, `channel` ASC, `language` ASC) USING BTREE,
+  INDEX `idx_notification_templates_org`(`organization_id` ASC) USING BTREE,
+  INDEX `idx_notification_templates_category`(`category` ASC) USING BTREE,
+  INDEX `idx_notification_templates_channel`(`channel` ASC) USING BTREE,
+  INDEX `idx_notification_templates_active`(`is_active` ASC) USING BTREE,
+  INDEX `idx_notification_templates_system`(`is_system` ASC) USING BTREE,
+  CONSTRAINT `fk_notification_templates_org` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `fk_notification_templates_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_notification_templates_updated_by` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+```
+
+---
+
+## 📋 2. `notification_preferences`
+
+Preferensi notifikasi per user (channel mana yang aktif, kategori mana yang di-subscribe).
+
+```sql
+-- ----------------------------
+-- Table structure for notification_preferences
+-- ----------------------------
+DROP TABLE IF EXISTS `notification_preferences`;
+CREATE TABLE `notification_preferences`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `user_id` bigint UNSIGNED NOT NULL COMMENT 'FK ke users',
+  `organization_id` bigint UNSIGNED NULL COMMENT 'FK ke organizations',
+  `category` enum('academic','finance','attendance','admission','announcement','reminder','alert','system','marketing','other') NOT NULL COMMENT 'Kategori notifikasi',
+  `email_enabled` tinyint(1) NOT NULL DEFAULT 1 COMMENT '1 jika email aktif',
+  `whatsapp_enabled` tinyint(1) NOT NULL DEFAULT 1 COMMENT '1 jika WA aktif',
+  `sms_enabled` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika SMS aktif',
+  `push_enabled` tinyint(1) NOT NULL DEFAULT 1 COMMENT '1 jika push aktif',
+  `in_app_enabled` tinyint(1) NOT NULL DEFAULT 1 COMMENT '1 jika in-app aktif',
+  `quiet_hours_start` time NULL COMMENT 'Jam mulai mode senyap',
+  `quiet_hours_end` time NULL COMMENT 'Jam selesai mode senyap',
+  `digest_frequency` enum('instant','hourly','daily','weekly','never') NOT NULL DEFAULT 'instant' COMMENT 'Frekuensi digest',
+  `language` varchar(10) NOT NULL DEFAULT 'id' COMMENT 'Preferensi bahasa',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uk_notification_preferences_user_category`(`user_id` ASC, `category` ASC) USING BTREE,
+  INDEX `idx_notification_preferences_user`(`user_id` ASC) USING BTREE,
+  INDEX `idx_notification_preferences_org`(`organization_id` ASC) USING BTREE,
+  INDEX `idx_notification_preferences_category`(`category` ASC) USING BTREE,
+  CONSTRAINT `fk_notification_preferences_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `fk_notification_preferences_org` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+```
+
+---
+
+## 📋 3. `whatsapp_logs`
+
+Log pengiriman WhatsApp.
+
+```sql
+-- ----------------------------
+-- Table structure for whatsapp_logs
+-- ----------------------------
+DROP TABLE IF EXISTS `whatsapp_logs`;
+CREATE TABLE `whatsapp_logs`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `organization_id` bigint UNSIGNED NULL COMMENT 'FK ke organizations',
+  `notification_template_id` bigint UNSIGNED NULL COMMENT 'FK ke notification_templates',
+  `recipient_user_id` bigint UNSIGNED NULL COMMENT 'FK ke users (jika penerima user)',
+  `recipient_student_id` bigint UNSIGNED NULL COMMENT 'FK ke students',
+  `recipient_employee_id` bigint UNSIGNED NULL COMMENT 'FK ke employees',
+  `phone_number` varchar(30) NOT NULL COMMENT 'Nomor WA tujuan',
+  `recipient_name` varchar(150) NULL COMMENT 'Nama penerima',
+  `message_type` enum('text','image','document','video','audio','template','interactive') NOT NULL DEFAULT 'text' COMMENT 'Tipe pesan',
+  `message_body` text NULL COMMENT 'Isi pesan',
+  `template_name` varchar(100) NULL COMMENT 'Nama template WA (jika pakai template)',
+  `template_variables` json NULL COMMENT 'Variabel template',
+  `media_url` varchar(255) NULL COMMENT 'URL media',
+  `media_path` varchar(255) NULL COMMENT 'Path media lokal',
+  `provider` enum('twilio','fonnte','wablas','wati','meta','other') NOT NULL DEFAULT 'meta' COMMENT 'Provider WA',
+  `provider_message_id` varchar(255) NULL COMMENT 'ID pesan dari provider',
+  `provider_response` json NULL COMMENT 'Response dari provider',
+  `status` enum('queued','sending','sent','delivered','read','failed','undelivered','rejected') NOT NULL DEFAULT 'queued' COMMENT 'Status pengiriman',
+  `error_code` varchar(50) NULL,
+  `error_message` text NULL,
+  `retry_count` int UNSIGNED NOT NULL DEFAULT 0,
+  `max_retries` int UNSIGNED NOT NULL DEFAULT 3,
+  `scheduled_at` timestamp NULL DEFAULT NULL COMMENT 'Waktu dijadwalkan',
+  `sent_at` timestamp NULL DEFAULT NULL COMMENT 'Waktu terkirim',
+  `delivered_at` timestamp NULL DEFAULT NULL COMMENT 'Waktu diterima',
+  `read_at` timestamp NULL DEFAULT NULL COMMENT 'Waktu dibaca',
+  `failed_at` timestamp NULL DEFAULT NULL COMMENT 'Waktu gagal',
+  `cost` decimal(15,4) NULL COMMENT 'Biaya pengiriman',
+  `currency_id` bigint UNSIGNED NULL,
+  `reference_type` varchar(100) NULL COMMENT 'Tipe referensi (invoice, announcement, dll)',
+  `reference_id` bigint UNSIGNED NULL COMMENT 'ID referensi',
+  `created_by` bigint UNSIGNED NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_whatsapp_logs_org`(`organization_id` ASC) USING BTREE,
+  INDEX `idx_whatsapp_logs_template`(`notification_template_id` ASC) USING BTREE,
+  INDEX `idx_whatsapp_logs_recipient_user`(`recipient_user_id` ASC) USING BTREE,
+  INDEX `idx_whatsapp_logs_recipient_student`(`recipient_student_id` ASC) USING BTREE,
+  INDEX `idx_whatsapp_logs_recipient_employee`(`recipient_employee_id` ASC) USING BTREE,
+  INDEX `idx_whatsapp_logs_phone`(`phone_number` ASC) USING BTREE,
+  INDEX `idx_whatsapp_logs_status`(`status` ASC) USING BTREE,
+  INDEX `idx_whatsapp_logs_sent`(`sent_at` ASC) USING BTREE,
+  INDEX `idx_whatsapp_logs_reference`(`reference_type` ASC, `reference_id` ASC) USING BTREE,
+  CONSTRAINT `fk_whatsapp_logs_org` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_whatsapp_logs_template` FOREIGN KEY (`notification_template_id`) REFERENCES `notification_templates` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_whatsapp_logs_recipient_user` FOREIGN KEY (`recipient_user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_whatsapp_logs_recipient_student` FOREIGN KEY (`recipient_student_id`) REFERENCES `students` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_whatsapp_logs_recipient_employee` FOREIGN KEY (`recipient_employee_id`) REFERENCES `employees` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_whatsapp_logs_currency` FOREIGN KEY (`currency_id`) REFERENCES `currencies` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_whatsapp_logs_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+```
+
+---
+
+## 📋 4. `sms_logs`
+
+Log pengiriman SMS.
+
+```sql
+-- ----------------------------
+-- Table structure for sms_logs
+-- ----------------------------
+DROP TABLE IF EXISTS `sms_logs`;
+CREATE TABLE `sms_logs`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `organization_id` bigint UNSIGNED NULL COMMENT 'FK ke organizations',
+  `notification_template_id` bigint UNSIGNED NULL COMMENT 'FK ke notification_templates',
+  `recipient_user_id` bigint UNSIGNED NULL COMMENT 'FK ke users',
+  `recipient_student_id` bigint UNSIGNED NULL COMMENT 'FK ke students',
+  `recipient_employee_id` bigint UNSIGNED NULL COMMENT 'FK ke employees',
+  `phone_number` varchar(30) NOT NULL COMMENT 'Nomor SMS tujuan',
+  `recipient_name` varchar(150) NULL,
+  `message_body` text NOT NULL COMMENT 'Isi SMS',
+  `message_length` int UNSIGNED NULL COMMENT 'Panjang pesan',
+  `message_parts` int UNSIGNED NOT NULL DEFAULT 1 COMMENT 'Jumlah parts (jika > 160 char)',
+  `provider` enum('twilio','nexmo','vonage','local','other') NOT NULL DEFAULT 'twilio' COMMENT 'Provider SMS',
+  `provider_message_id` varchar(255) NULL,
+  `provider_response` json NULL,
+  `sender_id` varchar(50) NULL COMMENT 'Sender ID / nomor pengirim',
+  `status` enum('queued','sending','sent','delivered','failed','undelivered','rejected') NOT NULL DEFAULT 'queued',
+  `error_code` varchar(50) NULL,
+  `error_message` text NULL,
+  `retry_count` int UNSIGNED NOT NULL DEFAULT 0,
+  `max_retries` int UNSIGNED NOT NULL DEFAULT 3,
+  `scheduled_at` timestamp NULL DEFAULT NULL,
+  `sent_at` timestamp NULL DEFAULT NULL,
+  `delivered_at` timestamp NULL DEFAULT NULL,
+  `failed_at` timestamp NULL DEFAULT NULL,
+  `cost` decimal(15,4) NULL,
+  `currency_id` bigint UNSIGNED NULL,
+  `reference_type` varchar(100) NULL,
+  `reference_id` bigint UNSIGNED NULL,
+  `created_by` bigint UNSIGNED NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_sms_logs_org`(`organization_id` ASC) USING BTREE,
+  INDEX `idx_sms_logs_template`(`notification_template_id` ASC) USING BTREE,
+  INDEX `idx_sms_logs_recipient_user`(`recipient_user_id` ASC) USING BTREE,
+  INDEX `idx_sms_logs_recipient_student`(`recipient_student_id` ASC) USING BTREE,
+  INDEX `idx_sms_logs_recipient_employee`(`recipient_employee_id` ASC) USING BTREE,
+  INDEX `idx_sms_logs_phone`(`phone_number` ASC) USING BTREE,
+  INDEX `idx_sms_logs_status`(`status` ASC) USING BTREE,
+  INDEX `idx_sms_logs_sent`(`sent_at` ASC) USING BTREE,
+  INDEX `idx_sms_logs_reference`(`reference_type` ASC, `reference_id` ASC) USING BTREE,
+  CONSTRAINT `fk_sms_logs_org` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_sms_logs_template` FOREIGN KEY (`notification_template_id`) REFERENCES `notification_templates` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_sms_logs_recipient_user` FOREIGN KEY (`recipient_user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_sms_logs_recipient_student` FOREIGN KEY (`recipient_student_id`) REFERENCES `students` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_sms_logs_recipient_employee` FOREIGN KEY (`recipient_employee_id`) REFERENCES `employees` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_sms_logs_currency` FOREIGN KEY (`currency_id`) REFERENCES `currencies` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_sms_logs_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+```
+
+---
+
+## 📋 5. `email_logs`
+
+Log pengiriman email.
+
+```sql
+-- ----------------------------
+-- Table structure for email_logs
+-- ----------------------------
+DROP TABLE IF EXISTS `email_logs`;
+CREATE TABLE `email_logs`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `organization_id` bigint UNSIGNED NULL COMMENT 'FK ke organizations',
+  `notification_template_id` bigint UNSIGNED NULL COMMENT 'FK ke notification_templates',
+  `recipient_user_id` bigint UNSIGNED NULL COMMENT 'FK ke users',
+  `recipient_student_id` bigint UNSIGNED NULL COMMENT 'FK ke students',
+  `recipient_employee_id` bigint UNSIGNED NULL COMMENT 'FK ke employees',
+  `to_email` varchar(255) NOT NULL COMMENT 'Email tujuan',
+  `to_name` varchar(150) NULL COMMENT 'Nama penerima',
+  `cc` json NULL COMMENT 'Daftar CC',
+  `bcc` json NULL COMMENT 'Daftar BCC',
+  `from_email` varchar(255) NULL COMMENT 'Email pengirim',
+  `from_name` varchar(150) NULL COMMENT 'Nama pengirim',
+  `reply_to` varchar(255) NULL,
+  `subject` varchar(255) NOT NULL COMMENT 'Subjek email',
+  `body` longtext NULL COMMENT 'Isi email (text)',
+  `body_html` longtext NULL COMMENT 'Isi email (HTML)',
+  `attachments` json NULL COMMENT 'Daftar lampiran',
+  `provider` enum('smtp','mailgun','ses','postmark','sendgrid','resend','other') NOT NULL DEFAULT 'smtp' COMMENT 'Provider email',
+  `provider_message_id` varchar(255) NULL,
+  `provider_response` json NULL,
+  `status` enum('queued','sending','sent','delivered','bounced','failed','rejected','spam') NOT NULL DEFAULT 'queued',
+  `error_code` varchar(50) NULL,
+  `error_message` text NULL,
+  `retry_count` int UNSIGNED NOT NULL DEFAULT 0,
+  `max_retries` int UNSIGNED NOT NULL DEFAULT 3,
+  `scheduled_at` timestamp NULL DEFAULT NULL,
+  `sent_at` timestamp NULL DEFAULT NULL,
+  `delivered_at` timestamp NULL DEFAULT NULL,
+  `opened_at` timestamp NULL DEFAULT NULL COMMENT 'Waktu dibuka',
+  `clicked_at` timestamp NULL DEFAULT NULL COMMENT 'Waktu link diklik',
+  `bounced_at` timestamp NULL DEFAULT NULL,
+  `failed_at` timestamp NULL DEFAULT NULL,
+  `open_count` int UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Jumlah dibuka',
+  `click_count` int UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Jumlah klik',
+  `reference_type` varchar(100) NULL,
+  `reference_id` bigint UNSIGNED NULL,
+  `created_by` bigint UNSIGNED NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_email_logs_org`(`organization_id` ASC) USING BTREE,
+  INDEX `idx_email_logs_template`(`notification_template_id` ASC) USING BTREE,
+  INDEX `idx_email_logs_recipient_user`(`recipient_user_id` ASC) USING BTREE,
+  INDEX `idx_email_logs_recipient_student`(`recipient_student_id` ASC) USING BTREE,
+  INDEX `idx_email_logs_recipient_employee`(`recipient_employee_id` ASC) USING BTREE,
+  INDEX `idx_email_logs_to`(`to_email` ASC) USING BTREE,
+  INDEX `idx_email_logs_status`(`status` ASC) USING BTREE,
+  INDEX `idx_email_logs_sent`(`sent_at` ASC) USING BTREE,
+  INDEX `idx_email_logs_reference`(`reference_type` ASC, `reference_id` ASC) USING BTREE,
+  CONSTRAINT `fk_email_logs_org` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_email_logs_template` FOREIGN KEY (`notification_template_id`) REFERENCES `notification_templates` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_email_logs_recipient_user` FOREIGN KEY (`recipient_user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_email_logs_recipient_student` FOREIGN KEY (`recipient_student_id`) REFERENCES `students` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_email_logs_recipient_employee` FOREIGN KEY (`recipient_employee_id`) REFERENCES `employees` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_email_logs_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+```
+
+---
+
+## 📋 6. `push_notification_tokens`
+
+Token push notification (FCM/APNs) untuk mobile app.
+
+```sql
+-- ----------------------------
+-- Table structure for push_notification_tokens
+-- ----------------------------
+DROP TABLE IF EXISTS `push_notification_tokens`;
+CREATE TABLE `push_notification_tokens`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `user_id` bigint UNSIGNED NOT NULL COMMENT 'FK ke users',
+  `organization_id` bigint UNSIGNED NULL COMMENT 'FK ke organizations',
+  `token` text NOT NULL COMMENT 'Token FCM/APNs',
+  `token_hash` varchar(64) NOT NULL COMMENT 'Hash token untuk unique index',
+  `platform` enum('android','ios','web','huawei','other') NOT NULL DEFAULT 'android' COMMENT 'Platform',
+  `device_id` varchar(255) NULL COMMENT 'ID unik device',
+  `device_name` varchar(150) NULL COMMENT 'Nama device',
+  `device_model` varchar(150) NULL COMMENT 'Model device',
+  `os_version` varchar(50) NULL COMMENT 'Versi OS',
+  `app_version` varchar(50) NULL COMMENT 'Versi aplikasi',
+  `provider` enum('fcm','apns','huawei','web_push','other') NOT NULL DEFAULT 'fcm' COMMENT 'Provider push',
+  `locale` varchar(10) NULL COMMENT 'Locale device',
+  `timezone` varchar(50) NULL COMMENT 'Timezone device',
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `last_used_at` timestamp NULL DEFAULT NULL COMMENT 'Terakhir digunakan',
+  `expires_at` timestamp NULL DEFAULT NULL COMMENT 'Kadaluarsa token',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uk_push_tokens_hash`(`token_hash` ASC) USING BTREE,
+  INDEX `idx_push_tokens_user`(`user_id` ASC) USING BTREE,
+  INDEX `idx_push_tokens_org`(`organization_id` ASC) USING BTREE,
+  INDEX `idx_push_tokens_platform`(`platform` ASC) USING BTREE,
+  INDEX `idx_push_tokens_active`(`is_active` ASC) USING BTREE,
+  INDEX `idx_push_tokens_last_used`(`last_used_at` ASC) USING BTREE,
+  CONSTRAINT `fk_push_tokens_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `fk_push_tokens_org` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+```
+
+---
+
+## 📋 7. `message_threads`
+
+Thread percakapan (grup chat).
+
+```sql
+-- ----------------------------
+-- Table structure for message_threads
+-- ----------------------------
+DROP TABLE IF EXISTS `message_threads`;
+CREATE TABLE `message_threads`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `organization_id` bigint UNSIGNED NULL COMMENT 'FK ke organizations',
+  `created_by` bigint UNSIGNED NULL COMMENT 'FK ke users pembuat thread',
+  `thread_type` enum('direct','group','class','announcement','support','other') NOT NULL DEFAULT 'direct' COMMENT 'Tipe thread',
+  `title` varchar(255) NULL COMMENT 'Judul thread (untuk grup)',
+  `description` text NULL COMMENT 'Deskripsi thread',
+  `avatar_path` varchar(255) NULL COMMENT 'Avatar thread',
+  `reference_type` varchar(100) NULL COMMENT 'Tipe referensi (classroom, extracurricular, dll)',
+  `reference_id` bigint UNSIGNED NULL COMMENT 'ID referensi',
+  `is_locked` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika thread dikunci',
+  `is_pinned` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika di-pin',
+  `allow_attachments` tinyint(1) NOT NULL DEFAULT 1,
+  `allow_reactions` tinyint(1) NOT NULL DEFAULT 1,
+  `max_participants` int UNSIGNED NULL COMMENT 'Maks peserta',
+  `last_message_at` timestamp NULL DEFAULT NULL COMMENT 'Waktu pesan terakhir',
+  `last_message_id` bigint UNSIGNED NULL COMMENT 'ID pesan terakhir',
+  `message_count` int UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Jumlah pesan',
+  `is_archived` tinyint(1) NOT NULL DEFAULT 0,
+  `archived_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_message_threads_org`(`organization_id` ASC) USING BTREE,
+  INDEX `idx_message_threads_creator`(`created_by` ASC) USING BTREE,
+  INDEX `idx_message_threads_type`(`thread_type` ASC) USING BTREE,
+  INDEX `idx_message_threads_reference`(`reference_type` ASC, `reference_id` ASC) USING BTREE,
+  INDEX `idx_message_threads_last_message`(`last_message_at` ASC) USING BTREE,
+  INDEX `idx_message_threads_archived`(`is_archived` ASC) USING BTREE,
+  CONSTRAINT `fk_message_threads_org` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `fk_message_threads_creator` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+```
+
+---
+
+## 📋 8. `message_participants`
+
+Peserta thread percakapan.
+
+```sql
+-- ----------------------------
+-- Table structure for message_participants
+-- ----------------------------
+DROP TABLE IF EXISTS `message_participants`;
+CREATE TABLE `message_participants`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `message_thread_id` bigint UNSIGNED NOT NULL COMMENT 'FK ke message_threads',
+  `user_id` bigint UNSIGNED NOT NULL COMMENT 'FK ke users',
+  `role` enum('owner','admin','moderator','member','guest','readonly') NOT NULL DEFAULT 'member' COMMENT 'Peran di thread',
+  `nickname` varchar(100) NULL COMMENT 'Nama panggilan di thread',
+  `is_muted` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika di-mute',
+  `is_pinned` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika di-pin',
+  `last_read_at` timestamp NULL DEFAULT NULL COMMENT 'Terakhir baca',
+  `last_read_message_id` bigint UNSIGNED NULL COMMENT 'ID pesan terakhir yang dibaca',
+  `unread_count` int UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Jumlah belum dibaca',
+  `joined_at` timestamp NULL DEFAULT NULL COMMENT 'Waktu join',
+  `left_at` timestamp NULL DEFAULT NULL COMMENT 'Waktu keluar',
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `mute_until` timestamp NULL DEFAULT NULL COMMENT 'Mute sampai',
+  `notification_preference` enum('all','mentions','none') NOT NULL DEFAULT 'all' COMMENT 'Preferensi notifikasi',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uk_message_participants`(`message_thread_id` ASC, `user_id` ASC) USING BTREE,
+  INDEX `idx_message_participants_thread`(`message_thread_id` ASC) USING BTREE,
+  INDEX `idx_message_participants_user`(`user_id` ASC) USING BTREE,
+  INDEX `idx_message_participants_role`(`role` ASC) USING BTREE,
+  INDEX `idx_message_participants_active`(`is_active` ASC) USING BTREE,
+  INDEX `idx_message_participants_last_read`(`last_read_at` ASC) USING BTREE,
+  CONSTRAINT `fk_message_participants_thread` FOREIGN KEY (`message_thread_id`) REFERENCES `message_threads` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `fk_message_participants_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+```
+
+---
+
+## 🔗 Relasi Antar Tabel Komunikasi
+
+```
+notification_templates (1)
+    │
+    ├──< whatsapp_logs (N)
+    ├──< sms_logs (N)
+    └──< email_logs (N)
+
+users (1)
+    │
+    ├──< notification_preferences (N)
+    ├──< push_notification_tokens (N)
+    ├──< message_threads (N) — sebagai creator
+    └──< message_participants (N)
+
+message_threads (1)
+    │
+    └──< message_participants (N)
+            │
+            └── users (N)
+
+messages (existing) (1)
+    │
+    └── message_thread_id (FK baru, perlu ALTER)
+```
+
+---
+
+## ⚠️ Catatan Penting
+
+1. **Integrasi dengan `messages` (existing)** — Tabel `messages` Anda saat ini mungkin belum punya `message_thread_id`. Anda perlu **ALTER TABLE**:
+
+```sql
+ALTER TABLE `messages`
+  ADD COLUMN `message_thread_id` bigint UNSIGNED NULL AFTER `id`,
+  ADD COLUMN `parent_message_id` bigint UNSIGNED NULL AFTER `message_thread_id`,
+  ADD COLUMN `message_type` enum('text','image','file','audio','video','system','location','contact') NOT NULL DEFAULT 'text' AFTER `message_thread_id`,
+  ADD COLUMN `attachment_path` varchar(255) NULL AFTER `message_type`,
+  ADD COLUMN `attachment_metadata` json NULL AFTER `attachment_path`,
+  ADD COLUMN `is_edited` tinyint(1) NOT NULL DEFAULT 0 AFTER `attachment_metadata`,
+  ADD COLUMN `edited_at` timestamp NULL DEFAULT NULL AFTER `is_edited`,
+  ADD COLUMN `is_deleted` tinyint(1) NOT NULL DEFAULT 0 AFTER `edited_at`,
+  ADD COLUMN `deleted_at` timestamp NULL DEFAULT NULL AFTER `is_deleted`,
+  ADD INDEX `idx_messages_thread`(`message_thread_id` ASC) USING BTREE,
+  ADD INDEX `idx_messages_parent`(`parent_message_id` ASC) USING BTREE,
+  ADD INDEX `idx_messages_type`(`message_type` ASC) USING BTREE,
+  ADD INDEX `idx_messages_deleted`(`deleted_at` ASC) USING BTREE,
+  ADD CONSTRAINT `fk_messages_thread` FOREIGN KEY (`message_thread_id`) REFERENCES `message_threads` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  ADD CONSTRAINT `fk_messages_parent` FOREIGN KEY (`parent_message_id`) REFERENCES `messages` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT;
+```
+
+2. **`token_hash` di `push_notification_tokens`** — Saya tambahkan karena `token` bertipe TEXT tidak bisa di-index UNIQUE. `token_hash` = SHA-256 dari token.
+
+3. **Provider WA** — Saya support beberapa provider populer di Indonesia (Fonnte, Wablas, Wati, Meta). Sesuaikan dengan yang Anda pakai.
+
+4. **Biaya pengiriman** — `cost` & `currency_id` berguna untuk tracking biaya WA/SMS.
+
+5. **Reference polymorphic** — `reference_type` + `reference_id` memungkinkan log terhubung ke invoice, announcement, dll tanpa FK eksplisit.
+
+---
+
+✅ **Batch 2 selesai — 8 tabel Komunikasi Lanjutan.**
+
+Berikutnya **Batch 3: Dokumen Terpusat (6 tabel)**. Lanjut?
+Baik, lanjut ke **Batch 3: Dokumen Terpusat (6 tabel)**.
+
+Saya asumsikan Anda sudah punya tabel `users`, `students`, `employees`, `organizations`, `application_documents`, dan `rkas_documents` sebagai referensi.
+
+---
+
+## 📋 1. `document_types`
+
+Master jenis dokumen.
+
+```sql
+-- ----------------------------
+-- Table structure for document_types
+-- ----------------------------
+DROP TABLE IF EXISTS `document_types`;
+CREATE TABLE `document_types`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `organization_id` bigint UNSIGNED NULL COMMENT 'FK ke organizations, NULL untuk global',
+  `parent_id` bigint UNSIGNED NULL COMMENT 'FK ke document_types (hierarki)',
+  `code` varchar(100) NOT NULL COMMENT 'Kode unik jenis dokumen, misal: IJAZAH, AKTA',
+  `name` varchar(200) NOT NULL COMMENT 'Nama jenis dokumen',
+  `slug` varchar(200) NOT NULL COMMENT 'Slug untuk URL',
+  `category` enum('identity','academic','financial','legal','medical','employment','admission','graduation','certificate','report','other') NOT NULL DEFAULT 'other' COMMENT 'Kategori dokumen',
+  `description` text NULL,
+  `applicable_to` enum('all','student','employee','teacher','staff','applicant','alumni','organization') NOT NULL DEFAULT 'all' COMMENT 'Berlaku untuk',
+  `is_required' tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika wajib',
+  `is_expirable` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika punya masa berlaku',
+  `default_validity_days` int UNSIGNED NULL COMMENT 'Masa berlaku default (hari)',
+  `allowed_extensions` json NULL COMMENT 'Ekstensi file yang diizinkan, misal: ["pdf","jpg"]',
+  `max_file_size_mb` int UNSIGNED NULL COMMENT 'Ukuran maks file (MB)',
+  `requires_verification` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika perlu verifikasi',
+  `requires_signature` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika perlu tanda tangan',
+  `template_path` varchar(255) NULL COMMENT 'Template dokumen (jika generate otomatis)',
+  `sort_order` int UNSIGNED NOT NULL DEFAULT 0,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `is_system` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika tipe sistem',
+  `created_by` bigint UNSIGNED NULL,
+  `updated_by` bigint UNSIGNED NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uk_document_types_code`(`code` ASC, `organization_id` ASC) USING BTREE,
+  UNIQUE INDEX `uk_document_types_slug`(`slug` ASC) USING BTREE,
+  INDEX `idx_document_types_org`(`organization_id` ASC) USING BTREE,
+  INDEX `idx_document_types_parent`(`parent_id` ASC) USING BTREE,
+  INDEX `idx_document_types_category`(`category` ASC) USING BTREE,
+  INDEX `idx_document_types_applicable`(`applicable_to` ASC) USING BTREE,
+  INDEX `idx_document_types_active`(`is_active` ASC) USING BTREE,
+  CONSTRAINT `fk_document_types_org` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `fk_document_types_parent` FOREIGN KEY (`parent_id`) REFERENCES `document_types` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_document_types_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_document_types_updated_by` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+```
+
+---
+
+## 📋 2. `documents`
+
+Repositori dokumen terpusat (semua dokumen dari semua modul).
+
+```sql
+-- ----------------------------
+-- Table structure for documents
+-- ----------------------------
+DROP TABLE IF EXISTS `documents`;
+CREATE TABLE `documents`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `document_type_id` bigint UNSIGNED NULL COMMENT 'FK ke document_types',
+  `organization_id` bigint UNSIGNED NULL COMMENT 'FK ke organizations',
+  `owner_user_id` bigint UNSIGNED NULL COMMENT 'FK ke users (pemilik)',
+  `student_id` bigint UNSIGNED NULL COMMENT 'FK ke students',
+  `employee_id` bigint UNSIGNED NULL COMMENT 'FK ke employees',
+  `applicant_id` bigint UNSIGNED NULL COMMENT 'FK ke applicants',
+  `document_number` varchar(100) NULL COMMENT 'Nomor dokumen',
+  `title` varchar(255) NOT NULL COMMENT 'Judul dokumen',
+  `slug` varchar(255) NOT NULL COMMENT 'Slug untuk URL',
+  `description` text NULL,
+  `file_name` varchar(255) NOT NULL COMMENT 'Nama file asli',
+  `file_path` varchar(500) NOT NULL COMMENT 'Path file di storage',
+  `file_extension` varchar(20) NULL COMMENT 'Ekstensi file',
+  `file_size_bytes` bigint UNSIGNED NULL COMMENT 'Ukuran file',
+  `mime_type` varchar(100) NULL COMMENT 'MIME type',
+  `file_hash` varchar(64) NULL COMMENT 'SHA-256 hash file',
+  `thumbnail_path` varchar(500) NULL COMMENT 'Thumbnail (untuk gambar)',
+  `preview_path` varchar(500) NULL COMMENT 'Preview (untuk PDF)',
+  `issued_date` date NULL COMMENT 'Tanggal diterbitkan',
+  `expiry_date` date NULL COMMENT 'Tanggal kadaluarsa',
+  `issued_by` varchar(255) NULL COMMENT 'Diterbitkan oleh',
+  `issuing_authority` varchar(255) NULL COMMENT 'Lembaga penerbit',
+  `location` varchar(255) NULL COMMENT 'Lokasi fisik (jika ada)',
+  `status` enum('draft','active','pending_verification','verified','rejected','expired','archived','revoked','lost','destroyed') NOT NULL DEFAULT 'draft' COMMENT 'Status dokumen',
+  `verification_status` enum('unverified','pending','verified','rejected') NOT NULL DEFAULT 'unverified' COMMENT 'Status verifikasi',
+  `verified_by` bigint UNSIGNED NULL COMMENT 'FK ke users yang verifikasi',
+  `verified_at` timestamp NULL DEFAULT NULL,
+  `verification_notes` text NULL,
+  `is_confidential` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika dokumen rahasia',
+  `is_public` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika bisa diakses publik',
+  `access_level` enum('public','internal','restricted','confidential','secret') NOT NULL DEFAULT 'internal' COMMENT 'Level akses',
+  `allowed_roles` json NULL COMMENT 'Role yang boleh akses',
+  `allowed_users` json NULL COMMENT 'User ID yang boleh akses',
+  `download_allowed` tinyint(1) NOT NULL DEFAULT 1,
+  `print_allowed` tinyint(1) NOT NULL DEFAULT 1,
+  `share_allowed` tinyint(1) NOT NULL DEFAULT 0,
+  `watermark_enabled` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika ada watermark',
+  `password_protected` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika ada password',
+  `password_hash` varchar(255) NULL COMMENT 'Hash password',
+  `current_version` int UNSIGNED NOT NULL DEFAULT 1 COMMENT 'Versi saat ini',
+  `total_versions` int UNSIGNED NOT NULL DEFAULT 1 COMMENT 'Total versi',
+  `total_views` int UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Total views',
+  `total_downloads` int UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Total downloads',
+  `last_accessed_at` timestamp NULL DEFAULT NULL COMMENT 'Terakhir diakses',
+  `reference_type` varchar(100) NULL COMMENT 'Tipe referensi (invoice, rapor, dll)',
+  `reference_id` bigint UNSIGNED NULL COMMENT 'ID referensi',
+  `tags` json NULL COMMENT 'Tags untuk pencarian',
+  `metadata` json NULL COMMENT 'Metadata tambahan',
+  `notes` text NULL,
+  `created_by` bigint UNSIGNED NULL,
+  `updated_by` bigint UNSIGNED NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uk_documents_slug`(`slug` ASC) USING BTREE,
+  INDEX `idx_documents_type`(`document_type_id` ASC) USING BTREE,
+  INDEX `idx_documents_org`(`organization_id` ASC) USING BTREE,
+  INDEX `idx_documents_owner`(`owner_user_id` ASC) USING BTREE,
+  INDEX `idx_documents_student`(`student_id` ASC) USING BTREE,
+  INDEX `idx_documents_employee`(`employee_id` ASC) USING BTREE,
+  INDEX `idx_documents_applicant`(`applicant_id` ASC) USING BTREE,
+  INDEX `idx_documents_number`(`document_number` ASC) USING BTREE,
+  INDEX `idx_documents_hash`(`file_hash` ASC) USING BTREE,
+  INDEX `idx_documents_status`(`status` ASC) USING BTREE,
+  INDEX `idx_documents_verification`(`verification_status` ASC) USING BTREE,
+  INDEX `idx_documents_access`(`access_level` ASC) USING BTREE,
+  INDEX `idx_documents_issued`(`issued_date` ASC) USING BTREE,
+  INDEX `idx_documents_expiry`(`expiry_date` ASC) USING BTREE,
+  INDEX `idx_documents_reference`(`reference_type` ASC, `reference_id` ASC) USING BTREE,
+  FULLTEXT INDEX `ft_documents_search`(`title`, `description`, `document_number`) USING BTREE,
+  CONSTRAINT `fk_documents_type` FOREIGN KEY (`document_type_id`) REFERENCES `document_types` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_documents_org` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `fk_documents_owner` FOREIGN KEY (`owner_user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_documents_student` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `fk_documents_employee` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `fk_documents_applicant` FOREIGN KEY (`applicant_id`) REFERENCES `applicants` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `fk_documents_verified_by` FOREIGN KEY (`verified_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_documents_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_documents_updated_by` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+```
+
+---
+
+## 📋 3. `document_versions`
+
+Versioning dokumen (setiap upload ulang/revisi tersimpan).
+
+```sql
+-- ----------------------------
+-- Table structure for document_versions
+-- ----------------------------
+DROP TABLE IF EXISTS `document_versions`;
+CREATE TABLE `document_versions`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `document_id` bigint UNSIGNED NOT NULL COMMENT 'FK ke documents',
+  `organization_id` bigint UNSIGNED NULL COMMENT 'FK ke organizations',
+  `version_number` int UNSIGNED NOT NULL DEFAULT 1 COMMENT 'Nomor versi',
+  `version_label` varchar(50) NULL COMMENT 'Label versi, misal: v1.0, revisi-1',
+  `file_name` varchar(255) NOT NULL COMMENT 'Nama file asli',
+  `file_path` varchar(500) NOT NULL COMMENT 'Path file',
+  `file_extension` varchar(20) NULL,
+  `file_size_bytes` bigint UNSIGNED NULL,
+  `mime_type` varchar(100) NULL,
+  `file_hash` varchar(64) NULL COMMENT 'SHA-256 hash',
+  `change_summary` text NULL COMMENT 'Ringkasan perubahan',
+  `change_type` enum('initial','revision','correction','update','replacement','restore') NOT NULL DEFAULT 'revision' COMMENT 'Tipe perubahan',
+  `is_current` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika versi saat ini',
+  `status` enum('draft','active','superseded','archived','deleted') NOT NULL DEFAULT 'active' COMMENT 'Status versi',
+  `uploaded_by` bigint UNSIGNED NULL COMMENT 'FK ke users yang upload',
+  `approved_by` bigint UNSIGNED NULL COMMENT 'FK ke users yang approve',
+  `approved_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uk_document_versions_number`(`document_id` ASC, `version_number` ASC) USING BTREE,
+  INDEX `idx_document_versions_document`(`document_id` ASC) USING BTREE,
+  INDEX `idx_document_versions_org`(`organization_id` ASC) USING BTREE,
+  INDEX `idx_document_versions_current`(`is_current` ASC) USING BTREE,
+  INDEX `idx_document_versions_status`(`status` ASC) USING BTREE,
+  INDEX `idx_document_versions_hash`(`file_hash` ASC) USING BTREE,
+  CONSTRAINT `fk_document_versions_document` FOREIGN KEY (`document_id`) REFERENCES `documents` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `fk_document_versions_org` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `fk_document_versions_uploaded_by` FOREIGN KEY (`uploaded_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_document_versions_approved_by` FOREIGN KEY (`approved_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+```
+
+---
+
+## 📋 4. `document_access_logs`
+
+Log akses dokumen (siapa, kapan, aksi apa).
+
+```sql
+-- ----------------------------
+-- Table structure for document_access_logs
+-- ----------------------------
+DROP TABLE IF EXISTS `document_access_logs`;
+CREATE TABLE `document_access_logs`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `document_id` bigint UNSIGNED NOT NULL COMMENT 'FK ke documents',
+  `document_version_id` bigint UNSIGNED NULL COMMENT 'FK ke document_versions (jika akses versi tertentu)',
+  `user_id` bigint UNSIGNED NULL COMMENT 'FK ke users',
+  `student_id` bigint UNSIGNED NULL COMMENT 'FK ke students',
+  `employee_id` bigint UNSIGNED NULL COMMENT 'FK ke employees',
+  `organization_id` bigint UNSIGNED NULL COMMENT 'FK ke organizations',
+  `access_type` enum('view','preview','download','print','share','email','edit','delete','restore','verify','reject','sign','copy','move','rename') NOT NULL COMMENT 'Tipe akses',
+  `access_duration_seconds` int UNSIGNED NULL COMMENT 'Durasi akses (detik)',
+  `pages_viewed` int UNSIGNED NULL COMMENT 'Halaman yang dilihat',
+  `ip_address` varchar(45) NULL,
+  `user_agent` text NULL,
+  `device_type` enum('desktop','mobile','tablet','other') NULL,
+  `device_identifier` varchar(100) NULL,
+  `location` varchar(255) NULL COMMENT 'Lokasi (jika GPS)',
+  `latitude` decimal(10,7) NULL,
+  `longitude` decimal(10,7) NULL,
+  `referrer` varchar(500) NULL COMMENT 'Halaman asal',
+  `share_method` enum('link','email','whatsapp','download','other') NULL COMMENT 'Metode share',
+  `share_recipient` varchar(255) NULL COMMENT 'Penerima share',
+  `status` enum('success','failed','denied','expired') NOT NULL DEFAULT 'success' COMMENT 'Status akses',
+  `failure_reason` text NULL COMMENT 'Alasan gagal',
+  `session_id` varchar(100) NULL,
+  `accessed_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Waktu akses',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_document_access_document`(`document_id` ASC) USING BTREE,
+  INDEX `idx_document_access_version`(`document_version_id` ASC) USING BTREE,
+  INDEX `idx_document_access_user`(`user_id` ASC) USING BTREE,
+  INDEX `idx_document_access_student`(`student_id` ASC) USING BTREE,
+  INDEX `idx_document_access_employee`(`employee_id` ASC) USING BTREE,
+  INDEX `idx_document_access_org`(`organization_id` ASC) USING BTREE,
+  INDEX `idx_document_access_type`(`access_type` ASC) USING BTREE,
+  INDEX `idx_document_access_status`(`status` ASC) USING BTREE,
+  INDEX `idx_document_access_accessed`(`accessed_at` ASC) USING BTREE,
+  CONSTRAINT `fk_document_access_document` FOREIGN KEY (`document_id`) REFERENCES `documents` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `fk_document_access_version` FOREIGN KEY (`document_version_id`) REFERENCES `document_versions` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_document_access_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_document_access_student` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_document_access_employee` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_document_access_org` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+```
+
+---
+
+## 📋 5. `file_uploads`
+
+Attachment generik untuk semua modul (polymorphic).
+
+```sql
+-- ----------------------------
+-- Table structure for file_uploads
+-- ----------------------------
+DROP TABLE IF EXISTS `file_uploads`;
+CREATE TABLE `file_uploads`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `organization_id` bigint UNSIGNED NULL COMMENT 'FK ke organizations',
+  `uploaded_by` bigint UNSIGNED NULL COMMENT 'FK ke users yang upload',
+  `uploadable_type` varchar(255) NULL COMMENT 'Tipe model pemilik (polymorphic)',
+  `uploadable_id` bigint UNSIGNED NULL COMMENT 'ID model pemilik (polymorphic)',
+  `collection` varchar(100) NULL COMMENT 'Koleksi/grup, misal: attachments, photos, documents',
+  `original_name` varchar(255) NOT NULL COMMENT 'Nama file asli',
+  `file_name` varchar(255) NOT NULL COMMENT 'Nama file tersimpan',
+  `file_path` varchar(500) NOT NULL COMMENT 'Path file',
+  `file_extension` varchar(20) NULL,
+  `file_size_bytes` bigint UNSIGNED NULL,
+  `mime_type` varchar(100) NULL,
+  `file_hash` varchar(64) NULL COMMENT 'SHA-256 hash',
+  `disk` varchar(50) NOT NULL DEFAULT 'local' COMMENT 'Storage disk (local, s3, gcs)',
+  `is_public` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika bisa diakses publik',
+  `url` varchar(500) NULL COMMENT 'URL publik (jika public)',
+  `thumbnail_path` varchar(500) NULL COMMENT 'Thumbnail',
+  `metadata` json NULL COMMENT 'Metadata tambahan (dimensi, durasi, dll)',
+  `sort_order` int UNSIGNED NOT NULL DEFAULT 0,
+  `status` enum('uploading','active','archived','deleted','failed') NOT NULL DEFAULT 'active' COMMENT 'Status file',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_file_uploads_org`(`organization_id` ASC) USING BTREE,
+  INDEX `idx_file_uploads_uploader`(`uploaded_by` ASC) USING BTREE,
+  INDEX `idx_file_uploads_uploadable`(`uploadable_type` ASC, `uploadable_id` ASC) USING BTREE,
+  INDEX `idx_file_uploads_collection`(`collection` ASC) USING BTREE,
+  INDEX `idx_file_uploads_hash`(`file_hash` ASC) USING BTREE,
+  INDEX `idx_file_uploads_disk`(`disk` ASC) USING BTREE,
+  INDEX `idx_file_uploads_status`(`status` ASC) USING BTREE,
+  CONSTRAINT `fk_file_uploads_org` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `fk_file_uploads_uploader` FOREIGN KEY (`uploaded_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+```
+
+---
+
+## 📋 6. `digital_signatures`
+
+Tanda tangan digital (e-sign) untuk dokumen.
+
+```sql
+-- ----------------------------
+-- Table structure for digital_signatures
+-- ----------------------------
+DROP TABLE IF EXISTS `digital_signatures`;
+CREATE TABLE `digital_signatures`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `document_id` bigint UNSIGNED NOT NULL COMMENT 'FK ke documents',
+  `document_version_id` bigint UNSIGNED NULL COMMENT 'FK ke document_versions',
+  `organization_id` bigint UNSIGNED NULL COMMENT 'FK ke organizations',
+  `signer_user_id` bigint UNSIGNED NULL COMMENT 'FK ke users penandatangan',
+  `signer_employee_id` bigint UNSIGNED NULL COMMENT 'FK ke employees',
+  `signer_name` varchar(150) NOT NULL COMMENT 'Nama penandatangan',
+  `signer_email` varchar(150) NULL,
+  `signer_phone` varchar(30) NULL,
+  `signer_position` varchar(150) NULL COMMENT 'Jabatan',
+  `signer_nip` varchar(50) NULL COMMENT 'NIP/NIK',
+  `signature_type` enum('electronic','digital','stamp','biometric','wet','initials','parap') NOT NULL DEFAULT 'electronic' COMMENT 'Tipe tanda tangan',
+  `signature_method` enum('draw','type','upload','certificate','qr_code','otp','biometric') NOT NULL DEFAULT 'draw' COMMENT 'Metode tanda tangan',
+  `signature_data` longtext NULL COMMENT 'Data tanda tangan (base64 untuk draw)',
+  `signature_path` varchar(500) NULL COMMENT 'Path file tanda tangan',
+  `certificate_path` varchar(500) NULL COMMENT 'Path sertifikat digital',
+  `certificate_serial` varchar(100) NULL COMMENT 'Serial sertifikat',
+  `certificate_issuer` varchar(255) NULL COMMENT 'Penerbit sertifikat',
+  `certificate_valid_from` timestamp NULL DEFAULT NULL,
+  `certificate_valid_until` timestamp NULL DEFAULT NULL,
+  `signature_hash` varchar(64) NULL COMMENT 'SHA-256 hash tanda tangan',
+  `document_hash` varchar(64) NULL COMMENT 'SHA-256 hash dokumen saat ditandatangani',
+  `page_number` int UNSIGNED NULL COMMENT 'Halaman tanda tangan',
+  `position_x` decimal(10,4) NULL COMMENT 'Posisi X',
+  `position_y` decimal(10,4) NULL COMMENT 'Posisi Y',
+  `position_width` decimal(10,4) NULL COMMENT 'Lebar',
+  `position_height` decimal(10,4) NULL COMMENT 'Tinggi',
+  `signed_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Waktu tanda tangan',
+  `status` enum('pending','signed','rejected','expired','revoked','invalid') NOT NULL DEFAULT 'pending' COMMENT 'Status tanda tangan',
+  `verification_status` enum('unverified','verified','failed') NOT NULL DEFAULT 'unverified' COMMENT 'Status verifikasi',
+  `verified_at` timestamp NULL DEFAULT NULL,
+  `verified_by` bigint UNSIGNED NULL COMMENT 'FK ke users yang verifikasi',
+  `verification_notes` text NULL,
+  `rejection_reason` text NULL,
+  `revocation_reason` text NULL,
+  `revoked_at` timestamp NULL DEFAULT NULL,
+  `revoked_by` bigint UNSIGNED NULL COMMENT 'FK ke users yang revoke',
+  `ip_address` varchar(45) NULL,
+  `user_agent` text NULL,
+  `device_identifier` varchar(100) NULL,
+  `location` varchar(255) NULL,
+  `latitude` decimal(10,7) NULL,
+  `longitude` decimal(10,7) NULL,
+  `otp_code` varchar(20) NULL COMMENT 'Kode OTP (jika metode OTP)',
+  `otp_verified_at` timestamp NULL DEFAULT NULL,
+  `reference_type` varchar(100) NULL COMMENT 'Tipe referensi',
+  `reference_id` bigint UNSIGNED NULL COMMENT 'ID referensi',
+  `notes` text NULL,
+  `metadata` json NULL COMMENT 'Metadata tambahan',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_digital_signatures_document`(`document_id` ASC) USING BTREE,
+  INDEX `idx_digital_signatures_version`(`document_version_id` ASC) USING BTREE,
+  INDEX `idx_digital_signatures_org`(`organization_id` ASC) USING BTREE,
+  INDEX `idx_digital_signatures_signer_user`(`signer_user_id` ASC) USING BTREE,
+  INDEX `idx_digital_signatures_signer_employee`(`signer_employee_id` ASC) USING BTREE,
+  INDEX `idx_digital_signatures_type`(`signature_type` ASC) USING BTREE,
+  INDEX `idx_digital_signatures_method`(`signature_method` ASC) USING BTREE,
+  INDEX `idx_digital_signatures_status`(`status` ASC) USING BTREE,
+  INDEX `idx_digital_signatures_verification`(`verification_status` ASC) USING BTREE,
+  INDEX `idx_digital_signatures_signed`(`signed_at` ASC) USING BTREE,
+  INDEX `idx_digital_signatures_reference`(`reference_type` ASC, `reference_id` ASC) USING BTREE,
+  CONSTRAINT `fk_digital_signatures_document` FOREIGN KEY (`document_id`) REFERENCES `documents` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `fk_digital_signatures_version` FOREIGN KEY (`document_version_id`) REFERENCES `document_versions` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_digital_signatures_org` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `fk_digital_signatures_signer_user` FOREIGN KEY (`signer_user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_digital_signatures_signer_employee` FOREIGN KEY (`signer_employee_id`) REFERENCES `employees` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_digital_signatures_verified_by` FOREIGN KEY (`verified_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_digital_signatures_revoked_by` FOREIGN KEY (`revoked_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+```
+
+---
+
+## 🔗 Relasi Antar Tabel Dokumen
+
+```
+document_types (1)
+    │
+    └──< documents (N)
+            │
+            ├──< document_versions (N)
+            │       │
+            │       └──< digital_signatures (N)
+            │
+            ├──< document_access_logs (N)
+            │
+            └──< digital_signatures (N)
+
+file_uploads (polymorphic)
+    └── uploadable_type + uploadable_id → documents, students, employees, dll
+```
+
+---
+
+## ⚠️ Catatan Penting
+
+1. **Typo di `document_types`** — Ada typo di `is_required'` (harusnya `is_required`). Perbaiki:
+
+```sql
+-- Perbaiki typo
+ALTER TABLE `document_types`
+  CHANGE COLUMN `is_required'` `is_required` tinyint(1) NOT NULL DEFAULT 0;
+```
+
+2. **Integrasi dengan tabel existing** — Tabel `application_documents` dan `rkas_documents` Anda bisa:
+    - **Opsi A**: Tetap terpisah, tapi simpan `document_id` (FK ke `documents`) untuk file-nya
+    - **Opsi B**: Migrasi data ke `documents` dan hapus tabel lama
+    - **Opsi C**: Biarkan terpisah, `documents` hanya untuk dokumen umum
+
+3. **`file_uploads` polymorphic** — Ini pengganti attachment generik. Bisa dipakai di semua modul:
+    - `uploadable_type = 'App\Models\Student'`, `uploadable_id = 123`
+    - `uploadable_type = 'App\Models\Invoice'`, `uploadable_id = 456`
+
+4. **`document_versions`** — Setiap upload ulang/revisi, buat record baru. Update `documents.current_version` dan `documents.total_versions`.
+
+5. **`digital_signatures`** — Support multiple signatures per dokumen (misal: tanda tangan kepsek + wali kelas).
+
+6. **Storage** — Untuk `file_path`, `thumbnail_path`, dll, gunakan Laravel Storage dengan disk yang sesuai (`local`, `s3`, `gcs`).
+
+7. **FULLTEXT index** — Di `documents`, saya tambahkan FULLTEXT untuk pencarian. Pastikan MySQL 8+.
+
+---
+
+✅ **Batch 3 selesai — 6 tabel Dokumen Terpusat.**
+
+Berikutnya **Batch 4: Keamanan & Autentikasi (7 tabel)**. Lanjut?
