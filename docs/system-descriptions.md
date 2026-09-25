@@ -164,3 +164,2790 @@ Anda membangun **Sistem ERP Pendidikan Multi-Tenant berbasis SaaS** yang:
 Ini bukan proyek kecil — ini **platform ERP pendidikan skala enterprise** yang jika dikembangkan serius bisa bersaing dengan sistem seperti Sistem Informasi Sekolah (SIS) komersial di Indonesia.
 
 Apakah Anda ingin saya bantu memetakan **modul mana saja yang harus ada di versi MVP** terlebih dahulu, mengingat kompleksitasnya?
+
+Baik, saya buatkan struktur tabel untuk **point 11 (Ekstrakurikuler Lanjutan)** dan **point 13 (Perpustakaan Digital)**.
+
+---
+
+# 🏃 POINT 11: EKSTRAKURIKULER LANJUTAN
+
+Saya asumsikan Anda sudah punya tabel `extracurriculars`, `students`, `employees`, `users`, dan `organizations` sebagai referensi FK.
+
+Saya buat 4 tabel:
+
+1. `extracurricular_coaches` — pembina ekstrakurikuler
+2. `extracurricular_schedules` — jadwal latihan
+3. `extracurricular_achievements` — prestasi ekstrakurikuler
+4. `extracurricular_fees` — biaya ekstrakurikuler
+
+---
+
+## 📋 1. `extracurricular_coaches`
+
+Pembina/pelatih ekstrakurikuler.
+
+```sql
+-- ----------------------------
+-- Table structure for extracurricular_coaches
+-- ----------------------------
+DROP TABLE IF EXISTS `extracurricular_coaches`;
+CREATE TABLE `extracurricular_coaches`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `extracurricular_id` bigint UNSIGNED NOT NULL COMMENT 'FK ke extracurriculars',
+  `employee_id` bigint UNSIGNED NULL COMMENT 'FK ke employees (jika pembina internal)',
+  `user_id` bigint UNSIGNED NULL COMMENT 'FK ke users (jika pembina eksternal punya akun)',
+  `organization_id` bigint UNSIGNED NULL COMMENT 'FK ke organizations',
+  `name` varchar(150) NOT NULL COMMENT 'Nama pembina',
+  `coach_type` enum('internal','external','volunteer','student_assistant') NOT NULL DEFAULT 'internal' COMMENT 'Tipe pembina',
+  `role` enum('head_coach','assistant_coach','supervisor','advisor','trainer') NOT NULL DEFAULT 'head_coach' COMMENT 'Peran pembina',
+  `specialization` varchar(150) NULL COMMENT 'Bidang keahlian, misal: Karate, Basket',
+  `phone` varchar(30) NULL,
+  `email` varchar(150) NULL,
+  `address` text NULL,
+  `photo_path` varchar(255) NULL,
+  `certification` varchar(255) NULL COMMENT 'Sertifikasi/pelatihan',
+  `experience_years` int UNSIGNED NULL COMMENT 'Pengalaman (tahun)',
+  `is_primary` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika pembina utama',
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `joined_at` date NULL COMMENT 'Tanggal mulai bertugas',
+  `resigned_at` date NULL COMMENT 'Tanggal berhenti',
+  `notes` text NULL,
+  `created_by` bigint UNSIGNED NULL,
+  `updated_by` bigint UNSIGNED NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_extra_coach_extracurricular`(`extracurricular_id` ASC) USING BTREE,
+  INDEX `idx_extra_coach_employee`(`employee_id` ASC) USING BTREE,
+  INDEX `idx_extra_coach_user`(`user_id` ASC) USING BTREE,
+  INDEX `idx_extra_coach_org`(`organization_id` ASC) USING BTREE,
+  INDEX `idx_extra_coach_type`(`coach_type` ASC) USING BTREE,
+  INDEX `idx_extra_coach_active`(`is_active` ASC) USING BTREE,
+  CONSTRAINT `fk_extra_coach_extracurricular` FOREIGN KEY (`extracurricular_id`) REFERENCES `extracurriculars` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `fk_extra_coach_employee` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_extra_coach_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_extra_coach_org` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_extra_coach_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_extra_coach_updated_by` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+```
+
+---
+
+## 📋 2. `extracurricular_schedules`
+
+Jadwal latihan/kegiatan ekstrakurikuler.
+
+```sql
+-- ----------------------------
+-- Table structure for extracurricular_schedules
+-- ----------------------------
+DROP TABLE IF EXISTS `extracurricular_schedules`;
+CREATE TABLE `extracurricular_schedules`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `extracurricular_id` bigint UNSIGNED NOT NULL COMMENT 'FK ke extracurriculars',
+  `organization_id` bigint UNSIGNED NULL COMMENT 'FK ke organizations',
+  `coach_id` bigint UNSIGNED NULL COMMENT 'FK ke extracurricular_coaches',
+  `room_id` bigint UNSIGNED NULL COMMENT 'FK ke rooms',
+  `building_id` bigint UNSIGNED NULL COMMENT 'FK ke buildings',
+  `schedule_type` enum('regular','tryout','competition_prep','special_training','meeting','performance') NOT NULL DEFAULT 'regular' COMMENT 'Jenis jadwal',
+  `title` varchar(150) NOT NULL COMMENT 'Judul kegiatan',
+  `day_of_week` enum('monday','tuesday','wednesday','thursday','friday','saturday','sunday') NOT NULL COMMENT 'Hari',
+  `start_time` time NOT NULL,
+  `end_time` time NOT NULL,
+  `duration_minutes` int UNSIGNED NULL COMMENT 'Durasi (menit)',
+  `recurrence_type` enum('none','weekly','biweekly','monthly') NOT NULL DEFAULT 'weekly' COMMENT 'Tipe pengulangan',
+  `recurrence_until` date NULL COMMENT 'Berulang sampai tanggal',
+  `specific_date` date NULL COMMENT 'Tanggal spesifik (jika tidak berulang)',
+  `quota` int UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Kuota peserta',
+  `registered` int UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Jumlah terdaftar',
+  `location` varchar(255) NULL COMMENT 'Lokasi kegiatan',
+  `is_mandatory` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika wajib hadir',
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `effective_from` date NULL,
+  `effective_until` date NULL,
+  `notes` text NULL,
+  `created_by` bigint UNSIGNED NULL,
+  `updated_by` bigint UNSIGNED NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_extra_sched_extracurricular`(`extracurricular_id` ASC) USING BTREE,
+  INDEX `idx_extra_sched_org`(`organization_id` ASC) USING BTREE,
+  INDEX `idx_extra_sched_coach`(`coach_id` ASC) USING BTREE,
+  INDEX `idx_extra_sched_room`(`room_id` ASC) USING BTREE,
+  INDEX `idx_extra_sched_day`(`day_of_week` ASC) USING BTREE,
+  INDEX `idx_extra_sched_type`(`schedule_type` ASC) USING BTREE,
+  INDEX `idx_extra_sched_active`(`is_active` ASC) USING BTREE,
+  CONSTRAINT `fk_extra_sched_extracurricular` FOREIGN KEY (`extracurricular_id`) REFERENCES `extracurriculars` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `fk_extra_sched_org` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_extra_sched_coach` FOREIGN KEY (`coach_id`) REFERENCES `extracurricular_coaches` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_extra_sched_room` FOREIGN KEY (`room_id`) REFERENCES `rooms` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_extra_sched_building` FOREIGN KEY (`building_id`) REFERENCES `buildings` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_extra_sched_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_extra_sched_updated_by` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+```
+
+---
+
+## 📋 3. `extracurricular_achievements`
+
+Prestasi ekstrakurikuler (individu/tim).
+
+```sql
+-- ----------------------------
+-- Table structure for extracurricular_achievements
+-- ----------------------------
+DROP TABLE IF EXISTS `extracurricular_achievements`;
+CREATE TABLE `extracurricular_achievements`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `extracurricular_id` bigint UNSIGNED NOT NULL COMMENT 'FK ke extracurriculars',
+  `student_id` bigint UNSIGNED NULL COMMENT 'FK ke students (jika individu)',
+  `organization_id` bigint UNSIGNED NULL COMMENT 'FK ke organizations',
+  `coach_id` bigint UNSIGNED NULL COMMENT 'FK ke extracurricular_coaches (pembina pendamping)',
+  `achievement_type` enum('individual','team','school') NOT NULL DEFAULT 'individual' COMMENT 'Tipe prestasi',
+  `title` varchar(200) NOT NULL COMMENT 'Judul prestasi',
+  `event_name` varchar(200) NOT NULL COMMENT 'Nama event/kompetisi',
+  `event_level` enum('school','sub_district','district','city','province','national','international') NOT NULL DEFAULT 'school' COMMENT 'Tingkat event',
+  `organizer` varchar(200) NULL COMMENT 'Penyelenggara',
+  `position` enum('winner','runner_up','third_place','fourth_place','finalist','semi_finalist','participant','honorable_mention','special_award') NOT NULL DEFAULT 'participant' COMMENT 'Posisi',
+  `rank` int UNSIGNED NULL COMMENT 'Peringkat (1, 2, 3, ...)',
+  `medal` enum('gold','silver','bronze','none') NULL COMMENT 'Medali',
+  `event_date` date NOT NULL COMMENT 'Tanggal event',
+  `event_end_date` date NULL COMMENT 'Tanggal selesai event',
+  `location` varchar(255) NULL COMMENT 'Lokasi event',
+  `description` text NULL,
+  `certificate_path` varchar(255) NULL COMMENT 'File sertifikat',
+  `photo_path` varchar(255) NULL COMMENT 'File foto',
+  `documentation_url` varchar(255) NULL COMMENT 'URL dokumentasi',
+  `points` int UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Poin prestasi',
+  `is_verified` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika sudah diverifikasi',
+  `verified_by` bigint UNSIGNED NULL COMMENT 'FK ke users yang verifikasi',
+  `verified_at` timestamp NULL DEFAULT NULL,
+  `notes` text NULL,
+  `created_by` bigint UNSIGNED NULL,
+  `updated_by` bigint UNSIGNED NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_extra_ach_extracurricular`(`extracurricular_id` ASC) USING BTREE,
+  INDEX `idx_extra_ach_student`(`student_id` ASC) USING BTREE,
+  INDEX `idx_extra_ach_org`(`organization_id` ASC) USING BTREE,
+  INDEX `idx_extra_ach_coach`(`coach_id` ASC) USING BTREE,
+  INDEX `idx_extra_ach_type`(`achievement_type` ASC) USING BTREE,
+  INDEX `idx_extra_ach_level`(`event_level` ASC) USING BTREE,
+  INDEX `idx_extra_ach_position`(`position` ASC) USING BTREE,
+  INDEX `idx_extra_ach_date`(`event_date` ASC) USING BTREE,
+  INDEX `idx_extra_ach_verified`(`is_verified` ASC) USING BTREE,
+  CONSTRAINT `fk_extra_ach_extracurricular` FOREIGN KEY (`extracurricular_id`) REFERENCES `extracurriculars` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `fk_extra_ach_student` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_extra_ach_org` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_extra_ach_coach` FOREIGN KEY (`coach_id`) REFERENCES `extracurricular_coaches` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_extra_ach_verified_by` FOREIGN KEY (`verified_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_extra_ach_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_extra_ach_updated_by` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+```
+
+---
+
+## 📋 4. `extracurricular_fees`
+
+Biaya ekstrakurikuler.
+
+```sql
+-- ----------------------------
+-- Table structure for extracurricular_fees
+-- ----------------------------
+DROP TABLE IF EXISTS `extracurricular_fees`;
+CREATE TABLE `extracurricular_fees`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `extracurricular_id` bigint UNSIGNED NOT NULL COMMENT 'FK ke extracurriculars',
+  `organization_id` bigint UNSIGNED NULL COMMENT 'FK ke organizations',
+  `education_level_id` bigint UNSIGNED NULL COMMENT 'FK ke education_levels',
+  `fee_type` enum('registration','monthly','per_session','uniform','equipment','competition','other') NOT NULL DEFAULT 'monthly' COMMENT 'Jenis biaya',
+  `name` varchar(150) NOT NULL COMMENT 'Nama biaya',
+  `amount` decimal(15,2) NOT NULL DEFAULT 0 COMMENT 'Nominal',
+  `currency_id` bigint UNSIGNED NULL COMMENT 'FK ke currencies',
+  `billing_period` enum('once','daily','weekly','monthly','quarterly','semester','yearly') NOT NULL DEFAULT 'monthly' COMMENT 'Periode penagihan',
+  `is_mandatory` tinyint(1) NOT NULL DEFAULT 1 COMMENT '1 jika wajib',
+  `is_refundable` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika bisa dikembalikan',
+  `late_fee` decimal(15,2) NULL COMMENT 'Denda keterlambatan',
+  `late_fee_days` int UNSIGNED NULL COMMENT 'Denda berlaku setelah X hari',
+  `effective_from` date NULL,
+  `effective_until` date NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `description` text NULL,
+  `created_by` bigint UNSIGNED NULL,
+  `updated_by` bigint UNSIGNED NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_extra_fee_extracurricular`(`extracurricular_id` ASC) USING BTREE,
+  INDEX `idx_extra_fee_org`(`organization_id` ASC) USING BTREE,
+  INDEX `idx_extra_fee_level`(`education_level_id` ASC) USING BTREE,
+  INDEX `idx_extra_fee_type`(`fee_type` ASC) USING BTREE,
+  INDEX `idx_extra_fee_active`(`is_active` ASC) USING BTREE,
+  CONSTRAINT `fk_extra_fee_extracurricular` FOREIGN KEY (`extracurricular_id`) REFERENCES `extracurriculars` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `fk_extra_fee_org` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_extra_fee_level` FOREIGN KEY (`education_level_id`) REFERENCES `education_levels` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_extra_fee_currency` FOREIGN KEY (`currency_id`) REFERENCES `currencies` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_extra_fee_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_extra_fee_updated_by` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+```
+
+---
+
+# 📚 POINT 13: PERPUSTAKAAN DIGITAL
+
+Saya asumsikan Anda sudah punya tabel `library_books`, `library_memberships`, `students`, `employees`, `users`, dan `organizations`.
+
+Saya buat 4 tabel:
+
+1. `digital_library_items` — koleksi digital (e-book, jurnal, video)
+2. `digital_library_access_logs` — log akses
+3. `library_visits` — kunjungan perpustakaan fisik
+4. `library_stock_opname` — stock opname perpustakaan
+
+---
+
+## 📋 1. `digital_library_items`
+
+Koleksi perpustakaan digital.
+
+```sql
+-- ----------------------------
+-- Table structure for digital_library_items
+-- ----------------------------
+DROP TABLE IF EXISTS `digital_library_items`;
+CREATE TABLE `digital_library_items`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `organization_id` bigint UNSIGNED NULL COMMENT 'FK ke organizations',
+  `library_book_id` bigint UNSIGNED NULL COMMENT 'FK ke library_books (jika versi digital dari buku fisik)',
+  `book_category_id` bigint UNSIGNED NULL COMMENT 'FK ke book_categories',
+  `book_publisher_id` bigint UNSIGNED NULL COMMENT 'FK ke book_publishers',
+  `title` varchar(255) NOT NULL COMMENT 'Judul',
+  `slug` varchar(255) NOT NULL COMMENT 'Slug untuk URL',
+  `subtitle` varchar(255) NULL,
+  `item_type` enum('ebook','ejournal','article','video','audio','course','thesis','report','magazine','newspaper','other') NOT NULL DEFAULT 'ebook' COMMENT 'Jenis item digital',
+  `format` enum('pdf','epub','mobi','docx','pptx','mp4','mp3','html','zip','other') NOT NULL DEFAULT 'pdf' COMMENT 'Format file',
+  `isbn` varchar(20) NULL,
+  `issn` varchar(20) NULL,
+  `doi` varchar(100) NULL COMMENT 'Digital Object Identifier',
+  `author` varchar(255) NULL COMMENT 'Penulis',
+  `editor` varchar(255) NULL,
+  `translator` varchar(255) NULL,
+  `language` varchar(10) NOT NULL DEFAULT 'id' COMMENT 'Kode bahasa',
+  `edition` varchar(50) NULL,
+  `volume` varchar(50) NULL,
+  `issue` varchar(50) NULL,
+  `publication_year` year NULL,
+  `publication_date` date NULL,
+  `page_count` int UNSIGNED NULL COMMENT 'Jumlah halaman',
+  `duration_seconds` int UNSIGNED NULL COMMENT 'Durasi (untuk audio/video)',
+  `description` text NULL,
+  `abstract` text NULL,
+  `keywords` varchar(500) NULL,
+  `file_path` varchar(255) NULL COMMENT 'Path file utama',
+  `file_size_bytes` bigint UNSIGNED NULL COMMENT 'Ukuran file',
+  `cover_path` varchar(255) NULL COMMENT 'Path cover',
+  `external_url` varchar(255) NULL COMMENT 'URL eksternal',
+  `access_type` enum('open','restricted','subscription','purchase','internal') NOT NULL DEFAULT 'open' COMMENT 'Tipe akses',
+  `access_level` enum('public','member','student','teacher','staff','admin') NOT NULL DEFAULT 'member' COMMENT 'Level akses minimum',
+  `license_type` varchar(100) NULL COMMENT 'Tipe lisensi',
+  `license_expires_at` date NULL COMMENT 'Lisensi berakhir',
+  `max_concurrent_access` int UNSIGNED NULL COMMENT 'Maks akses bersamaan',
+  `download_allowed` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika boleh di-download',
+  `print_allowed` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika boleh di-print',
+  `copy_allowed` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika boleh di-copy',
+  `is_featured` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika featured',
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `published_at` timestamp NULL DEFAULT NULL,
+  `total_views` int UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Total views',
+  `total_downloads` int UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Total downloads',
+  `rating_average` decimal(3,2) NULL COMMENT 'Rating rata-rata',
+  `rating_count` int UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Jumlah rating',
+  `meta_title` varchar(200) NULL,
+  `meta_description` text NULL,
+  `meta_keywords` varchar(255) NULL,
+  `created_by` bigint UNSIGNED NULL,
+  `updated_by` bigint UNSIGNED NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uk_digital_library_slug`(`slug` ASC) USING BTREE,
+  INDEX `idx_digital_library_org`(`organization_id` ASC) USING BTREE,
+  INDEX `idx_digital_library_book`(`library_book_id` ASC) USING BTREE,
+  INDEX `idx_digital_library_category`(`book_category_id` ASC) USING BTREE,
+  INDEX `idx_digital_library_publisher`(`book_publisher_id` ASC) USING BTREE,
+  INDEX `idx_digital_library_type`(`item_type` ASC) USING BTREE,
+  INDEX `idx_digital_library_format`(`format` ASC) USING BTREE,
+  INDEX `idx_digital_library_access`(`access_type` ASC) USING BTREE,
+  INDEX `idx_digital_library_level`(`access_level` ASC) USING BTREE,
+  INDEX `idx_digital_library_active`(`is_active` ASC) USING BTREE,
+  INDEX `idx_digital_library_featured`(`is_featured` ASC) USING BTREE,
+  INDEX `idx_digital_library_year`(`publication_year` ASC) USING BTREE,
+  FULLTEXT INDEX `ft_digital_library_search`(`title`, `author`, `description`, `abstract`, `keywords`) USING BTREE,
+  CONSTRAINT `fk_digital_library_org` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_digital_library_book` FOREIGN KEY (`library_book_id`) REFERENCES `library_books` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_digital_library_category` FOREIGN KEY (`book_category_id`) REFERENCES `book_categories` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_digital_library_publisher` FOREIGN KEY (`book_publisher_id`) REFERENCES `book_publishers` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_digital_library_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_digital_library_updated_by` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+```
+
+---
+
+## 📋 2. `digital_library_access_logs`
+
+Log akses perpustakaan digital.
+
+```sql
+-- ----------------------------
+-- Table structure for digital_library_access_logs
+-- ----------------------------
+DROP TABLE IF EXISTS `digital_library_access_logs`;
+CREATE TABLE `digital_library_access_logs`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `digital_library_item_id` bigint UNSIGNED NOT NULL COMMENT 'FK ke digital_library_items',
+  `user_id` bigint UNSIGNED NULL COMMENT 'FK ke users',
+  `student_id` bigint UNSIGNED NULL COMMENT 'FK ke students (jika siswa)',
+  `employee_id` bigint UNSIGNED NULL COMMENT 'FK ke employees (jika karyawan)',
+  `organization_id` bigint UNSIGNED NULL COMMENT 'FK ke organizations',
+  `access_type` enum('view','read','download','stream','print','share','bookmark','rate','review') NOT NULL COMMENT 'Tipe akses',
+  `access_duration_seconds` int UNSIGNED NULL COMMENT 'Durasi akses (detik)',
+  `pages_read` int UNSIGNED NULL COMMENT 'Halaman yang dibaca',
+  `last_page_read` int UNSIGNED NULL COMMENT 'Halaman terakhir dibaca',
+  `progress_percentage` decimal(5,2) NULL COMMENT 'Persentase progress baca',
+  `device_type` enum('desktop','mobile','tablet','other') NULL COMMENT 'Tipe device',
+  `device_identifier` varchar(100) NULL,
+  `user_agent` text NULL,
+  `ip_address` varchar(45) NULL,
+  `referrer` varchar(255) NULL COMMENT 'Halaman asal',
+  `session_id` varchar(100) NULL COMMENT 'Session ID',
+  `rating` decimal(3,2) NULL COMMENT 'Rating (jika access_type = rate)',
+  `review` text NULL COMMENT 'Review (jika access_type = review)',
+  `is_offline` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika akses offline',
+  `accessed_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Waktu akses',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_digital_log_item`(`digital_library_item_id` ASC) USING BTREE,
+  INDEX `idx_digital_log_user`(`user_id` ASC) USING BTREE,
+  INDEX `idx_digital_log_student`(`student_id` ASC) USING BTREE,
+  INDEX `idx_digital_log_employee`(`employee_id` ASC) USING BTREE,
+  INDEX `idx_digital_log_org`(`organization_id` ASC) USING BTREE,
+  INDEX `idx_digital_log_type`(`access_type` ASC) USING BTREE,
+  INDEX `idx_digital_log_accessed`(`accessed_at` ASC) USING BTREE,
+  CONSTRAINT `fk_digital_log_item` FOREIGN KEY (`digital_library_item_id`) REFERENCES `digital_library_items` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `fk_digital_log_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_digital_log_student` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_digital_log_employee` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_digital_log_org` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+```
+
+---
+
+## 📋 3. `library_visits`
+
+Kunjungan fisik ke perpustakaan.
+
+```sql
+-- ----------------------------
+-- Table structure for library_visits
+-- ----------------------------
+DROP TABLE IF EXISTS `library_visits`;
+CREATE TABLE `library_visits`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `library_membership_id` bigint UNSIGNED NULL COMMENT 'FK ke library_memberships',
+  `user_id` bigint UNSIGNED NULL COMMENT 'FK ke users',
+  `student_id` bigint UNSIGNED NULL COMMENT 'FK ke students',
+  `employee_id` bigint UNSIGNED NULL COMMENT 'FK ke employees',
+  `organization_id` bigint UNSIGNED NULL COMMENT 'FK ke organizations',
+  `visit_type` enum('student','teacher','staff','guest','alumni','parent') NOT NULL DEFAULT 'student' COMMENT 'Tipe pengunjung',
+  `purpose` enum('read','borrow','return','study','research','meeting','computer_use','print','other') NOT NULL DEFAULT 'read' COMMENT 'Tujuan kunjungan',
+  `check_in_time` datetime NOT NULL COMMENT 'Waktu masuk',
+  `check_out_time` datetime NULL COMMENT 'Waktu keluar',
+  `duration_minutes` int UNSIGNED NULL COMMENT 'Durasi kunjungan (menit)',
+  `check_in_method` enum('manual','rfid','qr_code','fingerprint','face_recognition','mobile_app') NOT NULL DEFAULT 'manual' COMMENT 'Metode check-in',
+  `check_out_method` enum('manual','rfid','qr_code','fingerprint','face_recognition','mobile_app') NULL COMMENT 'Metode check-out',
+  `visitor_name` varchar(150) NULL COMMENT 'Nama pengunjung (jika guest)',
+  `visitor_phone` varchar(30) NULL,
+  `visitor_institution` varchar(150) NULL COMMENT 'Institusi asal (jika guest)',
+  `visitor_id_number` varchar(50) NULL COMMENT 'Nomor identitas (jika guest)',
+  `companion_count` int UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Jumlah pendamping',
+  `books_read` int UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Jumlah buku dibaca',
+  `notes` text NULL,
+  `created_by` bigint UNSIGNED NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_library_visit_membership`(`library_membership_id` ASC) USING BTREE,
+  INDEX `idx_library_visit_user`(`user_id` ASC) USING BTREE,
+  INDEX `idx_library_visit_student`(`student_id` ASC) USING BTREE,
+  INDEX `idx_library_visit_employee`(`employee_id` ASC) USING BTREE,
+  INDEX `idx_library_visit_org`(`organization_id` ASC) USING BTREE,
+  INDEX `idx_library_visit_type`(`visit_type` ASC) USING BTREE,
+  INDEX `idx_library_visit_purpose`(`purpose` ASC) USING BTREE,
+  INDEX `idx_library_visit_checkin`(`check_in_time` ASC) USING BTREE,
+  CONSTRAINT `fk_library_visit_membership` FOREIGN KEY (`library_membership_id`) REFERENCES `library_memberships` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_library_visit_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_library_visit_student` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_library_visit_employee` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_library_visit_org` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_library_visit_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+```
+
+---
+
+## 📋 4. `library_stock_opname`
+
+Stock opname perpustakaan.
+
+```sql
+-- ----------------------------
+-- Table structure for library_stock_opname
+-- ----------------------------
+DROP TABLE IF EXISTS `library_stock_opname`;
+CREATE TABLE `library_stock_opname`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `organization_id` bigint UNSIGNED NULL COMMENT 'FK ke organizations',
+  `library_book_id` bigint UNSIGNED NULL COMMENT 'FK ke library_books',
+  `book_copy_id` bigint UNSIGNED NULL COMMENT 'FK ke book_copies',
+  `opname_batch` varchar(50) NOT NULL COMMENT 'Batch opname, misal: OPNAME-2025-01',
+  `opname_date` date NOT NULL COMMENT 'Tanggal opname',
+  `expected_quantity` int UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Jumlah seharusnya',
+  `actual_quantity` int UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Jumlah aktual',
+  `difference` int NOT NULL DEFAULT 0 COMMENT 'Selisih (actual - expected)',
+  `condition` enum('good','fair','poor','damaged','lost','written_off') NOT NULL DEFAULT 'good' COMMENT 'Kondisi buku',
+  `status` enum('draft','in_progress','completed','verified','cancelled') NOT NULL DEFAULT 'draft' COMMENT 'Status opname',
+  `discrepancy_reason` text NULL COMMENT 'Alasan selisih',
+  `action_taken` text NULL COMMENT 'Tindakan yang diambil',
+  `location` varchar(255) NULL COMMENT 'Lokasi penyimpanan',
+  `shelf_code` varchar(50) NULL COMMENT 'Kode rak',
+  `checked_by` bigint UNSIGNED NULL COMMENT 'FK ke users yang memeriksa',
+  `verified_by` bigint UNSIGNED NULL COMMENT 'FK ke users yang verifikasi',
+  `verified_at` timestamp NULL DEFAULT NULL,
+  `notes` text NULL,
+  `attachment_path` varchar(255) NULL COMMENT 'Bukti foto/dokumen',
+  `created_by` bigint UNSIGNED NULL,
+  `updated_by` bigint UNSIGNED NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uk_library_opname_batch_copy`(`opname_batch` ASC, `book_copy_id` ASC) USING BTREE,
+  INDEX `idx_library_opname_org`(`organization_id` ASC) USING BTREE,
+  INDEX `idx_library_opname_book`(`library_book_id` ASC) USING BTREE,
+  INDEX `idx_library_opname_copy`(`book_copy_id` ASC) USING BTREE,
+  INDEX `idx_library_opname_batch`(`opname_batch` ASC) USING BTREE,
+  INDEX `idx_library_opname_date`(`opname_date` ASC) USING BTREE,
+  INDEX `idx_library_opname_status`(`status` ASC) USING BTREE,
+  INDEX `idx_library_opname_condition`(`condition` ASC) USING BTREE,
+  CONSTRAINT `fk_library_opname_org` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_library_opname_book` FOREIGN KEY (`library_book_id`) REFERENCES `library_books` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_library_opname_copy` FOREIGN KEY (`book_copy_id`) REFERENCES `book_copies` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_library_opname_checked_by` FOREIGN KEY (`checked_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_library_opname_verified_by` FOREIGN KEY (`verified_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_library_opname_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_library_opname_updated_by` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+```
+
+---
+
+## 🔗 Relasi Antar Tabel
+
+### Ekstrakurikuler Lanjutan
+
+```
+extracurriculars (1)
+    │
+    ├──< extracurricular_coaches (N)
+    │       │
+    │       ├──< extracurricular_schedules (N)
+    │       └──< extracurricular_achievements (N)
+    │
+    ├──< extracurricular_schedules (N)
+    │
+    ├──< extracurricular_achievements (N)
+    │       │
+    │       └── students (N)
+    │
+    └──< extracurricular_fees (N)
+```
+
+### Perpustakaan Digital
+
+```
+library_books (1)
+    │
+    ├──< digital_library_items (N)
+    │       │
+    │       └──< digital_library_access_logs (N)
+    │
+    ├──< library_stock_opname (N)
+    │       │
+    │       └── book_copies (N)
+    │
+    └──< library_visits (N) — via library_memberships
+```
+
+---
+
+## ⚠️ Catatan Penting
+
+1. **FK ke `book_copies`** — Di `library_stock_opname`, saya referensikan `book_copy_id`. Pastikan tabel `book_copies` sudah ada (sudah ada di list Anda).
+
+2. **FK ke `library_memberships`** — Di `library_visits`, saya referensikan `library_membership_id`. Sudah ada di list Anda.
+
+3. **Fulltext index** — Di `digital_library_items` saya tambahkan FULLTEXT index untuk pencarian. Pastikan MySQL 8+ dan engine InnoDB mendukung.
+
+4. **Enum vs Lookup** — Saya pakai `enum` untuk kesederhanaan. Jika ingin fleksibel, ganti dengan lookup table.
+
+5. **`digital_library_items.slug`** — Saya buat UNIQUE. Jika Anda ingin slug per organisasi, ubah menjadi composite unique (`organization_id`, `slug`).
+
+6. **`library_stock_opname` unique** — Saya buat unique berdasarkan `opname_batch + book_copy_id`. Jika satu batch bisa multiple opname untuk copy yang sama, hapus unique-nya.
+
+7. **Rating & review** — Di `digital_library_access_logs`, saya gabungkan rating/review sebagai `access_type`. Jika ingin tabel terpisah (`digital_library_ratings`, `digital_library_reviews`), bisa saya buatkan.
+
+8. **Storage file** — Untuk `file_path`, `cover_path`, `certificate_path`, dll, saya sarankan simpan path relatif (misal: `digital-library/2025/01/ebook-123.pdf`) dan gunakan Laravel Storage untuk resolve URL.
+
+---
+
+Apakah Anda ingin saya bantu buatkan juga:
+
+- **Tabel `digital_library_ratings` & `digital_library_reviews`** (terpisah)?
+- **Tabel `digital_library_bookmarks`** untuk fitur bookmark?
+- **Tabel `digital_library_collections`** untuk kategorisasi koleksi?
+- **Query untuk laporan kunjungan perpustakaan**?
+- **Struktur tabel untuk point 12 (Bimbingan Konseling Lanjutan)**?
+
+Baik, saya buatkan struktur tabel untuk **PPDB Lanjutan** sesuai point 7 sebelumnya. Saya asumsikan Anda sudah punya tabel `admissions`, `applicants`, `admission_selections`, `admission_timelines`, dan `users` sebagai referensi FK.
+
+Saya akan buat 8 tabel:
+
+1. `admission_paths` — jalur masuk (zonasi, prestasi, afirmasi, reguler)
+2. `admission_quota_settings` — kuota per jalur
+3. `admission_registration_fees` — biaya pendaftaran
+4. `admission_test_schedules` — jadwal tes masuk
+5. `admission_test_results` — hasil tes masuk
+6. `admission_interviews` — wawancara
+7. `admission_document_verifications` — verifikasi dokumen
+8. `admission_announcements` — pengumuman hasil seleksi
+
+---
+
+## 📋 1. `admission_paths`
+
+Master jalur masuk PPDB (zonasi, prestasi, afirmasi, reguler, dll).
+
+```sql
+-- ----------------------------
+-- Table structure for admission_paths
+-- ----------------------------
+DROP TABLE IF EXISTS `admission_paths`;
+CREATE TABLE `admission_paths`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `admission_id` bigint UNSIGNED NOT NULL COMMENT 'FK ke admissions',
+  `organization_id` bigint UNSIGNED NULL COMMENT 'FK ke organizations',
+  `code` varchar(50) NOT NULL COMMENT 'Kode jalur, misal: ZONASI, PRESTASI',
+  `name` varchar(100) NOT NULL COMMENT 'Nama jalur',
+  `description` text NULL,
+  `quota` int UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Kuota jalur ini',
+  `min_score` decimal(5,2) NULL COMMENT 'Nilai minimum (jika ada)',
+  `max_score` decimal(5,2) NULL COMMENT 'Nilai maksimum (jika ada)',
+  `requirements` json NULL COMMENT 'Persyaratan khusus dalam JSON',
+  `sort_order` int UNSIGNED NOT NULL DEFAULT 0,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `open_date` date NULL COMMENT 'Tanggal buka pendaftaran',
+  `close_date` date NULL COMMENT 'Tanggal tutup pendaftaran',
+  `created_by` bigint UNSIGNED NULL,
+  `updated_by` bigint UNSIGNED NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uk_admission_paths_code`(`admission_id` ASC, `code` ASC) USING BTREE,
+  INDEX `idx_admission_paths_admission`(`admission_id` ASC) USING BTREE,
+  INDEX `idx_admission_paths_org`(`organization_id` ASC) USING BTREE,
+  INDEX `idx_admission_paths_active`(`is_active` ASC) USING BTREE,
+  CONSTRAINT `fk_admission_paths_admission` FOREIGN KEY (`admission_id`) REFERENCES `admissions` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_paths_org` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_paths_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_paths_updated_by` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+```
+
+---
+
+## 📋 2. `admission_quota_settings`
+
+Pengaturan kuota per jalur, per gelombang, atau per program studi.
+
+```sql
+-- ----------------------------
+-- Table structure for admission_quota_settings
+-- ----------------------------
+DROP TABLE IF EXISTS `admission_quota_settings`;
+CREATE TABLE `admission_quota_settings`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `admission_id` bigint UNSIGNED NOT NULL COMMENT 'FK ke admissions',
+  `admission_path_id` bigint UNSIGNED NULL COMMENT 'FK ke admission_paths',
+  `organization_id` bigint UNSIGNED NULL COMMENT 'FK ke organizations',
+  `study_program_id` bigint UNSIGNED NULL COMMENT 'FK ke study_programs (jika per prodi)',
+  `faculty_id` bigint UNSIGNED NULL COMMENT 'FK ke faculties (jika per fakultas)',
+  `education_level_id` bigint UNSIGNED NULL COMMENT 'FK ke education_levels (jika per jenjang)',
+  `class_level_id` bigint UNSIGNED NULL COMMENT 'FK ke class_levels',
+  `quota` int UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Jumlah kuota',
+  `filled` int UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Jumlah yang sudah terisi',
+  `reserved` int UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Jumlah yang direservasi',
+  `waitlist_quota` int UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Kuota waiting list',
+  `min_quota` int UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Kuota minimum agar jalur dibuka',
+  `notes` text NULL,
+  `created_by` bigint UNSIGNED NULL,
+  `updated_by` bigint UNSIGNED NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uk_admission_quota_unique`(`admission_id` ASC, `admission_path_id` ASC, `study_program_id` ASC, `education_level_id` ASC) USING BTREE,
+  INDEX `idx_admission_quota_admission`(`admission_id` ASC) USING BTREE,
+  INDEX `idx_admission_quota_path`(`admission_path_id` ASC) USING BTREE,
+  INDEX `idx_admission_quota_org`(`organization_id` ASC) USING BTREE,
+  INDEX `idx_admission_quota_program`(`study_program_id` ASC) USING BTREE,
+  INDEX `idx_admission_quota_faculty`(`faculty_id` ASC) USING BTREE,
+  INDEX `idx_admission_quota_level`(`education_level_id` ASC) USING BTREE,
+  CONSTRAINT `fk_admission_quota_admission` FOREIGN KEY (`admission_id`) REFERENCES `admissions` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_quota_path` FOREIGN KEY (`admission_path_id`) REFERENCES `admission_paths` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_quota_org` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_quota_program` FOREIGN KEY (`study_program_id`) REFERENCES `study_programs` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_quota_faculty` FOREIGN KEY (`faculty_id`) REFERENCES `faculties` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_quota_level` FOREIGN KEY (`education_level_id`) REFERENCES `education_levels` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_quota_class_level` FOREIGN KEY (`class_level_id`) REFERENCES `class_levels` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_quota_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_quota_updated_by` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+```
+
+---
+
+## 📋 3. `admission_registration_fees`
+
+Biaya pendaftaran per jalur/gelombang.
+
+```sql
+-- ----------------------------
+-- Table structure for admission_registration_fees
+-- ----------------------------
+DROP TABLE IF EXISTS `admission_registration_fees`;
+CREATE TABLE `admission_registration_fees`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `admission_id` bigint UNSIGNED NOT NULL COMMENT 'FK ke admissions',
+  `admission_path_id` bigint UNSIGNED NULL COMMENT 'FK ke admission_paths',
+  `organization_id` bigint UNSIGNED NULL COMMENT 'FK ke organizations',
+  `education_level_id` bigint UNSIGNED NULL COMMENT 'FK ke education_levels',
+  `name` varchar(100) NOT NULL COMMENT 'Nama biaya, misal: Biaya Pendaftaran Gelombang 1',
+  `fee_type` enum('registration','test','interview','document','other') NOT NULL DEFAULT 'registration' COMMENT 'Jenis biaya',
+  `amount` decimal(15,2) NOT NULL DEFAULT 0 COMMENT 'Nominal biaya',
+  `currency_id` bigint UNSIGNED NULL COMMENT 'FK ke currencies',
+  `is_mandatory` tinyint(1) NOT NULL DEFAULT 1 COMMENT '1 jika wajib',
+  `is_refundable` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika bisa dikembalikan',
+  `early_bird_amount` decimal(15,2) NULL COMMENT 'Harga early bird',
+  `early_bird_until` date NULL COMMENT 'Early bird berlaku sampai',
+  `effective_from` date NULL,
+  `effective_until` date NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `notes` text NULL,
+  `created_by` bigint UNSIGNED NULL,
+  `updated_by` bigint UNSIGNED NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_admission_fee_admission`(`admission_id` ASC) USING BTREE,
+  INDEX `idx_admission_fee_path`(`admission_path_id` ASC) USING BTREE,
+  INDEX `idx_admission_fee_org`(`organization_id` ASC) USING BTREE,
+  INDEX `idx_admission_fee_level`(`education_level_id` ASC) USING BTREE,
+  INDEX `idx_admission_fee_type`(`fee_type` ASC) USING BTREE,
+  INDEX `idx_admission_fee_active`(`is_active` ASC) USING BTREE,
+  CONSTRAINT `fk_admission_fee_admission` FOREIGN KEY (`admission_id`) REFERENCES `admissions` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_fee_path` FOREIGN KEY (`admission_path_id`) REFERENCES `admission_paths` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_fee_org` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_fee_level` FOREIGN KEY (`education_level_id`) REFERENCES `education_levels` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_fee_currency` FOREIGN KEY (`currency_id`) REFERENCES `currencies` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_fee_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_fee_updated_by` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+```
+
+---
+
+## 📋 4. `admission_test_schedules`
+
+Jadwal tes masuk per jalur/gelombang.
+
+```sql
+-- ----------------------------
+-- Table structure for admission_test_schedules
+-- ----------------------------
+DROP TABLE IF EXISTS `admission_test_schedules`;
+CREATE TABLE `admission_test_schedules`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `admission_id` bigint UNSIGNED NOT NULL COMMENT 'FK ke admissions',
+  `admission_path_id` bigint UNSIGNED NULL COMMENT 'FK ke admission_paths',
+  `organization_id` bigint UNSIGNED NULL COMMENT 'FK ke organizations',
+  `test_type_id` bigint UNSIGNED NULL COMMENT 'FK ke test_types',
+  `room_id` bigint UNSIGNED NULL COMMENT 'FK ke rooms',
+  `building_id` bigint UNSIGNED NULL COMMENT 'FK ke buildings',
+  `name` varchar(150) NOT NULL COMMENT 'Nama sesi tes, misal: Tes Potensi Akademik Gel 1',
+  `test_date` date NOT NULL COMMENT 'Tanggal tes',
+  `start_time` time NOT NULL COMMENT 'Jam mulai',
+  `end_time` time NOT NULL COMMENT 'Jam selesai',
+  `duration_minutes` int UNSIGNED NULL COMMENT 'Durasi tes (menit)',
+  `quota` int UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Kuota peserta',
+  `registered` int UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Jumlah terdaftar',
+  `attended` int UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Jumlah hadir',
+  `exam_package_id` bigint UNSIGNED NULL COMMENT 'FK ke exam_packages (jika CBT)',
+  `cbt_session_id` bigint UNSIGNED NULL COMMENT 'FK ke cbt_sessions (jika CBT)',
+  `supervisor_id` bigint UNSIGNED NULL COMMENT 'FK ke employees (pengawas)',
+  `proctor_id` bigint UNSIGNED NULL COMMENT 'FK ke employees (proktor)',
+  `location` varchar(255) NULL COMMENT 'Lokasi tes',
+  `online_meeting_url` varchar(255) NULL COMMENT 'URL meeting jika online',
+  `instructions` text NULL COMMENT 'Instruksi tes',
+  `status` enum('draft','published','ongoing','completed','cancelled') NOT NULL DEFAULT 'draft',
+  `is_online` tinyint(1) NOT NULL DEFAULT 0,
+  `created_by` bigint UNSIGNED NULL,
+  `updated_by` bigint UNSIGNED NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_admission_test_admission`(`admission_id` ASC) USING BTREE,
+  INDEX `idx_admission_test_path`(`admission_path_id` ASC) USING BTREE,
+  INDEX `idx_admission_test_org`(`organization_id` ASC) USING BTREE,
+  INDEX `idx_admission_test_date`(`test_date` ASC) USING BTREE,
+  INDEX `idx_admission_test_type`(`test_type_id` ASC) USING BTREE,
+  INDEX `idx_admission_test_room`(`room_id` ASC) USING BTREE,
+  INDEX `idx_admission_test_status`(`status` ASC) USING BTREE,
+  CONSTRAINT `fk_admission_test_admission` FOREIGN KEY (`admission_id`) REFERENCES `admissions` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_test_path` FOREIGN KEY (`admission_path_id`) REFERENCES `admission_paths` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_test_org` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_test_type` FOREIGN KEY (`test_type_id`) REFERENCES `test_types` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_test_room` FOREIGN KEY (`room_id`) REFERENCES `rooms` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_test_building` FOREIGN KEY (`building_id`) REFERENCES `buildings` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_test_exam_package` FOREIGN KEY (`exam_package_id`) REFERENCES `exam_packages` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_test_cbt_session` FOREIGN KEY (`cbt_session_id`) REFERENCES `cbt_sessions` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_test_supervisor` FOREIGN KEY (`supervisor_id`) REFERENCES `employees` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_test_proctor` FOREIGN KEY (`proctor_id`) REFERENCES `employees` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_test_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_test_updated_by` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+```
+
+---
+
+## 📋 5. `admission_test_results`
+
+Hasil tes masuk per peserta.
+
+```sql
+-- ----------------------------
+-- Table structure for admission_test_results
+-- ----------------------------
+DROP TABLE IF EXISTS `admission_test_results`;
+CREATE TABLE `admission_test_results`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `admission_test_schedule_id` bigint UNSIGNED NOT NULL COMMENT 'FK ke admission_test_schedules',
+  `applicant_id` bigint UNSIGNED NOT NULL COMMENT 'FK ke applicants',
+  `admission_id` bigint UNSIGNED NOT NULL COMMENT 'FK ke admissions',
+  `admission_path_id` bigint UNSIGNED NULL COMMENT 'FK ke admission_paths',
+  `organization_id` bigint UNSIGNED NULL COMMENT 'FK ke organizations',
+  `test_type_id` bigint UNSIGNED NULL COMMENT 'FK ke test_types',
+  `registration_number` varchar(50) NULL COMMENT 'Nomor registrasi peserta',
+  `attendance_status` enum('present','absent','late','sick','permission') NOT NULL DEFAULT 'present' COMMENT 'Status kehadiran tes',
+  `check_in_time` datetime NULL COMMENT 'Waktu check-in',
+  `check_out_time` datetime NULL COMMENT 'Waktu check-out',
+  `raw_score` decimal(8,2) NULL COMMENT 'Skor mentah',
+  `final_score` decimal(8,2) NULL COMMENT 'Skor akhir setelah konversi',
+  `max_score` decimal(8,2) NULL COMMENT 'Skor maksimum',
+  `percentage` decimal(5,2) NULL COMMENT 'Persentase',
+  `grade` varchar(10) NULL COMMENT 'Grade (A, B, C, dll)',
+  `rank` int UNSIGNED NULL COMMENT 'Peringkat',
+  `passing_status` enum('pending','passed','failed','waitlist') NOT NULL DEFAULT 'pending' COMMENT 'Status kelulusan tes',
+  `cbt_session_id` bigint UNSIGNED NULL COMMENT 'FK ke cbt_sessions (jika CBT)',
+  `cbt_session_answer_id` bigint UNSIGNED NULL COMMENT 'FK ke cbt_session_answers',
+  `detail_scores` json NULL COMMENT 'Detail skor per sub-tes',
+  `notes` text NULL,
+  `graded_by` bigint UNSIGNED NULL COMMENT 'FK ke users yang menilai',
+  `graded_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL,
+  `updated_by` bigint UNSIGNED NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uk_admission_test_result`(`admission_test_schedule_id` ASC, `applicant_id` ASC) USING BTREE,
+  INDEX `idx_admission_result_schedule`(`admission_test_schedule_id` ASC) USING BTREE,
+  INDEX `idx_admission_result_applicant`(`applicant_id` ASC) USING BTREE,
+  INDEX `idx_admission_result_admission`(`admission_id` ASC) USING BTREE,
+  INDEX `idx_admission_result_path`(`admission_path_id` ASC) USING BTREE,
+  INDEX `idx_admission_result_org`(`organization_id` ASC) USING BTREE,
+  INDEX `idx_admission_result_status`(`passing_status` ASC) USING BTREE,
+  INDEX `idx_admission_result_rank`(`rank` ASC) USING BTREE,
+  CONSTRAINT `fk_admission_result_schedule` FOREIGN KEY (`admission_test_schedule_id`) REFERENCES `admission_test_schedules` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_result_applicant` FOREIGN KEY (`applicant_id`) REFERENCES `applicants` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_result_admission` FOREIGN KEY (`admission_id`) REFERENCES `admissions` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_result_path` FOREIGN KEY (`admission_path_id`) REFERENCES `admission_paths` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_result_org` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_result_test_type` FOREIGN KEY (`test_type_id`) REFERENCES `test_types` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_result_cbt_session` FOREIGN KEY (`cbt_session_id`) REFERENCES `cbt_sessions` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_result_cbt_answer` FOREIGN KEY (`cbt_session_answer_id`) REFERENCES `cbt_session_answers` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_result_graded_by` FOREIGN KEY (`graded_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_result_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_result_updated_by` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+```
+
+---
+
+## 📋 6. `admission_interviews`
+
+Wawancara calon peserta didik/mahasiswa.
+
+```sql
+-- ----------------------------
+-- Table structure for admission_interviews
+-- ----------------------------
+DROP TABLE IF EXISTS `admission_interviews`;
+CREATE TABLE `admission_interviews`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `admission_id` bigint UNSIGNED NOT NULL COMMENT 'FK ke admissions',
+  `admission_path_id` bigint UNSIGNED NULL COMMENT 'FK ke admission_paths',
+  `applicant_id` bigint UNSIGNED NOT NULL COMMENT 'FK ke applicants',
+  `organization_id` bigint UNSIGNED NULL COMMENT 'FK ke organizations',
+  `interviewer_id` bigint UNSIGNED NULL COMMENT 'FK ke employees (pewawancara)',
+  `secondary_interviewer_id` bigint UNSIGNED NULL COMMENT 'FK ke employees (pewawancara kedua)',
+  `room_id` bigint UNSIGNED NULL COMMENT 'FK ke rooms',
+  `schedule_date` date NOT NULL COMMENT 'Tanggal wawancara',
+  `start_time` time NOT NULL,
+  `end_time` time NULL,
+  `duration_minutes` int UNSIGNED NULL,
+  `interview_type` enum('in_person','online','phone','video_call') NOT NULL DEFAULT 'in_person',
+  `meeting_url` varchar(255) NULL COMMENT 'URL meeting jika online',
+  `location` varchar(255) NULL,
+  `status` enum('scheduled','ongoing','completed','no_show','cancelled','rescheduled') NOT NULL DEFAULT 'scheduled',
+  `attendance_status` enum('present','absent','late','sick','permission') NOT NULL DEFAULT 'present',
+  `score` decimal(5,2) NULL COMMENT 'Skor wawancara',
+  `max_score` decimal(5,2) NULL,
+  `recommendation` enum('strongly_recommended','recommended','neutral','not_recommended','strongly_not_recommended') NULL,
+  `result` enum('pending','passed','failed','waitlist') NOT NULL DEFAULT 'pending',
+  `notes` text NULL COMMENT 'Catatan pewawancara',
+  `internal_notes` text NULL COMMENT 'Catatan internal (tidak terlihat applicant)',
+  `attachment_path` varchar(255) NULL COMMENT 'Bukti/dokumen wawancara',
+  `completed_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL,
+  `updated_by` bigint UNSIGNED NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_admission_interview_admission`(`admission_id` ASC) USING BTREE,
+  INDEX `idx_admission_interview_path`(`admission_path_id` ASC) USING BTREE,
+  INDEX `idx_admission_interview_applicant`(`applicant_id` ASC) USING BTREE,
+  INDEX `idx_admission_interview_org`(`organization_id` ASC) USING BTREE,
+  INDEX `idx_admission_interview_date`(`schedule_date` ASC) USING BTREE,
+  INDEX `idx_admission_interview_status`(`status` ASC) USING BTREE,
+  INDEX `idx_admission_interview_interviewer`(`interviewer_id` ASC) USING BTREE,
+  CONSTRAINT `fk_admission_interview_admission` FOREIGN KEY (`admission_id`) REFERENCES `admissions` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_interview_path` FOREIGN KEY (`admission_path_id`) REFERENCES `admission_paths` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_interview_applicant` FOREIGN KEY (`applicant_id`) REFERENCES `applicants` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_interview_org` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_interview_interviewer` FOREIGN KEY (`interviewer_id`) REFERENCES `employees` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_interview_secondary` FOREIGN KEY (`secondary_interviewer_id`) REFERENCES `employees` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_interview_room` FOREIGN KEY (`room_id`) REFERENCES `rooms` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_interview_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_interview_updated_by` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+```
+
+---
+
+## 📋 7. `admission_document_verifications`
+
+Verifikasi dokumen pendaftaran.
+
+```sql
+-- ----------------------------
+-- Table structure for admission_document_verifications
+-- ----------------------------
+DROP TABLE IF EXISTS `admission_document_verifications`;
+CREATE TABLE `admission_document_verifications`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `applicant_id` bigint UNSIGNED NOT NULL COMMENT 'FK ke applicants',
+  `application_document_id` bigint UNSIGNED NULL COMMENT 'FK ke application_documents',
+  `admission_id` bigint UNSIGNED NULL COMMENT 'FK ke admissions',
+  `organization_id` bigint UNSIGNED NULL COMMENT 'FK ke organizations',
+  `document_type` varchar(100) NOT NULL COMMENT 'Jenis dokumen, misal: Ijazah, Akta, KK',
+  `document_number` varchar(100) NULL COMMENT 'Nomor dokumen',
+  `file_path` varchar(255) NULL COMMENT 'Path file dokumen',
+  `verification_status` enum('pending','verified','rejected','revision_required','expired') NOT NULL DEFAULT 'pending',
+  `verification_method` enum('manual','online','physical','third_party') NOT NULL DEFAULT 'manual',
+  `verified_by` bigint UNSIGNED NULL COMMENT 'FK ke users yang verifikasi',
+  `verified_at` timestamp NULL DEFAULT NULL,
+  `rejected_by` bigint UNSIGNED NULL COMMENT 'FK ke users yang reject',
+  `rejected_at` timestamp NULL DEFAULT NULL,
+  `rejection_reason` text NULL,
+  `revision_notes` text NULL COMMENT 'Catatan jika perlu revisi',
+  `revision_deadline` date NULL COMMENT 'Batas waktu revisi',
+  `is_mandatory` tinyint(1) NOT NULL DEFAULT 1 COMMENT '1 jika dokumen wajib',
+  `is_valid` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika dokumen valid',
+  `valid_until` date NULL COMMENT 'Berlaku sampai (jika ada masa berlaku)',
+  `notes` text NULL,
+  `created_by` bigint UNSIGNED NULL,
+  `updated_by` bigint UNSIGNED NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_admission_verif_applicant`(`applicant_id` ASC) USING BTREE,
+  INDEX `idx_admission_verif_document`(`application_document_id` ASC) USING BTREE,
+  INDEX `idx_admission_verif_admission`(`admission_id` ASC) USING BTREE,
+  INDEX `idx_admission_verif_org`(`organization_id` ASC) USING BTREE,
+  INDEX `idx_admission_verif_status`(`verification_status` ASC) USING BTREE,
+  INDEX `idx_admission_verif_type`(`document_type` ASC) USING BTREE,
+  INDEX `idx_admission_verif_verified_by`(`verified_by` ASC) USING BTREE,
+  CONSTRAINT `fk_admission_verif_applicant` FOREIGN KEY (`applicant_id`) REFERENCES `applicants` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_verif_document` FOREIGN KEY (`application_document_id`) REFERENCES `application_documents` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_verif_admission` FOREIGN KEY (`admission_id`) REFERENCES `admissions` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_verif_org` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_verif_verified_by` FOREIGN KEY (`verified_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_verif_rejected_by` FOREIGN KEY (`rejected_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_verif_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_verif_updated_by` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+```
+
+---
+
+## 📋 8. `admission_announcements`
+
+Pengumuman hasil seleksi PPDB.
+
+```sql
+-- ----------------------------
+-- Table structure for admission_announcements
+-- ----------------------------
+DROP TABLE IF EXISTS `admission_announcements`;
+CREATE TABLE `admission_announcements`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `admission_id` bigint UNSIGNED NOT NULL COMMENT 'FK ke admissions',
+  `admission_path_id` bigint UNSIGNED NULL COMMENT 'FK ke admission_paths',
+  `organization_id` bigint UNSIGNED NULL COMMENT 'FK ke organizations',
+  `education_level_id` bigint UNSIGNED NULL COMMENT 'FK ke education_levels',
+  `study_program_id` bigint UNSIGNED NULL COMMENT 'FK ke study_programs',
+  `title` varchar(200) NOT NULL COMMENT 'Judul pengumuman',
+  `slug` varchar(200) NOT NULL COMMENT 'Slug untuk URL',
+  `content` longtext NULL COMMENT 'Isi pengumuman (HTML/Markdown)',
+  `announcement_type` enum('selection_result','document_verification','test_schedule','interview_schedule','general','re_registration','waitlist') NOT NULL DEFAULT 'selection_result' COMMENT 'Jenis pengumuman',
+  `announcement_date` datetime NOT NULL COMMENT 'Tanggal & waktu pengumuman',
+  `publish_date` datetime NULL COMMENT 'Tanggal publish',
+  `expired_date` datetime NULL COMMENT 'Tanggal kadaluarsa',
+  `is_published` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika sudah dipublish',
+  `is_public` tinyint(1) NOT NULL DEFAULT 1 COMMENT '1 jika bisa diakses publik',
+  `requires_login` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika harus login',
+  `attachment_path` varchar(255) NULL COMMENT 'File lampiran (PDF)',
+  `external_url` varchar(255) NULL COMMENT 'URL eksternal (jika ada)',
+  `show_ranking` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika tampilkan ranking',
+  `show_score` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika tampilkan skor',
+  `total_participants` int UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Total peserta',
+  `total_passed` int UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Total lulus',
+  `total_failed` int UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Total tidak lulus',
+  `total_waitlist` int UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Total waiting list',
+  `notification_sent` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika notifikasi sudah dikirim',
+  `notification_sent_at` timestamp NULL DEFAULT NULL,
+  `notification_channels` json NULL COMMENT 'Channel notifikasi (email, wa, sms)',
+  `meta_title` varchar(200) NULL COMMENT 'SEO title',
+  `meta_description` text NULL COMMENT 'SEO description',
+  `meta_keywords` varchar(255) NULL COMMENT 'SEO keywords',
+  `views_count` int UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Jumlah views',
+  `created_by` bigint UNSIGNED NULL,
+  `updated_by` bigint UNSIGNED NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uk_admission_announcement_slug`(`slug` ASC) USING BTREE,
+  INDEX `idx_admission_ann_admission`(`admission_id` ASC) USING BTREE,
+  INDEX `idx_admission_ann_path`(`admission_path_id` ASC) USING BTREE,
+  INDEX `idx_admission_ann_org`(`organization_id` ASC) USING BTREE,
+  INDEX `idx_admission_ann_level`(`education_level_id` ASC) USING BTREE,
+  INDEX `idx_admission_ann_program`(`study_program_id` ASC) USING BTREE,
+  INDEX `idx_admission_ann_type`(`announcement_type` ASC) USING BTREE,
+  INDEX `idx_admission_ann_date`(`announcement_date` ASC) USING BTREE,
+  INDEX `idx_admission_ann_published`(`is_published` ASC) USING BTREE,
+  INDEX `idx_admission_ann_public`(`is_public` ASC) USING BTREE,
+  CONSTRAINT `fk_admission_ann_admission` FOREIGN KEY (`admission_id`) REFERENCES `admissions` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_ann_path` FOREIGN KEY (`admission_path_id`) REFERENCES `admission_paths` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_ann_org` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_ann_level` FOREIGN KEY (`education_level_id`) REFERENCES `education_levels` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_ann_program` FOREIGN KEY (`study_program_id`) REFERENCES `study_programs` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_ann_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_admission_ann_updated_by` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+```
+
+---
+
+## 🔗 Relasi Antar Tabel PPDB Lanjutan
+
+```
+admissions (1)
+    │
+    ├──< admission_paths (N)
+    │       │
+    │       ├──< admission_quota_settings (N)
+    │       ├──< admission_registration_fees (N)
+    │       ├──< admission_test_schedules (N)
+    │       └──< admission_interviews (N)
+    │
+    ├──< admission_test_schedules (N)
+    │       │
+    │       └──< admission_test_results (N)
+    │               │
+    │               └── applicants (N)
+    │
+    ├──< admission_interviews (N)
+    │       │
+    │       └── applicants (N)
+    │
+    ├──< admission_document_verifications (N)
+    │       │
+    │       ├── applicants (N)
+    │       └── application_documents (N)
+    │
+    └──< admission_announcements (N)
+```
+
+---
+
+## ⚠️ Catatan Penting
+
+1. **FK ke `admissions`** — Saya asumsikan tabel `admissions` sudah ada dan punya primary key `id`. Jika belum, sesuaikan.
+
+2. **FK ke `applicants`** — Sudah ada di list Anda.
+
+3. **FK ke `application_documents`** — Sudah ada di list Anda.
+
+4. **FK ke `cbt_sessions` & `cbt_session_answers`** — Sudah ada di list Anda.
+
+5. **FK ke `employees`** — Untuk interviewer/pengawas. Jika ingin pakai `users` langsung, tinggal ganti referensinya.
+
+6. **Enum vs Lookup** — Saya pakai `enum` untuk kesederhanaan. Jika ingin lebih fleksibel, ganti dengan lookup table.
+
+7. **`admission_quota_settings` unique index** — Saya buat unique berdasarkan kombinasi `admission_id + admission_path_id + study_program_id + education_level_id`. Jika salah satu NULL, MySQL menganggapnya unik (NULL != NULL), jadi hati-hati jika ada kombinasi NULL.
+
+8. **JSON columns** — `requirements`, `detail_scores`, `notification_channels` menggunakan JSON. Pastikan MySQL 8+.
+
+---
+
+Apakah Anda ingin saya bantu buatkan juga:
+
+- **Query untuk generate ranking otomatis** berdasarkan hasil tes?
+- **Stored procedure untuk update kuota** saat applicant lulus?
+- **Seeder** untuk `admission_paths` default (Zonasi, Prestasi, Afirmasi, Reguler)?
+- **Struktur tabel `devices`** untuk master perangkat absensi (yang tertunda)?
+
+Baik, saya bantu buatkan struktur tabel untuk **employee_attendances**, **employee_attendance_logs**, **work_schedules**, dan **attendance_corrections**.
+
+Saya asumsikan Anda menggunakan **MySQL 8+** dengan **InnoDB**, **utf8mb4**, dan konvensi **bigint UNSIGNED** untuk primary key (konsisten dengan tabel `question_banks` yang Anda contohkan).
+
+---
+
+## 📋 1. `work_schedules`
+
+Menyimpan definisi jadwal kerja (misal: "Shift Pagi", "Shift Siang", "Normal Office Hours").
+
+```sql
+-- ----------------------------
+-- Table structure for work_schedules
+-- ----------------------------
+DROP TABLE IF EXISTS `work_schedules`;
+CREATE TABLE `work_schedules`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `organization_id` bigint UNSIGNED NULL DEFAULT NULL COMMENT 'FK ke organizations, NULL untuk global',
+  `name` varchar(100) NOT NULL COMMENT 'Nama jadwal, misal: Shift Pagi, Normal Office',
+  `code` varchar(50) NOT NULL COMMENT 'Kode unik jadwal, misal: SHIFT_PAGI',
+  `description` text NULL,
+  `day_type` enum('weekday','weekend','holiday','all') NOT NULL DEFAULT 'weekday' COMMENT 'Tipe hari berlaku',
+  `check_in_time` time NOT NULL COMMENT 'Jam masuk yang diharapkan',
+  `check_out_time` time NOT NULL COMMENT 'Jam pulang yang diharapkan',
+  `break_start_time` time NULL COMMENT 'Jam mulai istirahat',
+  `break_end_time` time NULL COMMENT 'Jam selesai istirahat',
+  `late_tolerance_minutes` int UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Toleransi keterlambatan (menit)',
+  `early_leave_tolerance_minutes` int UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Toleransi pulang cepat (menit)',
+  `overtime_threshold_minutes` int UNSIGNED NOT NULL DEFAULT 30 COMMENT 'Ambang batas overtime (menit)',
+  `is_cross_day` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika shift melewati tengah malam',
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `effective_from` date NULL COMMENT 'Berlaku mulai tanggal',
+  `effective_until` date NULL COMMENT 'Berlaku sampai tanggal',
+  `created_by` bigint UNSIGNED NULL,
+  `updated_by` bigint UNSIGNED NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uk_work_schedules_code`(`code` ASC, `organization_id` ASC) USING BTREE,
+  INDEX `idx_work_schedules_org`(`organization_id` ASC) USING BTREE,
+  INDEX `idx_work_schedules_active`(`is_active` ASC) USING BTREE,
+  CONSTRAINT `fk_work_schedules_org` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_work_schedules_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_work_schedules_updated_by` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+```
+
+---
+
+## 📋 2. `employee_attendances`
+
+Menyimpan **ringkasan kehadiran harian** per karyawan (satu baris per karyawan per tanggal).
+
+```sql
+-- ----------------------------
+-- Table structure for employee_attendances
+-- ----------------------------
+DROP TABLE IF EXISTS `employee_attendances`;
+CREATE TABLE `employee_attendances`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `employee_id` bigint UNSIGNED NOT NULL COMMENT 'FK ke employees',
+  `organization_id` bigint UNSIGNED NULL COMMENT 'FK ke organizations',
+  `work_schedule_id` bigint UNSIGNED NULL COMMENT 'FK ke work_schedules',
+  `shift_id` bigint UNSIGNED NULL COMMENT 'FK ke shifts (jika menggunakan shift)',
+  `attendance_date` date NOT NULL COMMENT 'Tanggal kehadiran',
+  `check_in_time` datetime NULL COMMENT 'Waktu check-in aktual',
+  `check_out_time` datetime NULL COMMENT 'Waktu check-out aktual',
+  `scheduled_check_in` datetime NULL COMMENT 'Jadwal check-in seharusnya',
+  `scheduled_check_out` datetime NULL COMMENT 'Jadwal check-out seharusnya',
+  `work_duration_minutes` int UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Total durasi kerja (menit)',
+  `late_minutes` int UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Keterlambatan (menit)',
+  `early_leave_minutes` int UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Pulang cepat (menit)',
+  `overtime_minutes` int UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Lembur (menit)',
+  `break_duration_minutes` int UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Durasi istirahat (menit)',
+  `status` enum('present','absent','late','early_leave','on_leave','sick','permission','holiday','weekend','remote','business_trip','half_day') NOT NULL DEFAULT 'present' COMMENT 'Status kehadiran',
+  `attendance_method` enum('manual','rfid','fingerprint','face_recognition','gps','qr_code','import','mobile_app') NOT NULL DEFAULT 'manual' COMMENT 'Metode absensi',
+  `check_in_location` varchar(255) NULL COMMENT 'Lokasi check-in (jika GPS)',
+  `check_out_location` varchar(255) NULL COMMENT 'Lokasi check-out (jika GPS)',
+  `check_in_latitude` decimal(10,7) NULL,
+  `check_in_longitude` decimal(10,7) NULL,
+  `check_out_latitude` decimal(10,7) NULL,
+  `check_out_longitude` decimal(10,7) NULL,
+  `check_in_device_id` varchar(100) NULL COMMENT 'ID perangkat check-in',
+  `check_out_device_id` varchar(100) NULL COMMENT 'ID perangkat check-out',
+  `check_in_ip` varchar(45) NULL,
+  `check_out_ip` varchar(45) NULL,
+  `leave_request_id` bigint UNSIGNED NULL COMMENT 'FK ke employee_leaves jika status on_leave',
+  `permission_request_id` bigint UNSIGNED NULL COMMENT 'FK ke permission_requests',
+  `is_corrected` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika sudah dikoreksi',
+  `correction_id` bigint UNSIGNED NULL COMMENT 'FK ke attendance_corrections',
+  `notes` text NULL,
+  `approved_by` bigint UNSIGNED NULL COMMENT 'FK ke users yang approve',
+  `approved_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL,
+  `updated_by` bigint UNSIGNED NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uk_employee_attendance_date`(`employee_id` ASC, `attendance_date` ASC) USING BTREE,
+  INDEX `idx_emp_att_org`(`organization_id` ASC) USING BTREE,
+  INDEX `idx_emp_att_date`(`attendance_date` ASC) USING BTREE,
+  INDEX `idx_emp_att_status`(`status` ASC) USING BTREE,
+  INDEX `idx_emp_att_schedule`(`work_schedule_id` ASC) USING BTREE,
+  INDEX `idx_emp_att_shift`(`shift_id` ASC) USING BTREE,
+  INDEX `idx_emp_att_leave`(`leave_request_id` ASC) USING BTREE,
+  INDEX `idx_emp_att_permission`(`permission_request_id` ASC) USING BTREE,
+  CONSTRAINT `fk_emp_att_employee` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `fk_emp_att_org` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_emp_att_schedule` FOREIGN KEY (`work_schedule_id`) REFERENCES `work_schedules` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_emp_att_shift` FOREIGN KEY (`shift_id`) REFERENCES `shifts` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_emp_att_leave` FOREIGN KEY (`leave_request_id`) REFERENCES `employee_leaves` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_emp_att_permission` FOREIGN KEY (`permission_request_id`) REFERENCES `permission_requests` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_emp_att_approved_by` FOREIGN KEY (`approved_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_emp_att_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_emp_att_updated_by` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+```
+
+---
+
+## 📋 3. `employee_attendance_logs`
+
+Menyimpan **log detail setiap event absensi** (check-in, check-out, break, dll). Satu karyawan bisa punya banyak log per hari.
+
+```sql
+-- ----------------------------
+-- Table structure for employee_attendance_logs
+-- ----------------------------
+DROP TABLE IF EXISTS `employee_attendance_logs`;
+CREATE TABLE `employee_attendance_logs`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `employee_attendance_id` bigint UNSIGNED NULL COMMENT 'FK ke employee_attendances (bisa NULL jika log mentah)',
+  `employee_id` bigint UNSIGNED NOT NULL COMMENT 'FK ke employees',
+  `organization_id` bigint UNSIGNED NULL COMMENT 'FK ke organizations',
+  `device_id` bigint UNSIGNED NULL COMMENT 'FK ke devices (jika ada master device)',
+  `log_type` enum('check_in','check_out','break_start','break_end','overtime_start','overtime_end','manual_entry','correction','import') NOT NULL COMMENT 'Tipe log',
+  `log_time` datetime NOT NULL COMMENT 'Waktu kejadian',
+  `method` enum('manual','rfid','fingerprint','face_recognition','gps','qr_code','import','mobile_app','api') NOT NULL DEFAULT 'manual',
+  `latitude` decimal(10,7) NULL,
+  `longitude` decimal(10,7) NULL,
+  `location_name` varchar(255) NULL COMMENT 'Nama lokasi, misal: Gerbang Utama',
+  `ip_address` varchar(45) NULL,
+  `user_agent` text NULL,
+  `device_identifier` varchar(100) NULL COMMENT 'ID unik perangkat',
+  `photo_path` varchar(255) NULL COMMENT 'Path foto selfie (jika ada)',
+  `raw_data` json NULL COMMENT 'Data mentah dari perangkat/import',
+  `is_processed` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika sudah diproses ke employee_attendances',
+  `processed_at` timestamp NULL DEFAULT NULL,
+  `notes` text NULL,
+  `created_by` bigint UNSIGNED NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_emp_att_log_att`(`employee_attendance_id` ASC) USING BTREE,
+  INDEX `idx_emp_att_log_employee`(`employee_id` ASC) USING BTREE,
+  INDEX `idx_emp_att_log_org`(`organization_id` ASC) USING BTREE,
+  INDEX `idx_emp_att_log_time`(`log_time` ASC) USING BTREE,
+  INDEX `idx_emp_att_log_type`(`log_type` ASC) USING BTREE,
+  INDEX `idx_emp_att_log_processed`(`is_processed` ASC) USING BTREE,
+  CONSTRAINT `fk_emp_att_log_attendance` FOREIGN KEY (`employee_attendance_id`) REFERENCES `employee_attendances` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `fk_emp_att_log_employee` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `fk_emp_att_log_org` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_emp_att_log_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+```
+
+---
+
+## 📋 4. `attendance_corrections`
+
+Menyimpan **permintaan koreksi absensi** oleh karyawan (misal: lupa check-out, salah jam).
+
+```sql
+-- ----------------------------
+-- Table structure for attendance_corrections
+-- ----------------------------
+DROP TABLE IF EXISTS `attendance_corrections`;
+CREATE TABLE `attendance_corrections`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `employee_attendance_id` bigint UNSIGNED NULL COMMENT 'FK ke employee_attendances yang dikoreksi',
+  `employee_id` bigint UNSIGNED NOT NULL COMMENT 'FK ke employees yang mengajukan',
+  `organization_id` bigint UNSIGNED NULL COMMENT 'FK ke organizations',
+  `correction_type` enum('check_in','check_out','both','status','overtime','break','other') NOT NULL COMMENT 'Jenis koreksi',
+  `original_check_in` datetime NULL COMMENT 'Check-in sebelum koreksi',
+  `original_check_out` datetime NULL COMMENT 'Check-out sebelum koreksi',
+  `original_status` varchar(50) NULL COMMENT 'Status sebelum koreksi',
+  `requested_check_in` datetime NULL COMMENT 'Check-in yang diminta',
+  `requested_check_out` datetime NULL COMMENT 'Check-out yang diminta',
+  `requested_status` varchar(50) NULL COMMENT 'Status yang diminta',
+  `requested_overtime_minutes` int UNSIGNED NULL COMMENT 'Overtime yang diminta (menit)',
+  `reason` text NOT NULL COMMENT 'Alasan koreksi',
+  `attachment_path` varchar(255) NULL COMMENT 'Bukti pendukung (foto, surat)',
+  `status` enum('pending','approved','rejected','cancelled','revised') NOT NULL DEFAULT 'pending' COMMENT 'Status permintaan',
+  `approved_by` bigint UNSIGNED NULL COMMENT 'FK ke users yang approve',
+  `approved_at` timestamp NULL DEFAULT NULL,
+  `rejected_by` bigint UNSIGNED NULL COMMENT 'FK ke users yang reject',
+  `rejected_at` timestamp NULL DEFAULT NULL,
+  `rejection_reason` text NULL,
+  `applied_at` timestamp NULL DEFAULT NULL COMMENT 'Waktu koreksi diterapkan ke employee_attendances',
+  `created_by` bigint UNSIGNED NULL,
+  `updated_by` bigint UNSIGNED NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_att_corr_attendance`(`employee_attendance_id` ASC) USING BTREE,
+  INDEX `idx_att_corr_employee`(`employee_id` ASC) USING BTREE,
+  INDEX `idx_att_corr_org`(`organization_id` ASC) USING BTREE,
+  INDEX `idx_att_corr_status`(`status` ASC) USING BTREE,
+  INDEX `idx_att_corr_type`(`correction_type` ASC) USING BTREE,
+  CONSTRAINT `fk_att_corr_attendance` FOREIGN KEY (`employee_attendance_id`) REFERENCES `employee_attendances` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_att_corr_employee` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `fk_att_corr_org` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_att_corr_approved_by` FOREIGN KEY (`approved_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_att_corr_rejected_by` FOREIGN KEY (`rejected_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_att_corr_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_att_corr_updated_by` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+```
+
+---
+
+## 🔗 Relasi Antar Tabel
+
+```
+work_schedules (1) ────< employee_attendances (N)
+                              │
+                              │ (1)
+                              ▼
+                        employee_attendance_logs (N)
+                              │
+                              │ (0..1)
+                              ▼
+                        attendance_corrections (N)
+                              │
+                              │ (0..1)
+                              ▼
+                        employee_attendances (di-update)
+```
+
+**Alur:**
+
+1. `work_schedules` mendefinisikan jadwal kerja
+2. `employee_attendances` menyimpan ringkasan harian per karyawan
+3. `employee_attendance_logs` menyimpan detail setiap event (check-in, check-out, break)
+4. `attendance_corrections` menyimpan permintaan koreksi → jika approved, update `employee_attendances`
+
+---
+
+## ⚠️ Catatan Penting
+
+1. **Tabel `devices`** — Saya referensikan `device_id` di `employee_attendance_logs` tapi tidak ada FK ke `devices`. Jika Anda punya master device, tambahkan FK-nya. Jika tidak, biarkan sebagai `bigint UNSIGNED NULL` tanpa FK.
+
+2. **Tabel `permission_requests`** — Anda sudah punya di list, jadi saya referensikan di `employee_attendances`.
+
+3. **Tabel `employee_leaves`** — Anda sudah punya, saya referensikan untuk status `on_leave`.
+
+4. **Enum vs Lookup Table** — Saya menggunakan `enum` untuk kesederhanaan. Jika Anda ingin lebih fleksibel, bisa diganti dengan lookup table (misal: `attendance_statuses`, `attendance_methods`).
+
+5. **Partisi** — Jika data absensi sangat besar (jutaan baris), pertimbangkan **partitioning by `attendance_date`** (MySQL 8+ mendukung).
+
+6. **Index** — Saya sudah tambahkan index pada kolom yang sering di-query (`attendance_date`, `status`, `employee_id`).
+
+---
+
+Apakah Anda ingin saya bantu buatkan juga:
+
+- **Query untuk generate laporan absensi bulanan**?
+- **Stored procedure untuk auto-process log ke attendance**?
+- **Tabel `devices`** untuk master perangkat absensi?
+- **Seeder** untuk data awal (work_schedules default)?
+  Terima kasih sudah mengirimkan list terbaru. Saya sudah bandingkan dengan versi sebelumnya. **Ada banyak penambahan bagus** — terutama di area **asesmen, CBT, kurikulum, dan rapor**. Tapi masih ada **beberapa gap** yang menurut saya penting.
+
+---
+
+## ✅ Yang Sudah Anda Tambahkan (Bagus!)
+
+| Area                | Tabel Baru                                                                                                                                                                                                                        | Dampak                                       |
+| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| **Asesmen**         | `assessments`, `assessment_components`, `assessment_methods`, `assessment_rubrics`, `assessment_types`                                                                                                                            | Penilaian jadi fleksibel & berbasis rubrik   |
+| **Rapor**           | `report_cards`, `report_card_grades`, `report_card_components`, `report_card_notes`, `report_card_signatures`, `report_card_template_*`, `report_periods`                                                                         | Rapor lengkap dengan template & tanda tangan |
+| **CBT**             | `cbt_session_answers`, `question_banks`, `question_options`, `question_media`, `question_stimuli`, `question_types`, `question_matching_pairs`, `question_bank_versions`, `question_bank_tag_pivot`, `question_media_annotations` | Bank soal & CBT sangat lengkap               |
+| **Kurikulum**       | `curriculums`, `curriculum_objectives`, `curriculum_learning_outcomes`, `curriculum_subjects`, `student_curriculums`, `student_learning_plans`                                                                                    | Kurikulum lebih terstruktur                  |
+| **Penilaian Siswa** | `student_assessments`, `student_rubric_scores`, `mastery_tracking`                                                                                                                                                                | Tracking penguasaan materi                   |
+| **Grade**           | `grade_boundaries`, `cognitive_levels`, `difficulty_levels`                                                                                                                                                                       | Taksonomi Bloom & boundary nilai             |
+| **Konten**          | `sliders`, `tags`, `subject_categories`                                                                                                                                                                                           | Manajemen konten & kategorisasi              |
+| **Lainnya**         | `menus_bak` (backup menu)                                                                                                                                                                                                         | Ada backup                                   |
+
+---
+
+## 🔴 Masih Kurang (Prioritas Tinggi)
+
+### 1. **Kehadiran Guru & Karyawan** — ❌ Belum Ada
+
+Anda punya `attendances`, `student_attendances`, `attendance_dailies`, `attendance_logs`. Tapi **absensi guru/karyawan** masih belum terpisah.
+
+| Tabel yang kurang          | Fungsi                |
+| -------------------------- | --------------------- |
+| `employee_attendances`     | Absensi guru/karyawan |
+| `employee_attendance_logs` | Log check-in/out      |
+| `work_schedules`           | Jadwal kerja          |
+| `attendance_corrections`   | Koreksi absensi       |
+
+### 2. **Beasiswa & Bantuan Biaya** — ❌ Belum Ada
+
+Ini **sangat penting** di konteks Indonesia.
+
+| Tabel yang kurang           | Fungsi               |
+| --------------------------- | -------------------- |
+| `scholarships`              | Program beasiswa     |
+| `scholarship_types`         | Jenis beasiswa       |
+| `scholarship_applications`  | Pendaftaran beasiswa |
+| `scholarship_recipients`    | Penerima beasiswa    |
+| `scholarship_disbursements` | Pencairan            |
+| `financial_aid_requests`    | Keringanan biaya     |
+
+### 3. **Komunikasi Lanjutan (WA/SMS/Email)** — ❌ Belum Ada
+
+Anda punya `announcements`, `messages`, `notifications`. Tapi **log & template** belum ada.
+
+| Tabel yang kurang          | Fungsi                        |
+| -------------------------- | ----------------------------- |
+| `notification_templates`   | Template notifikasi           |
+| `notification_preferences` | Preferensi per user           |
+| `whatsapp_logs`            | Log WA (krusial di Indonesia) |
+| `sms_logs`                 | Log SMS                       |
+| `email_logs`               | Log email                     |
+| `push_notification_tokens` | Token FCM/APNs                |
+| `message_threads`          | Thread percakapan             |
+| `message_participants`     | Peserta thread                |
+
+### 4. **Dokumen Terpusat** — ⚠️ Sebagian
+
+Anda punya `application_documents`, `rkas_documents`. Tapi **repositori dokumen umum** belum ada.
+
+| Tabel yang kurang      | Fungsi                                |
+| ---------------------- | ------------------------------------- |
+| `documents`            | Repositori dokumen (ijazah, akta, KK) |
+| `document_types`       | Jenis dokumen                         |
+| `document_versions`    | Versioning                            |
+| `document_access_logs` | Log akses                             |
+| `file_uploads`         | Attachment generik                    |
+| `digital_signatures`   | Tanda tangan digital                  |
+
+### 5. **Keamanan & Autentikasi** — ❌ Belum Ada
+
+| Tabel yang kurang            | Fungsi                                          |
+| ---------------------------- | ----------------------------------------------- |
+| `login_attempts`             | Log percobaan login                             |
+| `two_factor_authentications` | 2FA                                             |
+| `two_factor_recovery_codes`  | Recovery 2FA                                    |
+| `personal_access_tokens`     | Sanctum (mungkin sudah ada tapi tidak terlihat) |
+| `password_histories`         | Riwayat password                                |
+| `trusted_devices`            | Perangkat terpercaya                            |
+| `security_events`            | Event keamanan                                  |
+| `blocked_ips`                | IP diblokir                                     |
+
+### 6. **Multi-Tenancy Lanjutan** — ⚠️ Sebagian
+
+Anda punya `organizations`, `organization_user`, `trial_registrations`. Tapi untuk SaaS sejati:
+
+| Tabel yang kurang       | Fungsi                           |
+| ----------------------- | -------------------------------- |
+| `tenants`               | Jika `organizations` belum cukup |
+| `tenant_domains`        | Mapping domain ke tenant         |
+| `tenant_settings`       | Setting per tenant               |
+| `tenant_subscriptions`  | Langganan per tenant             |
+| `subscription_plans`    | Paket langganan                  |
+| `subscription_invoices` | Invoice langganan                |
+| `subscription_payments` | Pembayaran langganan             |
+| `usage_records`         | Rekaman penggunaan untuk billing |
+| `feature_flags`         | Feature toggle per tenant        |
+
+### 7. **PPDB Lanjutan** — ⚠️ Sebagian
+
+Anda punya `admissions`, `admission_selections`, `admission_timelines`. Tapi biasanya kurang:
+
+| Tabel yang kurang                  | Fungsi                                   |
+| ---------------------------------- | ---------------------------------------- |
+| `admission_test_schedules`         | Jadwal tes masuk                         |
+| `admission_test_results`           | Hasil tes masuk                          |
+| `admission_interviews`             | Wawancara                                |
+| `admission_announcements`          | Pengumuman hasil                         |
+| `admission_registration_fees`      | Biaya pendaftaran                        |
+| `admission_document_verifications` | Verifikasi dokumen                       |
+| `admission_quota_settings`         | Kuota per jalur                          |
+| `admission_paths`                  | Jalur masuk (zonasi, prestasi, afirmasi) |
+
+### 8. **Monitoring & Backup** — ❌ Belum Ada
+
+| Tabel yang kurang     | Fungsi          |
+| --------------------- | --------------- |
+| `backups`             | Rekaman backup  |
+| `backup_schedules`    | Jadwal backup   |
+| `restore_logs`        | Log restore     |
+| `data_exports`        | Log export      |
+| `data_imports`        | Log import      |
+| `health_checks`       | Health check    |
+| `performance_metrics` | Metrik performa |
+| `slow_queries`        | Query lambat    |
+
+### 9. **Integrasi Eksternal** — ⚠️ Sebagian
+
+Anda punya `dapodik_*`, `payroll_integrations`, `payment_gateways`, `api_rate_limits`. Tapi:
+
+| Tabel yang kurang     | Fungsi                   |
+| --------------------- | ------------------------ |
+| `integrations`        | Master integrasi         |
+| `integration_logs`    | Log integrasi            |
+| `webhook_endpoints`   | Webhook keluar           |
+| `webhook_deliveries`  | Log pengiriman webhook   |
+| `api_clients`         | Klien API                |
+| `api_keys`            | API key                  |
+| `api_logs`            | Log API                  |
+| `third_party_configs` | Konfigurasi pihak ketiga |
+
+### 10. **Lokalisasi** — ❌ Belum Ada
+
+| Tabel yang kurang  | Fungsi         |
+| ------------------ | -------------- |
+| `languages`        | Daftar bahasa  |
+| `translations`     | Terjemahan     |
+| `translation_keys` | Key terjemahan |
+| `locales`          | Locale         |
+| `timezones`        | Timezone       |
+
+---
+
+## 🟠 Masih Kurang (Prioritas Sedang)
+
+### 11. **Ekstrakurikuler Lanjutan**
+
+| Tabel                          | Fungsi         |
+| ------------------------------ | -------------- |
+| `extracurricular_coaches`      | Pembina        |
+| `extracurricular_schedules`    | Jadwal latihan |
+| `extracurricular_achievements` | Prestasi       |
+| `extracurricular_fees`         | Biaya          |
+
+### 12. **Bimbingan Konseling Lanjutan**
+
+| Tabel                   | Fungsi               |
+| ----------------------- | -------------------- |
+| `counseling_categories` | Kategori masalah     |
+| `counseling_referrals`  | Rujukan eksternal    |
+| `behavior_records`      | Catatan perilaku     |
+| `discipline_actions`    | Tindakan disiplin    |
+| `discipline_categories` | Kategori pelanggaran |
+
+### 13. **Perpustakaan Digital**
+
+| Tabel                         | Fungsi         |
+| ----------------------------- | -------------- |
+| `digital_library_items`       | E-book, jurnal |
+| `digital_library_access_logs` | Log akses      |
+| `library_visits`              | Kunjungan      |
+| `library_stock_opname`        | Stock opname   |
+
+### 14. **Alumni Lanjutan**
+
+| Tabel                        | Fungsi            |
+| ---------------------------- | ----------------- |
+| `alumni_events`              | Reuni             |
+| `alumni_event_registrations` | Pendaftaran event |
+| `alumni_mentorships`         | Mentoring         |
+| `alumni_job_postings`        | Lowongan kerja    |
+| `alumni_businesses`          | Direktori usaha   |
+
+### 15. **Survei & Feedback**
+
+| Tabel              | Fungsi           |
+| ------------------ | ---------------- |
+| `surveys`          | Survei           |
+| `survey_questions` | Pertanyaan       |
+| `survey_responses` | Jawaban          |
+| `feedback_forms`   | Form feedback    |
+| `evaluations`      | Evaluasi kinerja |
+
+### 16. **Manajemen Proyek Internal**
+
+| Tabel             | Fungsi          |
+| ----------------- | --------------- |
+| `projects`        | Proyek internal |
+| `project_tasks`   | Task            |
+| `project_members` | Anggota         |
+| `task_comments`   | Komentar        |
+
+### 17. **Aset TI**
+
+| Tabel                  | Fungsi           |
+| ---------------------- | ---------------- |
+| `it_assets`            | Laptop, komputer |
+| `it_asset_assignments` | Peminjaman       |
+| `it_licenses`          | Lisensi software |
+| `it_maintenance_logs`  | Maintenance TI   |
+
+### 18. **Kesiswaan Lanjutan**
+
+| Tabel                          | Fungsi      |
+| ------------------------------ | ----------- |
+| `student_organizations`        | OSIS, BEM   |
+| `student_organization_members` | Anggota     |
+| `student_activities`           | Kegiatan    |
+| `student_awards`               | Penghargaan |
+
+### 19. **Kalender & Event**
+
+| Tabel                | Fungsi        |
+| -------------------- | ------------- |
+| `events`             | Event sekolah |
+| `event_participants` | Peserta       |
+| `event_reminders`    | Pengingat     |
+| `agendas`            | Agenda rapat  |
+| `meeting_minutes`    | Notulen       |
+
+### 20. **Keuangan Lanjutan**
+
+| Tabel                    | Fungsi            |
+| ------------------------ | ----------------- |
+| `donation_campaigns`     | Kampanye donasi   |
+| `fundraising_activities` | Penggalangan dana |
+| `sponsorships`           | Sponsor           |
+| `grants`                 | Hibah             |
+| `cash_advances`          | Uang muka         |
+| `reimbursements`         | Penggantian       |
+| `petty_cash`             | Kas kecil         |
+
+### 21. **Pengadaan Lanjutan**
+
+| Tabel                 | Fungsi         |
+| --------------------- | -------------- |
+| `tenders`             | Tender         |
+| `tender_bidders`      | Peserta        |
+| `tender_evaluations`  | Evaluasi       |
+| `contracts`           | Kontrak vendor |
+| `contract_amendments` | Amandemen      |
+
+---
+
+## 🟡 Masih Kurang (Teknis)
+
+### 22. **Konfigurasi Sistem**
+
+| Tabel                   | Fungsi           |
+| ----------------------- | ---------------- |
+| `settings`              | Setting global   |
+| `system_configurations` | Konfigurasi      |
+| `feature_toggles`       | Feature toggle   |
+| `maintenance_modes`     | Mode maintenance |
+
+### 23. **Audit Lanjutan**
+
+| Tabel                | Fungsi             |
+| -------------------- | ------------------ |
+| `data_change_logs`   | Log perubahan data |
+| `user_activity_logs` | Log aktivitas user |
+| `api_audit_logs`     | Audit API          |
+
+---
+
+## 🎯 Prioritas Paling Mendesak (10 Tabel)
+
+Jika harus memilih **10 tabel yang paling penting** untuk segera ditambahkan:
+
+| #   | Tabel                                                | Alasan                              |
+| --- | ---------------------------------------------------- | ----------------------------------- |
+| 1   | `employee_attendances`                               | Absensi guru/karyawan wajib         |
+| 2   | `scholarships`, `scholarship_recipients`             | Beasiswa sangat umum di Indonesia   |
+| 3   | `whatsapp_logs`, `sms_logs`                          | Komunikasi WA/SMS krusial           |
+| 4   | `notification_templates`                             | Template notifikasi                 |
+| 5   | `documents`, `document_types`                        | Repositori dokumen terpusat         |
+| 6   | `login_attempts`, `two_factor_authentications`       | Keamanan                            |
+| 7   | `tenant_domains`, `tenant_settings`                  | Multi-tenancy (sesuai diskusi awal) |
+| 8   | `subscription_plans`, `tenant_subscriptions`         | SaaS billing                        |
+| 9   | `admission_test_schedules`, `admission_test_results` | PPDB lebih lengkap                  |
+| 10  | `settings`                                           | Konfigurasi global                  |
+
+---
+
+## 📊 Ringkasan Visual
+
+```
+ERP Pendidikan Anda Saat Ini:
+├── ✅ Akademik (sangat lengkap)
+├── ✅ PPDB (lengkap, kurang tes & pengumuman)
+├── ✅ Keuangan (sangat lengkap)
+├── ✅ HR/Payroll (lengkap, kurang absensi)
+├── ✅ Perpustakaan (lengkap, kurang digital)
+├── ✅ Klinik (lengkap)
+├── ✅ Kantin (lengkap)
+├── ✅ Transportasi (lengkap)
+├── ✅ Inventaris (lengkap)
+├── ✅ Fasilitas (lengkap)
+├── ✅ CBT (sangat lengkap)
+├── ✅ Asesmen (lengkap)
+├── ✅ Rapor (lengkap)
+├── ✅ Kurikulum (lengkap)
+├── ✅ Workflow (lengkap)
+├── ✅ RBAC (lengkap)
+├── ✅ Audit (lengkap)
+├── ⚠️ Komunikasi (kurang template & WA/SMS)
+├── ⚠️ Dokumen (kurang central)
+├── ⚠️ Multi-Tenancy (kurang domain & subscription)
+├── ⚠️ PPDB (kurang tes & pengumuman)
+├── ❌ Beasiswa (belum ada)
+├── ❌ Kehadiran Guru (belum ada)
+├── ❌ Keamanan/2FA (belum ada)
+├── ❌ Monitoring & Backup (belum ada)
+├── ❌ Lokalisasi (belum ada)
+└── ❌ Integrasi Eksternal (sebagian)
+```
+
+---
+
+## 💡 Saran Akhir
+
+Sistem Anda **sudah sangat matang** — mungkin **90% lengkap** untuk ERP pendidikan. Yang kurang mostly adalah:
+
+1. **Lapisan operasional harian** (absensi guru, beasiswa, komunikasi WA/SMS)
+2. **Lapisan SaaS** (multi-tenancy lanjutan, subscription billing)
+3. **Lapisan keamanan** (2FA, login attempts)
+4. **Lapisan infrastruktur** (backup, monitoring, lokalisasi)
+
+Apakah Anda ingin saya bantu buatkan **migration schema** untuk 10 tabel prioritas tersebut? Atau mungkin Anda ingin fokus ke **satu area** dulu (misal: beasiswa atau multi-tenancy)?
+Terima kasih! Sekarang saya bisa analisis. Ternyata Anda menambahkan **banyak tabel baru** — dan ini mengungkap sesuatu yang penting: **sistem Anda ternyata juga mencakup Pesantren** (bukan hanya sekolah/kampus umum). Ini perubahan besar dari analisis sebelumnya.
+
+Saya bagi analisis menjadi beberapa bagian.
+
+---
+
+## 🆕 Apa yang Saya Lihat dari Tabel Baru
+
+### 1. 🕌 **Modul Pesantren** (Baru & Signifikan!)
+
+| Tabel                  | Fungsi                                                   |
+| ---------------------- | -------------------------------------------------------- |
+| `pesantren_aspects`    | Aspek penilaian pesantren (akhlak, ibadah, hafalan, dll) |
+| `pesantren_scores`     | Nilai aspek pesantren per santri                         |
+| `memorization_types`   | Jenis hafalan (Quran, Hadits, Doa, dll)                  |
+| `memorization_records` | Catatan hafalan santri                                   |
+| `sorogan_sessions`     | Sesi sorogan (metode belajar pesantren)                  |
+| `dormitories`          | Asrama pesantren                                         |
+
+**Kesimpulan**: Sistem Anda sekarang **dual-mode**: sekolah/kampus umum **+ pesantren**. Ini niche yang sangat kuat di Indonesia — banyak pesantren modern butuh sistem yang menggabungkan keduanya.
+
+### 2. 📊 **Modul Penilaian Lanjutan** (Revisi)
+
+| Tabel                      | Fungsi                                       | Catatan                                       |
+| -------------------------- | -------------------------------------------- | --------------------------------------------- |
+| `academic_scores`          | Nilai akademik                               | ⚠️ **Overlap** dengan `grades`                |
+| `final_scores`             | Nilai akhir                                  | ⚠️ **Duplikat** (muncul 2x di list!)          |
+| `predicates`               | Predikat nilai (A, B, C atau Mumtaz, Jayyid) | Bagus                                         |
+| `report_card_details`      | Detail rapor                                 | ⚠️ **Overlap** dengan `report_card_grades`    |
+| `report_data_sources`      | Sumber data rapor                            | Bagus untuk fleksibilitas                     |
+| `report_templates`         | Template rapor                               | ⚠️ **Overlap** dengan `report_card_templates` |
+| `report_template_versions` | Versioning template                          | Bagus                                         |
+| `template_assets`          | Aset template                                | Bagus                                         |
+| `template_classrooms`      | Mapping template ke kelas                    | Bagus                                         |
+
+### 3. 🏆 **Modul Prestasi & Pelanggaran** (Revisi)
+
+| Tabel               | Fungsi            | Catatan                                      |
+| ------------------- | ----------------- | -------------------------------------------- |
+| `achievement_types` | Jenis prestasi    | ⚠️ **Overlap** dengan enum di `achievements` |
+| `violation_types`   | Jenis pelanggaran | Bagus (sebelumnya saya sarankan)             |
+| `violations`        | Pelanggaran       | ⚠️ **Overlap** dengan `student_disciplines`  |
+
+### 4. 📚 **Modul Perpustakaan Lanjutan** (Baru)
+
+| Tabel                          | Fungsi          | Catatan                               |
+| ------------------------------ | --------------- | ------------------------------------- |
+| `books`                        | Buku (general)  | ⚠️ **Overlap** dengan `library_books` |
+| `book_discussions`             | Diskusi buku    | Bagus                                 |
+| `book_discussion_participants` | Peserta diskusi | Bagus                                 |
+
+### 5. 🏫 **Modul Kelas & Kenaikan** (Revisi)
+
+| Tabel                | Fungsi                        | Catatan                                    |
+| -------------------- | ----------------------------- | ------------------------------------------ |
+| `classroom_students` | Siswa per kelas               | ⚠️ **Overlap** dengan `student_classrooms` |
+| `classroom_subjects` | Mapel per kelas               | Bagus                                      |
+| `grade_promotions`   | Kenaikan kelas                | ⚠️ **Overlap** dengan `student_promotions` |
+| `teams`              | Tim (untuk kegiatan/kelompok) | Bagus                                      |
+
+### 6. 📝 **Modul Kegiatan** (Baru)
+
+| Tabel                   | Fungsi                     |
+| ----------------------- | -------------------------- |
+| `activities`            | Kegiatan sekolah/pesantren |
+| `activity_participants` | Peserta kegiatan           |
+
+### 7. 🔐 **Keamanan & Sistem** (Baru)
+
+| Tabel                    | Fungsi                                 |
+| ------------------------ | -------------------------------------- | ------------------------------------ |
+| `personal_access_tokens` | Token Sanctum ✅ (yang saya sarankan)  |
+| `settings`               | Setting global ✅ (yang saya sarankan) |
+| `audit_logs`             | Audit log                              | ⚠️ **Overlap** dengan `audit_trails` |
+| `signatory_officials`    | Pejabat penandatangan rapor            | Bagus                                |
+
+---
+
+## ⚠️ Masalah yang Saya Temukan
+
+### 🔴 1. **Duplikasi Internal** (Dalam list Anda sendiri!)
+
+| Tabel                  | Muncul Berapa Kali |
+| ---------------------- | ------------------ |
+| `final_scores`         | **2x**             |
+| `grade_promotions`     | **2x**             |
+| `memorization_records` | **2x**             |
+| `memorization_types`   | **2x**             |
+
+**Saran**: Hapus duplikat. Mungkin tidak sengaja ter-copy.
+
+### 🔴 2. **Overlap dengan Tabel Existing**
+
+Ini yang perlu Anda putuskan: **mau pakai yang lama, yang baru, atau gabung?**
+
+| Tabel Baru                 | Bentrok dengan                                 | Rekomendasi                                                                                |
+| -------------------------- | ---------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| `academic_scores`          | `grades`                                       | Pilih salah satu. `grades` lebih general, `academic_scores` lebih spesifik                 |
+| `final_scores`             | `grades`, `report_card_grades`                 | Gabung ke `report_card_grades`                                                             |
+| `report_card_details`      | `report_card_grades`, `report_card_components` | Gabung                                                                                     |
+| `report_templates`         | `report_card_templates`                        | **Pilih satu**. `report_templates` lebih general (bisa untuk rapor, transkrip, sertifikat) |
+| `report_template_versions` | —                                              | Bagus, tapi harus FK ke `report_templates`                                                 |
+| `violations`               | `student_disciplines`                          | **Pilih satu**. `violations` lebih jelas                                                   |
+| `violation_types`          | —                                              | Bagus, tapi `student_disciplines` perlu di-drop                                            |
+| `books`                    | `library_books`                                | **Pilih satu**. `library_books` lebih spesifik                                             |
+| `classroom_students`       | `student_classrooms`                           | **Pilih satu**. `student_classrooms` sudah ada                                             |
+| `classroom_subjects`       | `curriculum_courses`, `teaching_loads`         | Bisa koexist, tapi perlu jelas relasinya                                                   |
+| `grade_promotions`         | `student_promotions`                           | **Pilih satu**. `student_promotions` sudah ada                                             |
+| `achievement_types`        | enum di `achievements`                         | Bagus, ganti enum dengan FK                                                                |
+| `audit_logs`               | `audit_trails`                                 | **Pilih satu**. `audit_trails` sudah ada                                                   |
+| `teams`                    | —                                              | Bagus untuk kegiatan/kelompok                                                              |
+
+### 🟡 3. **Yang Masih Kurang dari Tabel Baru**
+
+| Area             | Tabel yang kurang                                           | Fungsi                                            |
+| ---------------- | ----------------------------------------------------------- | ------------------------------------------------- |
+| **Pesantren**    | `dormitory_rooms`                                           | Kamar asrama                                      |
+| **Pesantren**    | `dormitory_assignments`                                     | Penempatan santri ke kamar                        |
+| **Pesantren**    | `dormitory_movements`                                       | Mutasi kamar                                      |
+| **Pesantren**    | `sorogan_schedules`                                         | Jadwal sorogan                                    |
+| **Pesantren**    | `sorogan_evaluations`                                       | Evaluasi sorogan                                  |
+| **Pesantren**    | `kitab_references`                                          | Kitab yang dipelajari                             |
+| **Pesantren**    | `pesantren_activities`                                      | Kegiatan pesantren                                |
+| **Pesantren**    | `pesantren_rules`                                           | Peraturan pesantren                               |
+| **Kegiatan**     | `activity_categories`                                       | Kategori kegiatan                                 |
+| **Kegiatan**     | `activity_schedules`                                        | Jadwal kegiatan                                   |
+| **Kegiatan**     | `activity_attendances`                                      | Absensi kegiatan                                  |
+| **Kegiatan**     | `activity_documentations`                                   | Dokumentasi                                       |
+| **Kegiatan**     | `activity_budgets`                                          | Anggaran kegiatan                                 |
+| **Perpustakaan** | `book_reviews`                                              | Review buku                                       |
+| **Perpustakaan** | `book_ratings`                                              | Rating buku                                       |
+| **Perpustakaan** | `book_clubs`                                                | Klub buku                                         |
+| **Rapor**        | `report_card_templates` (lama) vs `report_templates` (baru) | Perlu keputusan                                   |
+| **Rapor**        | `report_card_signatures`                                    | Sudah ada, tapi perlu FK ke `signatory_officials` |
+| **Kelas**        | `classroom_subject_teachers`                                | Guru pengampu per mapel per kelas                 |
+| **Kelas**        | `classroom_schedules`                                       | Jadwal per kelas                                  |
+| **Keamanan**     | `login_attempts`                                            | Log login                                         |
+| **Keamanan**     | `two_factor_authentications`                                | 2FA                                               |
+| **Keamanan**     | `password_histories`                                        | Riwayat password                                  |
+| **Sistem**       | `feature_flags`                                             | Feature toggle                                    |
+| **Sistem**       | `notifications` (template)                                  | Template notifikasi                               |
+
+---
+
+## 🎯 Rekomendasi Saya
+
+### Opsi A: **Konsolidasi** (Bersihkan Duplikasi)
+
+Jika Anda ingin sistem yang **rapi dan tidak redundan**:
+
+1. **Pilih satu** dari setiap pasangan yang bentrok:
+    - `grades` **atau** `academic_scores` → **pilih `academic_scores`** (lebih eksplisit)
+    - `library_books` **atau** `books` → **pilih `books`** (lebih general, bisa untuk perpustakaan digital juga)
+    - `student_classrooms` **atau** `classroom_students` → **pilih `classroom_students`** (lebih jelas)
+    - `student_promotions` **atau** `grade_promotions` → **pilih `grade_promotions`** (lebih spesifik)
+    - `student_disciplines` **atau** `violations` → **pilih `violations`** (lebih jelas)
+    - `report_card_templates` **atau** `report_templates` → **pilih `report_templates`** (lebih general)
+    - `report_card_grades` **atau** `report_card_details` → **pilih `report_card_details`** (lebih detail)
+    - `audit_trails` **atau** `audit_logs` → **pilih `audit_logs`** (lebih standar)
+    - `grades` **atau** `final_scores` → **gabung** ke `final_scores`
+
+2. **Hapus tabel yang sudah digantikan**:
+    - `grades` (diganti `academic_scores`)
+    - `library_books` (diganti `books`)
+    - `student_classrooms` (diganti `classroom_students`)
+    - `student_promotions` (diganti `grade_promotions`)
+    - `student_disciplines` (diganti `violations`)
+    - `report_card_templates` (diganti `report_templates`)
+    - `report_card_grades` (diganti `report_card_details`)
+    - `report_card_components` (diganti `report_card_details`)
+    - `audit_trails` (diganti `audit_logs`)
+    - `report_card_template_curriculums` (diganti `template_classrooms`)
+    - `report_card_template_sections` (diganti `report_template_versions`)
+
+### Opsi B: **Biarkan Keduanya** (Multi-Mode)
+
+Jika Anda ingin sistem yang **mendukung banyak mode** (misal: sekolah umum vs pesantren):
+
+- `grades` untuk sekolah umum
+- `academic_scores` untuk pesantren
+- `library_books` untuk perpustakaan fisik
+- `books` untuk perpustakaan digital
+- `student_disciplines` untuk sekolah umum
+- `violations` untuk pesantren
+
+**Tapi ini berisiko**: data terpecah, query lebih kompleks, maintenance lebih sulit.
+
+**Saran saya**: **Opsi A** lebih baik. Kecuali Anda punya alasan kuat untuk memisahkan.
+
+---
+
+## 🏗️ Arsitektur Baru yang Saya Rekomendasikan
+
+```
+Sistem ERP Pendidikan + Pesantren
+│
+├── Core Akademik
+│   ├── academic_years, academic_semesters, periods
+│   ├── curriculums, curriculum_*, subjects, courses
+│   ├── classrooms, class_levels, classroom_students, classroom_subjects
+│   ├── students, teachers, employees, parents
+│   └── schedules, teaching_loads
+│
+├── Penilaian
+│   ├── assessments, assessment_components, assessment_rubrics
+│   ├── academic_scores, final_scores, predicates, grade_boundaries
+│   ├── report_templates, report_template_versions, report_card_details
+│   ├── report_cards, report_card_notes, report_card_signatures
+│   ├── report_data_sources, template_assets, template_classrooms
+│   └── signatory_officials
+│
+├── Pesantren
+│   ├── dormitories, dormitory_rooms, dormitory_assignments
+│   ├── pesantren_aspects, pesantren_scores
+│   ├── memorization_types, memorization_records
+│   ├── sorogan_sessions, sorogan_schedules
+│   └── kitab_references, pesantren_activities, pesantren_rules
+│
+├── Kesiswaan
+│   ├── achievements, achievement_types
+│   ├── violations, violation_types
+│   ├── activities, activity_participants, activity_categories
+│   ├── student_organizations, student_organization_members
+│   └── extracurriculars, extracurricular_coaches, extracurricular_schedules
+│
+├── Perpustakaan
+│   ├── books, book_authors, book_categories, book_publishers
+│   ├── book_copies, book_reservations, library_loans
+│   ├── book_discussions, book_discussion_participants
+│   ├── book_reviews, book_ratings, book_clubs
+│   └── digital_library_items, digital_library_access_logs
+│
+├── Keuangan
+│   └── (sudah lengkap)
+│
+├── HR/Payroll
+│   └── (sudah lengkap, tinggal tambah employee_attendances)
+│
+├── Beasiswa
+│   └── (sudah saya buatkan)
+│
+├── Sistem
+│   ├── settings, personal_access_tokens
+│   ├── audit_logs, system_logs
+│   ├── login_attempts, two_factor_authentications
+│   └── feature_flags
+│
+└── Multi-Tenancy
+    └── (perlu dilengkapi)
+```
+
+---
+
+## 📊 Ringkasan
+
+| Kategori                            | Status                                   |
+| ----------------------------------- | ---------------------------------------- |
+| ✅ **Modul Pesantren**              | Bagus! Ini nilai jual unik               |
+| ✅ **Modul Penilaian Lanjutan**     | Bagus, tapi perlu konsolidasi            |
+| ✅ **Modul Prestasi & Pelanggaran** | Bagus, perlu konsolidasi                 |
+| ✅ **Modul Perpustakaan Lanjutan**  | Bagus, perlu konsolidasi                 |
+| ✅ **Modul Kegiatan**               | Bagus, perlu dilengkapi                  |
+| ✅ **Keamanan & Sistem**            | Bagus, sudah mulai lengkap               |
+| ⚠️ **Duplikasi Internal**           | Perlu dibersihkan (4 tabel duplikat)     |
+| ⚠️ **Overlap dengan Existing**      | Perlu keputusan (9 pasangan)             |
+| ❌ **Pesantren Lanjutan**           | Masih kurang (asrama, kitab, dll)        |
+| ❌ **Kegiatan Lanjutan**            | Masih kurang (kategori, jadwal, absensi) |
+
+---
+
+## 💡 Pertanyaan untuk Anda
+
+Sebelum saya bantu lebih lanjut, saya perlu tahu:
+
+1. **Apakah sistem Anda memang untuk pesantren, atau sekolah umum, atau keduanya?**
+    - Jika pesantren → fokus ke modul pesantren
+    - Jika keduanya → perlu strategi multi-mode
+    - Jika sekolah umum → tabel pesantren mungkin tidak perlu
+
+2. **Untuk tabel yang overlap, mana yang ingin Anda pertahankan?**
+    - Misal: `grades` vs `academic_scores` → pilih mana?
+    - `library_books` vs `books` → pilih mana?
+
+3. **Apakah duplikat di list (final_scores, grade_promotions, dll) tidak sengaja, atau memang ada 2 versi?**
+
+4. **Apakah Anda ingin saya bantu buatkan struktur SQL untuk tabel-tabel pesantren lanjutan** (dormitory_rooms, dormitory_assignments, kitab_references, dll)?
+
+5. **Atau Anda ingin saya bantu konsolidasi** tabel yang overlap menjadi satu struktur yang rapi?
+
+Silakan jawab, nanti saya bantu lanjutkan.
+
+Baik, saya buatkan struktur SQL untuk **modul Pesantren Lanjutan**. Saya asumsikan Anda sudah punya tabel `dormitories`, `students`, `employees`, `users`, `organizations`, `academic_years`, `academic_semesters`, `rooms`, dan `buildings` sebagai referensi FK.
+
+Saya buat **10 tabel**:
+
+1. `dormitory_rooms` — kamar asrama
+2. `dormitory_assignments` — penempatan santri ke kamar
+3. `dormitory_movements` — mutasi kamar
+4. `kitab_references` — kitab yang dipelajari
+5. `sorogan_schedules` — jadwal sorogan
+6. `sorogan_evaluations` — evaluasi sorogan
+7. `pesantren_activities` — kegiatan pesantren
+8. `pesantren_rules` — peraturan pesantren
+9. `pesantren_rule_violations` — pelanggaran peraturan pesantren
+10. `dormitory_permits` — izin keluar/menginap
+
+---
+
+## 📋 1. `dormitory_rooms`
+
+Kamar di dalam asrama.
+
+```sql
+-- ----------------------------
+-- Table structure for dormitory_rooms
+-- ----------------------------
+DROP TABLE IF EXISTS `dormitory_rooms`;
+CREATE TABLE `dormitory_rooms`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `dormitory_id` bigint UNSIGNED NOT NULL COMMENT 'FK ke dormitories',
+  `organization_id` bigint UNSIGNED NULL COMMENT 'FK ke organizations',
+  `building_id` bigint UNSIGNED NULL COMMENT 'FK ke buildings',
+  `room_id` bigint UNSIGNED NULL COMMENT 'FK ke rooms (jika kamar = room fisik)',
+  `code` varchar(50) NOT NULL COMMENT 'Kode kamar, misal: A-101',
+  `name` varchar(100) NULL COMMENT 'Nama kamar',
+  `floor` varchar(20) NULL COMMENT 'Lantai',
+  `capacity` int UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Kapasitas santri',
+  `occupied` int UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Jumlah terisi',
+  `room_type` enum('male','female','mixed','vip','regular','isolation','guest') NOT NULL DEFAULT 'regular' COMMENT 'Tipe kamar',
+  `facilities` json NULL COMMENT 'Fasilitas kamar (AC, kipas, lemari, dll)',
+  `monthly_fee` decimal(15,2) NULL COMMENT 'Biaya bulanan (jika berbayar)',
+  `currency_id` bigint UNSIGNED NULL COMMENT 'FK ke currencies',
+  `condition` enum('good','fair','poor','damaged','renovation') NOT NULL DEFAULT 'good' COMMENT 'Kondisi kamar',
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `notes` text NULL,
+  `created_by` bigint UNSIGNED NULL,
+  `updated_by` bigint UNSIGNED NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uk_dormitory_rooms_code`(`dormitory_id` ASC, `code` ASC) USING BTREE,
+  INDEX `idx_dormitory_rooms_dormitory`(`dormitory_id` ASC) USING BTREE,
+  INDEX `idx_dormitory_rooms_org`(`organization_id` ASC) USING BTREE,
+  INDEX `idx_dormitory_rooms_building`(`building_id` ASC) USING BTREE,
+  INDEX `idx_dormitory_rooms_room`(`room_id` ASC) USING BTREE,
+  INDEX `idx_dormitory_rooms_type`(`room_type` ASC) USING BTREE,
+  INDEX `idx_dormitory_rooms_active`(`is_active` ASC) USING BTREE,
+  CONSTRAINT `fk_dormitory_rooms_dormitory` FOREIGN KEY (`dormitory_id`) REFERENCES `dormitories` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `fk_dormitory_rooms_org` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_dormitory_rooms_building` FOREIGN KEY (`building_id`) REFERENCES `buildings` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_dormitory_rooms_room` FOREIGN KEY (`room_id`) REFERENCES `rooms` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_dormitory_rooms_currency` FOREIGN KEY (`currency_id`) REFERENCES `currencies` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_dormitory_rooms_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_dormitory_rooms_updated_by` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+```
+
+---
+
+## 📋 2. `dormitory_assignments`
+
+Penempatan santri ke kamar.
+
+```sql
+-- ----------------------------
+-- Table structure for dormitory_assignments
+-- ----------------------------
+DROP TABLE IF EXISTS `dormitory_assignments`;
+CREATE TABLE `dormitory_assignments`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `dormitory_id` bigint UNSIGNED NOT NULL COMMENT 'FK ke dormitories',
+  `dormitory_room_id` bigint UNSIGNED NOT NULL COMMENT 'FK ke dormitory_rooms',
+  `student_id` bigint UNSIGNED NOT NULL COMMENT 'FK ke students',
+  `organization_id` bigint UNSIGNED NULL COMMENT 'FK ke organizations',
+  `academic_year_id` bigint UNSIGNED NULL COMMENT 'FK ke academic_years',
+  `academic_semester_id` bigint UNSIGNED NULL COMMENT 'FK ke academic_semesters',
+  `assignment_number` varchar(50) NOT NULL COMMENT 'Nomor penempatan',
+  `bed_number` varchar(20) NULL COMMENT 'Nomor kasur',
+  `locker_number` varchar(20) NULL COMMENT 'Nomor lemari',
+  `check_in_date` date NOT NULL COMMENT 'Tanggal masuk asrama',
+  `check_out_date` date NULL COMMENT 'Tanggal keluar asrama',
+  `status` enum('active','checked_out','transferred','suspended','completed') NOT NULL DEFAULT 'active' COMMENT 'Status penempatan',
+  `guardian_name` varchar(150) NULL COMMENT 'Nama wali kamar',
+  `guardian_phone` varchar(30) NULL,
+  `emergency_contact_name` varchar(150) NULL,
+  `emergency_contact_phone` varchar(30) NULL,
+  `health_notes` text NULL COMMENT 'Catatan kesehatan',
+  `special_needs` text NULL COMMENT 'Kebutuhan khusus',
+  `monthly_fee` decimal(15,2) NULL COMMENT 'Biaya bulanan',
+  `currency_id` bigint UNSIGNED NULL COMMENT 'FK ke currencies',
+  `is_fee_paid` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika biaya sudah dibayar',
+  `notes` text NULL,
+  `assigned_by` bigint UNSIGNED NULL COMMENT 'FK ke users yang menempatkan',
+  `assigned_at` timestamp NULL DEFAULT NULL,
+  `checked_out_by` bigint UNSIGNED NULL COMMENT 'FK ke users yang checkout',
+  `checked_out_at` timestamp NULL DEFAULT NULL,
+  `checkout_reason` text NULL,
+  `created_by` bigint UNSIGNED NULL,
+  `updated_by` bigint UNSIGNED NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uk_dormitory_assignment_number`(`assignment_number` ASC) USING BTREE,
+  UNIQUE INDEX `uk_dormitory_assignment_student`(`dormitory_id` ASC, `student_id` ASC, `academic_year_id` ASC) USING BTREE,
+  INDEX `idx_dormitory_assignment_dormitory`(`dormitory_id` ASC) USING BTREE,
+  INDEX `idx_dormitory_assignment_room`(`dormitory_room_id` ASC) USING BTREE,
+  INDEX `idx_dormitory_assignment_student`(`student_id` ASC) USING BTREE,
+  INDEX `idx_dormitory_assignment_org`(`organization_id` ASC) USING BTREE,
+  INDEX `idx_dormitory_assignment_year`(`academic_year_id` ASC) USING BTREE,
+  INDEX `idx_dormitory_assignment_semester`(`academic_semester_id` ASC) USING BTREE,
+  INDEX `idx_dormitory_assignment_status`(`status` ASC) USING BTREE,
+  INDEX `idx_dormitory_assignment_checkin`(`check_in_date` ASC) USING BTREE,
+  INDEX `idx_dormitory_assignment_checkout`(`check_out_date` ASC) USING BTREE,
+  CONSTRAINT `fk_dormitory_assignment_dormitory` FOREIGN KEY (`dormitory_id`) REFERENCES `dormitories` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `fk_dormitory_assignment_room` FOREIGN KEY (`dormitory_room_id`) REFERENCES `dormitory_rooms` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `fk_dormitory_assignment_student` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `fk_dormitory_assignment_org` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_dormitory_assignment_year` FOREIGN KEY (`academic_year_id`) REFERENCES `academic_years` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_dormitory_assignment_semester` FOREIGN KEY (`academic_semester_id`) REFERENCES `academic_semesters` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_dormitory_assignment_currency` FOREIGN KEY (`currency_id`) REFERENCES `currencies` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_dormitory_assignment_assigned_by` FOREIGN KEY (`assigned_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_dormitory_assignment_checked_out_by` FOREIGN KEY (`checked_out_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_dormitory_assignment_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_dormitory_assignment_updated_by` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+```
+
+---
+
+## 📋 3. `dormitory_movements`
+
+Mutasi/perpindahan kamar santri.
+
+```sql
+-- ----------------------------
+-- Table structure for dormitory_movements
+-- ----------------------------
+DROP TABLE IF EXISTS `dormitory_movements`;
+CREATE TABLE `dormitory_movements`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `dormitory_assignment_id` bigint UNSIGNED NOT NULL COMMENT 'FK ke dormitory_assignments',
+  `student_id` bigint UNSIGNED NOT NULL COMMENT 'FK ke students',
+  `organization_id` bigint UNSIGNED NULL COMMENT 'FK ke organizations',
+  `from_dormitory_id` bigint UNSIGNED NULL COMMENT 'FK ke dormitories (asal)',
+  `from_room_id` bigint UNSIGNED NULL COMMENT 'FK ke dormitory_rooms (asal)',
+  `to_dormitory_id` bigint UNSIGNED NULL COMMENT 'FK ke dormitories (tujuan)',
+  `to_room_id` bigint UNSIGNED NULL COMMENT 'FK ke dormitory_rooms (tujuan)',
+  `movement_type` enum('transfer','swap','promotion','demotion','health','discipline','request','other') NOT NULL DEFAULT 'transfer' COMMENT 'Jenis mutasi',
+  `movement_date` date NOT NULL COMMENT 'Tanggal mutasi',
+  `reason` text NOT NULL COMMENT 'Alasan mutasi',
+  `from_bed_number` varchar(20) NULL,
+  `to_bed_number` varchar(20) NULL,
+  `approved_by` bigint UNSIGNED NULL COMMENT 'FK ke users yang approve',
+  `approved_at` timestamp NULL DEFAULT NULL,
+  `status` enum('pending','approved','rejected','completed','cancelled') NOT NULL DEFAULT 'pending' COMMENT 'Status mutasi',
+  `rejection_reason` text NULL,
+  `notes` text NULL,
+  `created_by` bigint UNSIGNED NULL,
+  `updated_by` bigint UNSIGNED NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_dormitory_movement_assignment`(`dormitory_assignment_id` ASC) USING BTREE,
+  INDEX `idx_dormitory_movement_student`(`student_id` ASC) USING BTREE,
+  INDEX `idx_dormitory_movement_org`(`organization_id` ASC) USING BTREE,
+  INDEX `idx_dormitory_movement_from_dorm`(`from_dormitory_id` ASC) USING BTREE,
+  INDEX `idx_dormitory_movement_from_room`(`from_room_id` ASC) USING BTREE,
+  INDEX `idx_dormitory_movement_to_dorm`(`to_dormitory_id` ASC) USING BTREE,
+  INDEX `idx_dormitory_movement_to_room`(`to_room_id` ASC) USING BTREE,
+  INDEX `idx_dormitory_movement_type`(`movement_type` ASC) USING BTREE,
+  INDEX `idx_dormitory_movement_date`(`movement_date` ASC) USING BTREE,
+  INDEX `idx_dormitory_movement_status`(`status` ASC) USING BTREE,
+  CONSTRAINT `fk_dormitory_movement_assignment` FOREIGN KEY (`dormitory_assignment_id`) REFERENCES `dormitory_assignments` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `fk_dormitory_movement_student` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `fk_dormitory_movement_org` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_dormitory_movement_from_dorm` FOREIGN KEY (`from_dormitory_id`) REFERENCES `dormitories` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_dormitory_movement_from_room` FOREIGN KEY (`from_room_id`) REFERENCES `dormitory_rooms` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_dormitory_movement_to_dorm` FOREIGN KEY (`to_dormitory_id`) REFERENCES `dormitories` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_dormitory_movement_to_room` FOREIGN KEY (`to_room_id`) REFERENCES `dormitory_rooms` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_dormitory_movement_approved_by` FOREIGN KEY (`approved_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_dormitory_movement_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_dormitory_movement_updated_by` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+```
+
+---
+
+## 📋 4. `kitab_references`
+
+Kitab yang dipelajari di pesantren.
+
+```sql
+-- ----------------------------
+-- Table structure for kitab_references
+-- ----------------------------
+DROP TABLE IF EXISTS `kitab_references`;
+CREATE TABLE `kitab_references`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `organization_id` bigint UNSIGNED NULL COMMENT 'FK ke organizations',
+  `subject_id` bigint UNSIGNED NULL COMMENT 'FK ke subjects (mapel terkait)',
+  `course_id` bigint UNSIGNED NULL COMMENT 'FK ke courses',
+  `curriculum_id` bigint UNSIGNED NULL COMMENT 'FK ke curriculums',
+  `education_level_id` bigint UNSIGNED NULL COMMENT 'FK ke education_levels',
+  `code` varchar(50) NOT NULL COMMENT 'Kode kitab',
+  `title` varchar(255) NOT NULL COMMENT 'Judul kitab',
+  `arabic_title` varchar(255) NULL COMMENT 'Judul dalam bahasa Arab',
+  `slug` varchar(255) NOT NULL COMMENT 'Slug untuk URL',
+  `author` varchar(200) NULL COMMENT 'Pengarang',
+  `author_arabic` varchar(200) NULL COMMENT 'Pengarang (Arab)',
+  `publisher` varchar(200) NULL,
+  `publication_year` year NULL,
+  `edition` varchar(50) NULL,
+  `volume` varchar(50) NULL,
+  `language` varchar(10) NOT NULL DEFAULT 'ar' COMMENT 'Bahasa',
+  `category` enum('fiqih','tauhid','tafsir','hadits','akhlak','nahwu','sharaf','balaghah','manthiq','ushul_fiqih','tajwid','tarikh','tasawuf','doa','other') NOT NULL DEFAULT 'other' COMMENT 'Kategori kitab',
+  `level` enum('ibtidaiyah','tsanawiyah','aliyah','kuliah','umum') NOT NULL DEFAULT 'umum' COMMENT 'Jenjang',
+  `description` text NULL,
+  `summary` text NULL COMMENT 'Ringkasan isi',
+  `total_pages` int UNSIGNED NULL,
+  `total_chapters` int UNSIGNED NULL,
+  `file_path` varchar(255) NULL COMMENT 'File digital (PDF)',
+  `cover_path` varchar(255) NULL COMMENT 'Cover kitab',
+  `is_digital` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika tersedia digital',
+  `is_printed` tinyint(1) NOT NULL DEFAULT 1 COMMENT '1 jika tersedia cetak',
+  `stock` int UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Stok cetak',
+  `is_mandatory` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika wajib',
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `sort_order` int UNSIGNED NOT NULL DEFAULT 0,
+  `created_by` bigint UNSIGNED NULL,
+  `updated_by` bigint UNSIGNED NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uk_kitab_references_code`(`code` ASC, `organization_id` ASC) USING BTREE,
+  UNIQUE INDEX `uk_kitab_references_slug`(`slug` ASC) USING BTREE,
+  INDEX `idx_kitab_references_org`(`organization_id` ASC) USING BTREE,
+  INDEX `idx_kitab_references_subject`(`subject_id` ASC) USING BTREE,
+  INDEX `idx_kitab_references_course`(`course_id` ASC) USING BTREE,
+  INDEX `idx_kitab_references_curriculum`(`curriculum_id` ASC) USING BTREE,
+  INDEX `idx_kitab_references_level`(`education_level_id` ASC) USING BTREE,
+  INDEX `idx_kitab_references_category`(`category` ASC) USING BTREE,
+  INDEX `idx_kitab_references_level_kitab`(`level` ASC) USING BTREE,
+  INDEX `idx_kitab_references_active`(`is_active` ASC) USING BTREE,
+  FULLTEXT INDEX `ft_kitab_references_search`(`title`, `arabic_title`, `author`, `description`) USING BTREE,
+  CONSTRAINT `fk_kitab_references_org` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_kitab_references_subject` FOREIGN KEY (`subject_id`) REFERENCES `subjects` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_kitab_references_course` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_kitab_references_curriculum` FOREIGN KEY (`curriculum_id`) REFERENCES `curriculums` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_kitab_references_level` FOREIGN KEY (`education_level_id`) REFERENCES `education_levels` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_kitab_references_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_kitab_references_updated_by` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+```
+
+---
+
+## 📋 5. `sorogan_schedules`
+
+Jadwal sorogan (belajar individual dengan ustadz).
+
+```sql
+-- ----------------------------
+-- Table structure for sorogan_schedules
+-- ----------------------------
+DROP TABLE IF EXISTS `sorogan_schedules`;
+CREATE TABLE `sorogan_schedules`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `organization_id` bigint UNSIGNED NULL COMMENT 'FK ke organizations',
+  `kitab_reference_id` bigint UNSIGNED NULL COMMENT 'FK ke kitab_references',
+  `teacher_id` bigint UNSIGNED NULL COMMENT 'FK ke teachers (ustadz)',
+  `employee_id` bigint UNSIGNED NULL COMMENT 'FK ke employees',
+  `dormitory_id` bigint UNSIGNED NULL COMMENT 'FK ke dormitories',
+  `room_id` bigint UNSIGNED NULL COMMENT 'FK ke rooms',
+  `academic_year_id` bigint UNSIGNED NULL COMMENT 'FK ke academic_years',
+  `academic_semester_id` bigint UNSIGNED NULL COMMENT 'FK ke academic_semesters',
+  `title` varchar(200) NOT NULL COMMENT 'Judul sesi sorogan',
+  `sorogan_type` enum('individual','group','classical','halaqah','talaqqi','musyawarah') NOT NULL DEFAULT 'individual' COMMENT 'Tipe sorogan',
+  `day_of_week` enum('monday','tuesday','wednesday','thursday','friday','saturday','sunday') NULL COMMENT 'Hari',
+  `specific_date` date NULL COMMENT 'Tanggal spesifik',
+  `start_time` time NOT NULL,
+  `end_time` time NOT NULL,
+  `duration_minutes` int UNSIGNED NULL,
+  `recurrence_type` enum('none','weekly','biweekly','monthly') NOT NULL DEFAULT 'weekly' COMMENT 'Tipe pengulangan',
+  `recurrence_until` date NULL,
+  `quota` int UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Kuota peserta',
+  `registered` int UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Jumlah terdaftar',
+  `location` varchar(255) NULL,
+  `is_mandatory` tinyint(1) NOT NULL DEFAULT 0,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `effective_from` date NULL,
+  `effective_until` date NULL,
+  `notes` text NULL,
+  `created_by` bigint UNSIGNED NULL,
+  `updated_by` bigint UNSIGNED NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_sorogan_sched_org`(`organization_id` ASC) USING BTREE,
+  INDEX `idx_sorogan_sched_kitab`(`kitab_reference_id` ASC) USING BTREE,
+  INDEX `idx_sorogan_sched_teacher`(`teacher_id` ASC) USING BTREE,
+  INDEX `idx_sorogan_sched_employee`(`employee_id` ASC) USING BTREE,
+  INDEX `idx_sorogan_sched_dormitory`(`dormitory_id` ASC) USING BTREE,
+  INDEX `idx_sorogan_sched_room`(`room_id` ASC) USING BTREE,
+  INDEX `idx_sorogan_sched_year`(`academic_year_id` ASC) USING BTREE,
+  INDEX `idx_sorogan_sched_semester`(`academic_semester_id` ASC) USING BTREE,
+  INDEX `idx_sorogan_sched_type`(`sorogan_type` ASC) USING BTREE,
+  INDEX `idx_sorogan_sched_day`(`day_of_week` ASC) USING BTREE,
+  INDEX `idx_sorogan_sched_active`(`is_active` ASC) USING BTREE,
+  CONSTRAINT `fk_sorogan_sched_org` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_sorogan_sched_kitab` FOREIGN KEY (`kitab_reference_id`) REFERENCES `kitab_references` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_sorogan_sched_teacher` FOREIGN KEY (`teacher_id`) REFERENCES `teachers` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_sorogan_sched_employee` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_sorogan_sched_dormitory` FOREIGN KEY (`dormitory_id`) REFERENCES `dormitories` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_sorogan_sched_room` FOREIGN KEY (`room_id`) REFERENCES `rooms` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_sorogan_sched_year` FOREIGN KEY (`academic_year_id`) REFERENCES `academic_years` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_sorogan_sched_semester` FOREIGN KEY (`academic_semester_id`) REFERENCES `academic_semesters` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_sorogan_sched_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_sorogan_sched_updated_by` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+```
+
+---
+
+## 📋 6. `sorogan_evaluations`
+
+Evaluasi sesi sorogan.
+
+```sql
+-- ----------------------------
+-- Table structure for sorogan_evaluations
+-- ----------------------------
+DROP TABLE IF EXISTS `sorogan_evaluations`;
+CREATE TABLE `sorogan_evaluations`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `sorogan_session_id` bigint UNSIGNED NULL COMMENT 'FK ke sorogan_sessions',
+  `sorogan_schedule_id` bigint UNSIGNED NULL COMMENT 'FK ke sorogan_schedules',
+  `student_id` bigint UNSIGNED NOT NULL COMMENT 'FK ke students',
+  `teacher_id` bigint UNSIGNED NULL COMMENT 'FK ke teachers (ustadz)',
+  `employee_id` bigint UNSIGNED NULL COMMENT 'FK ke employees',
+  `organization_id` bigint UNSIGNED NULL COMMENT 'FK ke organizations',
+  `kitab_reference_id` bigint UNSIGNED NULL COMMENT 'FK ke kitab_references',
+  `evaluation_date` date NOT NULL COMMENT 'Tanggal evaluasi',
+  `chapter` varchar(100) NULL COMMENT 'Bab yang dievaluasi',
+  `page_from` int UNSIGNED NULL COMMENT 'Halaman dari',
+  `page_to` int UNSIGNED NULL COMMENT 'Halaman sampai',
+  `content` text NULL COMMENT 'Materi yang dibaca',
+  `fluency_score` decimal(5,2) NULL COMMENT 'Skor kelancaran (0-100)',
+  `tajwid_score` decimal(5,2) NULL COMMENT 'Skor tajwid (0-100)',
+  `makhraj_score` decimal(5,2) NULL COMMENT 'Skor makhraj (0-100)',
+  `understanding_score` decimal(5,2) NULL COMMENT 'Skor pemahaman (0-100)',
+  `memorization_score` decimal(5,2) NULL COMMENT 'Skor hafalan (0-100)',
+  `final_score` decimal(5,2) NULL COMMENT 'Skor akhir',
+  `predicate` varchar(20) NULL COMMENT 'Predikat (Mumtaz, Jayyid Jiddan, dll)',
+  `mastery_level` enum('beginner','intermediate','advanced','expert') NULL COMMENT 'Level penguasaan',
+  `attendance_status` enum('present','absent','late','sick','permission') NOT NULL DEFAULT 'present',
+  `teacher_notes` text NULL COMMENT 'Catatan ustadz',
+  `recommendations` text NULL COMMENT 'Rekomendasi',
+  `next_target` text NULL COMMENT 'Target berikutnya',
+  `status` enum('draft','submitted','reviewed','finalized') NOT NULL DEFAULT 'draft' COMMENT 'Status evaluasi',
+  `reviewed_by` bigint UNSIGNED NULL COMMENT 'FK ke users yang review',
+  `reviewed_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL,
+  `updated_by` bigint UNSIGNED NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_sorogan_eval_session`(`sorogan_session_id` ASC) USING BTREE,
+  INDEX `idx_sorogan_eval_schedule`(`sorogan_schedule_id` ASC) USING BTREE,
+  INDEX `idx_sorogan_eval_student`(`student_id` ASC) USING BTREE,
+  INDEX `idx_sorogan_eval_teacher`(`teacher_id` ASC) USING BTREE,
+  INDEX `idx_sorogan_eval_employee`(`employee_id` ASC) USING BTREE,
+  INDEX `idx_sorogan_eval_org`(`organization_id` ASC) USING BTREE,
+  INDEX `idx_sorogan_eval_kitab`(`kitab_reference_id` ASC) USING BTREE,
+  INDEX `idx_sorogan_eval_date`(`evaluation_date` ASC) USING BTREE,
+  INDEX `idx_sorogan_eval_status`(`status` ASC) USING BTREE,
+  CONSTRAINT `fk_sorogan_eval_session` FOREIGN KEY (`sorogan_session_id`) REFERENCES `sorogan_sessions` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `fk_sorogan_eval_schedule` FOREIGN KEY (`sorogan_schedule_id`) REFERENCES `sorogan_schedules` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_sorogan_eval_student` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `fk_sorogan_eval_teacher` FOREIGN KEY (`teacher_id`) REFERENCES `teachers` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_sorogan_eval_employee` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_sorogan_eval_org` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_sorogan_eval_kitab` FOREIGN KEY (`kitab_reference_id`) REFERENCES `kitab_references` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_sorogan_eval_reviewed_by` FOREIGN KEY (`reviewed_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_sorogan_eval_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_sorogan_eval_updated_by` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+```
+
+---
+
+## 📋 7. `pesantren_activities`
+
+Kegiatan pesantren (kajian, halaqah, lomba, dll).
+
+```sql
+-- ----------------------------
+-- Table structure for pesantren_activities
+-- ----------------------------
+DROP TABLE IF EXISTS `pesantren_activities`;
+CREATE TABLE `pesantren_activities`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `organization_id` bigint UNSIGNED NULL COMMENT 'FK ke organizations',
+  `dormitory_id` bigint UNSIGNED NULL COMMENT 'FK ke dormitories',
+  `room_id` bigint UNSIGNED NULL COMMENT 'FK ke rooms',
+  `kitab_reference_id` bigint UNSIGNED NULL COMMENT 'FK ke kitab_references',
+  `academic_year_id` bigint UNSIGNED NULL COMMENT 'FK ke academic_years',
+  `academic_semester_id` bigint UNSIGNED NULL COMMENT 'FK ke academic_semesters',
+  `code` varchar(50) NOT NULL COMMENT 'Kode kegiatan',
+  `name` varchar(200) NOT NULL COMMENT 'Nama kegiatan',
+  `slug` varchar(200) NOT NULL COMMENT 'Slug untuk URL',
+  `category` enum('kajian','halaqah','musyawarah','lomba','haul','wisuda','rihlah','olahraga','seni','sosial','lainnya') NOT NULL DEFAULT 'kajian' COMMENT 'Kategori kegiatan',
+  `activity_type` enum('routine','special','annual','temporary') NOT NULL DEFAULT 'routine' COMMENT 'Tipe kegiatan',
+  `description` text NULL,
+  `objectives` text NULL COMMENT 'Tujuan kegiatan',
+  `start_date` date NOT NULL COMMENT 'Tanggal mulai',
+  `end_date` date NULL COMMENT 'Tanggal selesai',
+  `start_time` time NULL,
+  `end_time` time NULL,
+  `location` varchar(255) NULL,
+  `speaker_name` varchar(200) NULL COMMENT 'Nama pembicara/ustadz',
+  `speaker_phone` varchar(30) NULL,
+  `quota` int UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Kuota peserta',
+  `registered` int UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Jumlah terdaftar',
+  `attended` int UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Jumlah hadir',
+  `is_mandatory` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika wajib',
+  `is_public` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika terbuka untuk umum',
+  `requires_registration` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika perlu registrasi',
+  `registration_open` date NULL,
+  `registration_close` date NULL,
+  `budget` decimal(15,2) NULL COMMENT 'Anggaran kegiatan',
+  `actual_cost` decimal(15,2) NULL COMMENT 'Biaya aktual',
+  `currency_id` bigint UNSIGNED NULL COMMENT 'FK ke currencies',
+  `poster_path` varchar(255) NULL COMMENT 'Poster kegiatan',
+  `documentation_paths` json NULL COMMENT 'Dokumentasi kegiatan',
+  `status` enum('draft','published','ongoing','completed','cancelled','postponed') NOT NULL DEFAULT 'draft' COMMENT 'Status kegiatan',
+  `created_by` bigint UNSIGNED NULL,
+  `updated_by` bigint UNSIGNED NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uk_pesantren_activities_code`(`code` ASC, `organization_id` ASC) USING BTREE,
+  UNIQUE INDEX `uk_pesantren_activities_slug`(`slug` ASC) USING BTREE,
+  INDEX `idx_pesantren_activities_org`(`organization_id` ASC) USING BTREE,
+  INDEX `idx_pesantren_activities_dormitory`(`dormitory_id` ASC) USING BTREE,
+  INDEX `idx_pesantren_activities_room`(`room_id` ASC) USING BTREE,
+  INDEX `idx_pesantren_activities_kitab`(`kitab_reference_id` ASC) USING BTREE,
+  INDEX `idx_pesantren_activities_year`(`academic_year_id` ASC) USING BTREE,
+  INDEX `idx_pesantren_activities_semester`(`academic_semester_id` ASC) USING BTREE,
+  INDEX `idx_pesantren_activities_category`(`category` ASC) USING BTREE,
+  INDEX `idx_pesantren_activities_type`(`activity_type` ASC) USING BTREE,
+  INDEX `idx_pesantren_activities_start`(`start_date` ASC) USING BTREE,
+  INDEX `idx_pesantren_activities_status`(`status` ASC) USING BTREE,
+  CONSTRAINT `fk_pesantren_activities_org` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_pesantren_activities_dormitory` FOREIGN KEY (`dormitory_id`) REFERENCES `dormitories` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_pesantren_activities_room` FOREIGN KEY (`room_id`) REFERENCES `rooms` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_pesantren_activities_kitab` FOREIGN KEY (`kitab_reference_id`) REFERENCES `kitab_references` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_pesantren_activities_year` FOREIGN KEY (`academic_year_id`) REFERENCES `academic_years` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_pesantren_activities_semester` FOREIGN KEY (`academic_semester_id`) REFERENCES `academic_semesters` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_pesantren_activities_currency` FOREIGN KEY (`currency_id`) REFERENCES `currencies` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_pesantren_activities_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_pesantren_activities_updated_by` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+```
+
+---
+
+## 📋 8. `pesantren_rules`
+
+Peraturan pesantren.
+
+```sql
+-- ----------------------------
+-- Table structure for pesantren_rules
+-- ----------------------------
+DROP TABLE IF EXISTS `pesantren_rules`;
+CREATE TABLE `pesantren_rules`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `organization_id` bigint UNSIGNED NULL COMMENT 'FK ke organizations',
+  `dormitory_id` bigint UNSIGNED NULL COMMENT 'FK ke dormitories (jika spesifik asrama)',
+  `parent_id` bigint UNSIGNED NULL COMMENT 'FK ke pesantren_rules (untuk hierarki)',
+  `code` varchar(50) NOT NULL COMMENT 'Kode peraturan',
+  `title` varchar(200) NOT NULL COMMENT 'Judul peraturan',
+  `slug` varchar(200) NOT NULL COMMENT 'Slug untuk URL',
+  `category` enum('discipline','worship','study','dormitory','health','security','ethics','uniform','technology','other') NOT NULL DEFAULT 'discipline' COMMENT 'Kategori peraturan',
+  `description` text NOT NULL COMMENT 'Isi peraturan',
+  `legal_basis` text NULL COMMENT 'Dasar hukum',
+  `severity` enum('light','medium','heavy','severe') NOT NULL DEFAULT 'light' COMMENT 'Tingkat berat',
+  `sanction_type` enum('warning','point','detention','suspension','expulsion','community_service','other') NULL COMMENT 'Tipe sanksi',
+  `sanction_points` int UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Poin sanksi',
+  `effective_date` date NULL COMMENT 'Tanggal berlaku',
+  `expiry_date` date NULL COMMENT 'Tanggal berakhir',
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `sort_order` int UNSIGNED NOT NULL DEFAULT 0,
+  `document_path` varchar(255) NULL COMMENT 'File dokumen peraturan',
+  `created_by` bigint UNSIGNED NULL,
+  `updated_by` bigint UNSIGNED NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uk_pesantren_rules_code`(`code` ASC, `organization_id` ASC) USING BTREE,
+  UNIQUE INDEX `uk_pesantren_rules_slug`(`slug` ASC) USING BTREE,
+  INDEX `idx_pesantren_rules_org`(`organization_id` ASC) USING BTREE,
+  INDEX `idx_pesantren_rules_dormitory`(`dormitory_id` ASC) USING BTREE,
+  INDEX `idx_pesantren_rules_parent`(`parent_id` ASC) USING BTREE,
+  INDEX `idx_pesantren_rules_category`(`category` ASC) USING BTREE,
+  INDEX `idx_pesantren_rules_severity`(`severity` ASC) USING BTREE,
+  INDEX `idx_pesantren_rules_active`(`is_active` ASC) USING BTREE,
+  CONSTRAINT `fk_pesantren_rules_org` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_pesantren_rules_dormitory` FOREIGN KEY (`dormitory_id`) REFERENCES `dormitories` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_pesantren_rules_parent` FOREIGN KEY (`parent_id`) REFERENCES `pesantren_rules` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_pesantren_rules_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_pesantren_rules_updated_by` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+```
+
+---
+
+## 📋 9. `pesantren_rule_violations`
+
+Pelanggaran peraturan pesantren.
+
+```sql
+-- ----------------------------
+-- Table structure for pesantren_rule_violations
+-- ----------------------------
+DROP TABLE IF EXISTS `pesantren_rule_violations`;
+CREATE TABLE `pesantren_rule_violations`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `pesantren_rule_id` bigint UNSIGNED NOT NULL COMMENT 'FK ke pesantren_rules',
+  `student_id` bigint UNSIGNED NOT NULL COMMENT 'FK ke students',
+  `organization_id` bigint UNSIGNED NULL COMMENT 'FK ke organizations',
+  `dormitory_id` bigint UNSIGNED NULL COMMENT 'FK ke dormitories',
+  `reporter_id` bigint UNSIGNED NULL COMMENT 'FK ke users yang melaporkan',
+  `handler_id` bigint UNSIGNED NULL COMMENT 'FK ke users yang menangani',
+  `violation_number` varchar(50) NOT NULL COMMENT 'Nomor pelanggaran',
+  `violation_date` date NOT NULL COMMENT 'Tanggal pelanggaran',
+  `violation_time` time NULL COMMENT 'Waktu pelanggaran',
+  `location` varchar(255) NULL COMMENT 'Lokasi pelanggaran',
+  `description` text NOT NULL COMMENT 'Deskripsi pelanggaran',
+  `evidence_paths` json NULL COMMENT 'Bukti pelanggaran',
+  `witnesses` text NULL COMMENT 'Saksi',
+  `severity` enum('light','medium','heavy','severe') NOT NULL DEFAULT 'light' COMMENT 'Tingkat berat',
+  `sanction_type` enum('warning','point','detention','suspension','expulsion','community_service','other') NULL COMMENT 'Tipe sanksi',
+  `sanction_points` int UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Poin sanksi',
+  `sanction_description` text NULL COMMENT 'Deskripsi sanksi',
+  `sanction_start_date` date NULL,
+  `sanction_end_date` date NULL,
+  `status` enum('reported','investigating','resolved','appealed','closed','cancelled') NOT NULL DEFAULT 'reported' COMMENT 'Status penanganan',
+  `student_statement` text NULL COMMENT 'Keterangan santri',
+  `parent_notified` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika orang tua sudah diberitahu',
+  `parent_notified_at` timestamp NULL DEFAULT NULL,
+  `parent_response` text NULL COMMENT 'Tanggapan orang tua',
+  `resolved_at` timestamp NULL DEFAULT NULL,
+  `resolution_notes` text NULL,
+  `appeal_reason` text NULL COMMENT 'Alasan banding',
+  `appeal_status` enum('none','pending','accepted','rejected') NOT NULL DEFAULT 'none' COMMENT 'Status banding',
+  `appeal_decided_by` bigint UNSIGNED NULL COMMENT 'FK ke users yang memutuskan banding',
+  `appeal_decided_at` timestamp NULL DEFAULT NULL,
+  `notes` text NULL,
+  `created_by` bigint UNSIGNED NULL,
+  `updated_by` bigint UNSIGNED NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uk_pesantren_violation_number`(`violation_number` ASC) USING BTREE,
+  INDEX `idx_pesantren_violation_rule`(`pesantren_rule_id` ASC) USING BTREE,
+  INDEX `idx_pesantren_violation_student`(`student_id` ASC) USING BTREE,
+  INDEX `idx_pesantren_violation_org`(`organization_id` ASC) USING BTREE,
+  INDEX `idx_pesantren_violation_dormitory`(`dormitory_id` ASC) USING BTREE,
+  INDEX `idx_pesantren_violation_reporter`(`reporter_id` ASC) USING BTREE,
+  INDEX `idx_pesantren_violation_handler`(`handler_id` ASC) USING BTREE,
+  INDEX `idx_pesantren_violation_date`(`violation_date` ASC) USING BTREE,
+  INDEX `idx_pesantren_violation_severity`(`severity` ASC) USING BTREE,
+  INDEX `idx_pesantren_violation_status`(`status` ASC) USING BTREE,
+  CONSTRAINT `fk_pesantren_violation_rule` FOREIGN KEY (`pesantren_rule_id`) REFERENCES `pesantren_rules` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `fk_pesantren_violation_student` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `fk_pesantren_violation_org` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_pesantren_violation_dormitory` FOREIGN KEY (`dormitory_id`) REFERENCES `dormitories` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_pesantren_violation_reporter` FOREIGN KEY (`reporter_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_pesantren_violation_handler` FOREIGN KEY (`handler_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_pesantren_violation_appeal_decided_by` FOREIGN KEY (`appeal_decided_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_pesantren_violation_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_pesantren_violation_updated_by` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+```
+
+---
+
+## 📋 10. `dormitory_permits`
+
+Izin keluar/menginap santri.
+
+```sql
+-- ----------------------------
+-- Table structure for dormitory_permits
+-- ----------------------------
+DROP TABLE IF EXISTS `dormitory_permits`;
+CREATE TABLE `dormitory_permits`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `student_id` bigint UNSIGNED NOT NULL COMMENT 'FK ke students',
+  `dormitory_assignment_id` bigint UNSIGNED NULL COMMENT 'FK ke dormitory_assignments',
+  `organization_id` bigint UNSIGNED NULL COMMENT 'FK ke organizations',
+  `dormitory_id` bigint UNSIGNED NULL COMMENT 'FK ke dormitories',
+  `permit_number` varchar(50) NOT NULL COMMENT 'Nomor izin',
+  `permit_type` enum('leave','overnight','sick','emergency','home_visit','medical','family','other') NOT NULL DEFAULT 'leave' COMMENT 'Jenis izin',
+  `reason` text NOT NULL COMMENT 'Alasan izin',
+  `destination` varchar(255) NULL COMMENT 'Tujuan',
+  `start_datetime` datetime NOT NULL COMMENT 'Waktu mulai izin',
+  `end_datetime` datetime NOT NULL COMMENT 'Waktu selesai izin',
+  `actual_return_datetime` datetime NULL COMMENT 'Waktu kembali aktual',
+  `duration_hours` int UNSIGNED NULL COMMENT 'Durasi (jam)',
+  `status` enum('draft','pending','approved','rejected','ongoing','returned','late_return','overdue','cancelled') NOT NULL DEFAULT 'pending' COMMENT 'Status izin',
+  `approved_by` bigint UNSIGNED NULL COMMENT 'FK ke users yang approve',
+  `approved_at` timestamp NULL DEFAULT NULL,
+  `rejected_by` bigint UNSIGNED NULL COMMENT 'FK ke users yang reject',
+  `rejected_at` timestamp NULL DEFAULT NULL,
+  `rejection_reason` text NULL,
+  `guardian_name` varchar(150) NULL COMMENT 'Nama wali/orang tua yang menjemput',
+  `guardian_phone` varchar(30) NULL,
+  `guardian_relationship` varchar(50) NULL COMMENT 'Hubungan dengan santri',
+  `escort_name` varchar(150) NULL COMMENT 'Nama pengantar',
+  `escort_phone` varchar(30) NULL,
+  `contact_during_leave` varchar(30) NULL COMMENT 'Kontak selama izin',
+  `address_during_leave` text NULL COMMENT 'Alamat selama izin',
+  `return_notes` text NULL COMMENT 'Catatan saat kembali',
+  `late_return_reason` text NULL COMMENT 'Alasan terlambat kembali',
+  `sanction_applied` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika ada sanksi',
+  `sanction_description` text NULL,
+  `attachment_path` varchar(255) NULL COMMENT 'Surat izin',
+  `notes` text NULL,
+  `created_by` bigint UNSIGNED NULL,
+  `updated_by` bigint UNSIGNED NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uk_dormitory_permit_number`(`permit_number` ASC) USING BTREE,
+  INDEX `idx_dormitory_permit_student`(`student_id` ASC) USING BTREE,
+  INDEX `idx_dormitory_permit_assignment`(`dormitory_assignment_id` ASC) USING BTREE,
+  INDEX `idx_dormitory_permit_org`(`organization_id` ASC) USING BTREE,
+  INDEX `idx_dormitory_permit_dormitory`(`dormitory_id` ASC) USING BTREE,
+  INDEX `idx_dormitory_permit_type`(`permit_type` ASC) USING BTREE,
+  INDEX `idx_dormitory_permit_status`(`status` ASC) USING BTREE,
+  INDEX `idx_dormitory_permit_start`(`start_datetime` ASC) USING BTREE,
+  INDEX `idx_dormitory_permit_end`(`end_datetime` ASC) USING BTREE,
+  CONSTRAINT `fk_dormitory_permit_student` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `fk_dormitory_permit_assignment` FOREIGN KEY (`dormitory_assignment_id`) REFERENCES `dormitory_assignments` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_dormitory_permit_org` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_dormitory_permit_dormitory` FOREIGN KEY (`dormitory_id`) REFERENCES `dormitories` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_dormitory_permit_approved_by` FOREIGN KEY (`approved_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_dormitory_permit_rejected_by` FOREIGN KEY (`rejected_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_dormitory_permit_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_dormitory_permit_updated_by` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+```
+
+---
+
+## 🔗 Relasi Antar Tabel
+
+```
+dormitories (1)
+    │
+    ├──< dormitory_rooms (N)
+    │       │
+    │       └──< dormitory_assignments (N)
+    │               │
+    │               ├── students (N)
+    │               ├──< dormitory_movements (N)
+    │               └──< dormitory_permits (N)
+    │
+    ├──< dormitory_assignments (N)
+    ├──< dormitory_movements (N)
+    └──< dormitory_permits (N)
+
+kitab_references (1)
+    │
+    ├──< sorogan_schedules (N)
+    │       │
+    │       └──< sorogan_evaluations (N)
+    │
+    ├──< sorogan_evaluations (N)
+    └──< pesantren_activities (N)
+
+sorogan_sessions (1)
+    │
+    └──< sorogan_evaluations (N)
+
+pesantren_rules (1)
+    │
+    ├──< pesantren_rules (N) — self-referencing (hierarki)
+    └──< pesantren_rule_violations (N)
+
+pesantren_activities (1)
+    └── (peserta bisa dari activity_participants)
+```
+
+---
+
+## ⚠️ Catatan Penting
+
+1. **FK ke `dormitories`** — Saya asumsikan tabel `dormitories` sudah ada di list Anda.
+
+2. **FK ke `sorogan_sessions`** — Sudah ada di list Anda.
+
+3. **FK ke `teachers` & `employees`** — Saya referensikan keduanya. Jika di sistem Anda `teachers` adalah subset dari `employees`, pilih salah satu.
+
+4. **FK ke `rooms` & `buildings`** — Sudah ada di list Anda.
+
+5. **FK ke `curriculums`** — Sudah ada di list Anda (dari update terbaru).
+
+6. **FK ke `subjects` & `courses`** — Sudah ada di list Anda.
+
+7. **`kitab_references` FULLTEXT index** — Untuk pencarian judul/penulis. Pastikan MySQL 8+.
+
+8. **`pesantren_rules` self-referencing** — Untuk hierarki peraturan (bab → pasal → ayat).
+
+9. **Enum vs Lookup** — Saya pakai `enum` untuk kesederhanaan. Jika ingin fleksibel, ganti dengan lookup table.
+
+10. **Integrasi dengan modul lain**:
+    - `pesantren_scores` bisa FK ke `sorogan_evaluations` atau `memorization_records`
+    - `violations` (yang sudah ada) vs `pesantren_rule_violations` — pilih salah satu, atau bedakan berdasarkan konteks (sekolah vs pesantren)
+    - `activities` (yang sudah ada) vs `pesantren_activities` — bisa digabung jika fungsinya sama
+
+---
+
+## 💡 Saran Konsolidasi
+
+Karena Anda punya `violations` (sudah ada) dan sekarang `pesantren_rule_violations`, saya sarankan:
+
+**Opsi 1**: Gabung menjadi satu tabel `violations` dengan kolom `violation_context` enum('school','pesantren','dormitory').
+
+**Opsi 2**: Biarkan terpisah, tapi pastikan:
+
+- `violations` untuk pelanggaran sekolah umum
+- `pesantren_rule_violations` untuk pelanggaran pesantren/asrama
+
+**Opsi 3**: `pesantren_rule_violations` sebagai **detail** dari `violations` (one-to-one).
+
+Sama halnya dengan `activities` vs `pesantren_activities` — bisa digabung atau dipisah.
+
+---
+
+Apakah Anda ingin saya bantu buatkan juga:
+
+- **Struktur tabel `activity_participants`** (yang sudah ada di list Anda) untuk integrasi dengan `pesantren_activities`?
+- **Struktur tabel `memorization_records`** (yang sudah ada di list Anda) untuk integrasi dengan `kitab_references`?
+- **Query untuk generate laporan hafalan santri**?
+- **Query untuk generate laporan pelanggaran pesantren**?

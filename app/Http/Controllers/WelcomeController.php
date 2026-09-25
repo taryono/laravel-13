@@ -2,11 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ProfileUpdateRequest;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Redirect;
 use Illuminate\Http\JsonResponse;
 use Illuminate\View\View;
 use Models\TrialRegistration;
@@ -86,8 +83,8 @@ class WelcomeController extends Controller
         match ($step) {
             1 => tap($registration)->fill(collect($data)->except('education_level_id')->toArray())
                 ->modules() && $registration->education_level_ids()->sync(
-                    EducationLevel::whereIn('code', $data['education_level_id'])->pluck('id')
-                ),
+                        EducationLevel::whereIn('code', $data['education_level_id'])->pluck('id')
+                    ),
             2 => $registration->modules()->sync(
                 Module::whereIn('code', $data['modul'])->pluck('id')
             ),
