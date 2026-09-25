@@ -31,7 +31,7 @@ class HomeroomTeacherDataTable extends DataTable
                 return $this->renderActionButtons($row);
             })
             ->editColumn('status', function ($row) {
-                return $row->is_active ? '<span class="badge badge-success">Aktif</span>' : '<span class="badge badge-danger">Tidak Aktif</span>';
+                return $row->is_active ? '<span class="badge bg-success">Aktif</span>' : '<span class="badge bg-danger">Tidak Aktif</span>';
             })
             ->editColumn('assignment_date', function ($row) {
                 return $row->assignment_date ? Carbon::parse($row->assignment_date)->format('d M Y') : '-';
@@ -41,9 +41,17 @@ class HomeroomTeacherDataTable extends DataTable
             })
             ->editColumn('notes', function ($row) {
                 return $row->notes ? '<span title="' . e($row->notes) . '">' . e(Str::limit($row->notes, 30)) . '</span>' : '-';
+            })->addColumn('assignment_status', function ($row) {
+                if ($row->status == 1 && $row->end_date < Carbon::now()) {
+                    return '<span class="badge bg-success">Selesai</span>';
+                } else if ($row->status == 1 && $row->end_date >= Carbon::now()) {
+                    return '<span class="badge bg-warning">Aktif</span>';
+                } else {
+                    return '<span class="badge bg-danger">Tidak Aktif</span>';
+                }
             })
             ->addIndexColumn()
-            ->rawColumns(['action', 'status', 'assignment_date', 'end_date', 'notes']) // ✅ Tetap wajib ada!
+            ->rawColumns(['action', 'status', 'assignment_date', 'end_date', 'notes', 'assignment_status']) // ✅ Tetap wajib ada!
             ->setRowId('id');
     }
 

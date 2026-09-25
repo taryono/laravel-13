@@ -11,27 +11,36 @@ class MenuRepository
     public function all(): Collection
     {
         $query = Menu::query()
-            ->where('is_publish', 1)
-            ->where('is_active', 1);
+            ->where('is_active', 1)
+            ->whereNull('deleted_at');
+        // ✅ Hapus syarat is_publish = 1 karena datanya NULL
 
-        // ✅ Terapkan filter hanya jika user SUDAH login
         if (Auth::check()) {
+            $user = Auth::user();
+            $orgId = session('active_organization_id') ?? $user->active_organization_id;
 
-            $userRoleNames = Auth::user()->roles->pluck('name')->toArray();
+            if (!$user->isSuperUser()) {
+                $roleIds = DB::table('role_user')
+                    ->where('user_id', $user->id)
+                    ->where('organization_id', $orgId)
+                    ->pluck('role_id');
 
-            // Tampilkan menu yang role-nya cocok ATAU role-nya kosong (umum)
-            $query->where(function ($q) use ($userRoleNames) {
-                $q->whereIn('role', $userRoleNames)
-                    ->orWhereNull('role');
-            });
+                $allowedMenuIds = DB::table('menu_role')
+                    ->whereIn('role_id', $roleIds)
+                    ->where('is_view', 1)
+                    ->pluck('menu_id');
+
+                $query->whereIn('id', $allowedMenuIds);
+            }
         }
 
         return $query
-            ->orderBy('sequence')
-            ->orderBy('name')
+            ->orderBy('sort_order')
+            ->orderBy('id')
             ->get()
             ->map(fn(Menu $m) => MenuItem::fromModel($m));
     }
+
 
     /**
      * Ambil SEMUA menu tanpa filter apapun — khusus keperluan admin management.
@@ -39,7 +48,8 @@ class MenuRepository
      */
     public function allForAdmin(): Collection
     {
-        return Menu::query()
+        return Menu::with('roles')
+            ->orderBy('sort_order')
             ->orderBy('sequence')
             ->orderBy('name')
             ->get()

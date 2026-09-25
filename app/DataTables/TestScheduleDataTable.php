@@ -17,7 +17,7 @@ class TestScheduleDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['admission_id', 'admission_selection_id', 'academic_year_id', 'school_id', 'code', 'name', 'description', 'test_type', 'test_method', 'test_date', 'start_time', 'end_time', 'duration_minutes', 'registration_start', 'registration_end', 'room_id', 'building_id', 'location_detail', 'online_meeting_url', 'online_meeting_id', 'online_password', 'cbt_session_id', 'exam_package_id', 'quota', 'booked_count', 'min_participants', 'supervisor_id', 'coordinator_id', 'proctor_ids', 'allow_self_register', 'allow_reschedule', 'late_tolerance_min', 'status', 'is_active', 'passing_score', 'max_score', 'score_input_deadline', 'result_announcement', 'notes', 'attachments', 'settings', 'created_by', 'updated_by', 'created_at', 'updated_at', 'deleted_at'];
+    protected array $columns = ['admission.name', 'admission_selection.score', 'academic_year.name', 'school.name', 'code', 'name', 'description', 'test_type', 'test_method', 'test_date', 'start_time', 'end_time', 'duration_minutes', 'registration_start', 'registration_end', 'room.name', 'building_id', 'location_detail', 'online_meeting_url', 'online_meeting_id', 'online_password', 'cbt_session_id', 'exam_package_id', 'quota', 'booked_count', 'min_participants', 'supervisor_id', 'coordinator_id', 'proctor_ids', 'allow_self_register', 'allow_reschedule', 'late_tolerance_min', 'status', 'is_active', 'passing_score', 'max_score', 'score_input_deadline', 'result_announcement', 'notes', 'attachments', 'settings'];
 
     /**
      * Build DataTable response.
@@ -100,7 +100,7 @@ class TestScheduleDataTable extends DataTable
      */
     public function query(TestSchedule $model): QueryBuilder
     {
-        return $model->newQuery();
+        return $model->newQuery()->with('admission', 'admissionSelection', 'academicYear', 'school', 'room', 'building', 'cbtSession', 'examPackage', 'supervisor', 'coordinator', 'proctors');
     }
 
     /**
@@ -138,14 +138,14 @@ class TestScheduleDataTable extends DataTable
                  * Custom Bootstrap 5 layout.
                  */
                 'dom' =>
-                    '<"row mb-3"' .
-                        '<"col-md-6 d-flex align-items-center"B>' .
-                        '<"col-md-6"f>' .
+                '<"row mb-3"' .
+                    '<"col-md-6 d-flex align-items-center"B>' .
+                    '<"col-md-6"f>' .
                     '>' .
                     'rt' .
                     '<"row mt-3"' .
-                        '<"col-md-6"i>' .
-                        '<"col-md-6 d-flex justify-content-md-end"p>' .
+                    '<"col-md-6"i>' .
+                    '<"col-md-6 d-flex justify-content-md-end"p>' .
                     '>',
 
                 /*
@@ -264,12 +264,12 @@ class TestScheduleDataTable extends DataTable
      * explode() dari string literal seperti versi lama, yang rapuh
      * terhadap karakter khusus pada nama kolom.
      */
-     
+
     protected function getColumns(): array
     {
         return collect($this->columns)
-            ->map(fn (string $kolom) => Column::make($kolom)
-                ->title(ucwords(str_replace(['_',"."], [' ',' '], $kolom))))
+            ->map(fn(string $kolom) => Column::make($kolom)
+                ->title(ucwords(str_replace(['_', "."], [' ', ' '], $kolom))))
             // 1. PREPEND: Masukkan kolom No di posisi PALING AWAL (indeks 0)
             ->prepend(
                 Column::make('DT_RowIndex')

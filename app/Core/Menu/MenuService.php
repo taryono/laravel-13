@@ -1,5 +1,5 @@
 <?php
-// app/Core/Menu/MenuService.php
+
 namespace App\Core\Menu;
 
 use Models\Menu;
@@ -16,40 +16,51 @@ class MenuService
     public function __construct(MenuTreeBuilder $treeBuilder)
     {
         $this->treeBuilder = $treeBuilder;
+        // ✅ Inisialisasi di konstruktor
+        $this->allowedMenus = collect();
+        $this->allowedActions = collect();
     }
 
     public function getSplitMenu(string $currentUrl, $user = null): array
     {
-        // Jika user belum login, kembalikan menu kosong atau menu tamu
         if (!$user) {
-            return [
-                'menu' => collect(),
-                'topnavMenu' => collect()
-            ];
+            return ['menu' => collect(), 'topnavMenu' => collect()];
         }
 
-        // Ambil izin yang dimiliki user
-        $this->loadPermissions($user);
+        // ✅ Ambil organisasi aktif
+        $orgId = session('active_organization_id')
+            ?? $user->active_organization_id;
 
-        // Ambil menu yang diizinkan
-        $menus = Menu::where('is_active', 1)
-            ->whereIn('id', $this->allowedMenus)
-            ->orderBy('sort_order', 'asc')
-            ->get();
+        // ✅ Super Admin = semua menu
+        if ($user->isSuperUser()) {
+            // ✅ Pastikan keduanya diatur
+            $this->allowedMenus = collect();
+            $this->allowedActions = collect();
+        } else {
+            $this->loadPermissions($user, $orgId);
+        }
 
-        // Load allowed actions untuk setiap menu
+        // ✅ Ambil menu — is_publish boleh null/1, is_active=1
+        $query = Menu::where('is_active', 1)
+            ->whereNull('deleted_at');
+
+        // Terapkan filter izin (kecuali Super Admin)
+        if (!$user->isSuperUser() && $this->allowedMenus->isNotEmpty()) {
+            $query->whereIn('id', $this->allowedMenus);
+        }
+
+        $menus = $query->orderBy('sort_order', 'asc')->get();
         $menus = $this->loadAllowedActions($menus);
 
-        // Build tree menggunakan MenuTreeBuilder
+
         $tree = $this->treeBuilder
             ->setCustomParentMappings($this->getCustomParentMappings($user))
             ->setRootParentId($this->getRootParentId($user))
             ->build($menus, $currentUrl);
 
-        // Filter tree (hapus grup kosong)
+        // ✅ Filter yang sudah diperbaiki
         $filteredTree = $this->treeBuilder->filterByPermission($tree);
 
-        // Pisahkan menu berdasarkan jenisnya
         return [
             'menu' => $filteredTree->where('type', 'sidebar')->values(),
             'topnavMenu' => $filteredTree->where('type', 'topbar')->values(),
@@ -57,81 +68,82 @@ class MenuService
         ];
     }
 
-    /**
-     * Load allowed actions untuk setiap menu
-     */
+    protected function loadPermissions($user, $orgId): void
+    {
+        // ✅ Filter role_user dengan organization_id
+        $roleIds = DB::table('role_user')
+            ->where('user_id', $user->id)
+            ->where('organization_id', $orgId) // KUNCI INI
+            ->whereNull('deleted_at')
+            ->pluck('role_id');
+
+        if ($roleIds->isEmpty()) {
+            $this->allowedMenus = collect();
+            $this->allowedActions = collect();
+            return;
+        }
+
+        // ✅ Ambil menu yang ada izin is_view = 1
+        $this->allowedMenus = DB::table('menu_role')
+            ->whereIn('role_id', $roleIds)
+            ->where('is_view', 1) // Hanya yang boleh dilihat
+            ->pluck('menu_id');
+        dd($roleIds, $this->allowedMenus);
+        $this->allowedActions = DB::table('action_role')
+            ->whereIn('role_id', $roleIds)
+            ->pluck('action_id');
+    }
+
     protected function loadAllowedActions(Collection $menus): Collection
     {
         return $menus->map(function (Menu $menu) {
-            $menu->allowed_actions = Action::whereIn('id', $this->allowedActions)
+            $menu->allowed_actions = $this->allowedActions->isEmpty()
+                ? Action::where('menu_id', $menu->id)->get(['id', 'name', 'display_name'])
+                : Action::whereIn('id', $this->allowedActions)
                 ->where('menu_id', $menu->id)
                 ->get(['id', 'name', 'display_name']);
             return $menu;
         });
     }
 
-    /**
-     * Tentukan root parent ID berdasarkan role user
-     */
     protected function getRootParentId($user): ?int
     {
-        // Contoh logika
-        if ($user->hasRole('manager')) {
-            return 51; // Academic Management
-        }
-        
-        return null; // Default: semua menu
+        return null;
     }
 
-    /**
-     * Tentukan custom parent mappings berdasarkan role user
-     */
     protected function getCustomParentMappings($user): array
     {
-        $mappings = [];
-        
-        // Contoh: role khusus, Schedule Management jadi root
-        if ($user->hasRole('special_role')) {
-            $mappings[53] = null; // Schedule Management (id: 53) menjadi root
-        }
-        
-        return $mappings;
+        return [];
     }
 
-    /**
-     * Memuat daftar menu & aksi yang diizinkan untuk user
-     */
-    protected function loadPermissions($user): void
-    {
-        $roleIds = DB::table('role_user')
-            ->where('user_id', $user->id)
-            ->pluck('role_id');
-
-        // Ambil menu yang diizinkan
-        $this->allowedMenus = DB::table('menu_role')
-            ->whereIn('role_id', $roleIds)
-            ->pluck('menu_id');
-
-        // Ambil aksi yang diizinkan
-        $this->allowedActions = DB::table('action_role')
-            ->whereIn('role_id', $roleIds)
-            ->pluck('action_id');
-    }
-
-    /**
-     * Cek apakah user punya izin tertentu
-     */
     public function hasPermission($user, string $actionName): bool
     {
         if (!$user) return false;
-        
-        $roleIds = $user->roles->pluck('id');
-        
-        return DB::table('actions')
-            ->where('name', $actionName)
-            ->whereIn('id', function ($q) use ($roleIds) {
-                $q->select('action_id')->from('action_role')->whereIn('role_id', $roleIds);
-            })
+        if ($user->isSuperUser()) return true;
+
+        $orgId = session('active_organization_id')
+            ?? $user->active_organization_id;
+
+        $action = Action::where('name', $actionName)->first();
+        if (!$action) return false;
+
+        // Cek langsung ke user
+        $direct = DB::table('action_user')
+            ->where('action_id', $action->id)
+            ->where('user_id', $user->id)
+            ->whereNull('deleted_at')
+            ->exists();
+        if ($direct) return true;
+
+        // Cek lewat peran di organisasi aktif
+        $roleIds = DB::table('role_user')
+            ->where('user_id', $user->id)
+            ->where('organization_id', $orgId)
+            ->pluck('role_id');
+
+        return DB::table('action_role')
+            ->where('action_id', $action->id)
+            ->whereIn('role_id', $roleIds)
             ->exists();
     }
 }

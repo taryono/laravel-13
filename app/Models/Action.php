@@ -5,9 +5,13 @@ namespace Models;
 class Action extends BasedModel
 {
     protected $fillable = [
-        'menu_id', 'name', 'display_name', 'description',
-        'is_allow_view', 'is_allow_create', 'is_allow_edit', 'is_allow_delete', 'is_active'
-    ]; 
+        'organization_id',
+        'menu_id',
+        'name',
+        'display_name',
+        'description',
+        'is_active'
+    ];
 
     public function menu()
     {
@@ -27,13 +31,13 @@ class Action extends BasedModel
      * @constraintName=fk_actions_users
      * 
      */
-    public function users()
+    public function actionRoles()
     {
-        return $this->belongsToMany(\Models\User::class, 'action_user');
+        return $this->hasMany(ActionRole::class);
     }
 
-    public function roles()
+    public function actionUsers()
     {
-        return $this->belongsToMany(Role::class, 'action_role');
-    } 
+        return $this->hasMany(ActionUser::class);
+    }
 }

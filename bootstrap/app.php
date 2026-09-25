@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'access'    => \App\Http\Middleware\AccessCheck::class,
             'acl'       => \App\Http\Middleware\AclMiddleware::class,
             'proctor' => \App\Http\Middleware\Proctor::class,
+            // 'menu.permission' => \App\Http\Middleware\CheckMenuPermission::class
         ]);
         $middleware->append(\App\Http\Middleware\ResolveActiveOrganization::class);
     })

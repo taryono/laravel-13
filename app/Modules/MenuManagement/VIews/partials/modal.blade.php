@@ -144,17 +144,23 @@
 
             <div class="modal-body">
 
-                <div class="icon-search-box">
-                    <input type="text" class="search-input" id="iconSearchInput" placeholder="🔍 Cari icon...">
+                <div class="icon-search-box mb-2">
+                    <input type="text" class="search-input" id="iconSearchInput" placeholder="🔍 Cari icon berdasarkan nama/grup...">
 
                     <div class="type-selector">
-                        <button class="btn-type active" data-type="fa">
+                        <button class="btn-type active" data-type="fa" type="button">
                             <i class="fas fa-font-awesome"></i> Font Awesome
                         </button>
-                        <button class="btn-type" data-type="material">
-                            <span class="material-symbols-outlined" style="font-size: 1rem;">search</span> Material
+                        <button class="btn-type" data-type="material" type="button">
+                            <span class="material-symbols-outlined" style="font-size: 1rem; vertical-align: middle;">search</span> Material
                         </button>
                     </div>
+                </div>
+
+                <div class="input-group input-group-sm mb-3">
+                    <span class="input-group-text bg-white text-muted"><i class="fas fa-keyboard me-1"></i> Input Manual</span>
+                    <input type="text" class="form-control" id="customIconInput" placeholder="Ketik class FA (mis. fas fa-bell) atau nama Material (mis. bell)">
+                    <button class="btn btn-outline-primary" type="button" id="applyCustomIconBtn">Gunakan</button>
                 </div>
 
                 <div class="icon-counter" id="iconCounter">Menampilkan <span id="iconCount">0</span> icon</div>
@@ -702,9 +708,12 @@
     const searchInput = document.getElementById('iconSearchInput');
     const emptyState = document.getElementById('iconEmpty');
     const counter = document.getElementById('iconCount');
+    const customIconInput = document.getElementById('customIconInput');
+    const applyCustomIconBtn = document.getElementById('applyCustomIconBtn');
 
     // ===== RENDER ICONS =====
     function renderIcons() {
+        if (!grid) return;
         const icons = ICON_DATA[currentType] || [];
         const query = searchQuery.toLowerCase().trim();
 
@@ -717,14 +726,14 @@
             );
         }
 
-        counter.textContent = filtered.length;
+        if (counter) counter.textContent = filtered.length;
 
         if (filtered.length === 0) {
             grid.innerHTML = '';
-            emptyState.style.display = 'block';
+            if (emptyState) emptyState.style.display = 'block';
             return;
         }
-        emptyState.style.display = 'none';
+        if (emptyState) emptyState.style.display = 'none';
 
         let html = '';
         filtered.forEach(icon => {
@@ -747,35 +756,29 @@
 
         grid.innerHTML = html;
 
-        document.querySelectorAll('.icon-item').forEach(el => {
+        grid.querySelectorAll('.icon-item').forEach(el => {
             el.addEventListener('click', function() {
                 const value = this.dataset.value;
                 const label = this.dataset.label;
                 const type = this.dataset.type;
 
-                document.querySelectorAll('.icon-item').forEach(i => i.classList.remove('selected'));
+                grid.querySelectorAll('.icon-item').forEach(i => i.classList.remove('selected'));
                 this.classList.add('selected');
 
-                selectedIcon = {
-                    value,
-                    label,
-                    type
-                };
+                selectedIcon = { value, label, type };
+                if (customIconInput) customIconInput.value = value;
             });
         });
     }
 
-    // ===== UPDATE FORM PREVIEW ===== 
-    function updateFormPreview(icon) {
+    // ===== UPDATE FORM PREVIEW (EXPORT KE WINDOW) ===== 
+    window.updateIconFormPreview = function(icon) {
         if (!icon) return;
 
-        const {
-            value,
-            label,
-            type
-        } = icon;
+        const type = icon.type || 'fa';
+        const value = icon.value || (type === 'fa' ? 'fas fa-th-large' : 'dashboard');
+        const label = icon.label || value;
 
-        // 🔥 Perbaikan: langsung akses elemen di document (bukan di dalam form)
         const previewDisplay = document.getElementById('previewIconDisplay');
         const previewName = document.getElementById('previewIconName');
         const previewClass = document.getElementById('previewIconClass');
@@ -785,22 +788,23 @@
         const iconTypeInput = document.getElementById('menu_icon_type');
         const iconInput = document.getElementById('menu_icon');
 
+        if (iconTypeInput) iconTypeInput.value = type;
+        if (iconInput) iconInput.value = value;
+
         if (previewDisplay) {
             if (type === 'fa') {
                 previewDisplay.innerHTML = `<i class="${value}"></i>`;
-                if (previewClass) previewClass.textContent = value;
-                if (previewType) previewType.textContent = 'Font Awesome';
             } else {
                 previewDisplay.innerHTML = `<span class="material-symbols-outlined">${value}</span>`;
-                if (previewClass) previewClass.textContent = value;
-                if (previewType) previewType.textContent = 'Material Symbols';
             }
         }
 
-        if (previewName) previewName.textContent = label || value;
-
-        if (iconTypeInput) iconTypeInput.value = type;
-        if (iconInput) iconInput.value = value;
+        if (previewName) previewName.textContent = label;
+        if (previewClass) previewClass.textContent = value;
+        if (previewType) {
+            previewType.textContent = type === 'fa' ? 'Font Awesome' : 'Material Symbols';
+            previewType.className = `icon-type-badge badge ${type === 'fa' ? 'bg-primary-subtle text-primary' : 'bg-info-subtle text-info'}`;
+        }
 
         if (resultDisplay) {
             if (type === 'fa') {
@@ -812,30 +816,36 @@
         if (resultCode) {
             resultCode.textContent = `icon_type: ${type} | icon: ${value}`;
         }
-    }
+
+        currentType = type;
+        selectedIcon = { type, value, label };
+    };
 
     // ===== FUNGSI UNTUK BUKA ICON PICKER =====
     function openIconPicker() {
-        // 🔥 Perbaikan: langsung akses elemen dari document
         const iconTypeInput = document.getElementById('menu_icon_type');
         const iconInput = document.getElementById('menu_icon');
 
-        if (iconTypeInput && iconTypeInput.value) {
-            currentType = iconTypeInput.value;
-            selectedIcon.type = currentType;
-        }
-        if (iconInput && iconInput.value) {
-            selectedIcon.value = iconInput.value;
-            const icons = ICON_DATA[currentType] || [];
-            const found = icons.find(i => i.value === iconInput.value);
-            if (found) {
-                selectedIcon.label = found.label;
-            }
+        const type = (iconTypeInput && iconTypeInput.value) ? iconTypeInput.value : 'fa';
+        const val = (iconInput && iconInput.value) ? iconInput.value : (type === 'fa' ? 'fas fa-th-large' : 'dashboard');
+
+        currentType = type;
+        selectedIcon = { type, value: val, label: val };
+
+        const icons = ICON_DATA[currentType] || [];
+        const found = icons.find(i => i.value === val);
+        if (found) {
+            selectedIcon.label = found.label;
         }
 
         document.querySelectorAll('.btn-type').forEach(btn => {
             btn.classList.toggle('active', btn.dataset.type === currentType);
         });
+
+        if (searchInput) searchInput.value = '';
+        searchQuery = '';
+
+        if (customIconInput) customIconInput.value = val;
 
         renderIcons();
 
@@ -847,61 +857,97 @@
         }
         iconPickerInstance.show();
     }
+
     // ===== EVENT LISTENERS ICON PICKER =====
 
-    // Type selector
+    // Type selector (FA / Material)
     document.querySelectorAll('.btn-type').forEach(btn => {
-        btn.addEventListener('click', function() {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
             document.querySelectorAll('.btn-type').forEach(b => b.classList.remove('active'));
             this.classList.add('active');
             currentType = this.dataset.type;
+
+            // Jika icon saat ini tidak bertipe sama, berikan icon default untuk type yang dipilih
+            if (selectedIcon.type !== currentType) {
+                const defaultIcon = (ICON_DATA[currentType] && ICON_DATA[currentType][0]) ?
+                    ICON_DATA[currentType][0] :
+                    { value: currentType === 'fa' ? 'fas fa-th-large' : 'dashboard', label: 'Dashboard' };
+                selectedIcon = {
+                    type: currentType,
+                    value: defaultIcon.value,
+                    label: defaultIcon.label
+                };
+            }
+
+            if (customIconInput) customIconInput.value = selectedIcon.value;
             renderIcons();
         });
     });
 
-    // Search
-    searchInput.addEventListener('input', function() {
-        searchQuery = this.value;
-        renderIcons();
-    });
+    // Search input
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            searchQuery = this.value;
+            renderIcons();
+        });
+    }
+
+    // Manual input button
+    if (applyCustomIconBtn && customIconInput) {
+        applyCustomIconBtn.addEventListener('click', function() {
+            const val = customIconInput.value.trim();
+            if (!val) return;
+
+            // Auto switch type jika class font-awesome terdeteksi
+            if (val.startsWith('fa ') || val.startsWith('fas ') || val.startsWith('far ') || val.startsWith('fab ') || val.startsWith('fa-')) {
+                currentType = 'fa';
+            }
+
+            selectedIcon = {
+                type: currentType,
+                value: val,
+                label: val
+            };
+
+            document.querySelectorAll('.btn-type').forEach(b => b.classList.toggle('active', b.dataset.type === currentType));
+            if (grid) grid.querySelectorAll('.icon-item').forEach(i => i.classList.remove('selected'));
+            window.updateIconFormPreview(selectedIcon);
+            if (iconPickerInstance) iconPickerInstance.hide();
+        });
+    }
 
     // Confirm button
-    document.getElementById('confirmIconBtn').addEventListener('click', function() {
-        if (selectedIcon) {
-            updateFormPreview(selectedIcon);
+    const confirmBtn = document.getElementById('confirmIconBtn');
+    if (confirmBtn) {
+        confirmBtn.addEventListener('click', function() {
+            if (selectedIcon && selectedIcon.value) {
+                window.updateIconFormPreview(selectedIcon);
+            }
             if (iconPickerInstance) {
                 iconPickerInstance.hide();
-                // Cleanup backdrop
-                setTimeout(() => {
-                    const backdrops = document.querySelectorAll('.modal-backdrop');
-                    if (backdrops.length > 1) {
-                        // Hapus backdrop icon picker, simpan backdrop modal utama
-                        backdrops.forEach((backdrop, index) => {
-                            if (index > 0) backdrop.remove();
-                        });
-                    }
-                }, 150);
             }
-        }
-    });
+        });
+    }
 
     // Cancel button
-    document.getElementById('cancelIconBtn').addEventListener('click', function() {
-        if (iconPickerInstance) {
-            iconPickerInstance.hide();
-        }
-    });
-    // ===== CLEANUP =====
+    const cancelBtn = document.getElementById('cancelIconBtn');
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', function() {
+            if (iconPickerInstance) {
+                iconPickerInstance.hide();
+            }
+        });
+    }
+
+    // Cleanup backdrops on page unload
     window.addEventListener('beforeunload', function() {
         const backdrops = document.querySelectorAll('.modal-backdrop');
         backdrops.forEach(backdrop => backdrop.remove());
         document.body.classList.remove('modal-open');
     });
 
-    // ===== INIT =====
-    renderIcons();
-
-    // ===== ATTACH EVENT UNTUK ICON PREVIEW BOX =====
+    // Inisialisasi awal saat load
     document.addEventListener('DOMContentLoaded', function() {
         const previewBox = document.getElementById('iconPreviewBox');
         if (previewBox) {
@@ -912,23 +958,9 @@
             });
         }
 
-        // ===== HANDLE FORM SUBMIT =====
-        const form = document.getElementById('menuForm');
-        if (form) {
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                const iconType = document.getElementById('menu_icon_type');
-                const icon = document.getElementById('menu_icon');
-
-                if (!icon.value || icon.value === '') {
-                    alert('Silakan pilih icon terlebih dahulu!');
-                    return false;
-                }
-
-                console.log('📤 Data yang akan dikirim:');
-                console.log('icon_type:', iconType.value);
-                console.log('icon:', icon.value);
-            });
-        }
+        // Tampilkan preview awal bawaan form
+        const initialType = document.getElementById('menu_icon_type')?.value || 'fa';
+        const initialVal = document.getElementById('menu_icon')?.value || 'fas fa-th-large';
+        window.updateIconFormPreview({ type: initialType, value: initialVal, label: 'Dashboard' });
     });
 </script>

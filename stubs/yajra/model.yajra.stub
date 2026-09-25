@@ -1,14 +1,11 @@
 <?php
-
 namespace Models; 
 
 class {{modelName}} extends BasedModel
-{ 
+{
     // Relasi
-    // public function user()
-    // {
-    //     return $this->belongsTo(User::class);
-    // }
+    {{relations}}
+
 
     // Scope
     public function scopeActive($query)

@@ -43,8 +43,17 @@ class MenuManagementController extends MainController
     public function store(Request $request)
     {
         $data = $this->validated($request);
-        $data['slug']       = $data['slug'] ?? Str::slug($data['title']);
-        $data['sort_order'] = $data['sort_order'] ?? ((Menu::max('sort_order') ?? 0) + 1);
+        $data['name']       = $data['title'];
+        $data['slug']       = !empty($data['slug']) ? Str::slug($data['slug']) : Str::slug($data['title']);
+        $maxOrder           = Menu::max('sort_order') ?? Menu::max('sequence') ?? 0;
+        $data['sort_order'] = !empty($data['sort_order']) ? (int) $data['sort_order'] : ($maxOrder + 1);
+        $data['sequence']   = $data['sort_order'];
+        $data['is_publish'] = 1;
+
+        $orgId = session('active_organization.id') ?? auth()->user()?->organizations()?->first()?->id;
+        if ($orgId && empty($data['organization_id'])) {
+            $data['organization_id'] = $orgId;
+        }
 
         $menu = Menu::create($data);
 
@@ -55,13 +64,11 @@ class MenuManagementController extends MainController
 
     public function show(Menu $menu)
     {
-
         return response()->json($menu->load(['actions', 'roles']));
     }
 
     public function update(Request $request, Menu $menu)
     {
-
         $data = $this->validated($request, $menu->id);
         if (isset($data['parent_id']) && $this->wouldCreateCycle($menu->id, $data['parent_id'])) {
             return response()->json([
@@ -69,10 +76,15 @@ class MenuManagementController extends MainController
             ], 422);
         }
 
-        if (!isset($data['slug'])) {
-            $data['slug'] = $menu->slug;
+        if (empty($data['slug'])) {
+            $data['slug'] = $menu->slug ?: Str::slug($data['title']);
+        } else {
+            $data['slug'] = Str::slug($data['slug']);
         }
-        $data['name'] = $request->title;
+        $data['name'] = $data['title'];
+        if (isset($data['sort_order'])) {
+            $data['sequence'] = (int) $data['sort_order'];
+        }
         $menu->update($data);
 
         $this->clearMenuCache();
@@ -188,6 +200,10 @@ class MenuManagementController extends MainController
         ]);
 
         $data['menu_id'] = $menu->id;
+        $data['organization_id'] = $menu->organization_id
+            ?? session('active_organization.id')
+            ?? auth()->user()?->organizations()?->first()?->id
+            ?? 1;
 
         $action = Action::create($data);
 
@@ -259,6 +275,7 @@ class MenuManagementController extends MainController
             Menu::where('id', $node['id'])->update([
                 'parent_id'  => $parentId,
                 'sort_order' => $index + 1,
+                'sequence'   => $index + 1,
             ]);
 
             if (!empty($node['children'])) {
@@ -269,6 +286,11 @@ class MenuManagementController extends MainController
 
     private function validated(Request $request, ?int $ignoreId = null): array
     {
+        $parentId = $request->input('parent_id');
+        if ($parentId === '' || $parentId === 'null' || $parentId === null) {
+            $request->merge(['parent_id' => null]);
+        }
+
         return $request->validate([
             'title'         => 'required|string|max:191',
             'flyout_title'  => 'nullable|string|max:191',
@@ -282,16 +304,13 @@ class MenuManagementController extends MainController
             'icon_type'     => 'nullable|string|in:material,fa',
             'route'         => 'nullable|string|max:191',
             'url'           => 'nullable|string|max:255',
-            'type'          => 'required|string|in:topbar,sidebar',
-            'parent_id'     => array_filter([
+            'type'          => 'required|string|in:topbar,sidebar,module',
+            'parent_id'     => [
                 'nullable',
                 'integer',
                 Rule::exists('menus', 'id'),
-                // Tidak boleh jadi parent dari dirinya sendiri.
-                // Cek siklus lebih dalam (parent = salah satu keturunannya) ditangani
-                // manual lewat wouldCreateCycle() di method update().
                 $ignoreId ? Rule::notIn([$ignoreId]) : null,
-            ]),
+            ],
             'sort_order'    => 'nullable|integer|min:0',
             'is_active'     => 'required|boolean',
             'id_text'       => 'nullable|string|max:255',

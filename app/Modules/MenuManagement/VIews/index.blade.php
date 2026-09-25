@@ -35,6 +35,7 @@
                 store: @json(route('menu_management.store')),
                 show: @json(route('menu_management.show', ['menu' => '__MENU_ID__'])),
                 update: @json(route('menu_management.update', ['menu' => '__MENU_ID__'])),
+                destroy: @json(route('menu_management.destroy', ['menu' => '__MENU_ID__'])),
                 reorder: @json(route('menu_management.reorder')),
                 rolesSync: @json(route('menu_management.roles.sync', ['menu' => '__MENU_ID__'])),
                 actionsIndex: @json(route('menu_management.actions.index', ['menu' => '__MENU_ID__'])),

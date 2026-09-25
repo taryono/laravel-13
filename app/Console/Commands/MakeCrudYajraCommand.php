@@ -3,6 +3,8 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 
@@ -123,7 +125,7 @@ class MakeCrudYajraCommand extends Command
         // FIX: bangun validation rules dari --columns, dipakai di controller.yajra.stub
         // untuk menggantikan rule hardcoded 'name' saja.
         $validationRules = $this->buildValidationRules($columnsArray);
-
+        $relationsCode = $this->buildRelations($columnsArray, $modelNamespace, $name);
         $replacements = [
             '{{modelName}}' => $name,
             '{{modelVariable}}' => $modelVariable,
@@ -138,6 +140,7 @@ class MakeCrudYajraCommand extends Command
             '{{namespace}}' => $modelNamespace,
             '{{tableName}}' => $tableName,
             '{{routePrefix}}' => $routePrefix,
+            '{{relations}}' => $relationsCode,
         ];
 
         $this->newLine();
@@ -202,11 +205,11 @@ class MakeCrudYajraCommand extends Command
         $this->line('📌 Kolom    : ' . implode(', ', $columnsArray));
 
         $this->newLine();
-        \Artisan::call('cache:clear');
-        \Artisan::call('config:clear');
-        \Artisan::call('route:clear');
-        \Artisan::call('view:clear');
-        \Artisan::call('optimize');
+        Artisan::call('cache:clear');
+        Artisan::call('config:clear');
+        Artisan::call('route:clear');
+        Artisan::call('view:clear');
+        Artisan::call('optimize');
 
         return Command::SUCCESS;
     }
@@ -406,7 +409,7 @@ class MakeCrudYajraCommand extends Command
         );
 
         // Assign ke role super-admin
-        \DB::table('menu_role')->updateOrInsert(
+        DB::table('menu_role')->updateOrInsert(
             ['menu_id' => $menu->id, 'role_id' => $role->id],
             [
                 'is_view' => 1,
@@ -519,5 +522,46 @@ class MakeCrudYajraCommand extends Command
     protected function getTableName(string $name): string
     {
         return Str::snake(Str::plural($name));
+    }
+
+    /**
+     * Generate method belongsTo() untuk tiap kolom yang berakhiran _id.
+     * Heuristik: category_id -> categories relasi ke model Category,
+     * di namespace yang sama dengan model yang sedang dibuat.
+     * Developer tetap perlu review manual (nama model tidak selalu
+     * singular-mapping sempurna, mis. company_id -> Company sudah pas,
+     * tapi kasus non-standar harus dicek ulang).
+     */
+    protected function buildRelations(array $columnsArray, string $namespace, string $currentModel): string
+    {
+        $lines = [];
+        $namespace = trim($namespace, '\\');
+
+        foreach ($columnsArray as $column) {
+            if (!Str::endsWith($column, '_id')) {
+                continue;
+            }
+
+            $relationName = Str::camel(Str::beforeLast($column, '_id'));
+            $relatedModel = Str::studly(Str::beforeLast($column, '_id'));
+
+            // FIX: relasi ke User selalu point ke App\Models\User, apa pun
+            // default namespace project-nya, karena model User sendiri selalu
+            // digenerate di App\Models (lihat override di handle()).
+            $relatedNamespace = $relatedModel === 'User' ? 'App\\Models' : $namespace;
+
+            $note = $relatedModel === $currentModel
+                ? '        // NOTE: kemungkinan self-relation, cek ulang manual' . "\n"
+                : '';
+
+            $lines[] = <<<PHP
+                public function {$relationName}()
+                {
+            {$note}        return \$this->belongsTo(\\{$relatedNamespace}\\{$relatedModel}::class, '{$column}');
+                }
+            PHP;
+        }
+
+        return implode("\n\n", $lines);
     }
 }

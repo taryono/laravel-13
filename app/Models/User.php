@@ -10,7 +10,6 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Cache;
 use Laravel\Sanctum\HasApiTokens;
-// use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -28,20 +27,73 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-            'deleted_at' => 'datetime',
+            'password'          => 'hashed',
+            'deleted_at'         => 'datetime',
         ];
     }
 
-    // --- Relasi ---
+    // =====================================================
+    // RELASI
+    // =====================================================
+
+    // Semua peran user di semua organisasi
+    public function roleUsers()
+    {
+        return $this->hasMany(\Models\RoleUser::class);
+    }
+
+    // Peran dengan filter organisasi aktif
     public function roles()
     {
         return $this->belongsToMany(\Models\Role::class, 'role_user')
-            ->withPivot('is_default')
+            ->withPivot(['organization_id', 'is_default'])
             ->withTimestamps();
     }
 
-    // --- Cek Peran ---
+    // Organisasi yang diikuti user
+    public function organizations()
+    {
+        return $this->belongsToMany(\Models\Organization::class, 'organization_user')
+            ->withPivot(['is_default', 'is_active', 'id'])
+            ->wherePivot('is_active', 1)
+            ->withTimestamps();
+    }
+
+    // =====================================================
+    // ORGANISASI AKTIF
+    // =====================================================
+
+    public function currentOrganization()
+    {
+        return $this->organizations()
+            ->wherePivot('is_default', 1)
+            ->first();
+    }
+
+    public function getCurrentOrganizationIdAttribute()
+    {
+        return $this->activeOrganization()?->id;
+    }
+
+    public function activeOrganization()
+    {
+        $orgId = session('active_organization_id') ?? $this->current_organization_id;
+        return $this->organizations()
+            ->when($orgId, fn($q) => $q->where('organizations.id', $orgId))
+            ->orderByRaw('is_default DESC, id ASC')
+            ->first();
+    }
+
+    // Daftar ID organisasi user
+    public function organizationIds(): array
+    {
+        return $this->organizations()->pluck('organizations.id')->toArray();
+    }
+
+    // =====================================================
+    // CEK PERAN
+    // =====================================================
+
     public function isSuperUser(): bool
     {
         return Cache::remember("user_{$this->id}_is_super", 3600, function () {
@@ -51,114 +103,135 @@ class User extends Authenticatable implements MustVerifyEmail
         });
     }
 
-
-    public function isAdmin()
-    {
-        return $this->hasRole('admin');
-    }
-
-    // --- Fungsi Bantu ---
-    public function authorizeRoles($roles)
+    public function hasRole($role, $orgId = null): bool
     {
         if ($this->isSuperUser()) return true;
 
-        $hasRole = is_array($roles)
-            ? $this->hasAnyRole($roles)
-            : $this->hasRole($roles);
+        $orgId = $orgId ?? $this->active_organization_id;
+        $roles = (array)$role;
+        $cacheKey = "user_{$this->id}_roles_" . md5(implode(',', $roles) . "_{$orgId}");
 
-        if (!$hasRole) {
-            abort(403, 'Anda tidak memiliki akses ke halaman ini.');
-        }
-
-        return true;
-    }
-
-    public function hasAnyRole($roles)
-    {
-        return $this->roles()->whereIn('name', (array)$roles)->exists();
-    }
-
-    // Tambahkan method untuk clear cache
-    public function clearRoleCache()
-    {
-        $cacheKeys = [
-            "user_{$this->id}_role_super-admin",
-            "user_{$this->id}_role_admin",
-            // dll
-        ];
-        foreach ($cacheKeys as $key) {
-            Cache::forget($key);
-        }
-        Cache::forget("user_{$this->id}_roles");
-    }
-
-    // Atau pakai cache dengan tag (Redis/Memcached)
-    public function hasRole($role)
-    {
-        // Buat cache key yang benar untuk array
-        $roleKey = is_array($role) ? implode('_', $role) : $role;
-        $cacheKey = "user_{$this->id}_role_{$roleKey}";
-
-        return Cache::remember($cacheKey, 3600, function () use ($role) {
-            $roles = is_array($role) ? $role : [$role];
-
-            // Gunakan getQuery() agar tidak memicu event/model boot lain
+        return Cache::remember($cacheKey, 3600, function () use ($roles, $orgId) {
             return $this->roles()
+                ->when($orgId, fn($q) => $q->where('organization_id', $orgId))
                 ->whereIn('name', $roles)
                 ->exists();
         });
     }
 
-    // Panggil saat role berubah
-    public function syncRoles(...$roles)
+    public function hasAnyRole($roles, $orgId = null): bool
     {
-        parent::syncRoles($roles);
-
-        // Hapus semua cache yang berkaitan dengan user ini
-        $cacheKeys = [
-            "user_{$this->id}_role_admin",
-            "user_{$this->id}_role_manager",
-            "user_{$this->id}_role_special_role",
-            // Tambahkan semua role yang mungkin
-        ];
-
-        foreach ($cacheKeys as $key) {
-            Cache::forget($key);
-        }
-
-        // Atau lebih simple: flush semua cache user
-        // Cache::forget("user_{$this->id}_role_*"); // Tidak support wildcard
+        return $this->hasRole($roles, $orgId);
     }
 
-    // --- Session & Lainnya ---
+    public function authorizeRoles($roles, $orgId = null): bool
+    {
+        if ($this->isSuperUser()) return true;
+
+        if (!$this->hasAnyRole($roles, $orgId)) {
+            abort(403, 'Anda tidak memiliki akses ke halaman ini.');
+        }
+        return true;
+    }
+
+    // =====================================================
+    // CEK IZIN MENU (CRUD)
+    // =====================================================
+
+    public function hasMenuPermission($menuSlug, $action = 'is_view', $orgId = null): bool
+    {
+        // Super Admin = semua izin
+        if ($this->isSuperUser()) return true;
+
+        $orgId = $orgId ?? $this->active_organization_id;
+
+        $menu = \Models\Menu::where('slug', $menuSlug)->first();
+        if (!$menu) return false;
+
+        // Ambil ID peran user di organisasi aktif
+        $roleIds = $this->roleUsers()
+            ->where('organization_id', $orgId)
+            ->whereNull('deleted_at')
+            ->pluck('role_id');
+
+        if ($roleIds->isEmpty()) return false;
+
+        return \Models\MenuRole::where('menu_id', $menu->id)
+            ->whereIn('role_id', $roleIds)
+            ->where($action, 1)
+            ->exists();
+    }
+
+    // =====================================================
+    // CEK IZIN AKSI KHUSUS (di luar CRUD)
+    // =====================================================
+
+    public function hasActionPermission($actionName, $orgId = null): bool
+    {
+        if ($this->isSuperUser()) return true;
+
+        $orgId = $orgId ?? $this->active_organization_id;
+
+        $action = \Models\Action::where('name', $actionName)
+            ->where('organization_id', $orgId)
+            ->first();
+
+        if (!$action) return false;
+
+        // Cek langsung ke user
+        $direct = \Models\ActionUser::where('action_id', $action->id)
+            ->where('user_id', $this->id)
+            ->exists();
+
+        if ($direct) return true;
+
+        // Cek lewat peran
+        $roleIds = $this->roleUsers()
+            ->where('organization_id', $orgId)
+            ->whereNull('deleted_at')
+            ->pluck('role_id');
+
+        return \Models\ActionRole::where('action_id', $action->id)
+            ->whereIn('role_id', $roleIds)
+            ->exists();
+    }
+
+    // =====================================================
+    // SESI & BANTUAN LAIN
+    // =====================================================
+
     public function setAuthSession($role, $roles)
     {
         session()->put('user_auth', [
-            'login_as'      => $role->name,
+            'login_as'        => $role->name,
             'active_role_id'  => $role->id,
-            'auth_role_ids' => $roles->pluck('id'),
-            'auth_roles'    => $roles->pluck('name'),
-            'auth_role'     => $role,
-            'layout'        => $role->layout,
-            'origin_role'   => $role,
+            'auth_role_ids'   => $roles->pluck('id'),
+            'auth_roles'      => $roles->pluck('name'),
+            'auth_role'       => $role,
+            'layout'          => $role->layout ?? null,
+            'origin_role'     => $role,
         ]);
         session()->put('role_ids', $roles->pluck('id'));
     }
+
     public function isMale()
     {
-        return $this->sex == "L";
+        return ($this->sex ?? '') === 'L';
     }
+
     public function isFemale()
     {
-        return $this->sex == "P";
+        return ($this->sex ?? '') === 'P';
     }
+
     public function gender()
     {
-        return $this->sex == "P" ? "Perempuan" : "Laki-laki";
+        return $this->isFemale() ? 'Perempuan' : 'Laki-laki';
     }
+
     public function whatsapp()
     {
-        return $this->cellphone;
+        return $this->cellphone ?? $this->phone ?? '';
     }
 
     protected function email(): Attribute
@@ -169,8 +242,27 @@ class User extends Authenticatable implements MustVerifyEmail
         );
     }
 
+    // =====================================================
+    // MANAJEMEN CACHE
+    // =====================================================
+
+    public function clearRoleCache()
+    {
+        Cache::forget("user_{$this->id}_is_super");
+
+        // Hapus semua cache peran user ini
+        $prefix = "user_{$this->id}_";
+        Cache::flush(); // Atau gunakan tag jika pakai Redis
+    }
+
     protected static function booted()
     {
+        static::saved(function ($user) {
+            if ($user->isDirty('roles') || $user->wasChanged()) {
+                $user->clearRoleCache();
+            }
+        });
+
         static::deleted(function ($user) {
             $user->clearRoleCache();
         });
@@ -178,61 +270,5 @@ class User extends Authenticatable implements MustVerifyEmail
         static::restored(function ($user) {
             $user->clearRoleCache();
         });
-
-        // Clear cache saat role sync (gunakan event observer)
-        static::saved(function ($user) {
-            if ($user->wasChanged()) {
-                $user->clearRoleCache();
-            }
-        });
-    }
-
-    public function organizations()
-    {
-        return $this->belongsToMany(\Models\Organization::class, 'organization_user')
-            ->withPivot('is_default', 'is_active', 'id')
-            ->wherePivot('is_active', 1)
-            ->withTimestamps();
-    }
-
-    // Ambil organisasi yang sedang aktif/default
-    public function currentOrganization()
-    {
-        return $this->organizations()
-            ->wherePivot('is_active', 1)
-            ->wherePivot('is_default', 1)
-            ->first();
-    }
-
-    public function getCurrentOrganizationIdAttribute()
-    {
-        return $this->currentOrganization()?->id;
-    }
-
-
-
-    public function organizationIds(): array
-    {
-        return $this->organizations()->pluck('organizations.id')->toArray();
-    }
-
-    // Ambil organisasi yang sedang aktif
-    public function activeOrganization()
-    {
-        $orgId = session('active_organization_id');
-
-        return $this->organizations()
-            ->when($orgId, function ($q) use ($orgId) {
-                $q->where('organizations.id', $orgId);
-            })
-            ->wherePivot('is_active', 1)
-            ->orderByRaw('is_default DESC, id ASC')
-            ->first();
-    }
-
-    // Helper ambil ID langsung
-    public function getActiveOrganizationIdAttribute()
-    {
-        return session('active_organization_id');
     }
 }

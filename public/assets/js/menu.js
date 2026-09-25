@@ -40,11 +40,16 @@ window.openMenuModal = async function (mode, id = null) {
     const form = document.getElementById('menuForm');
     form.reset();
     document.getElementById('menu_id').value = '';
-    document.getElementById('menu_icon_type').value = 'material';
     document.getElementById('menu_type').value = 'sidebar';
+    document.getElementById('id_text').value = '';
+    document.getElementById('en_text').value = '';
     document.getElementById('menuModalTitle').textContent = mode === 'create' ? 'Tambah Menu' : 'Edit Menu';
 
-    if (mode === 'edit' && id) {
+    if (mode === 'create') {
+        if (typeof window.updateIconFormPreview === 'function') {
+            window.updateIconFormPreview({ type: 'fa', value: 'fas fa-th-large', label: 'Dashboard' });
+        }
+    } else if (mode === 'edit' && id) {
         try {
             const data = await request({
                 url: routeFor(window.MENU_ROUTES.show, id, '__MENU_ID__'),
@@ -54,17 +59,29 @@ window.openMenuModal = async function (mode, id = null) {
             document.getElementById('menu_id').value = data.id;
             document.getElementById('menu_title').value = data.title ?? '';
             document.getElementById('menu_flyout_title').value = data.flyout_title ?? '';
+            document.getElementById('id_text').value = data.id_text ?? '';
+            document.getElementById('en_text').value = data.en_text ?? '';
             document.getElementById('menu_slug').value = data.slug ?? '';
             document.getElementById('menu_url').value = data.url ?? '';
             document.getElementById('menu_route').value = data.route ?? '';
             document.getElementById('menu_icon').value = data.icon ?? '';
-            document.getElementById('menu_icon_type').value = data.icon_type ?? 'material';
+            document.getElementById('menu_icon_type').value = data.icon_type ?? 'fa';
             document.getElementById('menu_type').value = data.type ?? 'sidebar';
             document.getElementById('menu_parent_id').value = data.parent_id ?? '';
-            document.getElementById('menu_sort_order').value = data.sort_order ?? '';
+            document.getElementById('menu_sort_order').value = data.sort_order ?? data.sequence ?? '';
             document.getElementById('menu_is_active').checked = !!data.is_active;
+
+            const iconType = data.icon_type || 'fa';
+            const iconVal = data.icon || (iconType === 'material' ? 'dashboard' : 'fas fa-th-large');
+            if (typeof window.updateIconFormPreview === 'function') {
+                window.updateIconFormPreview({
+                    type: iconType,
+                    value: iconVal,
+                    label: data.title || iconVal
+                });
+            }
         } catch (e) {
-            return; // handleAjaxError sudah menampilkan pesan
+            return;
         }
     }
 
@@ -81,14 +98,14 @@ async function handleMenuSubmit(e) {
         slug: document.getElementById('menu_slug').value || null,
         url: document.getElementById('menu_url').value,
         route: document.getElementById('menu_route').value,
-        icon: document.getElementById('menu_icon').value,
-        icon_type: document.getElementById('menu_icon_type').value,
-        type: document.getElementById('menu_type').value,
+        icon: document.getElementById('menu_icon').value || (document.getElementById('menu_icon_type').value === 'fa' ? 'fas fa-bars' : 'menu'),
+        icon_type: document.getElementById('menu_icon_type').value || 'fa',
+        type: document.getElementById('menu_type').value || 'sidebar',
         parent_id: document.getElementById('menu_parent_id').value || null,
         sort_order: document.getElementById('menu_sort_order').value || null,
         is_active: document.getElementById('menu_is_active').checked ? 1 : 0,
-        id_text: document.getElementById('id_text').value,
-        en_text: document.getElementById('en_text').value,
+        id_text: document.getElementById('id_text').value || null,
+        en_text: document.getElementById('en_text').value || null,
     };
 
     const url = id ? routeFor(window.MENU_ROUTES.update, id, '__MENU_ID__') : window.MENU_ROUTES.store;
@@ -97,7 +114,9 @@ async function handleMenuSubmit(e) {
     try {
         await request({ url, method, data: payload, successMessage: 'Menu berhasil disimpan.' });
         menuModal.hide();
-        //window.location.reload(); // simpel: reload supaya tree ke-refresh.
+        setTimeout(() => {
+            window.location.reload();
+        }, 400);
     } catch (e) {
         // handleAjaxError sudah menampilkan pesan validasi
     }
@@ -184,7 +203,9 @@ async function handleMenuRolesSubmit(e) {
             successMessage: 'Role untuk menu berhasil disimpan.',
         });
         menuRolesModal.hide();
-        // window.location.reload(); // supaya badge role di tree ikut ter-update
+        setTimeout(() => {
+            window.location.reload();
+        }, 400);
     } catch (e) {
         // handleAjaxError sudah menampilkan pesan validasi
     }
@@ -428,3 +449,25 @@ function initMenuRolesCheckAll() {
         masterCheckbox.checked = allChecked;
     }
 }
+
+// ==============================================
+// HAPUS MENU
+// ==============================================
+window.handleDeleteMenu = async function (id, title) {
+    if (!confirm(`Hapus menu "${title}"?`)) {
+        return;
+    }
+
+    try {
+        await request({
+            url: routeFor(window.MENU_ROUTES.destroy || window.MENU_ROUTES.show, id, '__MENU_ID__'),
+            method: 'DELETE',
+            successMessage: 'Menu berhasil dihapus.'
+        });
+        setTimeout(() => {
+            window.location.reload();
+        }, 400);
+    } catch (e) {
+        // handleAjaxError sudah menampilkan pesan jika menu masih punya sub-menu
+    }
+};

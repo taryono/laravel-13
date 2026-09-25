@@ -50,9 +50,7 @@ class MenuTreeBuilder
             ->map(function ($item) use ($grouped, $currentUrl) {
                 // Biarkan sebagai Collection, jangan diubah ke array
                 $item->children = $this->buildLevel($grouped, $item->id, $currentUrl)->all();
-                $currentPath = parse_url($currentUrl, PHP_URL_PATH);
-                // Hapus leading slash jika ada
-                $currentPath = ltrim($currentPath, '/');
+                $currentPath = $currentUrl !== null ? ltrim((string) parse_url($currentUrl, PHP_URL_PATH), '/') : '';
 
                 // Bandingkan dengan item->url
                 // Tambahkan properti active dan open
@@ -60,14 +58,13 @@ class MenuTreeBuilder
                 $item->open = $item->active || collect($item->children)->contains(function ($child) {
                     return $child->active ?? false || $child->open ?? false;
                 });
-
-
                 return $item;
             });
     }
 
     private function extractSubtree(Collection $items, int $rootId): Collection
     {
+
         $root = $items->firstWhere('id', $rootId);
         if (!$root) {
             return collect();
@@ -100,14 +97,17 @@ class MenuTreeBuilder
     {
         return $items
             ->map(function ($item) {
-                if (!empty($item->children) && $item->children instanceof Collection) {
-                    $item->children = $this->filterByPermission($item->children);
+                if (!empty($item->children)) {
+                    $item->children = $this->filterByPermission(collect($item->children));
                 }
                 return $item;
             })
             ->filter(function ($item) {
+                // ✅ Tampilkan jika: punya URL ATAU punya anak yang tampil
                 $hasChildren = !empty($item->children) && collect($item->children)->isNotEmpty();
-                return $item->url !== null || $hasChildren;
+                $hasUrl = $item->url !== null && $item->url !== '';
+
+                return $hasUrl || $hasChildren;
             })
             ->values();
     }

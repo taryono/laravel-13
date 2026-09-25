@@ -15,10 +15,12 @@ use Illuminate\View\View;
 use Throwable;
 use App\Core\Menu\MenuRepository;
 use App\Core\Menu\MenuTreeBuilder;
+use Illuminate\Support\Facades\Auth;
 
 class MenuController extends MainController
 {
-    public function __construct(){
+    public function __construct()
+    {
         parent::__construct(new Menu());
     }
     /**
@@ -32,6 +34,10 @@ class MenuController extends MainController
         Request $request,
         MenuDataTable $dataTable
     ) {
+
+        // Cache::forget('acl-all-menus');
+        // Cache::forget('acl-all-actions');
+
         /*
          * Yajra DataTables request contains "draw".
          *
@@ -51,12 +57,13 @@ class MenuController extends MainController
      * Show the form for creating a new resource.
      */
     public function create(): View
-    {   $model = new Menu();
+    {
+        $model = new Menu();
         $items = (new MenuRepository())->allForAdmin();
         $tree  = (new MenuTreeBuilder())->build($items);
-        $roles = Role::orderBy('name')->get(['id', 'name', 'display_name']); 
-       
-        $parentOptions = $this->flattenForSelect($tree); 
+        $roles = Role::orderBy('name')->get(['id', 'name', 'display_name']);
+
+        $parentOptions = $this->flattenForSelect($tree);
         return view(
             'Menu::create',
             compact('model', 'parentOptions')
@@ -86,7 +93,6 @@ class MenuController extends MainController
                 'Data Menu berhasil ditambahkan.',
                 $model
             );
-
         } catch (Throwable $e) {
 
             Log::error(
@@ -94,7 +100,7 @@ class MenuController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => Auth::id(),
                 ]
             );
 
@@ -113,10 +119,10 @@ class MenuController extends MainController
         $menu = Menu::find($id);
         $items = (new MenuRepository())->allForAdmin();
         $tree  = (new MenuTreeBuilder())->build($items);
-        $roles = Role::orderBy('name')->get(['id', 'name', 'display_name']); 
+        $roles = Role::orderBy('name')->get(['id', 'name', 'display_name']);
 
         $parentOptions = $this->flattenForSelect($tree);
-       
+
         return view(
             'Menu::edit',
             compact('menu', 'parentOptions')
@@ -152,7 +158,6 @@ class MenuController extends MainController
                 'Data Menu berhasil diperbarui.',
                 $menu
             );
-
         } catch (Throwable $e) {
 
             Log::error(
@@ -161,7 +166,7 @@ class MenuController extends MainController
                     'exception' => $e,
                     'Menu_id' => $menu->getKey(),
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => Auth::id(),
                 ]
             );
 
@@ -189,7 +194,6 @@ class MenuController extends MainController
                 $request,
                 'Data Menu berhasil dihapus.'
             );
-
         } catch (Throwable $e) {
 
             Log::error(
@@ -197,7 +201,7 @@ class MenuController extends MainController
                 [
                     'exception' => $e,
                     'Menu_id' => $menu->getKey(),
-                    'user_id' => auth()->id(),
+                    'user_id' => Auth::id(),
                 ]
             );
 
@@ -207,5 +211,4 @@ class MenuController extends MainController
             );
         }
     }
- 
 }
