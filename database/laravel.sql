@@ -1916,6 +1916,43 @@ CREATE TABLE `assets` (
 -- Records of assets
 -- ----------------------------
 
+
+-- ----------------------------
+-- Table structure for asset_depreciation_logs
+-- ----------------------------
+DROP TABLE IF EXISTS `asset_depreciation_logs`;
+CREATE TABLE `asset_depreciation_logs`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `asset_id` bigint UNSIGNED NOT NULL,
+  `period_year` smallint UNSIGNED NOT NULL,
+  `period_month` tinyint UNSIGNED NOT NULL,
+  `period_date` date NOT NULL,
+  `opening_book_value` decimal(18, 2) NOT NULL,
+  `depreciation_amount` decimal(18, 2) NOT NULL,
+  `accumulated_depreciation` decimal(18, 2) NOT NULL,
+  `closing_book_value` decimal(18, 2) NOT NULL,
+  `depreciation_method` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `purchase_price` decimal(18, 2) NOT NULL,
+  `salvage_value` decimal(18, 2) NOT NULL DEFAULT 0.00,
+  `useful_life_months` int UNSIGNED NOT NULL,
+  `is_posted` tinyint(1) NOT NULL DEFAULT 0,
+  `posted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `asset_period_unique`(`asset_id`, `period_year`, `period_month`) USING BTREE,
+  INDEX `asset_depreciation_logs_created_by_foreign`(`created_by`) USING BTREE,
+  INDEX `asset_depreciation_logs_updated_by_foreign`(`updated_by`) USING BTREE,
+  INDEX `asset_depreciation_logs_asset_id_period_date_index`(`asset_id`, `period_date`) USING BTREE,
+  INDEX `asset_depreciation_logs_is_posted_index`(`is_posted`) USING BTREE
+) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of asset_depreciation_logs
+-- --------------------------
+
 -- ----------------------------
 -- Table structure for assignments_quizzes
 -- ----------------------------
@@ -6609,62 +6646,7 @@ CREATE TABLE `fiscal_years`  (
 -- ----------------------------
 -- Records of fiscal_years
 -- ----------------------------
-
--- ----------------------------
--- Table structure for fixed_assets
--- ----------------------------
-DROP TABLE IF EXISTS `fixed_assets`;
-CREATE TABLE `fixed_assets`  (
-  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
-  `school_id` int NULL DEFAULT NULL,
-  `organization_id` bigint UNSIGNED NOT NULL,
-  `asset_category_id` int NULL DEFAULT NULL,
-  `brand` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `model` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `asset_code` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `serial_number` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `specification` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `acquisition_date` date NOT NULL,
-  `acquisition_cost` decimal(15, 2) NOT NULL DEFAULT 0.00,
-  `residual_value` decimal(15, 2) NOT NULL DEFAULT 0.00,
-  `useful_life_months` int NOT NULL DEFAULT 0,
-  `useful_life_years` int NULL DEFAULT NULL,
-  `depreciation_method` enum('straight_line','declining_balance') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'straight_line',
-  `accumulated_depreciation` decimal(15, 2) NOT NULL DEFAULT 0.00,
-  `book_value` decimal(15, 2) NOT NULL DEFAULT 0.00,
-  `asset_account_id` bigint UNSIGNED NOT NULL,
-  `accumulated_depreciation_account_id` bigint UNSIGNED NULL DEFAULT NULL,
-  `depreciation_expense_account_id` bigint UNSIGNED NULL DEFAULT NULL,
-  `status` enum('draft','active','disposed','fully_depreciated') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'draft',
-  `condition` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `disposed_at` date NULL DEFAULT NULL,
-  `disposal_value` decimal(15, 2) NULL DEFAULT NULL,
-  `disposal_reason` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `photo_url` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
-  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL,
-  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
-  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
-  PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `fixed_assets_org_code_unique`(`organization_id` ASC, `asset_code` ASC) USING BTREE,
-  INDEX `fixed_assets_asset_account_fk`(`asset_account_id` ASC) USING BTREE,
-  INDEX `fixed_assets_accum_account_fk`(`accumulated_depreciation_account_id` ASC) USING BTREE,
-  INDEX `fixed_assets_depr_expense_account_fk`(`depreciation_expense_account_id` ASC) USING BTREE,
-  INDEX `fixed_assets_status_index`(`status` ASC) USING BTREE,
-  INDEX `fixed_assets_deleted_at_index`(`deleted_at` ASC) USING BTREE,
-  CONSTRAINT `fixed_assets_accum_account_fk` FOREIGN KEY (`accumulated_depreciation_account_id`) REFERENCES `chart_of_accounts` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
-  CONSTRAINT `fixed_assets_asset_account_fk` FOREIGN KEY (`asset_account_id`) REFERENCES `chart_of_accounts` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
-  CONSTRAINT `fixed_assets_depr_expense_account_fk` FOREIGN KEY (`depreciation_expense_account_id`) REFERENCES `chart_of_accounts` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
-  CONSTRAINT `fixed_assets_org_fk` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
-
--- ----------------------------
--- Records of fixed_assets
--- ----------------------------
-
+ 
 -- ----------------------------
 -- Table structure for floors
 -- ----------------------------

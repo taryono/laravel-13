@@ -1,17 +1,4 @@
-{{ Form::model($promotion - criterion, ['method' => 'PUT', 'route' => ['promotion_criteria.update', $promotion - criterion->id], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
-<div class="row">
-    <div class="col-md-6 mb-3">
-        @forelse ($forms as $key => $form)
-            <div class="row">
-                <div class="col-md-12 mb-3">
-                    <label>{{ say($form['label']) }}</label>
-                    {!! $form['content'] !!}
-                </div>
-            </div>
-        @empty
-            <p>{{ say('Data Tidak Ditemukan') }}</p>
-        @endforelse
-    </div>
-</div>
+{{ Form::model($promotion_criteria, ['method' => 'PUT', 'route' => ['promotion_criteria.update', $promotion_criteria->id], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
+@include('PromotionCriteria::form', ['promotion_criteria' => $promotion_criteria])
 {{ Form::close() }}
 <!-- /.row -->

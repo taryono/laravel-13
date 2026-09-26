@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Middleware\EnsureSessionIsActive;
+use App\Http\Middleware\RedirectIfAuthenticated;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -18,7 +20,11 @@ return Application::configure(basePath: dirname(__DIR__))
             'access'    => \App\Http\Middleware\AccessCheck::class,
             'acl'       => \App\Http\Middleware\AclMiddleware::class,
             'proctor' => \App\Http\Middleware\Proctor::class,
-            // 'menu.permission' => \App\Http\Middleware\CheckMenuPermission::class
+            'menu.permission' => \App\Http\Middleware\CheckMenuPermission::class,
+            'guest' => RedirectIfAuthenticated::class,
+        ]);
+        $middleware->web(append: [
+            EnsureSessionIsActive::class,
         ]);
         $middleware->append(\App\Http\Middleware\ResolveActiveOrganization::class);
     })

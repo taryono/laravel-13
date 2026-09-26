@@ -2,7 +2,7 @@
 
 namespace App\DataTables;
 
-use Models\PromotionCriterion;
+use \App\Models\Assessment;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
@@ -10,14 +10,14 @@ use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
 use Yajra\DataTables\Services\DataTable;
 
-class PromotionCriterionDataTable extends DataTable
+class AssessmentDataTable extends DataTable
 {
     /**
      * Kolom yang ditampilkan di tabel (selain DT_RowIndex & action).
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['academic_year_id', 'class_level_id', 'min_final_score', 'min_attendance_rate', 'min_behavior_score', 'max_failed_subjects', 'auto_promote', 'allow_manual_override', 'notes', 'is_active', 'created_at', 'updated_at'];
+    protected array $columns = ['school_id', 'curriculum_structure_id', 'assessment_type_id', 'assessment_method_id', 'assessment_rubric_id', 'academic_year_id', 'semester', 'title', 'code', 'description', 'max_score', 'weight', 'assessment_date', 'due_date', 'is_published', 'is_active', 'created_by', 'updated_by'];
 
     /**
      * Build DataTable response.
@@ -48,20 +48,20 @@ class PromotionCriterionDataTable extends DataTable
      */
     protected function renderActionButtons($row): string
     {
-        $title = e('Detail PromotionCriterion ' . $row->name);
+        $title = e('Detail Assessment ' . $row->name);
 
         $context = htmlspecialchars(
             json_encode([
                 'executeDraw' => true,
-                'tableId'     => 'promotion-criterion-table',
+                'tableId'     => 'assessment-table',
                 'reloadDelay' => 500,
             ]),
             ENT_QUOTES,
             'UTF-8'
         );
 
-        $editUrl   = e(route('promotion_criterion.edit', $row));
-        $deleteUrl = e(route('promotion_criterion.destroy', $row));
+        $editUrl   = e(route('assessment.edit', $row));
+        $deleteUrl = e(route('assessment.destroy', $row));
 
         return <<<HTML
             <div class="d-flex justify-content-center gap-1">
@@ -75,7 +75,7 @@ class PromotionCriterionDataTable extends DataTable
                     data-title="{$title}"
                     data-url="{$editUrl}"
                     data-datatable-context='{$context}'
-                    data-submit='<button class="btn btn-primary modal-submit" type="button" data-is_execute_drawer="true" data-datatable-id="promotion-criterion-table">Simpan</button>'
+                    data-submit='<button class="btn btn-primary modal-submit" type="button" data-is_execute_drawer="true" data-datatable-id="assessment-table">Simpan</button>'
                     data-cancel='<button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Batal</button>'>
                     <span class="material-symbols-outlined">edit</span>
                 </button>
@@ -98,7 +98,7 @@ class PromotionCriterionDataTable extends DataTable
     /**
      * Get query source of DataTable.
      */
-    public function query(PromotionCriterion $model): QueryBuilder
+    public function query(Assessment $model): QueryBuilder
     {
         return $model->newQuery();
     }
@@ -115,14 +115,14 @@ class PromotionCriterionDataTable extends DataTable
              * Asesi -> asesi-table
              * Asesor -> asesor-table
              */
-            ->setTableId('promotion-criterion-table')
+            ->setTableId('assessment-table')
 
             ->columns($this->getColumns())
 
             /*
              * Server-side AJAX endpoint.
              */
-            ->minifiedAjax(route('promotion_criterion.index'))
+            ->minifiedAjax(route('assessment.index'))
 
             /*
              * Default sorting:
@@ -296,6 +296,6 @@ class PromotionCriterionDataTable extends DataTable
      */
     protected function filename(): string
     {
-        return 'PromotionCriterion_' . date('YmdHis');
+        return 'Assessment_' . date('YmdHis');
     }
 }

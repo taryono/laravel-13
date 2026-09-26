@@ -221,6 +221,14 @@ class CrudGeneratorController extends MainController
         $tables = $tables->filter(function ($table) use ($filtered, $rejected) {
             return !in_array(Str::singular(Str::studly($table['name'])), $filtered) && !in_array($table['name'], $rejected);
         });
+        $tables = $tables->map(function ($table) {
+            // ignore created_at, updated_at,deleted_at, remember_token
+            $table['columns'] = array_filter($table['columns'], function ($column) {
+                return !in_array($column, ['created_at', 'updated_at', 'deleted_at', 'remember_token']);
+            });
+
+            return $table;
+        });
         return ['tables' => $tables, 'filtered' => $names];
     }
 

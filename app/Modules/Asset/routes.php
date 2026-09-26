@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Route;
 |
  */
 
-Route::group(['prefix' => 'fixed-asset', 'namespace' => 'App\Modules\Asset\Controllers', 'middleware' => ['web']], function () {
+Route::group(['prefix' => 'asset', 'namespace' => 'App\Modules\Asset\Controllers', 'middleware' => ['web']], function () {
     Route::get('/', ['as' => 'asset.index', 'uses' => 'AssetController@index']);
     Route::any('/search', ['as' => 'asset.search', 'uses' => 'AssetController@search']);
     Route::get('/create', ['as' => 'asset.create', 'uses' => 'AssetController@create']);

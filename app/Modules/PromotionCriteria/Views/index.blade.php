@@ -4,10 +4,11 @@
     <div class="container">
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Daftar PromotionCriterion</h5>
+                <h5 class="mb-0">Daftar Promotion Criteria / Rule</h5>
                 <button type="button" class="btn btn-primary btn-sm" data-toggle="ajax-modal" data-size="lg" data-method="GET"
-                    data-title="Tambah Data PromotionCriterion Baru" data-url="{{ route('promotion_criteria.create') }}"
-                    data-submit='<button class="btn btn-primary" type="submit" form="formPromotionCriterion">Simpan</button>'
+                    data-title="Tambah Data Promotion Criteria / Rule Baru"
+                    data-url="{{ route('promotion_criteria.create') }}"
+                    data-submit='<button class="btn btn-primary" type="submit" form="formPromotionCriteria">Simpan</button>'
                     data-cancel='<button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Batal</button>'>
                     <i class="bi bi-plus-circle"></i> Tambah Baru
                 </button>

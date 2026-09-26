@@ -85,7 +85,8 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function activeOrganization()
     {
-        $orgId = session('active_organization_id') ?? $this->current_organization_id;
+        $orgId = session('active_organization_id');
+
         return $this->organizations()
             ->when($orgId, fn($q) => $q->where('organizations.id', $orgId))
             ->orderByRaw('is_default DESC, id ASC')

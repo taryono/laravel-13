@@ -11,6 +11,10 @@
     </nav>
     <div class="mt-auto pt-4 border-top border-white border-opacity-10">
         <div class="d-flex flex-column gap-1">
+            <a href="#" class="bnsp-nav-link py-2" data-tooltip="System Settings">
+                <span class="material-symbols-outlined">settings</span>
+                <span class="nav-label">System Settings</span>
+            </a>
             <a href="#" class="bnsp-nav-link py-2" data-tooltip="Help Center">
                 <span class="material-symbols-outlined">help</span>
                 <span class="nav-label">Help Center</span>

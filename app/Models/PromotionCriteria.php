@@ -35,12 +35,12 @@ class PromotionCriteria extends BasedModel
 
     // ============ RELASI ============
 
-    public function academicYear(): BelongsTo
+    public function academic_year(): BelongsTo
     {
         return $this->belongsTo(AcademicYear::class);
     }
 
-    public function classLevel(): BelongsTo
+    public function class_level(): BelongsTo
     {
         return $this->belongsTo(ClassLevel::class);
     }

@@ -35,7 +35,7 @@ class PromotionCriteriaController extends MainController
          * Yajra DataTables request contains "draw".
          *
          * Example:
-         * /promotion-criterion?draw=1&start=0&length=10
+         * /promotion-criteria?draw=1&start=0&length=10
          */
         if ($request->filled('draw')) {
             return $dataTable->ajax();
@@ -52,13 +52,11 @@ class PromotionCriteriaController extends MainController
     public function create(): View
     {
         $promotionCriterion = new PromotionCriteria();
-        $result = $this->getForm($promotionCriterion);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
-
+        $academic_years = \Models\AcademicYear::pluck('name', 'id');
+        $class_levels = \Models\ClassLevel::pluck('name', 'id');
         return view(
             'PromotionCriteria::create',
-            compact('promotionCriterion', 'forms', 'groupedForms')
+            compact('promotionCriterion', 'academic_years', 'class_levels')
         );
     }
 
@@ -116,13 +114,12 @@ class PromotionCriteriaController extends MainController
     public function edit($id): View
     {
         $promotionCriterion = $this->model->findOrFail($id);
-        $result = $this->getForm($promotionCriterion);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
+        $academic_years = \Models\AcademicYear::pluck('name', 'id');
+        $class_levels = \Models\ClassLevel::pluck('name', 'id');
 
         return view(
             'PromotionCriteria::edit',
-            compact('promotionCriterion', 'forms', 'groupedForms')
+            compact('promotionCriterion', 'academic_years', 'class_levels')
         );
     }
 

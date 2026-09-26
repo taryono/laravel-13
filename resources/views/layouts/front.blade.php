@@ -480,7 +480,11 @@
                         <i id="themeIcon" class="fa-regular fa-moon text-secondary"></i>
                     </button>
                     <a href="{{ route('trial.form') }}" class="btn btn-brand">Get Started</a>
-                    <a href="{{ url('/login') }}" class="btn btn-brand">Login</a>
+                    @if (!auth()->check())
+                        <a href="{{ url('/login') }}" class="btn btn-brand">Login</a>
+                    @else
+                        <a href="{{ url('/dashboard') }}" class="btn btn-brand">Dashboard</a>
+                    @endif
                 </div>
             </div>
         </div>
