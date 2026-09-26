@@ -12,8 +12,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 use Throwable;
-use Models\Account;
-use Models\Department; 
+use Models\ChartOfAccount;
+use Models\Department;
 
 class BudgetController extends MainController
 {
@@ -34,7 +34,7 @@ class BudgetController extends MainController
     public function create(): View
     {
         $budget = new Budget();
-        $accounts = Account::where('is_active', 1)->orderBy('code')->pluck('name', 'id');
+        $accounts = ChartOfAccount::where('is_active', 1)->orderBy('code')->pluck('name', 'id');
         $departments = Department::where('is_active', 1)->pluck('name', 'id');
 
         $result = $this->getForm($budget);
@@ -48,7 +48,7 @@ class BudgetController extends MainController
     {
         $validated = $request->validate([
             'budget_code' => 'required|string|max:255|unique:budgets,budget_code',
-            'account_id' => 'required|exists:accounts,id',
+            'chart_of_account_id' => 'required|exists:accounts,id',
             'department_id' => 'nullable|exists:departments,id',
             'year' => 'required|integer|min:2000|max:2100',
             'month' => 'nullable|integer|min:1|max:12',
@@ -74,7 +74,7 @@ class BudgetController extends MainController
     public function edit($id): View
     {
         $budget = $this->model->findOrFail($id);
-        $accounts = Account::where('is_active', 1)->orderBy('code')->pluck('name', 'id');
+        $accounts = ChartOfAccount::where('is_active', 1)->orderBy('code')->pluck('name', 'id');
         $departments = Department::where('is_active', 1)->pluck('name', 'id');
 
         $result = $this->getForm($budget);
@@ -94,7 +94,7 @@ class BudgetController extends MainController
 
         $validated = $request->validate([
             'budget_code' => 'required|string|max:255|unique:budgets,budget_code,' . $id,
-            'account_id' => 'required|exists:accounts,id',
+            'chart_of_account_id' => 'required|exists:accounts,id',
             'department_id' => 'nullable|exists:departments,id',
             'year' => 'required|integer|min:2000|max:2100',
             'month' => 'nullable|integer|min:1|max:12',
@@ -180,11 +180,11 @@ class BudgetController extends MainController
     {
         try {
             $budget = $this->model->findOrFail($id);
-            
+
             // Calculate actual amount based on journal entries
             $actualAmount = $this->getActualAmount($budget);
             $variance = $budget->amount - $actualAmount;
-            
+
             return response()->json([
                 'success' => true,
                 'data' => [

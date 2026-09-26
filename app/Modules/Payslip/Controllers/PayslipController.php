@@ -82,7 +82,6 @@ class PayslipController extends MainController
                 'Akun berhasil ditambahkan.',
                 $payslip
             );
-
         } catch (Throwable $e) {
             Log::error('Gagal menambahkan akun.', [
                 'exception' => $e,
@@ -155,11 +154,10 @@ class PayslipController extends MainController
                 'Akun berhasil diperbarui.',
                 $payslip
             );
-
         } catch (Throwable $e) {
             Log::error('Gagal memperbarui akun.', [
                 'exception' => $e,
-                'account_id' => $id,
+                'chart_of_account_id' => $id,
                 'data' => $validated,
                 'user_id' => auth()->id(),
             ]);
@@ -202,11 +200,10 @@ class PayslipController extends MainController
                 $request,
                 'Akun berhasil dihapus.'
             );
-
         } catch (Throwable $e) {
             Log::error('Gagal menghapus akun.', [
                 'exception' => $e,
-                'account_id' => $id,
+                'chart_of_account_id' => $id,
                 'user_id' => auth()->id(),
             ]);
 
@@ -235,11 +232,10 @@ class PayslipController extends MainController
                     'normal_balance' => $payslip->normal_balance,
                 ]
             ]);
-
         } catch (Throwable $e) {
             Log::error('Gagal mengambil saldo akun.', [
                 'exception' => $e,
-                'account_id' => $id,
+                'chart_of_account_id' => $id,
                 'user_id' => auth()->id(),
             ]);
 

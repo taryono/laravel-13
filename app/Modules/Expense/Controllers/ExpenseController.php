@@ -11,9 +11,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
-use Models\Account;
-use App\Services\JournalService; 
-use Throwable;  
+use Models\ChartOfAccount;
+use App\Services\JournalService;
+use Throwable;
 
 class ExpenseController extends MainController
 {
@@ -45,9 +45,9 @@ class ExpenseController extends MainController
         $approvers = User::where('is_active', true)->get();
 
         return view('expense.form', compact(
-            'expense', 
-            'categories', 
-            'journalEntries', 
+            'expense',
+            'categories',
+            'journalEntries',
             'approvers'
         ));
     }
@@ -77,7 +77,7 @@ class ExpenseController extends MainController
             DB::beginTransaction();
 
             // Generate total jika tidak diisi
-            $validated['total_amount'] = $validated['total_amount'] ?? 
+            $validated['total_amount'] = $validated['total_amount'] ??
                 ($validated['amount'] + ($validated['tax'] ?? 0));
 
             // Upload attachment
@@ -101,7 +101,6 @@ class ExpenseController extends MainController
             return redirect()
                 ->route('expense.index')
                 ->with('success', 'Pengeluaran berhasil ditambahkan!');
-
         } catch (\Exception $e) {
             DB::rollBack();
             return back()
@@ -115,30 +114,30 @@ class ExpenseController extends MainController
      */
     public function edit(Expense $expense)
     {
-        
-        $categories = 
-        ExpenseCategory::active()->orderBy('sort_order')->get();
+
+        $categories =
+            ExpenseCategory::active()->orderBy('sort_order')->get();
         $journalEntries = JournalEntry::orderBy('journal_number')->get();
         $approvers = User::where('is_active', true)->get();
 
         return view('expense.form', compact(
-            'expense', 
-            'categories', 
-            'journalEntries', 
+            'expense',
+            'categories',
+            'journalEntries',
             'approvers'
         ));
-    } 
+    }
 
     private function createExpenseJournal(Expense $expense): void
     {
-        $accountExpense = Account::where('code', '5-1000')->first(); // Beban
-        $accountCash = Account::where('code', '1-1000')->first(); // Kas
+        $accountExpense = ChartOfAccount::where('code', '5-1000')->first(); // Beban
+        $accountCash = ChartOfAccount::where('code', '1-1000')->first(); // Kas
 
         $journalItems = [];
 
         // Debit: Beban
         $journalItems[] = [
-            'account_id' => $accountExpense->id,
+            'chart_of_account_id' => $accountExpense->id,
             'debit' => $expense->total_amount,
             'credit' => 0,
             'description' => 'Beban ' . $expense->expense_category . ' - ' . $expense->description,
@@ -146,7 +145,7 @@ class ExpenseController extends MainController
 
         // Credit: Kas
         $journalItems[] = [
-            'account_id' => $accountCash->id,
+            'chart_of_account_id' => $accountCash->id,
             'debit' => 0,
             'credit' => $expense->total_amount,
             'description' => 'Pembayaran pengeluaran ' . $expense->expense_number,
@@ -161,7 +160,7 @@ class ExpenseController extends MainController
         ], $expense->total_amount, $expense->total_amount);
 
         $expense->update(['journal_entry_id' => $journal->id]);
-    } 
+    }
 
     public function update(Request $request, $id)
     {

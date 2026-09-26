@@ -1,11 +1,11 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
 class BankAccount extends BasedModel
-{ 
-     protected $fillable = [
-        'account_id',
+{
+    protected $fillable = [
+        'chart_of_account_id',
         'bank_name',
         'account_number',
         'account_name',
@@ -22,9 +22,9 @@ class BankAccount extends BasedModel
     ];
 
     // Relasi ke Chart of Accounts
-    public function account()
+    public function chart_of_account()
     {
-        return $this->belongsTo(Account::class);
+        return $this->belongsTo(ChartOfAccount::class);
     }
 
     // Scope

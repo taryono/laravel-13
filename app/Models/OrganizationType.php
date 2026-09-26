@@ -1,9 +1,13 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
 class OrganizationType extends BasedModel
-{ 
+{
+    protected $fillable = [
+        'code',
+        'name'
+    ];
     // Relasi
     public function organizations()
     {

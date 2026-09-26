@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 use Throwable;
 use Models\BankAccount;
-use Models\BankTransaction; 
+use Models\BankTransaction;
 
 class ReconciliationController extends MainController
 {
@@ -46,7 +46,7 @@ class ReconciliationController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'bank_account_id' => 'required|exists:bank_accounts,id',
+            'bank_chart_of_account_id' => 'required|exists:bank_accounts,id',
             'reconciliation_date' => 'required|date',
             'statement_balance' => 'required|numeric|min:0',
             'book_balance' => 'required|numeric|min:0',
@@ -87,7 +87,7 @@ class ReconciliationController extends MainController
         }
 
         $validated = $request->validate([
-            'bank_account_id' => 'required|exists:bank_accounts,id',
+            'bank_chart_of_account_id' => 'required|exists:bank_accounts,id',
             'reconciliation_date' => 'required|date',
             'statement_balance' => 'required|numeric|min:0',
             'book_balance' => 'required|numeric|min:0',

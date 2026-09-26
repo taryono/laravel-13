@@ -11,9 +11,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
-use Models\Account;
-use App\Services\JournalService; 
-use Throwable; 
+use Models\ChartOfAccount;
+use App\Services\JournalService;
+use Throwable;
 
 class TaxPaymentController extends MainController
 {
@@ -166,14 +166,14 @@ class TaxPaymentController extends MainController
 
     private function createTaxJournal(TaxPayment $tax): void
     {
-        $accountTax = Account::where('code', '2-2000')->first(); // Hutang Pajak
-        $accountCash = Account::where('code', '1-1000')->first(); // Kas
+        $accountTax = ChartOfAccount::where('code', '2-2000')->first(); // Hutang Pajak
+        $accountCash = ChartOfAccount::where('code', '1-1000')->first(); // Kas
 
         $journalItems = [];
 
         // Debit: Hutang Pajak
         $journalItems[] = [
-            'account_id' => $accountTax->id,
+            'chart_of_account_id' => $accountTax->id,
             'debit' => $tax->tax_amount,
             'credit' => 0,
             'description' => 'Pembayaran pajak ' . $tax->tax_type,
@@ -181,7 +181,7 @@ class TaxPaymentController extends MainController
 
         // Credit: Kas
         $journalItems[] = [
-            'account_id' => $accountCash->id,
+            'chart_of_account_id' => $accountCash->id,
             'debit' => 0,
             'credit' => $tax->tax_amount,
             'description' => 'Pembayaran pajak ' . $tax->tax_type,

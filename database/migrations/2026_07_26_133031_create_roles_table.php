@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('roles', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('organization_id')->constrained()->cascadeOnDelete();
             $table->string('code', 50)
                 ->nullable() // isi dulu data lama, lalu ubah jadi tidak boleh null
                 ->unique()
@@ -28,9 +28,11 @@ return new class extends Migration
 
             // Indeks untuk pencarian cepat
             $table->index('parent_id');
-
+            $table->text('description')->nullable();
+            $table->boolean('is_system')->default(false); // 🔑 Hanya kamu yang punya = true
+            $table->boolean('is_editable')->default(true); // Bisa diubah/hapus? Super Admin = tidak
             $table->timestamps();
-            $table->unique(['user_id', 'name']);
+            $table->unique(['organization_id', 'name']);
             $table->softDeletes();
         });
     }

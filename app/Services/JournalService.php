@@ -4,7 +4,7 @@ namespace App\Services;
 
 use Models\JournalEntry;
 use Models\JournalDetail;
-use Models\Account;
+use Models\ChartOfAccount;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Throwable;
@@ -105,7 +105,7 @@ class JournalService
     {
         $lastJournal = JournalEntry::orderBy('id', 'desc')->first();
         $number = $lastJournal ? intval(substr($lastJournal->journal_number, -6)) + 1 : 1;
-        
+
         return 'JRN-' . date('Ymd') . '-' . str_pad($number, 6, '0', STR_PAD_LEFT);
     }
 

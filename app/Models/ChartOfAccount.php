@@ -1,11 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class Account extends BasedModel
-{ 
-   protected $table = 'accounts';
-    
+class ChartOfAccount extends BasedModel
+{
     protected $fillable = [
         'code',
         'name',
@@ -28,7 +26,7 @@ class Account extends BasedModel
         'is_system' => 'boolean',
     ];
 
-    // ─── Account Type Constants ───
+    // ─── ChartOfAccount Type Constants ───
     public const TYPE_HEADER = 'header';
     public const TYPE_DETAIL = 'detail';
 
@@ -48,14 +46,14 @@ class Account extends BasedModel
     // Relasi ke parent (induk)
     public function parent()
     {
-        return $this->belongsTo(Account::class, 'parent_id');
+        return $this->belongsTo(ChartOfAccount::class, 'parent_id');
     }
 
     // Relasi ke children (anak-anak)
     public function children()
     {
-        return $this->hasMany(Account::class, 'parent_id');
-    } 
+        return $this->hasMany(ChartOfAccount::class, 'parent_id');
+    }
 
     // Scope untuk hanya akun detail (bukan header)
     public function scopeDetails($query)
@@ -86,7 +84,7 @@ class Account extends BasedModel
     {
         $category = AccountCategory::find($this->account_category_id);
         $prefix = $category ? $category->code : 'ACC';
-        
+
         $last = $this->where('code', 'LIKE', $prefix . '-%')
             ->orderBy('id', 'desc')
             ->first();
@@ -105,7 +103,7 @@ class Account extends BasedModel
     public function account_category()
     {
         return $this->belongsTo(AccountCategory::class);
-    } 
+    }
 
     public function journalDetails()
     {
@@ -117,11 +115,11 @@ class Account extends BasedModel
     {
         $debit = $this->journalDetails()->sum('debit');
         $credit = $this->journalDetails()->sum('credit');
-        
+
         if ($this->normal_balance === 'debit') {
             return $this->opening_balance + $debit - $credit;
         } else {
             return $this->opening_balance + $credit - $debit;
         }
-    } 
+    }
 }

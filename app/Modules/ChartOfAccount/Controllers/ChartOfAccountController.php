@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Modules\Account\Controllers;
+namespace App\Modules\ChartOfAccount\Controllers;
 
 use App\DataTables\AccountDataTable;
 use App\Http\Controllers\MainController;
-use Models\Account;
+use Models\ChartOfAccount;
 use Models\AccountCategory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -15,11 +15,11 @@ use Illuminate\View\View;
 use Throwable;
 use Yajra\DataTables\Services\DataTable;
 
-class AccountController extends MainController
+class ChartOfAccountController extends MainController
 {
     public function __construct()
     {
-        parent::__construct(new Account());
+        parent::__construct(new ChartOfAccount());
     }
 
     /**
@@ -31,7 +31,7 @@ class AccountController extends MainController
             return $dataTable->ajax();
         }
 
-        return $dataTable->render('Account::index');
+        return $dataTable->render('ChartOfAccount::index');
     }
 
     /**
@@ -39,12 +39,12 @@ class AccountController extends MainController
      */
     public function create()
     {
-        return view('Account::create', [
+        return view('ChartOfAccount::create', [
             'action'         => 'account.store',
             'method'         => 'POST',
-            'account'        => new Account(),
+            'account'        => new ChartOfAccount(),
             'categories'     => AccountCategory::orderBy('name')->get(),
-            'parentAccounts' => Account::where('account_type', 'header')
+            'parentAccounts' => ChartOfAccount::where('account_type', 'header')
                 ->orWhere('account_type', 'detail')
                 ->orderBy('code')
                 ->get(['id', 'code', 'name']),
@@ -60,7 +60,7 @@ class AccountController extends MainController
             $coa =  DB::transaction(function () use ($validated) {
                 // Saldo terkini = saldo awal saat pembuatan
                 $validated['current_balance'] = $validated['opening_balance'];
-                return Account::create($validated);
+                return ChartOfAccount::create($validated);
             });
             return response()->json(['success' => true, 'data' => $coa]);
         } catch (Throwable $e) {
@@ -71,20 +71,20 @@ class AccountController extends MainController
 
     public function edit($id)
     {
-        $account = Account::find($id);
-        return view('Account::edit', [
+        $account = ChartOfAccount::find($id);
+        return view('ChartOfAccount::edit', [
             'action'         =>  ["account.edit", $id],
             'method'         => 'PUT',
             'account'        => $account,
             'categories'     => AccountCategory::orderBy('name')->get(),
-            'parentAccounts' => Account::where('id', '!=', $account->id)
+            'parentAccounts' => ChartOfAccount::where('id', '!=', $account->id)
                 ->orderBy('code')
                 ->get(['id', 'code', 'name']),
             'currencies'     => ['IDR', 'USD', 'SGD', 'EUR'],
         ]);
     }
 
-    public function update(Request $request, Account $account)
+    public function update(Request $request, ChartOfAccount $account)
     {
         // Lindungi akun sistem dari perubahan tertentu
         if ($account->is_system) {
@@ -168,7 +168,7 @@ class AccountController extends MainController
         } catch (Throwable $e) {
             Log::error('Gagal menghapus akun.', [
                 'exception' => $e,
-                'account_id' => $id,
+                'chart_of_account_id' => $id,
                 'user_id' => auth()->id,
             ]);
 
@@ -200,7 +200,7 @@ class AccountController extends MainController
         } catch (Throwable $e) {
             Log::error('Gagal mengambil saldo akun.', [
                 'exception' => $e,
-                'account_id' => $id,
+                'chart_of_account_id' => $id,
                 'user_id' => auth()->id,
             ]);
 
@@ -213,7 +213,7 @@ class AccountController extends MainController
 
     public function getTreeData(Request $request)
     {
-        $accounts = Account::with(['children' => function ($query) {
+        $accounts = ChartOfAccount::with(['children' => function ($query) {
             $query->where('is_active', true)->orderBy('code');
         }, 'account_category'])
             ->whereNull('parent_id')
@@ -301,7 +301,7 @@ class AccountController extends MainController
     public function getDataTree(Request $request): View
     {
         return view(
-            'Account::tree'
+            'ChartOfAccount::tree'
         );
     }
 }

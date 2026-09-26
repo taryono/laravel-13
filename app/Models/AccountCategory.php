@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
 class AccountCategory extends BasedModel
-{ 
+{
     protected $table = 'account_categories';
 
     protected $fillable = [
@@ -23,7 +23,7 @@ class AccountCategory extends BasedModel
         'deleted_at' => 'datetime',
     ];
 
-    // ─── Account Type Constants (English) ───
+    // ─── ChartOfAccount Type Constants (English) ───
     public const TYPE_ASSET = 'asset';
     public const TYPE_LIABILITY = 'liability';
     public const TYPE_EQUITY = 'equity';
@@ -55,7 +55,7 @@ class AccountCategory extends BasedModel
 
     public function accounts()
     {
-        return $this->hasMany(Account::class);
+        return $this->hasMany(ChartOfAccount::class);
     }
 
     // Scope

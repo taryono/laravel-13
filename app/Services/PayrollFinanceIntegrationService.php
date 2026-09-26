@@ -4,7 +4,7 @@ namespace App\Modules\Integration\Services;
 
 use Models\PayrollRun;
 use Models\JournalEntry;
-use Models\Account;
+use Models\ChartOfAccount;
 use App\Services\JournalService;
 use Models\PayrollIntegration;
 use Models\AccountMapping;
@@ -25,7 +25,7 @@ class PayrollFinanceIntegrationService
     {
         // Check if already synced
         $integration = PayrollIntegration::where('payroll_run_id', $payrollRun->id)->first();
-        
+
         if ($integration && $integration->status === 'synced') {
             throw new \Exception('Payroll already synced to finance');
         }

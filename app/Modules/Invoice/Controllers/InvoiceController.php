@@ -11,10 +11,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
-use Throwable;  
+use Throwable;
 use Models\InvoiceItem;
-use Models\Account;
-use App\Services\JournalService; 
+use Models\ChartOfAccount;
+use App\Services\JournalService;
 
 class InvoiceController extends MainController
 {
@@ -38,7 +38,7 @@ class InvoiceController extends MainController
     public function create(): View
     {
         $invoice = new Invoice();
-        $accounts = Account::where('is_active', 1)
+        $accounts = ChartOfAccount::where('is_active', 1)
             ->where('account_type', 'detail')
             ->orderBy('code')
             ->pluck('name', 'id');
@@ -102,15 +102,15 @@ class InvoiceController extends MainController
     private function createInvoiceJournal(Invoice $invoice): void
     {
         // Get account mappings (implementasi sesuai kebutuhan)
-        $accountReceivable = Account::where('code', '1-1100')->first(); // Piutang Usaha
-        $accountRevenue = Account::where('code', '4-1000')->first(); // Pendapatan
-        $accountTax = Account::where('code', '2-2000')->first(); // Hutang Pajak
+        $accountReceivable = ChartOfAccount::where('code', '1-1100')->first(); // Piutang Usaha
+        $accountRevenue = ChartOfAccount::where('code', '4-1000')->first(); // Pendapatan
+        $accountTax = ChartOfAccount::where('code', '2-2000')->first(); // Hutang Pajak
 
         $journalItems = [];
 
         // Debit: Piutang Usaha
         $journalItems[] = [
-            'account_id' => $accountReceivable->id,
+            'chart_of_account_id' => $accountReceivable->id,
             'debit' => $invoice->total_amount,
             'credit' => 0,
             'description' => 'Piutang invoice ' . $invoice->invoice_number,
@@ -118,7 +118,7 @@ class InvoiceController extends MainController
 
         // Credit: Pendapatan
         $journalItems[] = [
-            'account_id' => $accountRevenue->id,
+            'chart_of_account_id' => $accountRevenue->id,
             'debit' => 0,
             'credit' => $invoice->subtotal,
             'description' => 'Pendapatan invoice ' . $invoice->invoice_number,
@@ -127,7 +127,7 @@ class InvoiceController extends MainController
         // Credit: Hutang Pajak (if tax > 0)
         if ($invoice->tax > 0) {
             $journalItems[] = [
-                'account_id' => $accountTax->id,
+                'chart_of_account_id' => $accountTax->id,
                 'debit' => 0,
                 'credit' => $invoice->tax,
                 'description' => 'Hutang Pajak invoice ' . $invoice->invoice_number,
@@ -148,7 +148,7 @@ class InvoiceController extends MainController
     public function edit($id): View
     {
         $invoice = $this->model->with('items')->findOrFail($id);
-        $accounts = Account::where('is_active', 1)
+        $accounts = ChartOfAccount::where('is_active', 1)
             ->where('account_type', 'detail')
             ->orderBy('code')
             ->pluck('name', 'id');
@@ -198,7 +198,7 @@ class InvoiceController extends MainController
                 if (!empty($validated['items'])) {
                     foreach ($validated['items'] as $item) {
                         $item['total_price'] = ($item['quantity'] * $item['unit_price']) - ($item['discount'] ?? 0);
-                        
+
                         if (isset($item['id'])) {
                             $invoiceItem = InvoiceItem::find($item['id']);
                             if ($invoiceItem) {
@@ -287,14 +287,14 @@ class InvoiceController extends MainController
 
     private function createPaymentJournal(Invoice $invoice): void
     {
-        $accountCash = Account::where('code', '1-1000')->first(); // Kas
-        $accountReceivable = Account::where('code', '1-1100')->first(); // Piutang Usaha
+        $accountCash = ChartOfAccount::where('code', '1-1000')->first(); // Kas
+        $accountReceivable = ChartOfAccount::where('code', '1-1100')->first(); // Piutang Usaha
 
         $journalItems = [];
 
         // Debit: Kas
         $journalItems[] = [
-            'account_id' => $accountCash->id,
+            'chart_of_account_id' => $accountCash->id,
             'debit' => $invoice->total_amount,
             'credit' => 0,
             'description' => 'Penerimaan pembayaran invoice ' . $invoice->invoice_number,
@@ -302,7 +302,7 @@ class InvoiceController extends MainController
 
         // Credit: Piutang Usaha
         $journalItems[] = [
-            'account_id' => $accountReceivable->id,
+            'chart_of_account_id' => $accountReceivable->id,
             'debit' => 0,
             'credit' => $invoice->total_amount,
             'description' => 'Pelunasan piutang invoice ' . $invoice->invoice_number,

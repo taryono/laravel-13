@@ -11,8 +11,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
-use Throwable; 
-use Models\Account; 
+use Throwable;
+use Models\ChartOfAccount;
 use Models\Organization;
 
 class AccountMappingController extends MainController
@@ -35,7 +35,7 @@ class AccountMappingController extends MainController
     {
         $account_mapping = new AccountMapping();
         $organizations = Organization::orderBy('name')->pluck('name', 'id');
-        $accounts = Account::where('is_active', 1)
+        $accounts = ChartOfAccount::where('is_active', 1)
             ->where('account_type', 'detail')
             ->orderBy('code')
             ->get()
@@ -50,8 +50,8 @@ class AccountMappingController extends MainController
             'organization_id' => 'required|exists:organizations,id',
             'source_type' => 'required|in:payroll_component,sales,purchase,expense,tax,loan,bank,other',
             'source_code' => 'required|string|max:255',
-            'debit_account_id' => 'nullable|exists:accounts,id',
-            'credit_account_id' => 'nullable|exists:accounts,id',
+            'debit_chart_of_account_id' => 'nullable|exists:accounts,id',
+            'credit_chart_of_account_id' => 'nullable|exists:accounts,id',
             'description' => 'nullable|string',
             'is_active' => 'boolean',
         ]);
@@ -72,7 +72,7 @@ class AccountMappingController extends MainController
     {
         $account_mapping = $this->model->findOrFail($id);
         $organizations = Organization::orderBy('name')->pluck('name', 'id');
-        $accounts = Account::where('is_active', 1)
+        $accounts = ChartOfAccount::where('is_active', 1)
             ->where('account_type', 'detail')
             ->orderBy('code')
             ->get()
@@ -89,8 +89,8 @@ class AccountMappingController extends MainController
             'organization_id' => 'required|exists:organizations,id',
             'source_type' => 'required|in:payroll_component,sales,purchase,expense,tax,loan,bank,other',
             'source_code' => 'required|string|max:255',
-            'debit_account_id' => 'nullable|exists:accounts,id',
-            'credit_account_id' => 'nullable|exists:accounts,id',
+            'debit_chart_of_account_id' => 'nullable|exists:accounts,id',
+            'credit_chart_of_account_id' => 'nullable|exists:accounts,id',
             'description' => 'nullable|string',
             'is_active' => 'boolean',
         ]);

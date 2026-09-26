@@ -29,11 +29,7 @@ class BasedModel extends Model
         'deleted_at' => 'datetime',
     ];
     public $timestamps = true;
-    protected $hidden = [
-        "created_at",
-        "updated_at",
-        "deleted_at",
-    ];
+    protected $hidden = [];
 
     protected $exceptions = ['_method', '_token', 'id', 'password_confirmation', 'image', 'photo', 'file', 'logo', 'thumb'];
     protected $ignored = [];
@@ -43,15 +39,9 @@ class BasedModel extends Model
         parent::boot();
 
         static::addGlobalScope('organization_id', function (Builder $builder) {
-            // 🔑 CEGAH LOOP: Lewati jika sedang memuat user itu sendiri atau relasi sistem
-            if (Auth::guard('web')->guest()) {
-                return;
-            }
-
-            // Dapatkan user TANPA memicu muat ulang relasi
+            if (!Auth::check()) return;
             $user = Auth::user();
-
-            // Jika belum terisi atau sedang dalam proses pengecekan → lewati
+            if (!$user || !$user instanceof \App\Models\User) return;
             if (!$user || $user->isCheckingRole ?? false) {
                 return;
             }
@@ -61,20 +51,19 @@ class BasedModel extends Model
 
             try {
                 $table = $builder->getModel()->getTable();
+                if (!Schema::hasColumn($table, 'organization_id')) return;
 
-                // Hanya terapkan pada tabel yang punya kolom ini
-                if (!Schema::hasColumn($table, 'organization_id')) {
-                    return;
+                // 🔑 Sistem Super Admin = LIHAT SEMUA, tanpa filter
+                if ($user->isSystemSuperAdmin()) {
+                    return; // Tidak diterapkan filter — bisa akses semua organisasi
                 }
 
-                // Cek role TANPA lewat method yang memicu query berulang
-                $isSuperAdmin = $user->roles()->where('name', 'super_admin')->exists();
+                // 2. Ambil semua ID organisasi yang bisa diakses user ini
+                $accessibleOrgIds = \Models\Organization::getIdsForUser($user);
 
-                if (!$isSuperAdmin) {
-                    $org = $user->organizations()->first();
-                    if ($org) {
-                        $builder->where($table . '.organization_id', $org->id);
-                    }
+                // 3. Terapkan filter
+                if (!empty($accessibleOrgIds)) {
+                    $builder->whereIn($table . '.organization_id', $accessibleOrgIds);
                 }
             } finally {
                 // Lepas tanda setelah selesai
@@ -98,14 +87,13 @@ class BasedModel extends Model
                 if (!Schema::hasColumn($model->getTable(), 'organization_id')) {
                     return;
                 }
-
-                $isSuperAdmin = $user->roles()->where('name', 'super_admin')->exists();
-
-                if (!$isSuperAdmin) {
-                    $org = $user->organizations()->first();
-                    if ($org) {
-                        $model->organization_id = $org->id;
-                    }
+                if ($user->isSystemSuperAdmin()) {
+                    // Super Admin bisa pilih organisasi secara manual
+                    return;
+                }
+                // Isi otomatis dengan organisasi aktif user
+                if (!$model->organization_id) {
+                    $model->organization_id = $user->get_current_organization_id;
                 }
             } finally {
                 $user->isCheckingRole = false;
@@ -194,7 +182,10 @@ class BasedModel extends Model
                     }
                 }
             }
-            $result = array_filter($result);
+            // Ganti array_filter dengan penyaringan yang aman
+            $result = array_filter($result, function ($value) {
+                return $value !== null && $value !== '';
+            });
         } catch (\Exception $e) {
             throw new \RuntimeException('Error serializing request: ' . $e->getMessage());
         }

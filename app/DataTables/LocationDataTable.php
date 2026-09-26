@@ -2,7 +2,7 @@
 
 namespace App\DataTables;
 
-use Models\FixedAsset;
+use App\Models\Location;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
@@ -10,14 +10,14 @@ use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
 use Yajra\DataTables\Services\DataTable;
 
-class FixedAssetDataTable extends DataTable
+class LocationDataTable extends DataTable
 {
     /**
      * Kolom yang ditampilkan di tabel (selain DT_RowIndex & action).
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['asset_code', 'asset_name', 'category'];
+    protected array $columns = ['name'];
 
     /**
      * Build DataTable response.
@@ -48,20 +48,20 @@ class FixedAssetDataTable extends DataTable
      */
     protected function renderActionButtons($row): string
     {
-        $title = e('Detail FixedAsset ' . $row->name);
+        $title = e('Detail Location ' . $row->name);
 
         $context = htmlspecialchars(
             json_encode([
                 'executeDraw' => true,
-                'tableId'     => 'fixed-asset-table',
+                'tableId'     => 'location-table',
                 'reloadDelay' => 500,
             ]),
             ENT_QUOTES,
             'UTF-8'
         );
 
-        $editUrl   = e(route('fixed-asset.edit', $row));
-        $deleteUrl = e(route('fixed-asset.destroy', $row));
+        $editUrl   = e(route('location.edit', $row));
+        $deleteUrl = e(route('location.destroy', $row));
 
         return <<<HTML
             <div class="d-flex justify-content-center gap-1">
@@ -75,7 +75,7 @@ class FixedAssetDataTable extends DataTable
                     data-title="{$title}"
                     data-url="{$editUrl}"
                     data-datatable-context='{$context}'
-                    data-submit='<button class="btn btn-primary modal-submit" type="button" data-is_execute_drawer="true" data-datatable-id="fixed-asset-table">Simpan</button>'
+                    data-submit='<button class="btn btn-primary modal-submit" type="button" data-is_execute_drawer="true" data-datatable-id="location-table">Simpan</button>'
                     data-cancel='<button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Batal</button>'>
                     <span class="material-symbols-outlined">edit</span>
                 </button>
@@ -98,7 +98,7 @@ class FixedAssetDataTable extends DataTable
     /**
      * Get query source of DataTable.
      */
-    public function query(FixedAsset $model): QueryBuilder
+    public function query(Location $model): QueryBuilder
     {
         return $model->newQuery();
     }
@@ -115,14 +115,14 @@ class FixedAssetDataTable extends DataTable
              * Asesi -> asesi-table
              * Asesor -> asesor-table
              */
-            ->setTableId('fixed-asset-table')
+            ->setTableId('location-table')
 
             ->columns($this->getColumns())
 
             /*
              * Server-side AJAX endpoint.
              */
-            ->minifiedAjax(route('fixed-asset.index'))
+            ->minifiedAjax(route('location.index'))
 
             /*
              * Default sorting:
@@ -264,6 +264,7 @@ class FixedAssetDataTable extends DataTable
      * explode() dari string literal seperti versi lama, yang rapuh
      * terhadap karakter khusus pada nama kolom.
      */
+     
     protected function getColumns(): array
     {
         return collect($this->columns)
@@ -295,6 +296,6 @@ class FixedAssetDataTable extends DataTable
      */
     protected function filename(): string
     {
-        return 'FixedAsset_' . date('YmdHis');
+        return 'Location_' . date('YmdHis');
     }
 }

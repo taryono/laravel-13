@@ -12,9 +12,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 use Models\BankAccount;
-use Models\Account;
-use App\Services\JournalService; 
-use Throwable;  
+use Models\ChartOfAccount;
+use App\Services\JournalService;
+use Throwable;
 
 class BankTransactionController extends MainController
 {
@@ -40,17 +40,13 @@ class BankTransactionController extends MainController
         $transaction = new BankTransaction();
         $bankAccounts = BankAccount::where('is_active', 1)->pluck('bank_name', 'id');
 
-        $result = $this->getForm($transaction);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
-
-        return view('BankTransaction::create', compact('transaction', 'forms', 'groupedForms', 'bankAccounts'));
+        return view('BankTransaction::create', compact('transaction', 'bankAccounts'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'bank_account_id' => 'required|exists:bank_accounts,id',
+            'bank_chart_of_account_id' => 'required|exists:bank_accounts,id',
             'transaction_date' => 'required|date',
             'transaction_type' => 'required|in:debit,credit,transfer',
             'description' => 'required|string',
@@ -88,35 +84,35 @@ class BankTransactionController extends MainController
         $journalItems = [];
 
         if ($transaction->transaction_type === 'debit') {
-            // Debit: Bank Account
+            // Debit: Bank ChartOfAccount
             $journalItems[] = [
-                'account_id' => $accountBank->id,
+                'chart_of_account_id' => $accountBank->id,
                 'debit' => $transaction->amount,
                 'credit' => 0,
                 'description' => $transaction->description,
             ];
 
             // Credit: Pendapatan Lain atau Akun terkait
-            $otherAccount = Account::where('code', '4-9000')->first(); // Pendapatan Lain-lain
+            $otherAccount = ChartOfAccount::where('code', '4-9000')->first(); // Pendapatan Lain-lain
             $journalItems[] = [
-                'account_id' => $otherAccount->id,
+                'chart_of_account_id' => $otherAccount->id,
                 'debit' => 0,
                 'credit' => $transaction->amount,
                 'description' => $transaction->description,
             ];
         } else {
-            // Credit: Bank Account
+            // Credit: Bank ChartOfAccount
             $journalItems[] = [
-                'account_id' => $accountBank->id,
+                'chart_of_account_id' => $accountBank->id,
                 'debit' => 0,
                 'credit' => $transaction->amount,
                 'description' => $transaction->description,
             ];
 
             // Debit: Beban atau Akun terkait
-            $otherAccount = Account::where('code', '5-9000')->first(); // Beban Lain-lain
+            $otherAccount = ChartOfAccount::where('code', '5-9000')->first(); // Beban Lain-lain
             $journalItems[] = [
-                'account_id' => $otherAccount->id,
+                'chart_of_account_id' => $otherAccount->id,
                 'debit' => $transaction->amount,
                 'credit' => 0,
                 'description' => $transaction->description,
@@ -155,7 +151,7 @@ class BankTransactionController extends MainController
         }
 
         $validated = $request->validate([
-            'bank_account_id' => 'required|exists:bank_accounts,id',
+            'bank_chart_of_account_id' => 'required|exists:bank_accounts,id',
             'transaction_date' => 'required|date',
             'transaction_type' => 'required|in:debit,credit,transfer',
             'description' => 'required|string',
@@ -235,7 +231,7 @@ class BankTransactionController extends MainController
     public function getByBankAccount($bankAccountId): JsonResponse
     {
         try {
-            $transactions = BankTransaction::where('bank_account_id', $bankAccountId)
+            $transactions = BankTransaction::where('bank_chart_of_account_id', $bankAccountId)
                 ->orderBy('transaction_date', 'desc')
                 ->get();
 

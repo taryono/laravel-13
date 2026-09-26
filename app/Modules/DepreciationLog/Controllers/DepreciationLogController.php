@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 use Models\FixedAsset;
-use Models\Account;
+use Models\ChartOfAccount;
 use App\Services\JournalService;
 use Throwable;
 
@@ -86,12 +86,12 @@ class DepreciationLogController extends MainController
     private function createDepreciationJournal(DepreciationLog $log): void
     {
         $asset = $log->fixedAsset;
-        
+
         $journalItems = [];
 
         // Debit: Beban Penyusutan
         $journalItems[] = [
-            'account_id' => $asset->depreciation_account_id,
+            'chart_of_account_id' => $asset->depreciation_chart_of_account_id,
             'debit' => $log->depreciation_amount,
             'credit' => 0,
             'description' => 'Penyusutan ' . $asset->asset_name,
@@ -99,7 +99,7 @@ class DepreciationLogController extends MainController
 
         // Credit: Akumulasi Penyusutan
         $journalItems[] = [
-            'account_id' => $asset->account_id,
+            'chart_of_account_id' => $asset->chart_of_account_id,
             'debit' => 0,
             'credit' => $log->depreciation_amount,
             'description' => 'Akumulasi penyusutan ' . $asset->asset_name,
@@ -205,7 +205,7 @@ class DepreciationLogController extends MainController
     {
         try {
             $asset = FixedAsset::with('depreciationLogs')->findOrFail($assetId);
-            
+
             $summary = [
                 'asset_name' => $asset->asset_name,
                 'purchase_price' => $asset->purchase_price,
@@ -237,10 +237,10 @@ class DepreciationLogController extends MainController
             DB::transaction(function () use ($validated) {
                 foreach ($validated['asset_ids'] as $assetId) {
                     $asset = FixedAsset::findOrFail($assetId);
-                    
+
                     // Calculate depreciation
                     $depreciationAmount = $this->calculateDepreciationAmount($asset);
-                    
+
                     if ($depreciationAmount > 0 && $asset->book_value > $asset->salvage_value) {
                         $newBookValue = $asset->book_value - $depreciationAmount;
                         $newAccumulated = $asset->accumulated_depreciation + $depreciationAmount;

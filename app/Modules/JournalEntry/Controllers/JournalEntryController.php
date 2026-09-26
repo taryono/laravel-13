@@ -11,9 +11,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
-use Models\Account;
-use App\Services\JournalService; 
-use Throwable;   
+use Models\ChartOfAccount;
+use App\Services\JournalService;
+use Throwable;
 
 class JournalEntryController extends MainController
 {
@@ -43,7 +43,7 @@ class JournalEntryController extends MainController
     public function create(): View
     {
         $journalEntry = new JournalEntry();
-        $accounts = Account::where('is_active', 1)
+        $accounts = ChartOfAccount::where('is_active', 1)
             ->where('account_type', 'detail')
             ->orderBy('code')
             ->get();
@@ -68,7 +68,7 @@ class JournalEntryController extends MainController
             'description' => 'required|string',
             'reference_number' => 'nullable|string|max:255',
             'items' => 'required|array|min:2',
-            'items.*.account_id' => 'required|exists:accounts,id',
+            'items.*.chart_of_account_id' => 'required|exists:accounts,id',
             'items.*.debit' => 'nullable|numeric|min:0',
             'items.*.credit' => 'nullable|numeric|min:0',
             'items.*.description' => 'nullable|string',
@@ -96,7 +96,6 @@ class JournalEntryController extends MainController
                 'Jurnal berhasil dibuat.',
                 $journalEntry
             );
-
         } catch (Throwable $e) {
             Log::error('Gagal membuat jurnal.', [
                 'exception' => $e,
@@ -135,7 +134,7 @@ class JournalEntryController extends MainController
             abort(403, 'Jurnal yang sudah diposting tidak dapat diubah.');
         }
 
-        $accounts = Account::where('is_active', 1)
+        $accounts = ChartOfAccount::where('is_active', 1)
             ->where('account_type', 'detail')
             ->orderBy('code')
             ->get();
@@ -169,7 +168,7 @@ class JournalEntryController extends MainController
             'description' => 'required|string',
             'reference_number' => 'nullable|string|max:255',
             'items' => 'required|array|min:2',
-            'items.*.account_id' => 'required|exists:accounts,id',
+            'items.*.chart_of_account_id' => 'required|exists:accounts,id',
             'items.*.debit' => 'nullable|numeric|min:0',
             'items.*.credit' => 'nullable|numeric|min:0',
             'items.*.description' => 'nullable|string',
@@ -197,7 +196,6 @@ class JournalEntryController extends MainController
                 'Jurnal berhasil diperbarui.',
                 $journalEntry->fresh()
             );
-
         } catch (Throwable $e) {
             Log::error('Gagal memperbarui jurnal.', [
                 'exception' => $e,
@@ -237,7 +235,6 @@ class JournalEntryController extends MainController
                 'Jurnal berhasil diposting.',
                 $journalEntry->fresh()
             );
-
         } catch (Throwable $e) {
             Log::error('Gagal memposting jurnal.', [
                 'exception' => $e,
@@ -276,7 +273,6 @@ class JournalEntryController extends MainController
                 'Jurnal berhasil dibatalkan.',
                 $journalEntry->fresh()
             );
-
         } catch (Throwable $e) {
             Log::error('Gagal membatalkan jurnal.', [
                 'exception' => $e,
@@ -315,7 +311,6 @@ class JournalEntryController extends MainController
                 $request,
                 'Jurnal berhasil dihapus.'
             );
-
         } catch (Throwable $e) {
             Log::error('Gagal menghapus jurnal.', [
                 'exception' => $e,

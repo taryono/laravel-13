@@ -195,8 +195,8 @@ CREATE TABLE `account_mappings`  (
   INDEX `account_mappings_credit_fk`(`credit_account_id` ASC) USING BTREE,
   INDEX `account_mappings_is_active_index`(`is_active` ASC) USING BTREE,
   INDEX `account_mappings_deleted_at_index`(`deleted_at` ASC) USING BTREE,
-  CONSTRAINT `account_mappings_credit_fk` FOREIGN KEY (`credit_account_id`) REFERENCES `accounts` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
-  CONSTRAINT `account_mappings_debit_fk` FOREIGN KEY (`debit_account_id`) REFERENCES `accounts` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `account_mappings_credit_fk` FOREIGN KEY (`credit_account_id`) REFERENCES `chart_of_accounts` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `account_mappings_debit_fk` FOREIGN KEY (`debit_account_id`) REFERENCES `chart_of_accounts` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
   CONSTRAINT `account_mappings_org_fk` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
 ) ENGINE = InnoDB AUTO_INCREMENT = 73 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
@@ -309,10 +309,10 @@ CREATE TABLE `accounting_periods`  (
 -- ----------------------------
 
 -- ----------------------------
--- Table structure for accounts
+-- Table structure for chart_of_accounts
 -- ----------------------------
-DROP TABLE IF EXISTS `accounts`;
-CREATE TABLE `accounts`  (
+DROP TABLE IF EXISTS `chart_of_accounts`;
+CREATE TABLE `chart_of_accounts`  (
   `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `organization_id` bigint UNSIGNED NOT NULL,
   `code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -341,112 +341,112 @@ CREATE TABLE `accounts`  (
   INDEX `accounts_deleted_at_index`(`deleted_at` ASC) USING BTREE,
   CONSTRAINT `accounts_category_fk` FOREIGN KEY (`account_category_id`) REFERENCES `account_categories` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `accounts_org_fk` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
-  CONSTRAINT `accounts_parent_fk` FOREIGN KEY (`parent_id`) REFERENCES `accounts` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+  CONSTRAINT `accounts_parent_fk` FOREIGN KEY (`parent_id`) REFERENCES `chart_of_accounts` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
 ) ENGINE = InnoDB AUTO_INCREMENT = 101 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of accounts
 -- ----------------------------
-INSERT INTO `accounts` VALUES (1, 1, '1-1000', 'ASET LANCAR', 1, NULL, 'header', 'debit', 'IDR', 'Aset yang dapat dicairkan dalam waktu kurang dari 1 tahun', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (2, 1, '1-2000', 'ASET TETAP', 1, NULL, 'header', 'debit', 'IDR', 'Aset berwujud yang dimiliki untuk operasional jangka panjang', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (3, 1, '1-3000', 'ASET LAINNYA', 1, NULL, 'header', 'debit', 'IDR', 'Aset non-lancar lainnya seperti dana abadi', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (4, 1, '2-1000', 'KEWAJIBAN LANCAR', 2, NULL, 'header', 'kredit', 'IDR', 'Utang yang harus dibayar kurang dari 1 tahun', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (5, 1, '2-2000', 'KEWAJIBAN JANGKA PANJANG', 2, NULL, 'header', 'kredit', 'IDR', 'Utang dengan jatuh tempo lebih dari 1 tahun', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (6, 1, '3-1000', 'ASET BERSIH TIDAK TERIKAT', 3, NULL, 'header', 'kredit', 'IDR', 'Surplus yang bisa digunakan bebas oleh yayasan', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (7, 1, '3-2000', 'ASET BERSIH TERIKAT TEMPORER', 3, NULL, 'header', 'kredit', 'IDR', 'Dana hibah yang hanya boleh digunakan untuk tujuan tertentu dalam waktu tertentu', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (8, 1, '3-3000', 'ASET BERSIH TERIKAT PERMANEN', 3, NULL, 'header', 'kredit', 'IDR', 'Dana abadi yang pokoknya tidak boleh dipakai', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (9, 1, '4-1000', 'PENDAPATAN SPP / UKT', 4, NULL, 'header', 'kredit', 'IDR', 'Pendapatan dari SPP dan UKT semua jenjang', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (10, 1, '4-2000', 'PENDAPATAN NON-SPP', 4, NULL, 'header', 'kredit', 'IDR', 'Pendapatan selain SPP/UKT', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (11, 1, '4-3000', 'PENDAPATAN HIBAH & DONASI', 4, NULL, 'header', 'kredit', 'IDR', 'Pendapatan dari hibah pemerintah, donasi, sumbangan', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (12, 1, '4-4000', 'PENDAPATAN LAIN-LAIN', 4, NULL, 'header', 'kredit', 'IDR', 'Pendapatan investasi, sewa, dan lainnya', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (13, 1, '5-1000', 'BEBAN PROGRAM PENDIDIKAN', 5, NULL, 'header', 'debit', 'IDR', 'Biaya langsung untuk kegiatan belajar-mengajar', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (14, 1, '5-2000', 'BEBAN ADMINISTRASI & UMUM', 5, NULL, 'header', 'debit', 'IDR', 'Biaya operasional kantor dan administrasi', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (15, 1, '5-3000', 'BEBAN PENYUSUTAN', 5, NULL, 'header', 'debit', 'IDR', 'Penyusutan aset tetap', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (16, 1, '5-4000', 'BEBAN PAJAK & NON-OPERASIONAL', 5, NULL, 'header', 'debit', 'IDR', 'Beban pajak dan biaya non-operasional lainnya', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (17, 1, '1-1100', 'Kas', 1, 1, 'detail', 'debit', 'IDR', 'Uang tunai di tangan', 50000000.00, 50000000.00, 1, 1, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (18, 1, '1-1200', 'Bank BCA', 1, 1, 'detail', 'debit', 'IDR', 'Rekening Yayasan di BCA', 250000000.00, 250000000.00, 1, 1, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (19, 1, '1-1210', 'Bank Mandiri', 1, 1, 'detail', 'debit', 'IDR', 'Rekening Yayasan di Bank Mandiri', 150000000.00, 150000000.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (20, 1, '1-1220', 'Bank BRI', 1, 1, 'detail', 'debit', 'IDR', 'Rekening Yayasan di Bank BRI', 100000000.00, 100000000.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (21, 1, '1-1300', 'Piutang SPP TK', 1, 1, 'detail', 'debit', 'IDR', 'Tagihan SPP siswa TK yang belum dibayar', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (22, 1, '1-1301', 'Piutang SPP SD', 1, 1, 'detail', 'debit', 'IDR', 'Tagihan SPP siswa SD yang belum dibayar', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (23, 1, '1-1302', 'Piutang SPP SMP', 1, 1, 'detail', 'debit', 'IDR', 'Tagihan SPP siswa SMP yang belum dibayar', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (24, 1, '1-1303', 'Piutang SPP SMA', 1, 1, 'detail', 'debit', 'IDR', 'Tagihan SPP siswa SMA yang belum dibayar', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (25, 1, '1-1304', 'Piutang UKT Universitas', 1, 1, 'detail', 'debit', 'IDR', 'Tagihan UKT mahasiswa yang belum dibayar', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (26, 1, '1-1400', 'Piutang Hibah', 1, 1, 'detail', 'debit', 'IDR', 'Hibah yang sudah dijanjikan tapi belum diterima', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (27, 1, '1-1500', 'Persediaan ATK', 1, 1, 'detail', 'debit', 'IDR', 'Stok alat tulis kantor dan sekolah', 15000000.00, 15000000.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (28, 1, '1-1600', 'Persediaan Bahan Praktikum', 1, 1, 'detail', 'debit', 'IDR', 'Stok bahan praktikum laboratorium', 5000000.00, 5000000.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (29, 1, '1-2100', 'Tanah', 1, 2, 'detail', 'debit', 'IDR', 'Tanah milik yayasan', 5000000000.00, 5000000000.00, 1, 1, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (30, 1, '1-2200', 'Gedung TK', 1, 2, 'detail', 'debit', 'IDR', 'Gedung untuk jenjang TK', 500000000.00, 500000000.00, 1, 1, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (31, 1, '1-2210', 'Gedung SD', 1, 2, 'detail', 'debit', 'IDR', 'Gedung untuk jenjang SD', 800000000.00, 800000000.00, 1, 1, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (32, 1, '1-2220', 'Gedung SMP', 1, 2, 'detail', 'debit', 'IDR', 'Gedung untuk jenjang SMP', 1000000000.00, 1000000000.00, 1, 1, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (33, 1, '1-2230', 'Gedung SMA', 1, 2, 'detail', 'debit', 'IDR', 'Gedung untuk jenjang SMA', 1200000000.00, 1200000000.00, 1, 1, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (34, 1, '1-2240', 'Gedung Universitas', 1, 2, 'detail', 'debit', 'IDR', 'Gedung kampus universitas', 2000000000.00, 2000000000.00, 1, 1, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (35, 1, '1-2300', 'Kendaraan Operasional', 1, 2, 'detail', 'debit', 'IDR', 'Mobil dan kendaraan dinas yayasan', 350000000.00, 350000000.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (36, 1, '1-2400', 'Peralatan & Mesin', 1, 2, 'detail', 'debit', 'IDR', 'Mesin fotokopi, AC, peralatan dapur, dll', 200000000.00, 200000000.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (37, 1, '1-2500', 'Komputer & IT Equipment', 1, 2, 'detail', 'debit', 'IDR', 'Komputer, laptop, server, projector', 300000000.00, 300000000.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (38, 1, '1-2600', 'Akumulasi Penyusutan Aset Tetap', 1, 2, 'detail', 'kredit', 'IDR', 'Akumulasi penyusutan semua aset tetap (contra asset)', -50000000.00, -50000000.00, 1, 1, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (39, 1, '1-3100', 'Dana Abadi (Endowment)', 1, 3, 'detail', 'debit', 'IDR', 'Dana yang pokoknya tidak boleh dipakai, hanya hasil investasinya', 1000000000.00, 1000000000.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (40, 1, '1-3200', 'Investasi Jangka Panjang', 1, 3, 'detail', 'debit', 'IDR', 'Investasi saham, obligasi, reksadana', 500000000.00, 500000000.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (41, 1, '2-1100', 'Utang Usaha', 2, 4, 'detail', 'kredit', 'IDR', 'Utang kepada pemasok barang/jasa', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (42, 1, '2-1200', 'Utang Gaji & Tunjangan', 2, 4, 'detail', 'kredit', 'IDR', 'Gaji guru/staf yang belum dibayar', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (43, 1, '2-1300', 'Utang BPJS Ketenagakerjaan', 2, 4, 'detail', 'kredit', 'IDR', 'Iuran BPJS yang belum disetor', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (44, 1, '2-1400', 'Pendapatan Diterima di Muka (SPP)', 2, 4, 'detail', 'kredit', 'IDR', 'SPP yang sudah dibayar tapi belum menjadi hak yayasan (periode mendatang)', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (45, 1, '2-1500', 'Utang Pajak', 2, 4, 'detail', 'kredit', 'IDR', 'Pajak yang sudah dipotong/dihitung tapi belum disetor ke negara', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (46, 1, '2-2100', 'Utang Bank Jangka Panjang', 2, 5, 'detail', 'kredit', 'IDR', 'Utang bank untuk pembangunan gedung', 2000000000.00, 2000000000.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (47, 1, '3-1100', 'Saldo Aset Bersih Tidak Terikat', 3, 6, 'detail', 'kredit', 'IDR', 'Akumulasi surplus bebas dari tahun-tahun sebelumnya', 2500000000.00, 2500000000.00, 1, 1, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (48, 1, '3-1200', 'Surplus/(Defisit) Tahun Berjalan', 3, 6, 'detail', 'kredit', 'IDR', 'Selisih pendapatan - beban tahun ini (akan ditutup ke 3-1100)', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (49, 1, '3-2100', 'Dana BOS Terikat', 3, 7, 'detail', 'kredit', 'IDR', 'Dana BOS dari pemerintah yang penggunaannya diatur', 500000000.00, 500000000.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (50, 1, '3-2200', 'Dana BOPTN Terikat', 3, 7, 'detail', 'kredit', 'IDR', 'Dana BOPTN untuk universitas', 300000000.00, 300000000.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (51, 1, '3-2300', 'Dana Hibah Beasiswa Terikat', 3, 7, 'detail', 'kredit', 'IDR', 'Hibah khusus untuk beasiswa siswa/mahasiswa', 300000000.00, 300000000.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (52, 1, '3-2400', 'Dana Pembangunan Gedung Terikat', 3, 7, 'detail', 'kredit', 'IDR', 'Dana hibah khusus untuk pembangunan gedung', 200000000.00, 200000000.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (53, 1, '3-3100', 'Dana Abadi (Endowment Fund)', 3, 8, 'detail', 'kredit', 'IDR', 'Pokok dana abadi yang tidak boleh dikurangi', 1000000000.00, 1000000000.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (54, 1, '4-1100', 'Pendapatan SPP TK', 4, 9, 'detail', 'kredit', 'IDR', 'SPP siswa TK per bulan', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (55, 1, '4-1101', 'Pendapatan SPP SD', 4, 9, 'detail', 'kredit', 'IDR', 'SPP siswa SD per bulan', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (56, 1, '4-1102', 'Pendapatan SPP SMP', 4, 9, 'detail', 'kredit', 'IDR', 'SPP siswa SMP per bulan', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (57, 1, '4-1103', 'Pendapatan SPP SMA', 4, 9, 'detail', 'kredit', 'IDR', 'SPP siswa SMA per bulan', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (58, 1, '4-1104', 'Pendapatan UKT Universitas', 4, 9, 'detail', 'kredit', 'IDR', 'UKT mahasiswa per semester', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (59, 1, '4-2100', 'Pendapatan Uang Gedung', 4, 10, 'detail', 'kredit', 'IDR', 'Pendapatan dari uang pembangunan/gedung (daftar ulang)', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (60, 1, '4-2200', 'Pendapatan Pendaftaran Siswa/Mahasiswa Baru', 4, 10, 'detail', 'kredit', 'IDR', 'Biaya pendaftaran calon siswa/mahasiswa baru', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (61, 1, '4-2300', 'Pendapatan Sewa Fasilitas', 4, 10, 'detail', 'kredit', 'IDR', 'Sewa gedung aula, lapangan, ruang pertemuan', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (62, 1, '4-2400', 'Pendapatan Kantin & Koperasi', 4, 10, 'detail', 'kredit', 'IDR', 'Sewa kantin dan koperasi sekolah', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (63, 1, '4-2500', 'Pendapatan Kegiatan Khusus', 4, 10, 'detail', 'kredit', 'IDR', 'Study tour, camping, outbound, dll', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (64, 1, '4-3100', 'Pendapatan Hibah BOS', 4, 11, 'detail', 'kredit', 'IDR', 'Dana BOS dari pemerintah', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (65, 1, '4-3110', 'Pendapatan Hibah BOP', 4, 11, 'detail', 'kredit', 'IDR', 'Dana BOP untuk jenjang SD/SMP', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (66, 1, '4-3120', 'Pendapatan Hibah BOPTN', 4, 11, 'detail', 'kredit', 'IDR', 'Dana BOPTN untuk universitas', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (67, 1, '4-3200', 'Pendapatan Donasi Alumni', 4, 11, 'detail', 'kredit', 'IDR', 'Donasi dari alumni yayasan', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (68, 1, '4-3210', 'Pendapatan Donasi Corporate', 4, 11, 'detail', 'kredit', 'IDR', 'Donasi dari perusahaan/swasta', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (69, 1, '4-3220', 'Pendapatan Donasi Orang Tua', 4, 11, 'detail', 'kredit', 'IDR', 'Sumbangan sukarela dari orang tua siswa', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (70, 1, '4-4100', 'Pendapatan Bunga Bank', 4, 12, 'detail', 'kredit', 'IDR', 'Bunga dari deposito dan tabungan', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (71, 1, '4-4200', 'Pendapatan Dividen', 4, 12, 'detail', 'kredit', 'IDR', 'Dividen dari investasi saham', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (72, 1, '4-4300', 'Pendapatan Lain-lain', 4, 12, 'detail', 'kredit', 'IDR', 'Pendapatan tidak terduga lainnya', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (73, 1, '5-1100', 'Gaji Guru TK', 5, 13, 'detail', 'debit', 'IDR', 'Gaji dan tunjangan guru TK', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (74, 1, '5-1101', 'Gaji Guru SD', 5, 13, 'detail', 'debit', 'IDR', 'Gaji dan tunjangan guru SD', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (75, 1, '5-1102', 'Gaji Guru SMP', 5, 13, 'detail', 'debit', 'IDR', 'Gaji dan tunjangan guru SMP', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (76, 1, '5-1103', 'Gaji Guru SMA', 5, 13, 'detail', 'debit', 'IDR', 'Gaji dan tunjangan guru SMA', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (77, 1, '5-1104', 'Gaji Dosen Universitas', 5, 13, 'detail', 'debit', 'IDR', 'Gaji dan honorarium dosen', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (78, 1, '5-1200', 'Beban Praktikum & Laboratorium', 5, 13, 'detail', 'debit', 'IDR', 'Biaya bahan praktikum, alat lab, dan pemeliharaan lab', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (79, 1, '5-1300', 'Beban Perpustakaan', 5, 13, 'detail', 'debit', 'IDR', 'Pembelian buku, jurnal, langganan database, pemeliharaan perpustakaan', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (80, 1, '5-1400', 'Beban Kegiatan Ekstrakurikuler', 5, 13, 'detail', 'debit', 'IDR', 'Biaya pramuka, olahraga, seni, lomba, study tour', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (81, 1, '5-1500', 'Beban Wisuda & Pelepasan', 5, 13, 'detail', 'debit', 'IDR', 'Biaya wisuda siswa/mahasiswa dan pelepasan', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (82, 1, '5-1600', 'Beban Perlombaan & Kompetisi', 5, 13, 'detail', 'debit', 'IDR', 'Biaya mengikuti lomba akademik dan non-akademik', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (83, 1, '5-1700', 'Beban Beasiswa', 5, 13, 'detail', 'debit', 'IDR', 'Biaya pemberian beasiswa kepada siswa/mahasiswa berprestasi', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (84, 1, '5-2100', 'Gaji Staf Administrasi & TU', 5, 14, 'detail', 'debit', 'IDR', 'Gaji staf tata usaha, HRD, akuntan, IT', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (85, 1, '5-2200', 'Beban Listrik & Air', 5, 14, 'detail', 'debit', 'IDR', 'Tagihan listrik, air, dan internet', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (86, 1, '5-2300', 'Beban ATK & Peralatan Kantor', 5, 14, 'detail', 'debit', 'IDR', 'Pembelian alat tulis, kertas, tinta printer, dll', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (87, 1, '5-2400', 'Beban Perawatan Gedung & Fasilitas', 5, 14, 'detail', 'debit', 'IDR', 'Biaya perbaikan, renovasi ringan, kebersihan gedung', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (88, 1, '5-2500', 'Beban Transportasi & Perjalanan Dinas', 5, 14, 'detail', 'debit', 'IDR', 'Biaya perjalanan dinas guru/staf, BBM, tol', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (89, 1, '5-2600', 'Beban Asuransi', 5, 14, 'detail', 'debit', 'IDR', 'Premi asuransi aset dan kesehatan karyawan', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (90, 1, '5-2700', 'Beban Komunikasi & Internet', 5, 14, 'detail', 'debit', 'IDR', 'Tagihan telepon, internet, dan langganan sistem', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (91, 1, '5-2800', 'Beban Pelatihan & Pengembangan SDM', 5, 14, 'detail', 'debit', 'IDR', 'Biaya seminar, workshop, pelatihan guru/staf', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (92, 1, '5-2900', 'Beban Pemasaran & Promosi', 5, 14, 'detail', 'debit', 'IDR', 'Biaya promosi penerimaan siswa/mahasiswa baru', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (93, 1, '5-3100', 'Beban Penyusutan Gedung', 5, 15, 'detail', 'debit', 'IDR', 'Penyusutan gedung sekolah dan kampus', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (94, 1, '5-3200', 'Beban Penyusutan Kendaraan', 5, 15, 'detail', 'debit', 'IDR', 'Penyusutan kendaraan operasional', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (95, 1, '5-3300', 'Beban Penyusutan Peralatan & IT', 5, 15, 'detail', 'debit', 'IDR', 'Penyusutan komputer, mesin, peralatan', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (96, 1, '5-4100', 'Beban Pajak Penghasilan', 5, 16, 'detail', 'debit', 'IDR', 'PPh terutang yayasan', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (97, 1, '5-4200', 'Beban Administrasi Bank', 5, 16, 'detail', 'debit', 'IDR', 'Biaya admin bank, transfer, materai', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (98, 1, '5-4300', 'Beban Denda & Penalti', 5, 16, 'detail', 'debit', 'IDR', 'Denda keterlambatan pembayaran pajak atau pinjaman', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (99, 1, '5-4400', 'Beban Kerugian Piutang', 5, 16, 'detail', 'debit', 'IDR', 'Piutang SPP/UKT yang dihapuskan karena tidak tertagih', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
-INSERT INTO `accounts` VALUES (100, 1, '5-4500', 'Beban Lain-lain', 5, 16, 'detail', 'debit', 'IDR', 'Biaya tidak terduga lainnya', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (1, 1, '1-1000', 'ASET LANCAR', 1, NULL, 'header', 'debit', 'IDR', 'Aset yang dapat dicairkan dalam waktu kurang dari 1 tahun', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (2, 1, '1-2000', 'ASET TETAP', 1, NULL, 'header', 'debit', 'IDR', 'Aset berwujud yang dimiliki untuk operasional jangka panjang', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (3, 1, '1-3000', 'ASET LAINNYA', 1, NULL, 'header', 'debit', 'IDR', 'Aset non-lancar lainnya seperti dana abadi', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (4, 1, '2-1000', 'KEWAJIBAN LANCAR', 2, NULL, 'header', 'kredit', 'IDR', 'Utang yang harus dibayar kurang dari 1 tahun', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (5, 1, '2-2000', 'KEWAJIBAN JANGKA PANJANG', 2, NULL, 'header', 'kredit', 'IDR', 'Utang dengan jatuh tempo lebih dari 1 tahun', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (6, 1, '3-1000', 'ASET BERSIH TIDAK TERIKAT', 3, NULL, 'header', 'kredit', 'IDR', 'Surplus yang bisa digunakan bebas oleh yayasan', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (7, 1, '3-2000', 'ASET BERSIH TERIKAT TEMPORER', 3, NULL, 'header', 'kredit', 'IDR', 'Dana hibah yang hanya boleh digunakan untuk tujuan tertentu dalam waktu tertentu', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (8, 1, '3-3000', 'ASET BERSIH TERIKAT PERMANEN', 3, NULL, 'header', 'kredit', 'IDR', 'Dana abadi yang pokoknya tidak boleh dipakai', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (9, 1, '4-1000', 'PENDAPATAN SPP / UKT', 4, NULL, 'header', 'kredit', 'IDR', 'Pendapatan dari SPP dan UKT semua jenjang', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (10, 1, '4-2000', 'PENDAPATAN NON-SPP', 4, NULL, 'header', 'kredit', 'IDR', 'Pendapatan selain SPP/UKT', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (11, 1, '4-3000', 'PENDAPATAN HIBAH & DONASI', 4, NULL, 'header', 'kredit', 'IDR', 'Pendapatan dari hibah pemerintah, donasi, sumbangan', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (12, 1, '4-4000', 'PENDAPATAN LAIN-LAIN', 4, NULL, 'header', 'kredit', 'IDR', 'Pendapatan investasi, sewa, dan lainnya', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (13, 1, '5-1000', 'BEBAN PROGRAM PENDIDIKAN', 5, NULL, 'header', 'debit', 'IDR', 'Biaya langsung untuk kegiatan belajar-mengajar', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (14, 1, '5-2000', 'BEBAN ADMINISTRASI & UMUM', 5, NULL, 'header', 'debit', 'IDR', 'Biaya operasional kantor dan administrasi', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (15, 1, '5-3000', 'BEBAN PENYUSUTAN', 5, NULL, 'header', 'debit', 'IDR', 'Penyusutan aset tetap', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (16, 1, '5-4000', 'BEBAN PAJAK & NON-OPERASIONAL', 5, NULL, 'header', 'debit', 'IDR', 'Beban pajak dan biaya non-operasional lainnya', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:41', '2026-09-12 14:25:41', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (17, 1, '1-1100', 'Kas', 1, 1, 'detail', 'debit', 'IDR', 'Uang tunai di tangan', 50000000.00, 50000000.00, 1, 1, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (18, 1, '1-1200', 'Bank BCA', 1, 1, 'detail', 'debit', 'IDR', 'Rekening Yayasan di BCA', 250000000.00, 250000000.00, 1, 1, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (19, 1, '1-1210', 'Bank Mandiri', 1, 1, 'detail', 'debit', 'IDR', 'Rekening Yayasan di Bank Mandiri', 150000000.00, 150000000.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (20, 1, '1-1220', 'Bank BRI', 1, 1, 'detail', 'debit', 'IDR', 'Rekening Yayasan di Bank BRI', 100000000.00, 100000000.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (21, 1, '1-1300', 'Piutang SPP TK', 1, 1, 'detail', 'debit', 'IDR', 'Tagihan SPP siswa TK yang belum dibayar', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (22, 1, '1-1301', 'Piutang SPP SD', 1, 1, 'detail', 'debit', 'IDR', 'Tagihan SPP siswa SD yang belum dibayar', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (23, 1, '1-1302', 'Piutang SPP SMP', 1, 1, 'detail', 'debit', 'IDR', 'Tagihan SPP siswa SMP yang belum dibayar', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (24, 1, '1-1303', 'Piutang SPP SMA', 1, 1, 'detail', 'debit', 'IDR', 'Tagihan SPP siswa SMA yang belum dibayar', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (25, 1, '1-1304', 'Piutang UKT Universitas', 1, 1, 'detail', 'debit', 'IDR', 'Tagihan UKT mahasiswa yang belum dibayar', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (26, 1, '1-1400', 'Piutang Hibah', 1, 1, 'detail', 'debit', 'IDR', 'Hibah yang sudah dijanjikan tapi belum diterima', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (27, 1, '1-1500', 'Persediaan ATK', 1, 1, 'detail', 'debit', 'IDR', 'Stok alat tulis kantor dan sekolah', 15000000.00, 15000000.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (28, 1, '1-1600', 'Persediaan Bahan Praktikum', 1, 1, 'detail', 'debit', 'IDR', 'Stok bahan praktikum laboratorium', 5000000.00, 5000000.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (29, 1, '1-2100', 'Tanah', 1, 2, 'detail', 'debit', 'IDR', 'Tanah milik yayasan', 5000000000.00, 5000000000.00, 1, 1, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (30, 1, '1-2200', 'Gedung TK', 1, 2, 'detail', 'debit', 'IDR', 'Gedung untuk jenjang TK', 500000000.00, 500000000.00, 1, 1, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (31, 1, '1-2210', 'Gedung SD', 1, 2, 'detail', 'debit', 'IDR', 'Gedung untuk jenjang SD', 800000000.00, 800000000.00, 1, 1, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (32, 1, '1-2220', 'Gedung SMP', 1, 2, 'detail', 'debit', 'IDR', 'Gedung untuk jenjang SMP', 1000000000.00, 1000000000.00, 1, 1, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (33, 1, '1-2230', 'Gedung SMA', 1, 2, 'detail', 'debit', 'IDR', 'Gedung untuk jenjang SMA', 1200000000.00, 1200000000.00, 1, 1, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (34, 1, '1-2240', 'Gedung Universitas', 1, 2, 'detail', 'debit', 'IDR', 'Gedung kampus universitas', 2000000000.00, 2000000000.00, 1, 1, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (35, 1, '1-2300', 'Kendaraan Operasional', 1, 2, 'detail', 'debit', 'IDR', 'Mobil dan kendaraan dinas yayasan', 350000000.00, 350000000.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (36, 1, '1-2400', 'Peralatan & Mesin', 1, 2, 'detail', 'debit', 'IDR', 'Mesin fotokopi, AC, peralatan dapur, dll', 200000000.00, 200000000.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (37, 1, '1-2500', 'Komputer & IT Equipment', 1, 2, 'detail', 'debit', 'IDR', 'Komputer, laptop, server, projector', 300000000.00, 300000000.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (38, 1, '1-2600', 'Akumulasi Penyusutan Aset Tetap', 1, 2, 'detail', 'kredit', 'IDR', 'Akumulasi penyusutan semua aset tetap (contra asset)', -50000000.00, -50000000.00, 1, 1, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (39, 1, '1-3100', 'Dana Abadi (Endowment)', 1, 3, 'detail', 'debit', 'IDR', 'Dana yang pokoknya tidak boleh dipakai, hanya hasil investasinya', 1000000000.00, 1000000000.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (40, 1, '1-3200', 'Investasi Jangka Panjang', 1, 3, 'detail', 'debit', 'IDR', 'Investasi saham, obligasi, reksadana', 500000000.00, 500000000.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (41, 1, '2-1100', 'Utang Usaha', 2, 4, 'detail', 'kredit', 'IDR', 'Utang kepada pemasok barang/jasa', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (42, 1, '2-1200', 'Utang Gaji & Tunjangan', 2, 4, 'detail', 'kredit', 'IDR', 'Gaji guru/staf yang belum dibayar', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (43, 1, '2-1300', 'Utang BPJS Ketenagakerjaan', 2, 4, 'detail', 'kredit', 'IDR', 'Iuran BPJS yang belum disetor', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (44, 1, '2-1400', 'Pendapatan Diterima di Muka (SPP)', 2, 4, 'detail', 'kredit', 'IDR', 'SPP yang sudah dibayar tapi belum menjadi hak yayasan (periode mendatang)', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (45, 1, '2-1500', 'Utang Pajak', 2, 4, 'detail', 'kredit', 'IDR', 'Pajak yang sudah dipotong/dihitung tapi belum disetor ke negara', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (46, 1, '2-2100', 'Utang Bank Jangka Panjang', 2, 5, 'detail', 'kredit', 'IDR', 'Utang bank untuk pembangunan gedung', 2000000000.00, 2000000000.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (47, 1, '3-1100', 'Saldo Aset Bersih Tidak Terikat', 3, 6, 'detail', 'kredit', 'IDR', 'Akumulasi surplus bebas dari tahun-tahun sebelumnya', 2500000000.00, 2500000000.00, 1, 1, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (48, 1, '3-1200', 'Surplus/(Defisit) Tahun Berjalan', 3, 6, 'detail', 'kredit', 'IDR', 'Selisih pendapatan - beban tahun ini (akan ditutup ke 3-1100)', 0.00, 0.00, 1, 1, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (49, 1, '3-2100', 'Dana BOS Terikat', 3, 7, 'detail', 'kredit', 'IDR', 'Dana BOS dari pemerintah yang penggunaannya diatur', 500000000.00, 500000000.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (50, 1, '3-2200', 'Dana BOPTN Terikat', 3, 7, 'detail', 'kredit', 'IDR', 'Dana BOPTN untuk universitas', 300000000.00, 300000000.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (51, 1, '3-2300', 'Dana Hibah Beasiswa Terikat', 3, 7, 'detail', 'kredit', 'IDR', 'Hibah khusus untuk beasiswa siswa/mahasiswa', 300000000.00, 300000000.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (52, 1, '3-2400', 'Dana Pembangunan Gedung Terikat', 3, 7, 'detail', 'kredit', 'IDR', 'Dana hibah khusus untuk pembangunan gedung', 200000000.00, 200000000.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (53, 1, '3-3100', 'Dana Abadi (Endowment Fund)', 3, 8, 'detail', 'kredit', 'IDR', 'Pokok dana abadi yang tidak boleh dikurangi', 1000000000.00, 1000000000.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (54, 1, '4-1100', 'Pendapatan SPP TK', 4, 9, 'detail', 'kredit', 'IDR', 'SPP siswa TK per bulan', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (55, 1, '4-1101', 'Pendapatan SPP SD', 4, 9, 'detail', 'kredit', 'IDR', 'SPP siswa SD per bulan', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (56, 1, '4-1102', 'Pendapatan SPP SMP', 4, 9, 'detail', 'kredit', 'IDR', 'SPP siswa SMP per bulan', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (57, 1, '4-1103', 'Pendapatan SPP SMA', 4, 9, 'detail', 'kredit', 'IDR', 'SPP siswa SMA per bulan', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (58, 1, '4-1104', 'Pendapatan UKT Universitas', 4, 9, 'detail', 'kredit', 'IDR', 'UKT mahasiswa per semester', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (59, 1, '4-2100', 'Pendapatan Uang Gedung', 4, 10, 'detail', 'kredit', 'IDR', 'Pendapatan dari uang pembangunan/gedung (daftar ulang)', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (60, 1, '4-2200', 'Pendapatan Pendaftaran Siswa/Mahasiswa Baru', 4, 10, 'detail', 'kredit', 'IDR', 'Biaya pendaftaran calon siswa/mahasiswa baru', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (61, 1, '4-2300', 'Pendapatan Sewa Fasilitas', 4, 10, 'detail', 'kredit', 'IDR', 'Sewa gedung aula, lapangan, ruang pertemuan', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (62, 1, '4-2400', 'Pendapatan Kantin & Koperasi', 4, 10, 'detail', 'kredit', 'IDR', 'Sewa kantin dan koperasi sekolah', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (63, 1, '4-2500', 'Pendapatan Kegiatan Khusus', 4, 10, 'detail', 'kredit', 'IDR', 'Study tour, camping, outbound, dll', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (64, 1, '4-3100', 'Pendapatan Hibah BOS', 4, 11, 'detail', 'kredit', 'IDR', 'Dana BOS dari pemerintah', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (65, 1, '4-3110', 'Pendapatan Hibah BOP', 4, 11, 'detail', 'kredit', 'IDR', 'Dana BOP untuk jenjang SD/SMP', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (66, 1, '4-3120', 'Pendapatan Hibah BOPTN', 4, 11, 'detail', 'kredit', 'IDR', 'Dana BOPTN untuk universitas', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (67, 1, '4-3200', 'Pendapatan Donasi Alumni', 4, 11, 'detail', 'kredit', 'IDR', 'Donasi dari alumni yayasan', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (68, 1, '4-3210', 'Pendapatan Donasi Corporate', 4, 11, 'detail', 'kredit', 'IDR', 'Donasi dari perusahaan/swasta', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (69, 1, '4-3220', 'Pendapatan Donasi Orang Tua', 4, 11, 'detail', 'kredit', 'IDR', 'Sumbangan sukarela dari orang tua siswa', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (70, 1, '4-4100', 'Pendapatan Bunga Bank', 4, 12, 'detail', 'kredit', 'IDR', 'Bunga dari deposito dan tabungan', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (71, 1, '4-4200', 'Pendapatan Dividen', 4, 12, 'detail', 'kredit', 'IDR', 'Dividen dari investasi saham', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (72, 1, '4-4300', 'Pendapatan Lain-lain', 4, 12, 'detail', 'kredit', 'IDR', 'Pendapatan tidak terduga lainnya', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (73, 1, '5-1100', 'Gaji Guru TK', 5, 13, 'detail', 'debit', 'IDR', 'Gaji dan tunjangan guru TK', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (74, 1, '5-1101', 'Gaji Guru SD', 5, 13, 'detail', 'debit', 'IDR', 'Gaji dan tunjangan guru SD', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (75, 1, '5-1102', 'Gaji Guru SMP', 5, 13, 'detail', 'debit', 'IDR', 'Gaji dan tunjangan guru SMP', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (76, 1, '5-1103', 'Gaji Guru SMA', 5, 13, 'detail', 'debit', 'IDR', 'Gaji dan tunjangan guru SMA', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (77, 1, '5-1104', 'Gaji Dosen Universitas', 5, 13, 'detail', 'debit', 'IDR', 'Gaji dan honorarium dosen', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (78, 1, '5-1200', 'Beban Praktikum & Laboratorium', 5, 13, 'detail', 'debit', 'IDR', 'Biaya bahan praktikum, alat lab, dan pemeliharaan lab', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (79, 1, '5-1300', 'Beban Perpustakaan', 5, 13, 'detail', 'debit', 'IDR', 'Pembelian buku, jurnal, langganan database, pemeliharaan perpustakaan', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (80, 1, '5-1400', 'Beban Kegiatan Ekstrakurikuler', 5, 13, 'detail', 'debit', 'IDR', 'Biaya pramuka, olahraga, seni, lomba, study tour', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (81, 1, '5-1500', 'Beban Wisuda & Pelepasan', 5, 13, 'detail', 'debit', 'IDR', 'Biaya wisuda siswa/mahasiswa dan pelepasan', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (82, 1, '5-1600', 'Beban Perlombaan & Kompetisi', 5, 13, 'detail', 'debit', 'IDR', 'Biaya mengikuti lomba akademik dan non-akademik', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (83, 1, '5-1700', 'Beban Beasiswa', 5, 13, 'detail', 'debit', 'IDR', 'Biaya pemberian beasiswa kepada siswa/mahasiswa berprestasi', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (84, 1, '5-2100', 'Gaji Staf Administrasi & TU', 5, 14, 'detail', 'debit', 'IDR', 'Gaji staf tata usaha, HRD, akuntan, IT', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (85, 1, '5-2200', 'Beban Listrik & Air', 5, 14, 'detail', 'debit', 'IDR', 'Tagihan listrik, air, dan internet', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (86, 1, '5-2300', 'Beban ATK & Peralatan Kantor', 5, 14, 'detail', 'debit', 'IDR', 'Pembelian alat tulis, kertas, tinta printer, dll', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (87, 1, '5-2400', 'Beban Perawatan Gedung & Fasilitas', 5, 14, 'detail', 'debit', 'IDR', 'Biaya perbaikan, renovasi ringan, kebersihan gedung', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (88, 1, '5-2500', 'Beban Transportasi & Perjalanan Dinas', 5, 14, 'detail', 'debit', 'IDR', 'Biaya perjalanan dinas guru/staf, BBM, tol', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (89, 1, '5-2600', 'Beban Asuransi', 5, 14, 'detail', 'debit', 'IDR', 'Premi asuransi aset dan kesehatan karyawan', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (90, 1, '5-2700', 'Beban Komunikasi & Internet', 5, 14, 'detail', 'debit', 'IDR', 'Tagihan telepon, internet, dan langganan sistem', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (91, 1, '5-2800', 'Beban Pelatihan & Pengembangan SDM', 5, 14, 'detail', 'debit', 'IDR', 'Biaya seminar, workshop, pelatihan guru/staf', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (92, 1, '5-2900', 'Beban Pemasaran & Promosi', 5, 14, 'detail', 'debit', 'IDR', 'Biaya promosi penerimaan siswa/mahasiswa baru', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (93, 1, '5-3100', 'Beban Penyusutan Gedung', 5, 15, 'detail', 'debit', 'IDR', 'Penyusutan gedung sekolah dan kampus', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (94, 1, '5-3200', 'Beban Penyusutan Kendaraan', 5, 15, 'detail', 'debit', 'IDR', 'Penyusutan kendaraan operasional', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (95, 1, '5-3300', 'Beban Penyusutan Peralatan & IT', 5, 15, 'detail', 'debit', 'IDR', 'Penyusutan komputer, mesin, peralatan', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (96, 1, '5-4100', 'Beban Pajak Penghasilan', 5, 16, 'detail', 'debit', 'IDR', 'PPh terutang yayasan', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (97, 1, '5-4200', 'Beban Administrasi Bank', 5, 16, 'detail', 'debit', 'IDR', 'Biaya admin bank, transfer, materai', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (98, 1, '5-4300', 'Beban Denda & Penalti', 5, 16, 'detail', 'debit', 'IDR', 'Denda keterlambatan pembayaran pajak atau pinjaman', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (99, 1, '5-4400', 'Beban Kerugian Piutang', 5, 16, 'detail', 'debit', 'IDR', 'Piutang SPP/UKT yang dihapuskan karena tidak tertagih', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
+INSERT INTO `chart_of_accounts` VALUES (100, 1, '5-4500', 'Beban Lain-lain', 5, 16, 'detail', 'debit', 'IDR', 'Biaya tidak terduga lainnya', 0.00, 0.00, 1, 0, NULL, '2026-09-12 14:25:42', '2026-09-12 14:25:42', NULL, NULL, NULL);
 
 -- ----------------------------
 -- Table structure for achievements
@@ -2095,7 +2095,7 @@ CREATE TABLE `bank_accounts`  (
   `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `school_id` bigint UNSIGNED NOT NULL,
   `organization_id` bigint UNSIGNED NOT NULL,
-  `account_id` bigint UNSIGNED NOT NULL,
+  `chart_of_account_id` bigint UNSIGNED NOT NULL,
   `code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `bank_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `branch` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
@@ -2115,14 +2115,14 @@ CREATE TABLE `bank_accounts`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `bank_accounts_school_code_unique`(`school_id` ASC, `code` ASC) USING BTREE,
   INDEX `bank_accounts_school_index`(`school_id` ASC) USING BTREE,
-  INDEX `bank_accounts_coa_index`(`account_id` ASC) USING BTREE,
+  INDEX `bank_accounts_coa_index`(`chart_of_account_id` ASC) USING BTREE,
   INDEX `bank_accounts_currency_index`(`currency_id` ASC) USING BTREE,
   INDEX `bank_accounts_number_index`(`account_number` ASC) USING BTREE,
   INDEX `bank_accounts_is_cash_index`(`is_cash_account` ASC) USING BTREE,
   INDEX `bank_accounts_deleted_at_index`(`deleted_at` ASC) USING BTREE,
   INDEX `bank_accounts_created_by_index`(`created_by` ASC) USING BTREE,
   INDEX `bank_accounts_updated_by_index`(`updated_by` ASC) USING BTREE,
-  CONSTRAINT `bank_accounts_account_id_foreign` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `bank_accounts_account_id_foreign` FOREIGN KEY (`chart_of_account_id`) REFERENCES `chart_of_accounts` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `bank_accounts_currency_id_foreign` FOREIGN KEY (`currency_id`) REFERENCES `currencies` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `bank_accounts_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
@@ -2700,7 +2700,7 @@ CREATE TABLE `bos_report_items`  (
   `bos_report_id` bigint UNSIGNED NOT NULL,
   `bos_component_id` bigint UNSIGNED NULL DEFAULT NULL,
   `rkas_source_id` bigint UNSIGNED NULL DEFAULT NULL,
-  `account_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `chart_of_account_id` bigint UNSIGNED NULL DEFAULT NULL,
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
   `allocation_amount` decimal(20, 2) NOT NULL DEFAULT 0.00,
   `received_amount` decimal(20, 2) NOT NULL DEFAULT 0.00,
@@ -2718,11 +2718,11 @@ CREATE TABLE `bos_report_items`  (
   INDEX `bos_report_items_report_index`(`bos_report_id` ASC) USING BTREE,
   INDEX `bos_report_items_component_index`(`bos_component_id` ASC) USING BTREE,
   INDEX `bos_report_items_source_index`(`rkas_source_id` ASC) USING BTREE,
-  INDEX `bos_report_items_coa_index`(`account_id` ASC) USING BTREE,
+  INDEX `bos_report_items_coa_index`(`chart_of_account_id` ASC) USING BTREE,
   INDEX `bos_report_items_deleted_at_index`(`deleted_at` ASC) USING BTREE,
   INDEX `bos_report_items_created_by_index`(`created_by` ASC) USING BTREE,
   INDEX `bos_report_items_updated_by_index`(`updated_by` ASC) USING BTREE,
-  CONSTRAINT `bos_report_items_account_id_foreign` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `bos_report_items_account_id_foreign` FOREIGN KEY (`chart_of_account_id`) REFERENCES `chart_of_accounts` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `bos_report_items_bos_component_id_foreign` FOREIGN KEY (`bos_component_id`) REFERENCES `bos_components` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `bos_report_items_bos_report_id_foreign` FOREIGN KEY (`bos_report_id`) REFERENCES `bos_reports` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `bos_report_items_rkas_source_id_foreign` FOREIGN KEY (`rkas_source_id`) REFERENCES `rkas_sources` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
@@ -2841,7 +2841,7 @@ CREATE TABLE `budget_details`  (
   `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `budget_id` bigint UNSIGNED NOT NULL,
   `accounting_period_id` bigint UNSIGNED NULL DEFAULT NULL,
-  `account_id` bigint UNSIGNED NOT NULL,
+  `chart_of_account_id` bigint UNSIGNED NOT NULL,
   `cost_center_id` bigint UNSIGNED NULL DEFAULT NULL,
   `budget_amount` decimal(15, 2) NOT NULL DEFAULT 0.00,
   `actual_amount` decimal(15, 2) NOT NULL DEFAULT 0.00,
@@ -2856,10 +2856,10 @@ CREATE TABLE `budget_details`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `budget_details_budget_fk`(`budget_id` ASC) USING BTREE,
   INDEX `budget_details_period_fk`(`accounting_period_id` ASC) USING BTREE,
-  INDEX `budget_details_account_fk`(`account_id` ASC) USING BTREE,
+  INDEX `budget_details_account_fk`(`chart_of_account_id` ASC) USING BTREE,
   INDEX `budget_details_cost_center_fk`(`cost_center_id` ASC) USING BTREE,
   INDEX `budget_details_deleted_at_index`(`deleted_at` ASC) USING BTREE,
-  CONSTRAINT `budget_details_account_fk` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `budget_details_account_fk` FOREIGN KEY (`chart_of_account_id`) REFERENCES `chart_of_accounts` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `budget_details_budget_fk` FOREIGN KEY (`budget_id`) REFERENCES `budgets` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
   CONSTRAINT `budget_details_cost_center_fk` FOREIGN KEY (`cost_center_id`) REFERENCES `cost_centers` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
   CONSTRAINT `budget_details_period_fk` FOREIGN KEY (`accounting_period_id`) REFERENCES `accounting_periods` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
@@ -3943,7 +3943,7 @@ CREATE TABLE `customers`  (
   INDEX `customers_is_active_index`(`is_active` ASC) USING BTREE,
   INDEX `customers_deleted_at_index`(`deleted_at` ASC) USING BTREE,
   CONSTRAINT `customers_org_fk` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
-  CONSTRAINT `customers_receivable_account_fk` FOREIGN KEY (`receivable_account_id`) REFERENCES `accounts` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+  CONSTRAINT `customers_receivable_account_fk` FOREIGN KEY (`receivable_account_id`) REFERENCES `chart_of_accounts` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
@@ -5731,7 +5731,7 @@ CREATE TABLE `expense_items`  (
   `quantity` decimal(15, 4) NOT NULL DEFAULT 1.0000,
   `unit_amount` decimal(15, 2) NOT NULL DEFAULT 0.00,
   `amount` decimal(15, 2) NOT NULL DEFAULT 0.00,
-  `account_id` bigint UNSIGNED NOT NULL,
+  `chart_of_account_id` bigint UNSIGNED NOT NULL,
   `cost_center_id` bigint UNSIGNED NULL DEFAULT NULL,
   `tax_amount` decimal(15, 2) NOT NULL DEFAULT 0.00,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -5741,10 +5741,10 @@ CREATE TABLE `expense_items`  (
   `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `expense_items_expense_fk`(`expense_id` ASC) USING BTREE,
-  INDEX `expense_items_account_fk`(`account_id` ASC) USING BTREE,
+  INDEX `expense_items_account_fk`(`chart_of_account_id` ASC) USING BTREE,
   INDEX `expense_items_cost_center_fk`(`cost_center_id` ASC) USING BTREE,
   INDEX `expense_items_deleted_at_index`(`deleted_at` ASC) USING BTREE,
-  CONSTRAINT `expense_items_account_fk` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `expense_items_account_fk` FOREIGN KEY (`chart_of_account_id`) REFERENCES `chart_of_accounts` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `expense_items_cost_center_fk` FOREIGN KEY (`cost_center_id`) REFERENCES `cost_centers` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
   CONSTRAINT `expense_items_expense_fk` FOREIGN KEY (`expense_id`) REFERENCES `expenses` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
@@ -6614,9 +6614,9 @@ CREATE TABLE `fixed_assets`  (
   INDEX `fixed_assets_depr_expense_account_fk`(`depreciation_expense_account_id` ASC) USING BTREE,
   INDEX `fixed_assets_status_index`(`status` ASC) USING BTREE,
   INDEX `fixed_assets_deleted_at_index`(`deleted_at` ASC) USING BTREE,
-  CONSTRAINT `fixed_assets_accum_account_fk` FOREIGN KEY (`accumulated_depreciation_account_id`) REFERENCES `accounts` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
-  CONSTRAINT `fixed_assets_asset_account_fk` FOREIGN KEY (`asset_account_id`) REFERENCES `accounts` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
-  CONSTRAINT `fixed_assets_depr_expense_account_fk` FOREIGN KEY (`depreciation_expense_account_id`) REFERENCES `accounts` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fixed_assets_accum_account_fk` FOREIGN KEY (`accumulated_depreciation_account_id`) REFERENCES `chart_of_accounts` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fixed_assets_asset_account_fk` FOREIGN KEY (`asset_account_id`) REFERENCES `chart_of_accounts` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `fixed_assets_depr_expense_account_fk` FOREIGN KEY (`depreciation_expense_account_id`) REFERENCES `chart_of_accounts` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
   CONSTRAINT `fixed_assets_org_fk` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
@@ -6733,7 +6733,7 @@ CREATE TABLE `goods_receipt_items`  (
   `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `goods_receipt_id` bigint UNSIGNED NOT NULL,
   `purchase_order_item_id` bigint UNSIGNED NOT NULL,
-  `account_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `chart_of_account_id` bigint UNSIGNED NULL DEFAULT NULL,
   `name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `unit` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
   `ordered_quantity` decimal(20, 4) NOT NULL DEFAULT 0.0000,
@@ -6753,12 +6753,12 @@ CREATE TABLE `goods_receipt_items`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `goods_receipt_items_receipt_index`(`goods_receipt_id` ASC) USING BTREE,
   INDEX `goods_receipt_items_po_item_index`(`purchase_order_item_id` ASC) USING BTREE,
-  INDEX `goods_receipt_items_coa_index`(`account_id` ASC) USING BTREE,
+  INDEX `goods_receipt_items_coa_index`(`chart_of_account_id` ASC) USING BTREE,
   INDEX `goods_receipt_items_is_asset_index`(`is_asset` ASC) USING BTREE,
   INDEX `goods_receipt_items_deleted_at_index`(`deleted_at` ASC) USING BTREE,
   INDEX `goods_receipt_items_created_by_index`(`created_by` ASC) USING BTREE,
   INDEX `goods_receipt_items_updated_by_index`(`updated_by` ASC) USING BTREE,
-  CONSTRAINT `goods_receipt_items_account_id_foreign` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `goods_receipt_items_account_id_foreign` FOREIGN KEY (`chart_of_account_id`) REFERENCES `chart_of_accounts` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `goods_receipt_items_goods_receipt_id_foreign` FOREIGN KEY (`goods_receipt_id`) REFERENCES `goods_receipts` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `goods_receipt_items_purchase_order_item_id_foreign` FOREIGN KEY (`purchase_order_item_id`) REFERENCES `purchase_order_items` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
@@ -7253,8 +7253,8 @@ CREATE TABLE `inventory_items`  (
   INDEX `inv_items_cogs_account_index`(`cogs_account_id` ASC) USING BTREE,
   INDEX `inv_items_deleted_at_index`(`deleted_at` ASC) USING BTREE,
   CONSTRAINT `inv_items_cat_fk` FOREIGN KEY (`category_id`) REFERENCES `inventory_categories` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
-  CONSTRAINT `inv_items_cogs_acc_fk` FOREIGN KEY (`cogs_account_id`) REFERENCES `accounts` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
-  CONSTRAINT `inv_items_inv_acc_fk` FOREIGN KEY (`inventory_account_id`) REFERENCES `accounts` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `inv_items_cogs_acc_fk` FOREIGN KEY (`cogs_account_id`) REFERENCES `chart_of_accounts` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `inv_items_inv_acc_fk` FOREIGN KEY (`inventory_account_id`) REFERENCES `chart_of_accounts` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
   CONSTRAINT `inv_items_org_fk` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
   CONSTRAINT `inv_items_uom_fk` FOREIGN KEY (`uom_id`) REFERENCES `unit_of_measurements` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
@@ -7314,7 +7314,7 @@ CREATE TABLE `invoice_items`  (
   INDEX `invoice_items_revenue_account_fk`(`revenue_account_id` ASC) USING BTREE,
   INDEX `invoice_items_deleted_at_index`(`deleted_at` ASC) USING BTREE,
   CONSTRAINT `invoice_items_invoice_fk` FOREIGN KEY (`invoice_id`) REFERENCES `invoices` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
-  CONSTRAINT `invoice_items_revenue_account_fk` FOREIGN KEY (`revenue_account_id`) REFERENCES `accounts` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+  CONSTRAINT `invoice_items_revenue_account_fk` FOREIGN KEY (`revenue_account_id`) REFERENCES `chart_of_accounts` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
@@ -7445,37 +7445,7 @@ CREATE TABLE `jobs`  (
 -- ----------------------------
 -- Records of jobs
 -- ----------------------------
-
--- ----------------------------
--- Table structure for journal_details
--- ----------------------------
-DROP TABLE IF EXISTS `journal_details`;
-CREATE TABLE `journal_details`  (
-  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
-  `journal_entry_id` bigint UNSIGNED NOT NULL,
-  `account_id` bigint UNSIGNED NOT NULL,
-  `cost_center_id` bigint UNSIGNED NULL DEFAULT NULL,
-  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
-  `debit` decimal(15, 2) NOT NULL DEFAULT 0.00,
-  `credit` decimal(15, 2) NOT NULL DEFAULT 0.00,
-  `reference_type` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `reference_id` bigint UNSIGNED NULL DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`) USING BTREE,
-  INDEX `journal_details_entry_index`(`journal_entry_id` ASC) USING BTREE,
-  INDEX `journal_details_account_index`(`account_id` ASC) USING BTREE,
-  INDEX `journal_details_cost_center_index`(`cost_center_id` ASC) USING BTREE,
-  CONSTRAINT `journal_details_account_fk` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
-  CONSTRAINT `journal_details_cost_center_fk` FOREIGN KEY (`cost_center_id`) REFERENCES `cost_centers` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
-  CONSTRAINT `journal_details_entry_fk` FOREIGN KEY (`journal_entry_id`) REFERENCES `journal_entries` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
-  CONSTRAINT `journal_details_debit_credit_chk` CHECK ((`debit` >= 0) and (`credit` >= 0) and ((`debit` <= 0) or (`credit` <= 0)))
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
-
--- ----------------------------
--- Records of journal_details
--- ----------------------------
-
+ 
 -- ----------------------------
 -- Table structure for journal_entries
 -- ----------------------------
@@ -7536,49 +7506,95 @@ CREATE TABLE `journal_entries`  (
 -- ----------------------------
 -- Records of journal_entries
 -- ----------------------------
-
+ 
 -- ----------------------------
 -- Table structure for journal_entry_lines
 -- ----------------------------
 DROP TABLE IF EXISTS `journal_entry_lines`;
-CREATE TABLE `journal_entry_lines`  (
-  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
-  `journal_entry_id` bigint UNSIGNED NOT NULL,
-  `chart_of_account_id` bigint UNSIGNED NOT NULL,
-  `line_number` int NOT NULL DEFAULT 1,
-  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
-  `debit` decimal(20, 2) NOT NULL DEFAULT 0.00,
-  `credit` decimal(20, 2) NOT NULL DEFAULT 0.00,
-  `currency_id` bigint UNSIGNED NOT NULL,
-  `exchange_rate` decimal(20, 8) NOT NULL DEFAULT 1.00000000,
-  `foreign_debit` decimal(20, 2) NOT NULL DEFAULT 0.00,
-  `foreign_credit` decimal(20, 2) NOT NULL DEFAULT 0.00,
-  `functional_debit` decimal(20, 2) NOT NULL DEFAULT 0.00,
-  `functional_credit` decimal(20, 2) NOT NULL DEFAULT 0.00,
-  `vendor_id` bigint UNSIGNED NULL DEFAULT NULL,
-  `student_id` bigint UNSIGNED NULL DEFAULT NULL,
-  `is_active` tinyint(1) NOT NULL DEFAULT 1,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL,
-  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
-  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
-  PRIMARY KEY (`id`) USING BTREE,
-  INDEX `journal_entry_lines_entry_index`(`journal_entry_id` ASC) USING BTREE,
-  INDEX `journal_entry_lines_account_index`(`chart_of_account_id` ASC) USING BTREE,
-  INDEX `journal_entry_lines_currency_index`(`currency_id` ASC) USING BTREE,
-  INDEX `journal_entry_lines_vendor_index`(`vendor_id` ASC) USING BTREE,
-  INDEX `journal_entry_lines_student_index`(`student_id` ASC) USING BTREE,
-  INDEX `journal_entry_lines_line_number_index`(`line_number` ASC) USING BTREE,
-  INDEX `journal_entry_lines_deleted_at_index`(`deleted_at` ASC) USING BTREE,
-  INDEX `journal_entry_lines_created_by_index`(`created_by` ASC) USING BTREE,
-  INDEX `journal_entry_lines_updated_by_index`(`updated_by` ASC) USING BTREE,
-  CONSTRAINT `journal_entry_lines_chart_of_account_id_foreign` FOREIGN KEY (`chart_of_account_id`) REFERENCES `accounts` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
-  CONSTRAINT `journal_entry_lines_currency_id_foreign` FOREIGN KEY (`currency_id`) REFERENCES `currencies` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `journal_entry_lines_journal_entry_id_foreign` FOREIGN KEY (`journal_entry_id`) REFERENCES `journal_entries` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `journal_entry_lines_student_id_foreign` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `journal_entry_lines_vendor_id_foreign` FOREIGN KEY (`vendor_id`) REFERENCES `vendors` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+CREATE TABLE `journal_entry_lines` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `journal_entry_id` BIGINT UNSIGNED NOT NULL,
+  `chart_of_account_id` BIGINT UNSIGNED NOT NULL,
+  `cost_center_id` BIGINT UNSIGNED NULL DEFAULT NULL,
+  `line_number` INT UNSIGNED NOT NULL DEFAULT 1,
+  `description` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `debit` DECIMAL(20, 2) NOT NULL DEFAULT 0.00,
+  `credit` DECIMAL(20, 2) NOT NULL DEFAULT 0.00,
+  `currency_id` BIGINT UNSIGNED NOT NULL,
+  `exchange_rate` DECIMAL(20, 8) NOT NULL DEFAULT 1.00000000,
+  `foreign_debit` DECIMAL(20, 2) NOT NULL DEFAULT 0.00,
+  `foreign_credit` DECIMAL(20, 2) NOT NULL DEFAULT 0.00,
+  `functional_debit` DECIMAL(20, 2) NOT NULL DEFAULT 0.00,
+  `functional_credit` DECIMAL(20, 2) NOT NULL DEFAULT 0.00,
+  `vendor_id` BIGINT UNSIGNED NULL DEFAULT NULL,
+  `student_id` BIGINT UNSIGNED NULL DEFAULT NULL,
+  `source_type` VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `source_id` BIGINT UNSIGNED NULL DEFAULT NULL,
+  `created_at` TIMESTAMP NULL DEFAULT NULL,
+  `updated_at` TIMESTAMP NULL DEFAULT NULL,
+  `created_by` BIGINT UNSIGNED NULL DEFAULT NULL,
+  `updated_by` BIGINT UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,  UNIQUE KEY `journal_entry_lines_entry_line_unique`
+    (`journal_entry_id`, `line_number`) USING BTREE,  INDEX `journal_entry_lines_entry_index`
+    (`journal_entry_id`) USING BTREE,
+  INDEX `journal_entry_lines_account_index`(`chart_of_account_id`) USING BTREE,
+  INDEX `journal_entry_lines_cost_center_index`(`cost_center_id`) USING BTREE,
+  INDEX `journal_entry_lines_currency_index`(`currency_id`) USING BTREE,
+  INDEX `journal_entry_lines_vendor_index`(`vendor_id`) USING BTREE,
+  INDEX `journal_entry_lines_student_index`(`student_id`) USING BTREE,
+  INDEX `journal_entry_lines_source_index`(`source_type`, `source_id`) USING BTREE,
+  INDEX `journal_entry_lines_created_by_index`(`created_by`) USING BTREE,
+  INDEX `journal_entry_lines_updated_by_index`(`updated_by`) USING BTREE,
+  CONSTRAINT `journal_entry_lines_chart_of_account_fk`FOREIGN KEY (`chart_of_account_id`)
+    REFERENCES `chart_of_accounts` (`id`)ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT `journal_entry_lines_cost_center_fk`FOREIGN KEY (`cost_center_id`)
+    REFERENCES `cost_centers` (`id`)ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `journal_entry_lines_currency_fk` FOREIGN KEY (`currency_id`)
+    REFERENCES `currencies` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT `journal_entry_lines_vendor_fk` FOREIGN KEY (`vendor_id`)
+    REFERENCES `vendors` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `journal_entry_lines_student_fk`
+    FOREIGN KEY (`student_id`)
+    REFERENCES `students` (`id`)
+    ON DELETE SET NULL
+    ON UPDATE CASCADE,
+
+  CONSTRAINT `journal_entry_lines_entry_fk`
+    FOREIGN KEY (`journal_entry_id`)
+    REFERENCES `journal_entries` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+
+  CONSTRAINT `journal_entry_lines_debit_credit_chk`
+    CHECK (
+      `debit` >= 0
+      AND `credit` >= 0
+      AND (`debit` = 0 OR `credit` = 0)
+    ),
+
+  CONSTRAINT `journal_entry_lines_foreign_debit_credit_chk`
+    CHECK (
+      `foreign_debit` >= 0
+      AND `foreign_credit` >= 0
+      AND (`foreign_debit` = 0 OR `foreign_credit` = 0)
+    ),
+
+  CONSTRAINT `journal_entry_lines_functional_debit_credit_chk`
+    CHECK (
+      `functional_debit` >= 0
+      AND `functional_credit` >= 0
+      AND (`functional_debit` = 0 OR `functional_credit` = 0)
+    ),
+
+  CONSTRAINT `journal_entry_lines_exchange_rate_chk`
+    CHECK (`exchange_rate` > 0)
+
+) ENGINE = InnoDB
+  AUTO_INCREMENT = 1
+  CHARACTER SET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci
+  ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of journal_entry_lines
@@ -8934,7 +8950,7 @@ CREATE TABLE `opening_balances`  (
   `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `organization_id` bigint UNSIGNED NOT NULL,
   `fiscal_year_id` bigint UNSIGNED NOT NULL,
-  `account_id` bigint UNSIGNED NOT NULL,
+  `chart_of_account_id` bigint UNSIGNED NOT NULL,
   `cost_center_id` bigint UNSIGNED NULL DEFAULT NULL,
   `debit` decimal(15, 2) NOT NULL DEFAULT 0.00,
   `credit` decimal(15, 2) NOT NULL DEFAULT 0.00,
@@ -8945,13 +8961,13 @@ CREATE TABLE `opening_balances`  (
   `created_by` bigint UNSIGNED NULL DEFAULT NULL,
   `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `opening_balances_unique`(`organization_id` ASC, `fiscal_year_id` ASC, `account_id` ASC, `cost_center_id` ASC) USING BTREE,
+  UNIQUE INDEX `opening_balances_unique`(`organization_id` ASC, `fiscal_year_id` ASC, `chart_of_account_id` ASC, `cost_center_id` ASC) USING BTREE,
   INDEX `opening_balances_year_fk`(`fiscal_year_id` ASC) USING BTREE,
-  INDEX `opening_balances_account_fk`(`account_id` ASC) USING BTREE,
+  INDEX `opening_balances_account_fk`(`chart_of_account_id` ASC) USING BTREE,
   INDEX `opening_balances_cost_center_fk`(`cost_center_id` ASC) USING BTREE,
   INDEX `opening_balances_journal_fk`(`journal_entry_id` ASC) USING BTREE,
   INDEX `opening_balances_deleted_at_index`(`deleted_at` ASC) USING BTREE,
-  CONSTRAINT `opening_balances_account_fk` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `opening_balances_account_fk` FOREIGN KEY (`chart_of_account_id`) REFERENCES `chart_of_accounts` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `opening_balances_cost_center_fk` FOREIGN KEY (`cost_center_id`) REFERENCES `cost_centers` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
   CONSTRAINT `opening_balances_journal_fk` FOREIGN KEY (`journal_entry_id`) REFERENCES `journal_entries` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
   CONSTRAINT `opening_balances_org_fk` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
@@ -9025,7 +9041,7 @@ CREATE TABLE `organizations`  (
   `code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `legal_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `organization_type` enum('foundation','company','school','unit','other') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'foundation',
+  `organization_type_id` enum('foundation','company','school','unit','other') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'foundation',
   `parent_id` bigint UNSIGNED NULL DEFAULT NULL,
   `currency_code` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'IDR',
   `timezone` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Asia/Jakarta',
@@ -10334,7 +10350,7 @@ CREATE TABLE `purchase_order_items`  (
   `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `purchase_order_id` bigint UNSIGNED NOT NULL,
   `purchase_request_item_id` bigint UNSIGNED NULL DEFAULT NULL,
-  `account_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `chart_of_account_id` bigint UNSIGNED NULL DEFAULT NULL,
   `name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `specification` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
   `unit` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
@@ -10355,12 +10371,12 @@ CREATE TABLE `purchase_order_items`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `purchase_order_items_po_index`(`purchase_order_id` ASC) USING BTREE,
   INDEX `purchase_order_items_request_item_index`(`purchase_request_item_id` ASC) USING BTREE,
-  INDEX `purchase_order_items_coa_index`(`account_id` ASC) USING BTREE,
+  INDEX `purchase_order_items_coa_index`(`chart_of_account_id` ASC) USING BTREE,
   INDEX `purchase_order_items_line_number_index`(`line_number` ASC) USING BTREE,
   INDEX `purchase_order_items_deleted_at_index`(`deleted_at` ASC) USING BTREE,
   INDEX `purchase_order_items_created_by_index`(`created_by` ASC) USING BTREE,
   INDEX `purchase_order_items_updated_by_index`(`updated_by` ASC) USING BTREE,
-  CONSTRAINT `purchase_order_items_account_id_foreign` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `purchase_order_items_account_id_foreign` FOREIGN KEY (`chart_of_account_id`) REFERENCES `chart_of_accounts` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `purchase_order_items_purchase_order_id_foreign` FOREIGN KEY (`purchase_order_id`) REFERENCES `purchase_orders` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `purchase_order_items_purchase_request_item_id_foreign` FOREIGN KEY (`purchase_request_item_id`) REFERENCES `purchase_request_items` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
@@ -10445,7 +10461,7 @@ CREATE TABLE `purchase_request_items`  (
   `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `purchase_request_id` bigint UNSIGNED NOT NULL,
   `rkas_item_id` bigint UNSIGNED NULL DEFAULT NULL,
-  `account_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `chart_of_account_id` bigint UNSIGNED NULL DEFAULT NULL,
   `name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `specification` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
   `unit` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
@@ -10463,11 +10479,11 @@ CREATE TABLE `purchase_request_items`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `purchase_request_items_request_index`(`purchase_request_id` ASC) USING BTREE,
   INDEX `purchase_request_items_rkas_item_index`(`rkas_item_id` ASC) USING BTREE,
-  INDEX `purchase_request_items_coa_index`(`account_id` ASC) USING BTREE,
+  INDEX `purchase_request_items_coa_index`(`chart_of_account_id` ASC) USING BTREE,
   INDEX `purchase_request_items_deleted_at_index`(`deleted_at` ASC) USING BTREE,
   INDEX `purchase_request_items_created_by_index`(`created_by` ASC) USING BTREE,
   INDEX `purchase_request_items_updated_by_index`(`updated_by` ASC) USING BTREE,
-  CONSTRAINT `purchase_request_items_account_id_foreign` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `purchase_request_items_account_id_foreign` FOREIGN KEY (`chart_of_account_id`) REFERENCES `chart_of_accounts` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `purchase_request_items_purchase_request_id_foreign` FOREIGN KEY (`purchase_request_id`) REFERENCES `purchase_requests` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `purchase_request_items_rkas_item_id_foreign` FOREIGN KEY (`rkas_item_id`) REFERENCES `rkas_items` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
@@ -11516,7 +11532,7 @@ CREATE TABLE `rkas_components`  (
   `name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `component_type` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `account_code` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `account_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `chart_of_account_id` bigint UNSIGNED NULL DEFAULT NULL,
   `regulation_code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
   `regulation_version` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
   `max_percentage` decimal(5, 2) NULL DEFAULT NULL,
@@ -11534,13 +11550,13 @@ CREATE TABLE `rkas_components`  (
   INDEX `rkas_components_school_index`(`school_id` ASC) USING BTREE,
   INDEX `rkas_components_type_index`(`component_type` ASC) USING BTREE,
   INDEX `rkas_components_account_index`(`account_code` ASC) USING BTREE,
-  INDEX `rkas_components_coa_index`(`account_id` ASC) USING BTREE,
+  INDEX `rkas_components_coa_index`(`chart_of_account_id` ASC) USING BTREE,
   INDEX `rkas_components_regulation_index`(`regulation_code` ASC, `regulation_version` ASC) USING BTREE,
   INDEX `rkas_components_order_index`(`order_index` ASC) USING BTREE,
   INDEX `rkas_components_deleted_at_index`(`deleted_at` ASC) USING BTREE,
   INDEX `rkas_components_created_by_index`(`created_by` ASC) USING BTREE,
   INDEX `rkas_components_updated_by_index`(`updated_by` ASC) USING BTREE,
-  CONSTRAINT `rkas_components_account_id_foreign` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `rkas_components_account_id_foreign` FOREIGN KEY (`chart_of_account_id`) REFERENCES `chart_of_accounts` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `rkas_components_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
@@ -11738,7 +11754,7 @@ CREATE TABLE `rkas_report_items`  (
   `rkas_report_id` bigint UNSIGNED NOT NULL,
   `rkas_component_id` bigint UNSIGNED NULL DEFAULT NULL,
   `rkas_source_id` bigint UNSIGNED NULL DEFAULT NULL,
-  `account_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `chart_of_account_id` bigint UNSIGNED NULL DEFAULT NULL,
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
   `budget_amount` decimal(20, 2) NOT NULL DEFAULT 0.00,
   `realization_amount` decimal(20, 2) NOT NULL DEFAULT 0.00,
@@ -11755,11 +11771,11 @@ CREATE TABLE `rkas_report_items`  (
   INDEX `rkas_report_items_report_index`(`rkas_report_id` ASC) USING BTREE,
   INDEX `rkas_report_items_component_index`(`rkas_component_id` ASC) USING BTREE,
   INDEX `rkas_report_items_source_index`(`rkas_source_id` ASC) USING BTREE,
-  INDEX `rkas_report_items_coa_index`(`account_id` ASC) USING BTREE,
+  INDEX `rkas_report_items_coa_index`(`chart_of_account_id` ASC) USING BTREE,
   INDEX `rkas_report_items_deleted_at_index`(`deleted_at` ASC) USING BTREE,
   INDEX `rkas_report_items_created_by_index`(`created_by` ASC) USING BTREE,
   INDEX `rkas_report_items_updated_by_index`(`updated_by` ASC) USING BTREE,
-  CONSTRAINT `rkas_report_items_account_id_foreign` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `rkas_report_items_account_id_foreign` FOREIGN KEY (`chart_of_account_id`) REFERENCES `chart_of_accounts` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `rkas_report_items_rkas_component_id_foreign` FOREIGN KEY (`rkas_component_id`) REFERENCES `rkas_components` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `rkas_report_items_rkas_report_id_foreign` FOREIGN KEY (`rkas_report_id`) REFERENCES `rkas_reports` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `rkas_report_items_rkas_source_id_foreign` FOREIGN KEY (`rkas_source_id`) REFERENCES `rkas_sources` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
@@ -11882,7 +11898,7 @@ CREATE TABLE `rkas_sources`  (
   `name` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `source_type` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `authority` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `account_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `chart_of_account_id` bigint UNSIGNED NULL DEFAULT NULL,
   `allocation_amount` decimal(20, 2) NOT NULL DEFAULT 0.00,
   `regulation_version` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
   `is_active` tinyint(1) NOT NULL DEFAULT 1,
@@ -11896,11 +11912,11 @@ CREATE TABLE `rkas_sources`  (
   INDEX `rkas_sources_school_index`(`school_id` ASC) USING BTREE,
   INDEX `rkas_sources_type_index`(`source_type` ASC) USING BTREE,
   INDEX `rkas_sources_authority_index`(`authority` ASC) USING BTREE,
-  INDEX `rkas_sources_coa_index`(`account_id` ASC) USING BTREE,
+  INDEX `rkas_sources_coa_index`(`chart_of_account_id` ASC) USING BTREE,
   INDEX `rkas_sources_deleted_at_index`(`deleted_at` ASC) USING BTREE,
   INDEX `rkas_sources_created_by_index`(`created_by` ASC) USING BTREE,
   INDEX `rkas_sources_updated_by_index`(`updated_by` ASC) USING BTREE,
-  CONSTRAINT `rkas_sources_account_id_foreign` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `rkas_sources_account_id_foreign` FOREIGN KEY (`chart_of_account_id`) REFERENCES `chart_of_accounts` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `rkas_sources_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
@@ -11993,32 +12009,7 @@ CREATE TABLE `role_permission`  (
 -- ----------------------------
 -- Records of role_permission
 -- ----------------------------
-
--- ----------------------------
--- Table structure for role_permissions
--- ----------------------------
-DROP TABLE IF EXISTS `role_permissions`;
-CREATE TABLE `role_permissions`  (
-  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
-  `role_id` bigint UNSIGNED NOT NULL,
-  `permission_id` bigint UNSIGNED NOT NULL,
-  `is_active` tinyint(1) NOT NULL DEFAULT 1,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `role_permissions_unique`(`role_id` ASC, `permission_id` ASC) USING BTREE,
-  INDEX `role_permissions_role_index`(`role_id` ASC) USING BTREE,
-  INDEX `role_permissions_permission_index`(`permission_id` ASC) USING BTREE,
-  INDEX `role_permissions_deleted_at_index`(`deleted_at` ASC) USING BTREE,
-  CONSTRAINT `role_permissions_permission_id_foreign` FOREIGN KEY (`permission_id`) REFERENCES `permissions` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `role_permissions_role_id_foreign` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
-
--- ----------------------------
--- Records of role_permissions
--- ----------------------------
-
+ 
 -- ----------------------------
 -- Table structure for role_user
 -- ----------------------------
@@ -15332,7 +15323,7 @@ CREATE TABLE `vendor_invoice_lines`  (
   INDEX `vendor_invoice_lines_deleted_at_index`(`deleted_at` ASC) USING BTREE,
   INDEX `vendor_invoice_lines_created_by_index`(`created_by` ASC) USING BTREE,
   INDEX `vendor_invoice_lines_updated_by_index`(`updated_by` ASC) USING BTREE,
-  CONSTRAINT `vendor_invoice_lines_chart_of_account_id_foreign` FOREIGN KEY (`chart_of_account_id`) REFERENCES `accounts` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT `vendor_invoice_lines_chart_of_account_id_foreign` FOREIGN KEY (`chart_of_account_id`) REFERENCES `chart_of_accounts` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
   CONSTRAINT `vendor_invoice_lines_vendor_invoice_id_foreign` FOREIGN KEY (`vendor_invoice_id`) REFERENCES `vendor_invoices` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 

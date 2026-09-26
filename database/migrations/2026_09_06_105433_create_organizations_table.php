@@ -13,6 +13,13 @@ return new class extends Migration
     {
         Schema::create('organizations', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('parent_id')->nullable()->constrained('organizations')->onDelete('set null');
+            $table->string('organization_type')->default('branch'); // pusat, cabang, departement
+            $table->boolean('is_active')->default(true);
+
+            $table->foreignId('created_by')->nullable()->constrained('users')->onDelete('set null');
+            $table->foreignId('updated_by')->nullable()->constrained('users')->onDelete('set null');
+
             $table->timestamps();
         });
     }

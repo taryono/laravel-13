@@ -10,6 +10,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Cache;
 use Laravel\Sanctum\HasApiTokens;
+use Models\Role;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -17,7 +18,6 @@ class User extends Authenticatable implements MustVerifyEmail
 
     protected $guarded = ['id'];
     public $timestamps = true;
-
     protected $hidden = [
         'password',
         'remember_token',
@@ -63,11 +63,19 @@ class User extends Authenticatable implements MustVerifyEmail
     // ORGANISASI AKTIF
     // =====================================================
 
+    // Tambahkan di User model
+    public function isSuperAdmin(): bool
+    {
+        return cache()->remember('user_is_super_admin_' . $this->id, 300, function () {
+            return $this->roles()->where('name', 'super_admin')->exists();
+        });
+    }
+
     public function currentOrganization()
     {
-        return $this->organizations()
-            ->wherePivot('is_default', 1)
-            ->first();
+        return cache()->remember('user_org_' . $this->id, 300, function () {
+            return $this->organizations()->first();
+        });
     }
 
     public function getCurrentOrganizationIdAttribute()
@@ -260,15 +268,85 @@ class User extends Authenticatable implements MustVerifyEmail
         static::saved(function ($user) {
             if ($user->isDirty('roles') || $user->wasChanged()) {
                 $user->clearRoleCache();
+                $user->clearUserCache();
             }
         });
 
         static::deleted(function ($user) {
             $user->clearRoleCache();
+            $user->clearUserCache();
         });
 
         static::restored(function ($user) {
             $user->clearRoleCache();
+            $user->clearUserCache();
         });
+    }
+
+    public function clearUserCache()
+    {
+        cache()->forget('user_is_super_admin_' . $this->id);
+        cache()->forget('user_org_' . $this->id);
+        Cache::forget("user_{$this->id}_is_super");
+    }
+
+    // Cek apakah ini SUPER ADMIN SISTEM (kamu)
+    public function isSystemSuperAdmin(): bool
+    {
+        return Cache::remember("user_{$this->id}_is_sys_super", 3600, function () {
+            return $this->roles()
+                ->wherePivotNull('organization_id') // Peran lintas sistem
+                ->where('name', 'super-admin')
+                ->exists();
+        });
+    }
+
+    // Cek apakah ini ADMIN ORGANISASI
+    public function isOrganizationAdmin($orgId = null): bool
+    {
+        if ($this->isSystemSuperAdmin()) return true; // Sistem super admin = otomatis bisa semua
+
+        $orgId = $orgId ?? $this->active_organization_id;
+
+        return $this->hasRole('org-admin', $orgId);
+    }
+
+    public function getAllAccessibleOrganizationIds(): array
+    {
+        return \Models\Organization::getIdsForUser($this);
+    }
+
+
+    // Cek apakah bisa mengelola peran di bawahnya
+    public function canManageRole($roleId, $orgId = null): bool
+    {
+        if ($this->isSystemSuperAdmin()) return true;
+
+        $orgId = $orgId ?? $this->active_organization_id;
+
+        // Admin organisasi bisa mengelola semua peran di organisasinya
+        if ($this->isOrganizationAdmin($orgId)) return true;
+
+        // Peran biasa hanya bisa mengelola turunan langsungnya
+        $myRoleIds = $this->roles()
+            ->wherePivot('organization_id', $orgId)
+            ->pluck('id');
+
+        $role = Role::find($roleId);
+
+        // Cek apakah peran target ada di bawah salah satu peran saya
+        return in_array($role?->parent_id, $myRoleIds->toArray());
+    }
+
+    // User.php
+    public function descendantOrganizationIds(?int $orgId = null): array
+    {
+        $orgId = $orgId ?? $this->active_organization_id;
+
+        if (!$orgId) {
+            return [];
+        }
+
+        return \Models\Organization::descendantsOf($orgId); // reuse logic yang sudah benar, sekali diperbaiki, berlaku di semua tempat
     }
 }

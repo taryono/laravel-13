@@ -11,8 +11,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
-use Throwable; 
-use Models\Account;
+use Throwable;
+use Models\ChartOfAccount;
 
 class FixedAssetController extends MainController
 {
@@ -33,7 +33,7 @@ class FixedAssetController extends MainController
     public function create(): View
     {
         $asset = new FixedAsset();
-        $accounts = Account::where('is_active', 1)
+        $accounts = ChartOfAccount::where('is_active', 1)
             ->where('account_type', 'detail')
             ->orderBy('code')
             ->pluck('name', 'id');
@@ -56,8 +56,8 @@ class FixedAssetController extends MainController
             'salvage_value' => 'nullable|numeric|min:0',
             'useful_life' => 'required|integer|min:1',
             'depreciation_method' => 'required|in:straight_line,declining_balance,sum_of_years,double_declining',
-            'account_id' => 'required|exists:accounts,id',
-            'depreciation_account_id' => 'required|exists:accounts,id',
+            'chart_of_account_id' => 'required|exists:accounts,id',
+            'depreciation_chart_of_account_id' => 'required|exists:accounts,id',
             'status' => 'required|in:active,depreciated,sold,disposed',
             'notes' => 'nullable|string',
         ]);
@@ -78,7 +78,7 @@ class FixedAssetController extends MainController
     public function edit($id): View
     {
         $asset = $this->model->findOrFail($id);
-        $accounts = Account::where('is_active', 1)
+        $accounts = ChartOfAccount::where('is_active', 1)
             ->where('account_type', 'detail')
             ->orderBy('code')
             ->pluck('name', 'id');
@@ -103,8 +103,8 @@ class FixedAssetController extends MainController
             'salvage_value' => 'nullable|numeric|min:0',
             'useful_life' => 'required|integer|min:1',
             'depreciation_method' => 'required|in:straight_line,declining_balance,sum_of_years,double_declining',
-            'account_id' => 'required|exists:accounts,id',
-            'depreciation_account_id' => 'required|exists:accounts,id',
+            'chart_of_account_id' => 'required|exists:accounts,id',
+            'depreciation_chart_of_account_id' => 'required|exists:accounts,id',
             'status' => 'required|in:active,depreciated,sold,disposed',
             'notes' => 'nullable|string',
         ]);
@@ -170,24 +170,24 @@ class FixedAssetController extends MainController
     private function calculateDepreciationAmount(FixedAsset $asset): float
     {
         $depreciableAmount = $asset->purchase_price - $asset->salvage_value;
-        
+
         switch ($asset->depreciation_method) {
             case 'straight_line':
                 return $depreciableAmount / $asset->useful_life;
-            
+
             case 'declining_balance':
                 $rate = 1 - pow($asset->salvage_value / $asset->purchase_price, 1 / $asset->useful_life);
                 return $asset->book_value * $rate;
-            
+
             case 'sum_of_years':
                 $sumYears = ($asset->useful_life * ($asset->useful_life + 1)) / 2;
                 $remainingYears = $asset->useful_life - $this->getDepreciationYears($asset);
                 return $depreciableAmount * ($remainingYears / $sumYears);
-            
+
             case 'double_declining':
                 $rate = 2 / $asset->useful_life;
                 return $asset->book_value * $rate;
-            
+
             default:
                 return 0;
         }

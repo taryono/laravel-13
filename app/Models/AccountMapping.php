@@ -1,20 +1,20 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
 class AccountMapping extends BasedModel
-{ 
-   protected $table = 'account_mappings';
+{
+    protected $table = 'account_mappings';
 
     protected $fillable = [
         'organization_id',
         'source_type',
         'source_code',
-        'debit_account_id',
-        'credit_account_id',
+        'debit_chart_of_account_id',
+        'credit_chart_of_account_id',
         'description',
         'is_active',
-    ]; 
+    ];
 
     // ─── Source Type Constants ───
     public const SOURCE_PAYROLL_COMPONENT = 'payroll_component';
@@ -45,12 +45,12 @@ class AccountMapping extends BasedModel
 
     public function debit_account()
     {
-        return $this->belongsTo(Account::class, 'debit_account_id');
+        return $this->belongsTo(ChartOfAccount::class, 'debit_chart_of_account_id');
     }
 
     public function credit_account()
     {
-        return $this->belongsTo(Account::class, 'credit_account_id');
+        return $this->belongsTo(ChartOfAccount::class, 'credit_chart_of_account_id');
     }
     // Scope
     public function scopeActive($query)

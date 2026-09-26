@@ -4357,3 +4357,2444 @@ ALTER TABLE `document_types`
 ✅ **Batch 3 selesai — 6 tabel Dokumen Terpusat.**
 
 Berikutnya **Batch 4: Keamanan & Autentikasi (7 tabel)**. Lanjut?
+
+Secara keseluruhan, **struktur tabel kamu sudah sangat besar dan cakupannya sudah mendekati ERP + SIS/Academic + PPDB + Finance + HR/Payroll + Library + Boarding School + University**. Untuk sistem pendidikan multi-unit yang sedang kamu bangun, arahnya masuk akal.
+
+Tapi dari daftar ini saya melihat beberapa hal yang **sebaiknya dibereskan sekarang**, sebelum jumlah tabel makin bertambah. Yang paling penting bukan menambah tabel lagi, tetapi **mengurangi overlap, menentukan boundary tiap modul, dan menyeragamkan naming/relasi**.
+
+### 1. Arsitektur modulnya sudah terlihat jelas
+
+Saya akan membagi tabel kamu kurang lebih seperti ini:
+
+| Domain                    | Contoh tabel                                                                                                            |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| **Organization / Tenant** | `organizations`, `schools`, `organization_types`, `organization_user`, `units`*                                         |
+| **Identity & ACL**        | `users`, `roles`, `permissions`, `role_user`, `role_permission`, `actions`, `menus`                                     |
+| **Academic**              | `academic_years`, `academic_semesters`, `academic_calendar_events`, `curriculums`, `subjects`, `classrooms`, `teachers` |
+| **Student**               | `students`, `student_classrooms`, `student_curriculums`, `student_assessments`, `student_attendances`                   |
+| **Admission / PPDB**      | `applicants`, `admissions`, `admission_paths`, `admission_selections`, `applicant_payments`                             |
+| **Assessment**            | `assessment_types`, `assessment_methods`, `assessments`, `grades`, `grade_scales`, `report_cards`                       |
+| **Finance**               | `accounts`, `account_categories`, `journal_entries`, `journal_entry_lines`, `invoices`, `payments`                      |
+| **Accounting**            | `fiscal_years`, `fiscal_periods`, `accounting_periods`, `budgets`, `opening_balances`                                   |
+| **Asset / Inventory**     | `assets`, `fixed_assets`, `inventory_items`, `stock_movements`, `warehouses`                                            |
+| **HR / Payroll**          | `employees`, `employee_contracts`, `payroll_runs`, `payroll_details`, `payslips`                                        |
+| **Library**               | `library_books`, `library_loans`, `library_fines`, `book_copies`                                                        |
+| **Boarding / Pesantren**  | `dormitory_rooms`, `dormitory_assignments`, `pesantren_activities`, `sorogan_*`                                         |
+| **University**            | `faculties`, `study_programs`, `student_krs`, `student_khs`, `thesis_supervisions`, `yudisiums`                         |
+| **Payment**               | `payment_transactions`, `payment_gateways`, `virtual_accounts`, `qris_transactions`                                     |
+| **Integration**           | `dapodik_*`, `payroll_integrations`, `payment_webhook_logs`                                                             |
+| **System**                | `audit_trails`, `system_logs`, `notifications`, `generated_reports`                                                     |
+
+Jadi secara konseptual, **bukan daftar tabel yang kacau**. Domain bisnisnya sudah cukup matang.
+
+---
+
+## 2. Hal pertama yang saya sarankan: jangan tambah tabel sebelum melakukan "table audit"
+
+Saya melihat beberapa pasangan tabel yang berpotensi redundant.
+
+### A. `accounts` vs `account_categories` vs `account_mappings`
+
+Ini masih masuk akal:
+
+```text
+account_categories
+        │
+        ▼
+     accounts
+        │
+        ▼
+ account_mappings
+```
+
+Tetapi perlu dipastikan `account_mappings` memang mempunyai fungsi spesifik, misalnya:
+
+```text
+account_mappings
+----------------
+organization_id
+account_id
+mapping_type
+reference_type
+reference_id
+```
+
+Jangan sampai sebenarnya mapping tersebut hanya menjadi duplikasi relasi `account_id` di tabel transaksi.
+
+---
+
+### B. `journal_details` vs `journal_entry_lines`
+
+Ini yang menurut saya **harus diperiksa**.
+
+Kamu mempunyai:
+
+```text
+journal_entries
+journal_details
+journal_entry_lines
+```
+
+Saya sangat curiga `journal_details` dan `journal_entry_lines` mempunyai fungsi yang sama.
+
+Idealnya accounting cukup:
+
+```text
+journal_entries
+        │
+        └── journal_entry_lines
+                ├── account_id
+                ├── debit
+                ├── credit
+                └── description
+```
+
+Sehingga:
+
+```text
+journal_entries
+----------------
+id
+organization_id
+journal_number
+journal_date
+description
+total_debit
+total_credit
+...
+
+journal_entry_lines
+-------------------
+id
+journal_entry_id
+account_id
+description
+debit
+credit
+...
+```
+
+Kalau `journal_details` tidak punya fungsi bisnis yang berbeda, **saya akan menghapusnya**.
+
+---
+
+## 3. `assets` dan `fixed_assets` juga perlu diperjelas
+
+Kamu punya:
+
+```text
+assets
+fixed_assets
+asset_depreciations
+asset_disposals
+asset_maintenances
+```
+
+Ini bisa benar, tetapi harus jelas:
+
+### Model A — satu tabel asset
+
+```text
+assets
+ ├── asset_depreciations
+ ├── asset_disposals
+ └── asset_maintenances
+```
+
+atau:
+
+### Model B — generic asset + fixed asset
+
+```text
+assets
+   │
+   └── fixed_assets
+          ├── asset_depreciations
+          ├── asset_disposals
+          └── asset_maintenances
+```
+
+Kalau memang ada perbedaan:
+
+```text
+assets
+    = seluruh aset
+
+fixed_assets
+    = subset aset yang masuk fixed asset accounting
+```
+
+maka struktur kedua masuk akal.
+
+---
+
+# 4. Student vs enrollment perlu diperjelas
+
+Saya melihat:
+
+```text
+students
+student_classrooms
+student_curriculums
+student_promotions
+student_krs
+student_khs
+student_invoices
+...
+enrollment_conversions
+```
+
+Ini sudah cukup bagus, tetapi untuk sistem pendidikan multi-unit saya justru menyarankan kamu membedakan:
+
+```text
+person
+   │
+   ├── applicant
+   │
+   ├── student
+   │
+   ├── parent
+   │
+   └── employee
+```
+
+Kemudian status akademik mahasiswa/siswa jangan semuanya ditaruh di `students`.
+
+Misalnya:
+
+```text
+students
+---------
+id
+person_id
+student_number
+...
+
+student_enrollments
+-------------------
+id
+student_id
+organization_id
+academic_year_id
+education_level_id
+study_program_id
+status
+start_date
+end_date
+```
+
+Karena satu orang bisa mempunyai perjalanan:
+
+```text
+TK
+ ↓
+SD
+ ↓
+SMP
+ ↓
+SMA
+```
+
+atau pada universitas:
+
+```text
+S1 Kedokteran
+ ↓
+S2 ...
+```
+
+Untuk sistem multi-unit kamu, konsep **enrollment** akan sangat membantu.
+
+---
+
+# 5. `schools` dan `organizations` harus punya boundary yang jelas
+
+Ini salah satu bagian paling penting dari sistem kamu.
+
+Kamu punya:
+
+```text
+organizations
+organization_types
+organization_user
+schools
+```
+
+Saya menyarankan konsep:
+
+```text
+organization
+│
+├── school
+│    ├── TK
+│    ├── SD
+│    ├── SMP
+│    └── SMA
+│
+├── boarding_school
+│
+└── university
+     ├── faculty
+     │    └── study_program
+```
+
+Misalnya:
+
+```text
+Yayasan Nurul Islam
+        │
+        ├── TK Nurul Islam
+        ├── SD Nurul Islam
+        ├── SMP Nurul Islam
+        └── SMA Nurul Islam
+```
+
+Sedangkan:
+
+```text
+Yayasan Muhadi
+        │
+        └── Universitas Muhadi
+                │
+                ├── Fakultas Kedokteran
+                └── Fakultas Farmasi
+```
+
+Ini penting karena menentukan apakah `organization_id`, `school_id`, `faculty_id`, dan `study_program_id` berada pada level yang benar.
+
+---
+
+# 6. Ada beberapa tabel yang secara naming perlu distandarkan
+
+Contohnya:
+
+```text
+role_user
+role_permission
+user_roles
+role_permissions
+menu_role
+action_role
+action_user
+organization_user
+position_user
+```
+
+Ini berpotensi membingungkan.
+
+Laravel convention biasanya:
+
+```text
+role_user
+permission_role
+organization_user
+```
+
+Kalau memang ingin menggunakan nama plural:
+
+```text
+user_roles
+role_permissions
+```
+
+juga bisa, **tetapi pilih satu pola dan konsisten**.
+
+Saya pribadi untuk pivot table akan memilih:
+
+```text
+role_user
+permission_role
+organization_user
+position_user
+menu_role
+action_role
+action_user
+```
+
+---
+
+# 7. `attendance_*` juga terlihat memiliki overlap
+
+Kamu mempunyai:
+
+```text
+attendance_dailies
+attendance_import_batches
+attendance_logs
+attendances
+
+employee_attendance_logs
+employee_attendances
+
+extracurricular_attendances
+student_attendances
+```
+
+Ini tidak otomatis salah karena domainnya memang berbeda.
+
+Tetapi saya akan memastikan definisinya:
+
+```text
+student_attendances
+    = absensi siswa
+
+employee_attendances
+    = absensi pegawai
+
+extracurricular_attendances
+    = absensi kegiatan ekstrakurikuler
+```
+
+Sedangkan:
+
+```text
+attendance_logs
+attendance_dailies
+```
+
+harus benar-benar mempunyai fungsi berbeda.
+
+Contoh:
+
+```text
+attendance_logs
+    = raw event dari RFID/device
+
+attendance_dailies
+    = hasil kalkulasi harian
+
+student_attendances
+    = attendance resmi akademik
+```
+
+Kalau tidak demikian, tiga tabel tersebut bisa menjadi sumber duplikasi data.
+
+---
+
+# 8. Payment architecture kamu sudah luas, tetapi harus dipisahkan
+
+Kamu memiliki:
+
+```text
+applicant_payments
+student_payments
+invoice_payments
+payment_transactions
+payment_notifications
+payment_webhook_logs
+payment_channels
+payment_gateways
+virtual_accounts
+qris_transactions
+wallet_transactions
+```
+
+Ini justru bagus jika desainnya:
+
+```text
+Invoice
+   │
+   ▼
+Payment Transaction
+   │
+   ├── Gateway
+   ├── VA
+   ├── QRIS
+   └── Bank
+```
+
+Jangan sampai masing-masing:
+
+```text
+student_payments
+applicant_payments
+invoice_payments
+```
+
+memiliki sistem payment gateway sendiri-sendiri.
+
+Lebih baik payment infrastructure menjadi shared service.
+
+---
+
+# 9. PPDB kamu sudah sangat lengkap
+
+Bagian ini menurut saya sudah mempunyai domain boundary yang cukup bagus:
+
+```text
+applicants
+    │
+    ├── admissions
+    ├── application_documents
+    ├── admission_paths
+    ├── admission_selections
+    ├── admission_interviews
+    ├── admission_test_results
+    ├── applicant_invoices
+    └── applicant_payments
+```
+
+Bahkan:
+
+```text
+admission_timelines
+admission_announcements
+admission_quota_settings
+admission_registration_fees
+```
+
+juga sudah mendukung konfigurasi PPDB.
+
+Saya hanya akan memastikan `applicants` tidak bercampur dengan `students`.
+
+Flow ideal:
+
+```text
+Applicant
+   │
+   ▼
+Admission
+   │
+   ▼
+Accepted
+   │
+   ▼
+Student
+```
+
+---
+
+# 10. Curriculum domain kamu sudah cukup serius
+
+Kamu punya:
+
+```text
+curriculums
+curriculum_courses
+curriculum_learning_outcomes
+curriculum_objectives
+curriculum_phases
+curriculum_structures
+curriculum_subjects
+learning_outcomes
+```
+
+Ini bagus, tetapi ada potensi overlap antara:
+
+```text
+curriculum_learning_outcomes
+learning_outcomes
+```
+
+Saya akan audit hubungan keduanya.
+
+Misalnya:
+
+```text
+learning_outcomes
+    = master/global learning outcome
+
+curriculum_learning_outcomes
+    = mapping outcome ke curriculum
+```
+
+Kalau memang demikian, bagus.
+
+Kalau isinya sama, salah satunya sebaiknya dihilangkan.
+
+---
+
+# 11. Question bank / CBT juga sudah cukup matang
+
+Strukturnya:
+
+```text
+question_banks
+question_bank_versions
+question_types
+question_options
+question_stimuli
+question_matching_pairs
+question_media
+question_media_annotations
+question_bank_tag_pivot
+
+exam_packages
+exam_package_questions
+
+cbt_sessions
+cbt_session_answers
+cbt_proctoring
+cbt_activity_logs
+```
+
+Ini sudah mengarah ke **question bank + examination engine**, bukan sekadar tabel ujian sederhana.
+
+Yang perlu diperhatikan adalah versioning.
+
+Contoh:
+
+```text
+question_bank
+      │
+      ├── version 1
+      ├── version 2
+      └── version 3
+```
+
+Ketika soal digunakan dalam:
+
+```text
+exam_package_questions
+```
+
+sebaiknya yang direferensikan adalah **version tertentu**, bukan soal yang mutable.
+
+---
+
+# 12. Saya melihat satu area yang kemungkinan akan menjadi masalah besar: `periods`
+
+Kamu punya:
+
+```text
+periods
+academic_periods?
+academic_years
+academic_semesters
+accounting_periods
+fiscal_periods
+fiscal_years
+payroll_periods
+report_periods
+```
+
+Ini perlu disiplin naming.
+
+Karena `period` sangat generic.
+
+Saya akan menggunakan:
+
+```text
+academic_years
+academic_semesters
+
+fiscal_years
+fiscal_periods
+
+accounting_periods
+
+payroll_periods
+
+report_periods
+```
+
+dan menghindari generic:
+
+```text
+periods
+```
+
+kecuali memang `periods` adalah master universal yang benar-benar digunakan lintas domain.
+
+---
+
+# 13. Ada beberapa tabel yang menurut saya perlu dipertimbangkan sebagai "reference/master"
+
+Misalnya:
+
+```text
+blood_types
+genders
+marital_statuses
+religions
+identity_types
+currencies
+countries
+```
+
+Kamu sudah memulai pendekatan ini dengan:
+
+```text
+reference_types
+reference_values
+```
+
+Kalau tujuanmu memang membuat sistem semakin configurable, saya justru akan menentukan mana yang:
+
+### Static reference
+
+```text
+genders
+blood_types
+religions
+```
+
+dan mana yang:
+
+### Dynamic configurable reference
+
+```text
+reference_types
+reference_values
+```
+
+Jangan sampai keduanya digunakan untuk konsep yang sama.
+
+---
+
+# 14. `dictionaries` menarik dan harus ditentukan fungsinya
+
+Ada:
+
+```text
+dictionaries
+reference_types
+reference_values
+```
+
+Saya akan berhati-hati di sini.
+
+Misalnya:
+
+```text
+dictionaries
+```
+
+untuk:
+
+```text
+i18n / translation
+```
+
+maka jangan digunakan sebagai generic lookup.
+
+Sedangkan:
+
+```text
+reference_types
+reference_values
+```
+
+untuk:
+
+```text
+status
+category
+type
+classification
+```
+
+Itu lebih jelas.
+
+---
+
+# 15. Workflow kamu sudah bagus
+
+Saya melihat:
+
+```text
+approval_histories
+approval_requests
+
+workflow_definitions
+workflow_steps
+workflow_approvers
+
+permission_requests
+promotion_approvals
+rkas_approvals
+```
+
+Ini menunjukkan kamu sudah memikirkan **approval engine**.
+
+Tapi hati-hati jangan sampai:
+
+```text
+workflow_approvers
+approval_requests
+approval_histories
+promotion_approvals
+rkas_approvals
+```
+
+mengimplementasikan engine approval masing-masing.
+
+Idealnya:
+
+```text
+workflow_definitions
+       │
+       ▼
+workflow_steps
+       │
+       ▼
+workflow_approvers
+       │
+       ▼
+approval_requests
+       │
+       ▼
+approval_histories
+```
+
+Kemudian modul seperti:
+
+```text
+promotion
+RKA
+purchase request
+leave
+expense
+```
+
+cukup menjadi consumer dari workflow engine.
+
+---
+
+# 16. Hal yang menurut saya paling penting: buat dependency graph
+
+Dengan jumlah tabel sebanyak ini, saya **tidak menyarankan kita langsung membuat atau mengubah tabel satu per satu**.
+
+Lebih baik kita melakukan audit dalam urutan:
+
+```text
+1. Organization / Tenant
+        ↓
+2. Identity / ACL
+        ↓
+3. Master Data
+        ↓
+4. Academic
+        ↓
+5. Student
+        ↓
+6. Admission
+        ↓
+7. Finance / Accounting
+        ↓
+8. HR / Payroll
+        ↓
+9. Inventory / Asset
+        ↓
+10. Library / Boarding
+        ↓
+11. Payment
+        ↓
+12. Integration
+```
+
+Kemudian untuk setiap tabel kita identifikasi:
+
+```text
+TABLE
+├── PK
+├── FK
+├── organization_id
+├── school_id
+├── created_by
+├── updated_by
+├── deleted_at
+├── unique constraints
+├── indexes
+└── dependency
+```
+
+---
+
+## Kesimpulan saya
+
+**Secara konsep: bagus dan sudah sangat ambisius.**
+
+Tetapi pada tahap sekarang saya justru **tidak akan menambah banyak tabel baru dulu**. Saya akan melakukan **database architecture audit** karena ada beberapa indikasi yang perlu dirapikan:
+
+**Prioritas tinggi:**
+
+1. `journal_details` vs `journal_entry_lines`
+2. `assets` vs `fixed_assets`
+3. `students` vs enrollment
+4. `organizations` vs `schools`
+5. `attendance_*` yang berpotensi overlap
+6. `learning_outcomes` vs `curriculum_learning_outcomes`
+7. `periods` vs berbagai jenis period
+8. `role_user` / `user_roles` / `role_permissions` naming
+9. `reference_values` vs tabel master seperti `genders`, `religions`, dll.
+10. Standardisasi `organization_id`, `school_id`, `created_by`, `updated_by`, `deleted_at`
+11. Centralisasi workflow approval
+12. Centralisasi payment transaction
+
+Dan satu hal yang sangat penting: **jangan melihat 300+ tabel ini sebagai satu database besar tanpa boundary**. Saya akan memperlakukannya sebagai beberapa bounded domains yang berbagi master/identity/organization.
+
+Kalau tujuan berikutnya adalah memastikan database ini **tidak memiliki tabel redundant dan relasi yang salah**, saya bisa melakukan **audit seluruh daftar di atas satu per satu**, lalu menghasilkan matriks:
+
+`TABLE → MODULE → FUNGSI → DEPENDENCY → POTENSI DUPLIKASI → KEEP/MERGE/RENAME → PRIORITAS`
+
+Itu menurut saya langkah paling tepat sebelum kita lanjut membuat migration/seeder untuk tabel-tabel berikutnya.
+
+Ya, setelah melihat struktur aktual keduanya, **kesimpulan saya cukup tegas: `journal_details` dan `journal_entry_lines` adalah dua tabel yang secara konsep menjalankan fungsi yang sama**, yaitu menyimpan baris/detail dari `journal_entries`.
+
+Tetapi `journal_entry_lines` versi kamu **jauh lebih lengkap**, sehingga saya tidak menyarankan mempertahankan keduanya. Saya akan menjadikan `journal_entry_lines` sebagai tabel detail jurnal utama dan **menghapus `journal_details`**.
+
+### Perbandingan
+
+| Fitur               | `journal_details` | `journal_entry_lines` |
+| ------------------- | ----------------: | --------------------: |
+| `journal_entry_id`  |                 ✅ |                     ✅ |
+| Account             |      `account_id` | `chart_of_account_id` |
+| Description         |                 ✅ |                     ✅ |
+| Debit/Credit        |                 ✅ |                     ✅ |
+| Cost center         |                 ✅ |                     ❌ |
+| Currency            |                 ❌ |                     ✅ |
+| Exchange rate       |                 ❌ |                     ✅ |
+| Foreign currency    |                 ❌ |                     ✅ |
+| Functional currency |                 ❌ |                     ✅ |
+| Vendor              |                 ❌ |                     ✅ |
+| Student             |                 ❌ |                     ✅ |
+| Line number         |                 ❌ |                     ✅ |
+| Audit user          |                 ❌ |                     ✅ |
+| Soft delete         |                 ❌ |                     ✅ |
+| Active flag         |                 ❌ |                     ✅ |
+| Reference           |                 ✅ |                     ❌ |
+
+Jadi secara sederhana:
+
+```text
+journal_entries
+       │
+       └── journal_details
+              │
+              └── journal_entry_lines
+```
+
+**Tidak perlu dua level detail seperti ini.**
+
+Seharusnya:
+
+```text
+journal_entries
+       │
+       └── journal_entry_lines
+```
+
+---
+
+# 1. Saya akan mempertahankan `journal_entry_lines`
+
+Saya justru melihat `journal_entry_lines` sudah dirancang untuk sistem accounting yang lebih serius.
+
+Struktur:
+
+```text
+journal_entries
+       │
+       ├── journal_entry_lines
+       │      ├── account
+       │      ├── currency
+       │      ├── vendor
+       │      ├── student
+       │      └── amount
+       │
+       └── ...
+```
+
+Ini lebih cocok untuk sistem kamu yang mencakup:
+
+* sekolah
+* universitas
+* vendor
+* student billing
+* purchasing
+* payroll
+* inventory
+* asset
+* payment
+* accounting
+
+---
+
+# 2. Tetapi `journal_entry_lines` masih perlu diperbaiki
+
+Saya tidak akan sekadar menghapus `journal_details`.
+
+Ada beberapa field dari `journal_details` yang **justru perlu dipindahkan** ke `journal_entry_lines`.
+
+Yang paling jelas:
+
+```text
+cost_center_id
+reference_type
+reference_id
+```
+
+Saat ini `journal_entry_lines` belum memiliki:
+
+```sql
+cost_center_id
+reference_type
+reference_id
+```
+
+Padahal `cost_center_id` sangat berguna untuk accounting.
+
+Contoh:
+
+```text
+Debit  : Beban Listrik       5.000.000
+Credit : Bank                5.000.000
+```
+
+Kemudian:
+
+```text
+cost_center_id = OPERASIONAL_SEKOLAH
+```
+
+Untuk jurnal:
+
+```text
+Beban Gaji Guru
+Beban Gaji Staff
+Beban Listrik
+Beban Internet
+Beban Maintenance
+```
+
+cost center akan sangat membantu reporting.
+
+---
+
+# 3. `account_id` vs `chart_of_account_id`
+
+Ini juga saya sarankan distandarkan.
+
+Sekarang:
+
+`journal_details`:
+
+```sql
+account_id
+```
+
+sedangkan:
+
+`journal_entry_lines`:
+
+```sql
+chart_of_account_id
+```
+
+Padahal keduanya FK ke:
+
+```text
+accounts.id
+```
+
+Saya akan memilih:
+
+```sql
+account_id
+```
+
+karena tabel master kamu bernama:
+
+```text
+accounts
+```
+
+Sehingga lebih konsisten:
+
+```text
+journal_entry_lines.account_id
+        ↓
+accounts.id
+```
+
+Bukan:
+
+```text
+journal_entry_lines.chart_of_account_id
+        ↓
+accounts.id
+```
+
+Kalau kamu memang ingin istilah **Chart of Accounts**, lebih baik nama tabel master-nya juga:
+
+```text
+chart_of_accounts
+```
+
+Tetapi karena saat ini sistem kamu sudah menggunakan `accounts`, saya akan mempertahankan `accounts`.
+
+---
+
+# 4. `currency_id` sebaiknya jangan `ON DELETE CASCADE`
+
+Ini menurut saya penting.
+
+Sekarang:
+
+```sql
+CONSTRAINT `journal_entry_lines_currency_id_foreign`
+FOREIGN KEY (`currency_id`)
+REFERENCES `currencies` (`id`)
+ON DELETE CASCADE
+```
+
+Saya **tidak menyarankan cascade** untuk accounting transaction.
+
+Bayangkan:
+
+```text
+currencies
+    ID 1 = IDR
+```
+
+digunakan oleh:
+
+```text
+journal_entry_lines
+    10.000 transaksi
+```
+
+Kemudian seseorang menghapus currency IDR.
+
+Dengan `CASCADE`, semua journal lines terkait bisa ikut terhapus.
+
+Untuk accounting, itu sangat berbahaya.
+
+Saya lebih memilih:
+
+```sql
+ON DELETE RESTRICT
+ON UPDATE CASCADE
+```
+
+---
+
+# 5. `journal_entry_id` sudah benar menggunakan CASCADE
+
+Sebaliknya ini masuk akal:
+
+```sql
+journal_entry_lines.journal_entry_id
+    ON DELETE CASCADE
+```
+
+Karena:
+
+```text
+journal_entries
+       │
+       ├── line 1
+       ├── line 2
+       └── line 3
+```
+
+Jika parent journal memang dihapus, detailnya boleh ikut dihapus.
+
+Walaupun untuk accounting production, saya bahkan lebih menyarankan **journal yang sudah posted tidak boleh dihapus**, melainkan dilakukan reversal/correction.
+
+Tetapi itu adalah business rule di level service/application, bukan sekadar FK.
+
+---
+
+# 6. Saya juga mempertanyakan `deleted_at` pada journal lines
+
+Saat ini:
+
+```sql
+deleted_at timestamp NULL
+```
+
+Saya kurang menyukai soft delete pada posted accounting line.
+
+Misalnya:
+
+```text
+Journal #JV-2026-001
+--------------------------------
+Debit  Bank        10.000.000
+Credit Revenue     10.000.000
+```
+
+Kemudian salah satu line di-soft-delete:
+
+```text
+deleted_at = NOW()
+```
+
+Jurnal menjadi tidak balance secara logika.
+
+Karena itu saya lebih menyarankan:
+
+### Draft journal
+
+Boleh diedit.
+
+### Posted journal
+
+Tidak boleh:
+
+```text
+UPDATE
+DELETE
+SOFT DELETE
+```
+
+Jika salah:
+
+```text
+Original Journal
+       ↓
+Reversal Journal
+       ↓
+Correct Journal
+```
+
+Ini jauh lebih aman untuk accounting.
+
+Jadi saya cenderung **menghapus `deleted_at` dari `journal_entry_lines`** jika lifecycle journal kamu sudah menerapkan draft/posting.
+
+---
+
+# 7. `is_active` juga kemungkinan tidak diperlukan
+
+Sekarang:
+
+```sql
+is_active tinyint(1) NOT NULL DEFAULT 1
+```
+
+Untuk journal line, saya juga mempertanyakan ini.
+
+Sebuah journal line seharusnya bukan:
+
+```text
+ACTIVE
+INACTIVE
+```
+
+melainkan bagian dari:
+
+```text
+DRAFT
+POSTED
+REVERSED
+```
+
+yang statusnya lebih tepat berada di:
+
+```text
+journal_entries
+```
+
+Contohnya:
+
+```text
+journal_entries
+----------------
+status
+DRAFT
+POSTED
+REVERSED
+VOID
+```
+
+Kemudian line mengikuti parent journal.
+
+Jadi:
+
+```text
+journal_entry_lines.is_active
+```
+
+biasanya tidak diperlukan.
+
+---
+
+# 8. `vendor_id` dan `student_id`
+
+Ini sebenarnya bagus untuk sistem pendidikan kamu.
+
+Contoh:
+
+### Vendor
+
+```text
+Debit  Expense           5.000.000
+Credit Accounts Payable  5.000.000
+
+vendor_id = 123
+```
+
+### Student
+
+```text
+Debit  Student Receivable  2.000.000
+Credit Tuition Revenue     2.000.000
+
+student_id = 456
+```
+
+Ini memungkinkan accounting reporting:
+
+```text
+Outstanding vendor
+Student receivable
+Student payment
+Vendor payable
+```
+
+Tetapi saya akan mempertimbangkan satu hal.
+
+Karena sistem kamu mempunyai banyak source transaction:
+
+```text
+student
+vendor
+employee
+customer
+asset
+invoice
+payment
+purchase
+payroll
+```
+
+daripada terus menambahkan:
+
+```text
+student_id
+vendor_id
+employee_id
+customer_id
+...
+```
+
+ke journal line, kamu sudah punya konsep:
+
+```sql
+reference_type
+reference_id
+```
+
+Saya justru menyarankan menggunakan **reference/source transaction** untuk menghubungkan jurnal ke transaksi asal.
+
+Misalnya:
+
+```text
+reference_type = student_invoice
+reference_id   = 12345
+```
+
+atau:
+
+```text
+reference_type = vendor_invoice
+reference_id   = 9988
+```
+
+Namun saya tidak akan menjadikan ini pengganti `vendor_id`/`student_id` secara otomatis. Kita perlu menentukan kebutuhan reporting terlebih dahulu.
+
+---
+
+# 9. `reference_type` + `reference_id` layak dipindahkan
+
+`journal_details` memiliki:
+
+```sql
+reference_type varchar(100)
+reference_id bigint unsigned
+```
+
+Menurut saya konsep ini masih berguna.
+
+Contohnya:
+
+```text
+journal_entry_lines
+------------------------------------
+reference_type = student_invoice
+reference_id   = 10001
+```
+
+atau:
+
+```text
+reference_type = purchase_invoice
+reference_id   = 20001
+```
+
+atau:
+
+```text
+reference_type = payroll
+reference_id   = 30001
+```
+
+Dengan demikian kita bisa mengetahui **asal transaksi accounting**.
+
+Saya akan mempertahankannya, tetapi nanti kita perlu menentukan standar value `reference_type` agar tidak menjadi string liar.
+
+---
+
+# 10. `foreign_*` dan `functional_*` perlu dipastikan kebutuhannya
+
+Kamu mempunyai:
+
+```text
+debit
+credit
+
+foreign_debit
+foreign_credit
+
+functional_debit
+functional_credit
+
+exchange_rate
+```
+
+Ini sebenarnya sudah menuju **multi-currency accounting**.
+
+Misalnya functional currency:
+
+```text
+IDR
+```
+
+Transaksi:
+
+```text
+USD 100
+rate 16.000
+```
+
+Maka:
+
+```text
+foreign_debit = 100
+functional_debit = 1.600.000
+```
+
+Ini bagus **jika memang sistem kamu membutuhkan multi-currency**.
+
+Kalau memang akan mendukung:
+
+* USD
+* SGD
+* EUR
+* SAR
+* dll.
+
+maka saya akan pertahankan.
+
+---
+
+# 11. Ada satu hal yang saya sarankan: `currency_id` mungkin bisa nullable
+
+Sekarang:
+
+```sql
+currency_id bigint unsigned NOT NULL
+```
+
+Kalau semua journal wajib memiliki currency, tidak masalah.
+
+Tetapi kalau seluruh sistem accounting kamu menggunakan:
+
+```text
+functional currency = IDR
+```
+
+dan currency transaksi hanya diperlukan untuk transaksi foreign currency, desain alternatif:
+
+```sql
+currency_id BIGINT UNSIGNED NULL
+```
+
+dengan:
+
+```text
+NULL = functional currency
+```
+
+Namun saya **lebih menyukai currency selalu terisi** jika kamu ingin reporting accounting yang konsisten.
+
+Misalnya:
+
+```text
+currency_id = IDR
+exchange_rate = 1
+foreign_debit = 1.000.000
+functional_debit = 1.000.000
+```
+
+Itu lebih eksplisit.
+
+---
+
+# 12. `line_number` bagus, tetapi buat UNIQUE
+
+Sekarang:
+
+```sql
+line_number int NOT NULL DEFAULT 1
+```
+
+Saya sarankan:
+
+```sql
+UNIQUE KEY (
+    journal_entry_id,
+    line_number
+)
+```
+
+Supaya tidak terjadi:
+
+```text
+journal_entry_id = 100
+line_number = 1
+
+journal_entry_id = 100
+line_number = 1
+```
+
+Line number seharusnya:
+
+```text
+100 / 1
+100 / 2
+100 / 3
+100 / 4
+```
+
+---
+
+# 13. Struktur final yang saya rekomendasikan
+
+Saya akan mengarahkan `journal_entry_lines` menjadi seperti ini:
+
+```text
+journal_entry_lines
+------------------------------
+id
+journal_entry_id
+
+line_number
+
+account_id
+cost_center_id
+
+description
+
+debit
+credit
+
+currency_id
+exchange_rate
+
+foreign_debit
+foreign_credit
+
+functional_debit
+functional_credit
+
+vendor_id
+student_id
+
+reference_type
+reference_id
+
+created_at
+updated_at
+created_by
+updated_by
+```
+
+Dan saya akan menghilangkan:
+
+```text
+is_active
+deleted_at
+```
+
+dari journal line, **jika lifecycle accounting kamu menggunakan posting/reversal**.
+
+---
+
+# 14. Hubungan akhirnya
+
+Saya akan membuat:
+
+```text
+                         ┌──────────────┐
+                         │   accounts   │
+                         └──────┬───────┘
+                                │
+                                │
+┌──────────────────┐      ┌────▼─────────────────┐
+│ journal_entries  │─────▶│ journal_entry_lines  │
+└──────────────────┘  1:N └────┬─────────────────┘
+                               │
+              ┌────────────────┼────────────────┐
+              │                │                │
+              ▼                ▼                ▼
+       cost_centers        currencies        vendors
+                                              
+                               │
+                               ▼
+                            students
+```
+
+Dan **tidak ada lagi**:
+
+```text
+journal_details
+```
+
+---
+
+## 15. Jadi keputusan saya untuk point #1
+
+| Item                  | Keputusan                             |
+| --------------------- | ------------------------------------- |
+| `journal_details`     | ❌ **Remove**                          |
+| `journal_entry_lines` | ✅ **Keep**                            |
+| `account_id`          | ✅ Gunakan nama ini                    |
+| `cost_center_id`      | ✅ Tambahkan                           |
+| `reference_type`      | ✅ Tambahkan                           |
+| `reference_id`        | ✅ Tambahkan                           |
+| `vendor_id`           | ✅ Pertahankan                         |
+| `student_id`          | ✅ Pertahankan                         |
+| Multi-currency        | ✅ Pertahankan jika memang requirement |
+| `currency_id CASCADE` | ❌ Ganti `RESTRICT`                    |
+| `deleted_at`          | ⚠️ Sebaiknya remove                   |
+| `is_active`           | ⚠️ Sebaiknya remove                   |
+| `line_number`         | ✅ Pertahankan + UNIQUE                |
+| `created_by`          | ✅ Pertahankan                         |
+| `updated_by`          | ✅ Pertahankan                         |
+
+**Kesimpulan akhirnya: jangan merge `journal_details` ke `journal_entry_lines` dengan mempertahankan keduanya. Jadikan `journal_entry_lines` sebagai satu-satunya detail journal, lalu ambil field yang memang masih berguna dari `journal_details`, terutama `cost_center_id` dan `reference_type/reference_id`.**
+
+Dan menurut saya ini adalah fondasi yang lebih sehat untuk tabel `journal_entries` kamu yang sebelumnya juga sudah kita bahas.
+Tentu. Dengan keputusan baru:
+
+* `journal_details` **dihapus**
+* `accounts` → **`chart_of_accounts`**
+* `journal_entry_lines.account_id` → **`chart_of_account_id`**
+* `cost_center_id` ditambahkan
+* `reference_type` + `reference_id` ditambahkan
+* `is_active` dan `deleted_at` tidak digunakan
+* `line_number` dibuat unik per journal
+* FK currency menggunakan `RESTRICT`, bukan `CASCADE`
+
+Saya sarankan struktur final `journal_entry_lines` seperti berikut:
+
+```sql
+-- ----------------------------
+-- Table structure for journal_entry_lines
+-- ----------------------------
+DROP TABLE IF EXISTS `journal_entry_lines`;
+
+CREATE TABLE `journal_entry_lines` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `journal_entry_id` BIGINT UNSIGNED NOT NULL,
+  `chart_of_account_id` BIGINT UNSIGNED NOT NULL,
+  `cost_center_id` BIGINT UNSIGNED NULL DEFAULT NULL,
+
+  `line_number` INT UNSIGNED NOT NULL DEFAULT 1,
+
+  `description` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+
+  `debit` DECIMAL(20, 2) NOT NULL DEFAULT 0.00,
+  `credit` DECIMAL(20, 2) NOT NULL DEFAULT 0.00,
+
+  `currency_id` BIGINT UNSIGNED NOT NULL,
+  `exchange_rate` DECIMAL(20, 8) NOT NULL DEFAULT 1.00000000,
+
+  `foreign_debit` DECIMAL(20, 2) NOT NULL DEFAULT 0.00,
+  `foreign_credit` DECIMAL(20, 2) NOT NULL DEFAULT 0.00,
+
+  `functional_debit` DECIMAL(20, 2) NOT NULL DEFAULT 0.00,
+  `functional_credit` DECIMAL(20, 2) NOT NULL DEFAULT 0.00,
+
+  `vendor_id` BIGINT UNSIGNED NULL DEFAULT NULL,
+  `student_id` BIGINT UNSIGNED NULL DEFAULT NULL,
+
+  `reference_type` VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `reference_id` BIGINT UNSIGNED NULL DEFAULT NULL,
+
+  `created_at` TIMESTAMP NULL DEFAULT NULL,
+  `updated_at` TIMESTAMP NULL DEFAULT NULL,
+  `created_by` BIGINT UNSIGNED NULL DEFAULT NULL,
+  `updated_by` BIGINT UNSIGNED NULL DEFAULT NULL,
+
+  PRIMARY KEY (`id`) USING BTREE,
+
+  UNIQUE KEY `journal_entry_lines_entry_line_unique`
+    (`journal_entry_id`, `line_number`) USING BTREE,
+
+  INDEX `journal_entry_lines_entry_index`
+    (`journal_entry_id`) USING BTREE,
+
+  INDEX `journal_entry_lines_account_index`
+    (`chart_of_account_id`) USING BTREE,
+
+  INDEX `journal_entry_lines_cost_center_index`
+    (`cost_center_id`) USING BTREE,
+
+  INDEX `journal_entry_lines_currency_index`
+    (`currency_id`) USING BTREE,
+
+  INDEX `journal_entry_lines_vendor_index`
+    (`vendor_id`) USING BTREE,
+
+  INDEX `journal_entry_lines_student_index`
+    (`student_id`) USING BTREE,
+
+  INDEX `journal_entry_lines_reference_index`
+    (`reference_type`, `reference_id`) USING BTREE,
+
+  INDEX `journal_entry_lines_created_by_index`
+    (`created_by`) USING BTREE,
+
+  INDEX `journal_entry_lines_updated_by_index`
+    (`updated_by`) USING BTREE,
+
+  CONSTRAINT `journal_entry_lines_chart_of_account_fk`
+    FOREIGN KEY (`chart_of_account_id`)
+    REFERENCES `chart_of_accounts` (`id`)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE,
+
+  CONSTRAINT `journal_entry_lines_cost_center_fk`
+    FOREIGN KEY (`cost_center_id`)
+    REFERENCES `cost_centers` (`id`)
+    ON DELETE SET NULL
+    ON UPDATE CASCADE,
+
+  CONSTRAINT `journal_entry_lines_currency_fk`
+    FOREIGN KEY (`currency_id`)
+    REFERENCES `currencies` (`id`)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE,
+
+  CONSTRAINT `journal_entry_lines_vendor_fk`
+    FOREIGN KEY (`vendor_id`)
+    REFERENCES `vendors` (`id`)
+    ON DELETE SET NULL
+    ON UPDATE CASCADE,
+
+  CONSTRAINT `journal_entry_lines_student_fk`
+    FOREIGN KEY (`student_id`)
+    REFERENCES `students` (`id`)
+    ON DELETE SET NULL
+    ON UPDATE CASCADE,
+
+  CONSTRAINT `journal_entry_lines_entry_fk`
+    FOREIGN KEY (`journal_entry_id`)
+    REFERENCES `journal_entries` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+
+  CONSTRAINT `journal_entry_lines_debit_credit_chk`
+    CHECK (
+      `debit` >= 0
+      AND `credit` >= 0
+      AND (`debit` = 0 OR `credit` = 0)
+    ),
+
+  CONSTRAINT `journal_entry_lines_foreign_debit_credit_chk`
+    CHECK (
+      `foreign_debit` >= 0
+      AND `foreign_credit` >= 0
+      AND (`foreign_debit` = 0 OR `foreign_credit` = 0)
+    ),
+
+  CONSTRAINT `journal_entry_lines_functional_debit_credit_chk`
+    CHECK (
+      `functional_debit` >= 0
+      AND `functional_credit` >= 0
+      AND (`functional_debit` = 0 OR `functional_credit` = 0)
+    ),
+
+  CONSTRAINT `journal_entry_lines_exchange_rate_chk`
+    CHECK (`exchange_rate` > 0)
+
+) ENGINE = InnoDB
+  AUTO_INCREMENT = 1
+  CHARACTER SET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci
+  ROW_FORMAT = DYNAMIC;
+```
+
+### Ada satu hal penting sebelum menjalankan SQL ini
+
+Karena kamu mengubah:
+
+```text
+accounts
+```
+
+menjadi:
+
+```text
+chart_of_accounts
+```
+
+maka tabel-tabel lain yang saat ini memiliki FK ke `accounts` juga harus ikut diperiksa.
+
+Misalnya sebelumnya:
+
+```sql
+FOREIGN KEY (`account_id`)
+REFERENCES `accounts` (`id`)
+```
+
+harus berubah menjadi:
+
+```sql
+FOREIGN KEY (`account_id`)
+REFERENCES `chart_of_accounts` (`id`)
+```
+
+Dan saya **menyarankan nama kolom di tabel-tabel transaksi juga menggunakan `chart_of_account_id`**, sehingga terminology accounting kamu konsisten:
+
+```text
+chart_of_accounts
+        │
+        ├── journal_entry_lines
+        │      └── chart_of_account_id
+        │
+        ├── account_mappings
+        │      └── chart_of_account_id
+        │
+        └── opening_balances
+               └── chart_of_account_id
+```
+
+Satu catatan desain: saya sengaja **tidak menambahkan `organization_id` ke `journal_entry_lines`**. Karena line selalu berada di bawah `journal_entries`, dan `journal_entries` kamu sudah memiliki konteks organisasi. Ini menghindari duplikasi tenant information dan risiko `organization_id` pada header dan detail tidak sama.
+Ya, dengan melihat struktur dan data aktual `reference_types` / `reference_values` ini, saya jadi lebih jelas melihat arsitektur yang sedang kamu bangun.
+
+Menurut saya **struktur ini sudah bagus untuk lookup/master status yang configurable**, tetapi ada satu hal penting terkait review kita sebelumnya: **jangan gunakan `reference_type/reference_id` di `journal_entry_lines` untuk menggantikan `reference_types/reference_values`.** Keduanya memiliki fungsi yang berbeda.
+
+### Fungsi keduanya sebaiknya seperti ini
+
+```text
+reference_types
+      │
+      └── reference_values
+             │
+             ├── STUDENT_STATUS
+             ├── ADMISSION_STATUS
+             ├── ATTENDANCE_STATUS
+             ├── PARENT_RELATIONSHIP
+             └── PAYMENT_STATUS
+```
+
+Ini adalah **master lookup/status**.
+
+Sedangkan pada accounting:
+
+```text
+journal_entries
+      │
+      └── journal_entry_lines
+              │
+              └── reference_type + reference_id
+```
+
+Ini adalah **source/reference transaksi**.
+
+Contohnya:
+
+```text
+reference_types
+    PAYMENT_STATUS
+         │
+         ├── PENDING
+         ├── PROCESSING
+         ├── SUCCESS
+         ├── FAILED
+         └── CANCELLED
+```
+
+sedangkan:
+
+```text
+journal_entry_lines
+    reference_type = student_invoice
+    reference_id   = 12345
+```
+
+artinya:
+
+> Journal line ini berasal dari invoice siswa ID 12345.
+
+Jadi **dua konsep tersebut jangan digabung**.
+
+---
+
+## Saya justru menyarankan sedikit perubahan pada `journal_entry_lines`
+
+Karena kamu sudah memiliki `reference_types`, saya akan menghindari nama:
+
+```sql
+reference_type
+```
+
+di `journal_entry_lines`, karena berpotensi membingungkan developer.
+
+Lebih jelas kalau dinamakan:
+
+```sql
+source_type
+source_id
+```
+
+Misalnya:
+
+```text
+source_type = student_invoice
+source_id   = 12345
+```
+
+atau:
+
+```text
+source_type = vendor_invoice
+source_id   = 987
+```
+
+atau:
+
+```text
+source_type = payroll
+source_id   = 2026
+```
+
+Sehingga:
+
+```text
+reference_type / reference_values
+    = master lookup
+
+source_type / source_id
+    = asal transaksi
+```
+
+Menurut saya ini jauh lebih bersih.
+
+---
+
+# Tetapi ada satu masalah penting di `reference_values`
+
+Saya melihat:
+
+```sql
+badge_color
+badge_class
+text_color
+```
+
+Contoh:
+
+```text
+SUCCESS
+badge_color = success
+badge_class = badge bg-success
+text_color  = text-white
+```
+
+Ini memang praktis untuk Bootstrap 5, tetapi sebenarnya:
+
+```sql
+badge_class
+```
+
+mengandung **presentation/UI logic**.
+
+Saya akan menyarankan cukup menyimpan:
+
+```text
+badge_color
+text_color
+```
+
+misalnya:
+
+```text
+badge_color = success
+text_color  = white
+```
+
+kemudian Blade:
+
+```blade
+<span class="badge bg-{{ $value->badge_color }} text-{{ $value->text_color }}">
+    {{ $value->name }}
+</span>
+```
+
+Sehingga database tidak bergantung langsung pada Bootstrap.
+
+Misalnya suatu hari kamu pindah:
+
+```text
+Bootstrap 5
+        ↓
+Tabler
+```
+
+atau:
+
+```text
+Bootstrap
+        ↓
+Tailwind
+```
+
+data reference tidak perlu diubah.
+
+---
+
+# `badge_color` sendiri saya pertahankan
+
+Ini justru saya suka dari desain kamu.
+
+Misalnya:
+
+```text
+STUDENT_STATUS
+
+ACTIVE       → success
+GRADUATED    → primary
+TRANSFERRED  → warning
+DROPPED      → danger
+SUSPENDED    → secondary
+```
+
+Kemudian aplikasi bisa membuat badge secara generic:
+
+```php
+referenceValue('STUDENT_STATUS', 'ACTIVE')
+```
+
+dan UI otomatis mendapatkan:
+
+```text
+Active
+[success]
+```
+
+Ini membuat sistem jauh lebih configurable.
+
+---
+
+# `is_system` juga bagus
+
+Struktur:
+
+```text
+reference_types.is_system
+reference_values.is_system
+```
+
+memungkinkan kamu membedakan:
+
+```text
+SYSTEM
+```
+
+dengan:
+
+```text
+CUSTOM
+```
+
+Misalnya:
+
+```text
+PAYMENT_STATUS
+```
+
+adalah system reference.
+
+Administrator boleh menambahkan:
+
+```text
+ON_HOLD
+```
+
+tetapi tidak boleh menghapus:
+
+```text
+SUCCESS
+FAILED
+CANCELLED
+```
+
+Ini cocok dengan aplikasi multi-tenant yang sedang kamu bangun.
+
+---
+
+# Ada satu hal lagi yang perlu diperhatikan
+
+Saat ini:
+
+```sql
+reference_values.reference_type_id
+    ON DELETE CASCADE
+```
+
+Untuk lookup table ini **masih masuk akal**.
+
+Jika:
+
+```text
+reference_types
+    PAYMENT_STATUS
+```
+
+dihapus, seluruh:
+
+```text
+reference_values
+```
+
+di bawahnya ikut terhapus.
+
+Tetapi karena kamu memiliki:
+
+```text
+is_system = 1
+```
+
+saya menyarankan **business rule aplikasi mencegah system reference dihapus**, bukan mengandalkan FK saja.
+
+---
+
+# Dan ini membawa kita ke keputusan penting untuk accounting
+
+Setelah melihat `reference_types` milikmu, saya akan merevisi sedikit rekomendasi sebelumnya.
+
+Untuk `journal_entry_lines`, saya lebih memilih:
+
+```text
+id
+journal_entry_id
+chart_of_account_id
+cost_center_id
+
+line_number
+description
+
+debit
+credit
+
+currency_id
+exchange_rate
+
+foreign_debit
+foreign_credit
+
+functional_debit
+functional_credit
+
+vendor_id
+student_id
+
+source_type
+source_id
+
+created_at
+updated_at
+created_by
+updated_by
+```
+
+Daripada:
+
+```text
+reference_type
+reference_id
+```
+
+Dengan demikian terminology database menjadi sangat jelas:
+
+### Lookup
+
+```text
+reference_types
+reference_values
+```
+
+### Accounting source
+
+```text
+journal_entry_lines.source_type
+journal_entry_lines.source_id
+```
+
+Contoh nyata:
+
+```text
+reference_types
+└── PAYMENT_STATUS
+    ├── PENDING
+    ├── PROCESSING
+    ├── SUCCESS
+    ├── FAILED
+    └── CANCELLED
+```
+
+dan:
+
+```text
+journal_entry_lines
+└── source_type = student_invoice
+    source_id   = 10025
+```
+
+Tidak ada collision istilah.
+
+---
+
+## Kesimpulan
+
+Dengan struktur `reference_types/reference_values` yang kamu berikan, saya **tidak melihat kebutuhan untuk membuat tabel lookup baru**. Struktur ini sudah bisa menjadi **generic reference/lookup engine** untuk seluruh aplikasi.
+
+Saya hanya akan melakukan dua penyempurnaan:
+
+**1.** `badge_class` sebaiknya tidak disimpan sebagai class Bootstrap; cukup simpan semantic color.
+
+```text
+success
+danger
+warning
+info
+primary
+secondary
+```
+
+**2.** Pada `journal_entry_lines`, gunakan:
+
+```sql
+source_type
+source_id
+```
+
+daripada:
+
+```sql
+reference_type
+reference_id
+```
+
+supaya `reference_types/reference_values` tetap jelas sebagai **master lookup**, sedangkan `source_type/source_id` jelas sebagai **asal transaksi accounting**.
+
+Dengan perubahan ini, desain database kamu akan jauh lebih mudah dipahami oleh developer lain dan tidak mudah terjadi salah interpretasi antara **reference data** dan **transaction source**.
+Ya, ini memang **duplikasi domain**, tetapi keduanya punya tingkat kedalaman yang berbeda.
+
+Saya sarankan **kita gunakan `fixed_assets` sebagai tabel utama** dan **hapus `assets`**.
+
+Alasannya cukup kuat: `fixed_assets` sudah terintegrasi dengan modul accounting dan depreciation, sedangkan `assets` lebih mirip tabel inventaris sederhana.
+
+### Perbandingan
+
+| Fitur                            | `assets`         | `fixed_assets`                              |
+| -------------------------------- | ---------------- | ------------------------------------------- |
+| Identitas aset                   | ✅                | ✅                                           |
+| School                           | ✅                | ✅                                           |
+| Organization                     | ❌                | ✅                                           |
+| Kategori aset                    | `varchar`        | `asset_category_id`                         |
+| Brand / Model                    | ✅                | ✅                                           |
+| Serial number                    | ✅                | ✅                                           |
+| Tanggal pembelian                | ✅                | ✅                                           |
+| Harga perolehan                  | `purchase_price` | `acquisition_cost`                          |
+| Supplier                         | ✅                | ❌                                           |
+| Lokasi                           | ✅                | ❌                                           |
+| Penanggung jawab                 | `assigned_to`    | ❌                                           |
+| Kondisi                          | ✅                | ✅                                           |
+| Warranty                         | ✅                | ❌                                           |
+| Depresiasi                       | sederhana        | **lengkap**                                 |
+| Useful life                      | ❌                | ✅                                           |
+| Depreciation method              | ❌                | ✅                                           |
+| Accumulated depreciation         | ❌                | ✅                                           |
+| Book value                       | ❌                | ✅                                           |
+| Asset account                    | ❌                | **✅**                                       |
+| Accumulated depreciation account | ❌                | **✅**                                       |
+| Depreciation expense account     | ❌                | **✅**                                       |
+| Disposal                         | ❌                | **✅**                                       |
+| Status aset                      | `is_active`      | **draft/active/disposed/fully_depreciated** |
+| Accounting integration           | ❌                | **✅**                                       |
+
+Jadi secara arsitektur:
+
+```text
+assets
+  └── inventaris sederhana
+
+fixed_assets
+  └── fixed asset / aset tetap
+       ├── acquisition
+       ├── depreciation
+       ├── accounting
+       ├── disposal
+       └── book value
+```
+
+Karena aplikasi Anda sudah mempunyai **`chart_of_accounts`**, `journal_entries`, dan `journal_entry_lines`, maka `fixed_assets` jauh lebih cocok sebagai sumber data aset tetap.
+
+### Tetapi `fixed_assets` jangan digunakan mentah-mentah
+
+Ada beberapa field dari `assets` yang menurut saya **tetap perlu kita pindahkan ke `fixed_assets`**.
+
+Saya akan mempertahankan:
+
+```text
+supplier
+location
+assigned_to
+warranty_end
+```
+
+Kemudian saya juga akan memperbaiki beberapa desain:
+
+```text
+school_id
+organization_id
+asset_category_id
+asset_code
+name
+brand
+model
+specification
+serial_number
+
+acquisition_date
+acquisition_cost
+residual_value
+useful_life_months
+depreciation_method
+accumulated_depreciation
+book_value
+
+asset_account_id
+accumulated_depreciation_account_id
+depreciation_expense_account_id
+
+status
+condition
+
+supplier_id
+location_id
+assigned_to
+warranty_end
+
+disposed_at
+disposal_value
+disposal_reason
+
+photo_url
+notes
+
+created_at
+updated_at
+deleted_at
+created_by
+updated_by
+```
+
+Ada satu hal penting: **`supplier` dan `location` sebaiknya jangan tetap `varchar` kalau di sistem Anda sudah ada master supplier/location.** Lebih baik FK:
+
+```text
+supplier_id
+location_id
+```
+
+Begitu juga `condition` sebaiknya nantinya menggunakan `reference_values`, karena Anda sudah memiliki sistem:
+
+```text
+reference_types
+    ↓
+reference_values
+```
+
+Misalnya:
+
+```text
+ASSET_CONDITION
+    ├── NEW
+    ├── GOOD
+    ├── MINOR_DAMAGE
+    ├── DAMAGED
+    └── UNUSABLE
+```
+
+### Ada satu hal lagi yang sangat penting
+
+Saya **tidak menyarankan `useful_life_years` dan `useful_life_months` disimpan bersamaan**.
+
+Cukup:
+
+```sql
+useful_life_months INT NOT NULL DEFAULT 0
+```
+
+Karena:
+
+```text
+3 tahun = 36 bulan
+5 tahun = 60 bulan
+10 tahun = 120 bulan
+```
+
+Ini menghindari data seperti:
+
+```text
+useful_life_years  = 5
+useful_life_months = 48
+```
+
+yang secara logika bertentangan.
+
+---
+
+## Keputusan final
+
+Saya akan menetapkan arsitektur kita menjadi:
+
+```text
+❌ assets
+   → DIHAPUS
+
+✅ fixed_assets
+   → DIPERTAHANKAN
+   → DISEMPURNAKAN
+```
+
+Dan relasinya menjadi:
+
+```text
+organizations
+      │
+      └── schools
+             │
+             └── fixed_assets
+                    │
+                    ├── asset_categories
+                    ├── suppliers
+                    ├── locations
+                    ├── users
+                    │
+                    └── chart_of_accounts
+                           ├── asset_account_id
+                           ├── accumulated_depreciation_account_id
+                           └── depreciation_expense_account_id
+```
+
+Dengan demikian `fixed_assets` bukan hanya **inventaris**, tetapi benar-benar menjadi **sub-ledger aset tetap** yang dapat terhubung ke accounting.
+
+**Jadi untuk konsolidasi database kita: pilih `fixed_assets`, hapus `assets`, lalu kita merge field-field yang masih berguna dari `assets` ke `fixed_assets`.**

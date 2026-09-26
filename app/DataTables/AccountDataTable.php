@@ -2,7 +2,7 @@
 
 namespace App\DataTables;
 
-use Models\Account;
+use Models\ChartOfAccount;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
@@ -18,7 +18,7 @@ class AccountDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['code','name','account_type','normal_balance', 'account_category.name', 'parent.name','status_badge'];
+    protected array $columns = ['code', 'name', 'account_type', 'normal_balance', 'account_category.name', 'parent.name', 'status_badge'];
 
     /**
      * Build DataTable response.
@@ -45,18 +45,18 @@ class AccountDataTable extends DataTable
                 return $row->name_display ?? $row->name;
             })
             ->addColumn('account_type_badge', function ($row) {
-                return $row->account_type == 'header' 
-                    ? '<span class="badge bg-primary">Header</span>' 
+                return $row->account_type == 'header'
+                    ? '<span class="badge bg-primary">Header</span>'
                     : '<span class="badge bg-secondary">Detail</span>';
             })
             ->addColumn('normal_balance_badge', function ($row) {
-                return $row->normal_balance == 'debit' 
-                    ? '<span class="badge bg-success">Debit</span>' 
+                return $row->normal_balance == 'debit'
+                    ? '<span class="badge bg-success">Debit</span>'
                     : '<span class="badge bg-danger">Kredit</span>';
             })
             ->addColumn('status_badge', function ($row) {
-                return $row->is_active 
-                    ? '<span class="badge bg-success">Aktif</span>' 
+                return $row->is_active
+                    ? '<span class="badge bg-success">Aktif</span>'
                     : '<span class="badge bg-danger">Non-Aktif</span>';
             })
             ->addIndexColumn()
@@ -79,7 +79,7 @@ class AccountDataTable extends DataTable
      */
     protected function renderActionButtons($row): string
     {
-        $title = e('Detail Account ' . $row->name);
+        $title = e('Detail ChartOfAccount ' . $row->name);
 
         $context = htmlspecialchars(
             json_encode([
@@ -129,7 +129,7 @@ class AccountDataTable extends DataTable
     /**
      * Get query source of DataTable.
      */
-    public function query(Account $model): QueryBuilder
+    public function query(ChartOfAccount $model): QueryBuilder
     {
         return $model->newQuery();
     }
@@ -169,14 +169,14 @@ class AccountDataTable extends DataTable
                  * Custom Bootstrap 5 layout.
                  */
                 'dom' =>
-                    '<"row mb-3"' .
-                        '<"col-md-6 d-flex align-items-center"B>' .
-                        '<"col-md-6"f>' .
+                '<"row mb-3"' .
+                    '<"col-md-6 d-flex align-items-center"B>' .
+                    '<"col-md-6"f>' .
                     '>' .
                     'rt' .
                     '<"row mt-3"' .
-                        '<"col-md-6"i>' .
-                        '<"col-md-6 d-flex justify-content-md-end"p>' .
+                    '<"col-md-6"i>' .
+                    '<"col-md-6 d-flex justify-content-md-end"p>' .
                     '>',
 
                 /*
@@ -298,8 +298,8 @@ class AccountDataTable extends DataTable
     protected function getColumns(): array
     {
         return collect($this->columns)
-            ->map(fn (string $kolom) => Column::make($kolom)
-                ->title(ucwords(str_replace(['_',"."], [' ',' '], $kolom))))
+            ->map(fn(string $kolom) => Column::make($kolom)
+                ->title(ucwords(str_replace(['_', "."], [' ', ' '], $kolom))))
             // 1. PREPEND: Masukkan kolom No di posisi PALING AWAL (indeks 0)
             ->prepend(
                 Column::make('DT_RowIndex')

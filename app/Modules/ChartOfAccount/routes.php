@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Route;
 |
  */
 
-Route::group(['prefix' => 'account', 'namespace' => 'App\Modules\Account\Controllers', 'middleware' => ['web']], function () {
+Route::group(['prefix' => 'account', 'namespace' => 'App\Modules\ChartOfAccount\Controllers', 'middleware' => ['web']], function () {
     Route::get('/', ['as' => 'account.index', 'uses' => 'AccountController@index']);
     Route::any('/search', ['as' => 'account.search', 'uses' => 'AccountController@search']);
     Route::get('/create', ['as' => 'account.create', 'uses' => 'AccountController@create']);

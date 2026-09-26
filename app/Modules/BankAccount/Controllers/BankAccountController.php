@@ -11,8 +11,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
-use Throwable;  
-use Models\Account; 
+use Throwable;
+use Models\ChartOfAccount;
 
 class BankAccountController extends MainController
 {
@@ -33,9 +33,9 @@ class BankAccountController extends MainController
     public function create(): View
     {
         $bankAccount = new BankAccount();
-        $accounts = Account::where('is_active', 1)
+        $accounts = ChartOfAccount::where('is_active', 1)
             ->where('account_type', 'detail')
-            ->whereHas('account_category', function($query) {
+            ->whereHas('account_category', function ($query) {
                 $query->where('type', 'aset');
             })
             ->orderBy('code')
@@ -51,7 +51,7 @@ class BankAccountController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'account_id' => 'required|exists:accounts,id',
+            'chart_of_account_id' => 'required|exists:accounts,id',
             'bank_name' => 'required|string|max:255',
             'account_number' => 'required|string|max:50|unique:bank_accounts,account_number',
             'account_name' => 'required|string|max:255',
@@ -79,9 +79,9 @@ class BankAccountController extends MainController
     public function edit($id): View
     {
         $bankAccount = $this->model->findOrFail($id);
-        $accounts = Account::where('is_active', 1)
+        $accounts = ChartOfAccount::where('is_active', 1)
             ->where('account_type', 'detail')
-            ->whereHas('account_category', function($query) {
+            ->whereHas('account_category', function ($query) {
                 $query->where('type', 'aset');
             })
             ->orderBy('code')
@@ -99,7 +99,7 @@ class BankAccountController extends MainController
         $bankAccount = $this->model->findOrFail($id);
 
         $validated = $request->validate([
-            'account_id' => 'required|exists:accounts,id',
+            'chart_of_account_id' => 'required|exists:accounts,id',
             'bank_name' => 'required|string|max:255',
             'account_number' => 'required|string|max:50|unique:bank_accounts,account_number,' . $id,
             'account_name' => 'required|string|max:255',
@@ -121,7 +121,7 @@ class BankAccountController extends MainController
 
             return $this->successResponse($request, 'Data rekening bank berhasil diperbarui.', $bankAccount);
         } catch (Throwable $e) {
-            Log::error('Gagal memperbarui rekening bank.', ['exception' => $e, 'bank_account_id' => $id]);
+            Log::error('Gagal memperbarui rekening bank.', ['exception' => $e, 'bank_chart_of_account_id' => $id]);
             return $this->errorResponse($request, 'Data rekening bank gagal diperbarui.');
         }
     }
@@ -141,7 +141,7 @@ class BankAccountController extends MainController
 
             return $this->successResponse($request, 'Data rekening bank berhasil dihapus.');
         } catch (Throwable $e) {
-            Log::error('Gagal menghapus rekening bank.', ['exception' => $e, 'bank_account_id' => $id]);
+            Log::error('Gagal menghapus rekening bank.', ['exception' => $e, 'bank_chart_of_account_id' => $id]);
             return $this->errorResponse($request, 'Data rekening bank gagal dihapus.');
         }
     }

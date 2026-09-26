@@ -12,8 +12,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 use Models\JournalEntry;
-use Models\Account; 
-use Throwable; 
+use Models\ChartOfAccount;
+use Throwable;
 
 class JournalDetailController extends MainController
 {
@@ -35,7 +35,7 @@ class JournalDetailController extends MainController
     {
         $detail = new JournalDetail();
         $journalEntries = JournalEntry::where('status', 'draft')->pluck('journal_number', 'id');
-        $accounts = Account::where('is_active', 1)
+        $accounts = ChartOfAccount::where('is_active', 1)
             ->where('account_type', 'detail')
             ->orderBy('code')
             ->pluck('name', 'id');
@@ -51,7 +51,7 @@ class JournalDetailController extends MainController
     {
         $validated = $request->validate([
             'journal_entry_id' => 'required|exists:journal_entries,id',
-            'account_id' => 'required|exists:accounts,id',
+            'chart_of_account_id' => 'required|exists:accounts,id',
             'debit' => 'nullable|numeric|min:0',
             'credit' => 'nullable|numeric|min:0',
             'description' => 'nullable|string',
@@ -89,7 +89,7 @@ class JournalDetailController extends MainController
     {
         $detail = $this->model->findOrFail($id);
         $journalEntries = JournalEntry::where('status', 'draft')->pluck('journal_number', 'id');
-        $accounts = Account::where('is_active', 1)
+        $accounts = ChartOfAccount::where('is_active', 1)
             ->where('account_type', 'detail')
             ->orderBy('code')
             ->pluck('name', 'id');
@@ -111,7 +111,7 @@ class JournalDetailController extends MainController
 
         $validated = $request->validate([
             'journal_entry_id' => 'required|exists:journal_entries,id',
-            'account_id' => 'required|exists:accounts,id',
+            'chart_of_account_id' => 'required|exists:accounts,id',
             'debit' => 'nullable|numeric|min:0',
             'credit' => 'nullable|numeric|min:0',
             'description' => 'nullable|string',

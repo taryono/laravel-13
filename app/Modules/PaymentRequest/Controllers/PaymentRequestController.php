@@ -51,7 +51,7 @@ class PaymentRequestController extends MainController
             'description' => 'required|string',
             'amount' => 'required|numeric|min:0',
             'request_date' => 'required|date',
-            'bank_account_id' => 'nullable|exists:bank_accounts,id',
+            'bank_chart_of_account_id' => 'nullable|exists:bank_accounts,id',
             'notes' => 'nullable|string',
         ]);
 
@@ -95,7 +95,7 @@ class PaymentRequestController extends MainController
             'description' => 'required|string',
             'amount' => 'required|numeric|min:0',
             'request_date' => 'required|date',
-            'bank_account_id' => 'nullable|exists:bank_accounts,id',
+            'bank_chart_of_account_id' => 'nullable|exists:bank_accounts,id',
             'notes' => 'nullable|string',
         ]);
 

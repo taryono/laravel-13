@@ -682,7 +682,7 @@
             },
             {
                 value: 'account_balance',
-                label: 'Account Balance',
+                label: 'ChartOfAccount Balance',
                 group: 'Payments'
             },
             {
