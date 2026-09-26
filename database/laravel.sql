@@ -1831,44 +1831,85 @@ CREATE TABLE `asset_maintenances`  (
 -- Table structure for assets
 -- ----------------------------
 DROP TABLE IF EXISTS `assets`;
-CREATE TABLE `assets`  (
+CREATE TABLE `assets` (
   `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
-  `school_id` bigint UNSIGNED NOT NULL,
+  
+  -- Kepemilikan & Multi-tenant
+  `organization_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `school_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+
+  -- Identitas Aset & Relasi Master Data
+  `asset_category_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `supplier_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `location_id` bigint UNSIGNED NULL DEFAULT NULL,
   `code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `category` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
   `brand` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
   `model` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `specification` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
   `serial_number` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+
+  -- Keuangan & Penyusutan (Depreciation)
   `purchase_date` date NULL DEFAULT NULL,
-  `purchase_price` decimal(15, 2) NULL DEFAULT NULL,
-  `supplier` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `location` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `purchase_price` decimal(15, 2) NULL DEFAULT 0.00,
+  `salvage_value` decimal(15, 2) NULL DEFAULT 0.00,
+  `useful_life_months` int UNSIGNED NULL DEFAULT NULL,
+  `depreciation_method` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT 'straight_line',
+  `accumulated_depreciation` decimal(15, 2) NULL DEFAULT 0.00,
+  `asset_chart_of_account_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `accumulated_depreciation_chart_of_account_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `depreciation_expense_chart_of_account_id` bigint UNSIGNED NULL DEFAULT NULL,
+
+  -- Status & Penggunaan
+  `status` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT 'IN_USE',
   `condition` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'GOOD',
   `assigned_to` bigint UNSIGNED NULL DEFAULT NULL,
   `warranty_end` date NULL DEFAULT NULL,
-  `depreciation_value` decimal(15, 2) NULL DEFAULT NULL,
-  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+
+  -- Disposal (Penghapusan / Penjualan Aset)
+  `disposed_at` datetime NULL DEFAULT NULL,
+  `disposal_value` decimal(15, 2) NULL DEFAULT 0.00,
+  `disposal_reason` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+
+  -- Lampiran & Catatan
   `photo_url` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
-  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+
+  -- Audit Log
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
-  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
-  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `assets_school_code_unique`(`school_id` ASC, `code` ASC) USING BTREE,
+  
+  -- Indexing
+  UNIQUE INDEX `assets_organization_code_unique`(`organization_id` ASC, `code` ASC) USING BTREE,
+  INDEX `assets_organization_index`(`organization_id` ASC) USING BTREE,
   INDEX `assets_school_index`(`school_id` ASC) USING BTREE,
-  INDEX `assets_category_index`(`category` ASC) USING BTREE,
-  INDEX `assets_condition_index`(`condition` ASC) USING BTREE,
-  INDEX `assets_location_index`(`location` ASC) USING BTREE,
+  INDEX `assets_category_index`(`asset_category_id` ASC) USING BTREE,
+  INDEX `assets_supplier_index`(`supplier_id` ASC) USING BTREE,
+  INDEX `assets_location_index`(`location_id` ASC) USING BTREE,
   INDEX `assets_assigned_to_index`(`assigned_to` ASC) USING BTREE,
+  INDEX `assets_status_index`(`status` ASC) USING BTREE,
+  INDEX `assets_condition_index`(`condition` ASC) USING BTREE,
   INDEX `assets_purchase_date_index`(`purchase_date` ASC) USING BTREE,
+  INDEX `assets_disposed_at_index`(`disposed_at` ASC) USING BTREE,
+  INDEX `assets_is_active_index`(`is_active` ASC) USING BTREE,
   INDEX `assets_deleted_at_index`(`deleted_at` ASC) USING BTREE,
-  INDEX `assets_created_by_index`(`created_by` ASC) USING BTREE,
-  INDEX `assets_updated_by_index`(`updated_by` ASC) USING BTREE,
+
+  -- Foreign Key Constraints
+  CONSTRAINT `assets_organization_id_foreign` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `assets_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `assets_category_id_foreign` FOREIGN KEY (`asset_category_id`) REFERENCES `asset_categories` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `assets_supplier_id_foreign` FOREIGN KEY (`supplier_id`) REFERENCES `suppliers` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `assets_location_id_foreign` FOREIGN KEY (`location_id`) REFERENCES `locations` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `assets_assigned_to_foreign` FOREIGN KEY (`assigned_to`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `assets_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE
+  CONSTRAINT `assets_asset_coa_foreign` FOREIGN KEY (`asset_chart_of_account_id`) REFERENCES `chart_of_accounts` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `assets_accum_depr_coa_foreign` FOREIGN KEY (`accumulated_depreciation_chart_of_account_id`) REFERENCES `chart_of_accounts` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `assets_depr_expense_coa_foreign` FOREIGN KEY (`depreciation_expense_chart_of_account_id`) REFERENCES `chart_of_accounts` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------

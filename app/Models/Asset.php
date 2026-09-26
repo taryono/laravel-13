@@ -4,6 +4,12 @@ namespace Models;
 
 class Asset extends BasedModel
 {
+    // Tambahkan baris ini agar 'book_value' & 'monthly_depreciation' otomatis masuk di response JSON/Array
+    protected $appends = [
+        'book_value',
+        'monthly_depreciation',
+    ];
+
     protected $fillable = [
         // Kepemilikan
         'organization_id',
@@ -112,20 +118,21 @@ class Asset extends BasedModel
         return $this->belongsTo(\App\Models\User::class, 'assigned_to');
     }
 
-    public function getMonthlyDepreciationAttribute()
+    public function getMonthlyDepreciationAttribute(): float
     {
         if (!$this->useful_life_months || $this->useful_life_months <= 0) {
             return 0;
         }
 
-        // Nilai yang dapat disusutkan = Harga beli – Nilai sisa
-        $depreciableAmount = $this->purchase_price - $this->salvage_value;
+        $depreciableAmount = (float) $this->purchase_price - (float) $this->salvage_value;
 
+        // Untuk perhitungan akurat semua metode, pakai AssetDepreciationService.
         return match ($this->depreciation_method) {
             'straight_line' => $depreciableAmount / $this->useful_life_months,
-            default => $depreciableAmount / $this->useful_life_months,
+            default         => $depreciableAmount / $this->useful_life_months, // fallback kasar
         };
     }
+
 
     public function getBookValueAttribute()
     {
@@ -146,5 +153,10 @@ class Asset extends BasedModel
     public function isDisposed()
     {
         return !is_null($this->disposed_at);
+    }
+
+    public function depreciationLogs()
+    {
+        return $this->hasMany(AssetDepreciationLog::class)->orderBy('period_year')->orderBy('period_month');
     }
 }
