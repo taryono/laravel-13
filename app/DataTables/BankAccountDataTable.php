@@ -17,7 +17,7 @@ class BankAccountDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['account.name', 'bank_name', 'account_number', 'account_name', 'current_balance', 'status', 'default'];
+    protected array $columns = ['chart_of_account.name', 'currency.name', 'bank_name', 'account_number', 'account_name', 'current_balance', 'status', 'default'];
 
     /**
      * Build DataTable response.
@@ -105,7 +105,7 @@ class BankAccountDataTable extends DataTable
      */
     public function query(BankAccount $model): QueryBuilder
     {
-        return $model->newQuery()->with(['account']);
+        return $model->newQuery()->with(['chart_of_account', 'currency']);
     }
 
     /**
@@ -143,14 +143,14 @@ class BankAccountDataTable extends DataTable
                  * Custom Bootstrap 5 layout.
                  */
                 'dom' =>
-                    '<"row mb-3"' .
-                        '<"col-md-6 d-flex align-items-center"B>' .
-                        '<"col-md-6"f>' .
+                '<"row mb-3"' .
+                    '<"col-md-6 d-flex align-items-center"B>' .
+                    '<"col-md-6"f>' .
                     '>' .
                     'rt' .
                     '<"row mt-3"' .
-                        '<"col-md-6"i>' .
-                        '<"col-md-6 d-flex justify-content-md-end"p>' .
+                    '<"col-md-6"i>' .
+                    '<"col-md-6 d-flex justify-content-md-end"p>' .
                     '>',
 
                 /*
@@ -272,8 +272,8 @@ class BankAccountDataTable extends DataTable
     protected function getColumns(): array
     {
         return collect($this->columns)
-            ->map(fn (string $kolom) => Column::make($kolom)
-                ->title(ucwords(str_replace(['_',"."], [' ',' '], $kolom))))
+            ->map(fn(string $kolom) => Column::make($kolom)
+                ->title(ucwords(str_replace(['_', "."], [' ', ' '], $kolom))))
             // 1. PREPEND: Masukkan kolom No di posisi PALING AWAL (indeks 0)
             ->prepend(
                 Column::make('DT_RowIndex')

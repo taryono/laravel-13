@@ -138,24 +138,21 @@ class CrudGeneratorController extends MainController
     public function generateAsync(Request $request)
     {
         $request->validate([
-            'model_name' => 'required|string|max:100|regex:/^[a-zA-Z]+$/',
-            'columns' => 'required|string|max:1000',
-            'create_menu' => 'boolean',
+            'model_name'   => 'required|string|max:100|regex:/^[a-zA-Z]+$/',
+            'columns'      => 'required|string|max:1000',
+            'create_menu'  => 'boolean',
         ]);
 
-        $modelName = Str::studly($request->model_name);
-        $columns = $request->columns;
-        $createMenu = $request->boolean('create_menu');
+        $modelName   = Str::studly($request->model_name);
+        $columns     = $request->columns;
+        $createMenu  = $request->boolean('create_menu');
 
-        // Gunakan Artisan::queue() untuk menjalankan di background
-        $command = "make:crud-yajra {$modelName} --model=\\App\\Models\\{$modelName} --columns={$columns}";
-
-        if (!$createMenu) {
-            $command .= " --no-menu";
-        }
-        Artisan::call('queue:work --queue=default --stop-when-empty');
-        // Artisan::queue akan otomatis mendispatch ke queue
-        Artisan::queue($command, [], 'default');
+        Artisan::queue('make:crud-yajra', [
+            'name'       => $modelName,
+            '--model'    => "App\\Models\\{$modelName}",
+            '--columns'  => $columns,
+            '--no-menu'  => !$createMenu,
+        ])->onQueue('default');
 
         return redirect()->route('crud_generator.index')
             ->with('info', "CRUD {$modelName} sedang diproses di background. Anda akan diberitahu saat selesai.");

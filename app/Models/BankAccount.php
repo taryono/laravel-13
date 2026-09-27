@@ -6,10 +6,12 @@ class BankAccount extends BasedModel
 {
     protected $fillable = [
         'chart_of_account_id',
+        'school_id',
+        'organization_id',
+        'currency_id',
         'bank_name',
         'account_number',
         'account_name',
-        'currency_code',
         'current_balance',
         'is_active',
         'is_default',
@@ -25,6 +27,21 @@ class BankAccount extends BasedModel
     public function chart_of_account()
     {
         return $this->belongsTo(ChartOfAccount::class);
+    }
+
+    public function currency()
+    {
+        return $this->belongsTo(Currency::class);
+    }
+
+    public function school()
+    {
+        return $this->belongsTo(School::class);
+    }
+
+    public function organization()
+    {
+        return $this->belongsTo(Organization::class);
     }
 
     // Scope

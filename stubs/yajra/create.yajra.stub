@@ -1,14 +1,14 @@
 {{ Form::open(['method' => 'POST', 'route' => ['{{routePrefix}}.store'], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
-    <div class="row">
+<div class="row">
+    @forelse ($forms as $key => $form)
         <div class="col-md-6 mb-3">
-            @forelse ($forms as $key => $form)
-                <div class="form-group">
-                    <label for="name">{{ say($form['label']) }}</label>
-                    {!! $form['content'] !!}
-                </div>
-            @empty
-                <p>{{ say('Data Tidak Ditemukan') }}</p>
-            @endforelse
+            <div class="form-group">
+                <label for="name">{{ $form['label'] }}</label>
+                {!! $form['content'] !!}
+            </div>
         </div>
-    </div>
+    @empty
+        <p>{{ say('Data Tidak Ditemukan') }}</p>
+    @endforelse
+</div>
 {{ Form::close() }}  

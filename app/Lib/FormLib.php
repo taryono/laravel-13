@@ -142,7 +142,7 @@ class FormLib
         }
 
         $this->forms[$field] = [
-            'label' => ucfirst(say($label)),
+            'label' => str_replace("_", " ", ucfirst(say($label))),
             'content' => Form::select(
                 $formName,
                 collect(['' => say('-- Pilih --')])->merge($relationData[$field] ?? []),
@@ -183,7 +183,7 @@ class FormLib
         $target = self::TARGET_AREA[$field];
 
         return [
-            'label' => ucfirst(say($label)),
+            'label' => str_replace("_", " ", ucfirst(say($label))),
             'content' => Form::select(
                 $field,
                 collect(['' => say('-- Pilih --')])->merge($selectData),
@@ -265,7 +265,7 @@ class FormLib
         }
 
         $fieldData = [
-            'label' => ucfirst(say($label)),
+            'label' => str_replace("_", " ", ucfirst(say($label))),
             'content' => $content,
             'comment' => $comment,
         ];
