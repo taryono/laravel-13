@@ -41,12 +41,11 @@ class WelcomeController extends Controller
             $request->session()->put('trial_token', $registration->token);
         }
 
-        $modules = Module::where('is_active', true)->pluck('id', 'name')->toArray();
-        $student_ranges = \Models\StudentRange::where('is_active', true)->pluck('id', 'name')->toArray();
-        $roles = Role::all();
-        $positions = Position::where('is_active', true)->pluck('id', 'name')->toArray();
-        $packages = Package::where('is_active', true)->pluck('id', 'name')->toArray();
-        return view('trial_signup', compact('registration', 'modules', 'roles', 'student_ranges', 'positions', 'packages'));
+        $modules = Module::where('is_active', true)->get(['id', 'name']);
+        $student_ranges = \Models\StudentRange::where('is_active', true)->get(['id', 'name']);
+        $roles = Role::where('is_active', true)->where('show_to_trial', 1)->get(['id', 'name']);
+        $packages = Package::where('is_active', true)->get(['id', 'name']);
+        return view('trial_signup', compact('registration', 'modules', 'roles', 'student_ranges', 'packages'));
     }
 
     public function saveStep(Request $request, int $step): JsonResponse
@@ -83,8 +82,8 @@ class WelcomeController extends Controller
         match ($step) {
             1 => tap($registration)->fill(collect($data)->except('education_level_id')->toArray())
                 ->modules() && $registration->education_level_ids()->sync(
-                        EducationLevel::whereIn('code', $data['education_level_id'])->pluck('id')
-                    ),
+                    EducationLevel::whereIn('code', $data['education_level_id'])->pluck('id')
+                ),
             2 => $registration->modules()->sync(
                 Module::whereIn('code', $data['modul'])->pluck('id')
             ),

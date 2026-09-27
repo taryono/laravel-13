@@ -13,7 +13,6 @@ class Role extends BasedModel
         'organization_id',
         'code',
         'name',
-        'display_name',
         'description',
         'parent_id',
         'is_system',
@@ -187,7 +186,7 @@ class Role extends BasedModel
     // Dapatkan daftar peran lengkap dengan struktur pohon
     public static function getTree($organizationId = null)
     {
-        $query = static::orderBy('display_name');
+        $query = static::orderBy('name');
         if ($organizationId) {
             $query->where('organization_id', $organizationId);
         }
@@ -205,7 +204,7 @@ class Role extends BasedModel
         return [
             'id' => $node->id,
             'name' => $node->name,
-            'display_name' => $node->display_name,
+            'name' => $node->name,
             'description' => $node->description,
             'is_system' => $node->is_system,
             'is_active' => $node->is_active,

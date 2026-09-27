@@ -28,9 +28,7 @@ class MenuService
         }
 
         // ✅ Ambil organisasi aktif
-        $orgId = session('active_organization_id')
-            ?? $user->active_organization_id;
-
+        $orgId = session('active_organization_id');
         // ✅ Super Admin = semua menu
         if ($user->isSuperUser()) {
             // ✅ Pastikan keduanya diatur
@@ -51,8 +49,6 @@ class MenuService
 
         $menus = $query->orderBy('sort_order', 'asc')->get();
         $menus = $this->loadAllowedActions($menus);
-
-
         $tree = $this->treeBuilder
             ->setCustomParentMappings($this->getCustomParentMappings($user))
             ->setRootParentId($this->getRootParentId($user))
@@ -73,7 +69,9 @@ class MenuService
         // ✅ Filter role_user dengan organization_id
         $roleIds = DB::table('role_user')
             ->where('user_id', $user->id)
-            ->where('organization_id', $orgId) // KUNCI INI
+            ->when($orgId, function ($query) use ($orgId) {
+                $query->where('organization_id', $orgId);
+            })
             ->whereNull('deleted_at')
             ->pluck('role_id');
 
@@ -88,7 +86,7 @@ class MenuService
             ->whereIn('role_id', $roleIds)
             ->where('is_view', 1) // Hanya yang boleh dilihat
             ->pluck('menu_id');
-        dd($roleIds, $this->allowedMenus);
+
         $this->allowedActions = DB::table('action_role')
             ->whereIn('role_id', $roleIds)
             ->pluck('action_id');
@@ -98,10 +96,10 @@ class MenuService
     {
         return $menus->map(function (Menu $menu) {
             $menu->allowed_actions = $this->allowedActions->isEmpty()
-                ? Action::where('menu_id', $menu->id)->get(['id', 'name', 'display_name'])
+                ? Action::where('menu_id', $menu->id)->get(['id', 'name'])
                 : Action::whereIn('id', $this->allowedActions)
                 ->where('menu_id', $menu->id)
-                ->get(['id', 'name', 'display_name']);
+                ->get(['id', 'name']);
             return $menu;
         });
     }
@@ -122,7 +120,7 @@ class MenuService
         if ($user->isSuperUser()) return true;
 
         $orgId = session('active_organization_id')
-            ?? $user->active_organization_id;
+            ?? $user->current_organization_id;
 
         $action = Action::where('name', $actionName)->first();
         if (!$action) return false;
@@ -138,7 +136,9 @@ class MenuService
         // Cek lewat peran di organisasi aktif
         $roleIds = DB::table('role_user')
             ->where('user_id', $user->id)
-            ->where('organization_id', $orgId)
+            ->when($orgId, function ($query) use ($orgId) {
+                $query->where('organization_id', $orgId);
+            })
             ->pluck('role_id');
 
         return DB::table('action_role')

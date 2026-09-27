@@ -107,7 +107,7 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return Cache::remember("user_{$this->id}_is_super", 3600, function () {
             return $this->roles()->withoutGlobalScopes()
-                ->where('name', 'super-admin')
+                ->where('code', 'super-admin')
                 ->exists();
         });
     }
@@ -297,7 +297,7 @@ class User extends Authenticatable implements MustVerifyEmail
         return Cache::remember("user_{$this->id}_is_sys_super", 3600, function () {
             return $this->roles()
                 ->wherePivotNull('organization_id') // Peran lintas sistem
-                ->where('name', 'super-admin')
+                ->where('code', 'super-admin')
                 ->exists();
         });
     }

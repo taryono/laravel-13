@@ -19,7 +19,7 @@ class RoleDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['code', 'name', 'display_name', 'description', 'is_system', 'is_active', 'parent'];
+    protected array $columns = ['code', 'name', 'description', 'is_system', 'is_active', 'parent'];
 
 
     /**
