@@ -17,7 +17,7 @@ class ApplicantPaymentDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['invoice_id', 'applicant_id', 'payment_method', 'payment_date', 'amount', 'reference_number', 'bank_name', 'payment_proof_url', 'status', 'verified_by', 'verification_date', 'refund_date', 'refund_reason', 'notes', 'is_active', 'created_at', 'updated_at', 'deleted_at', 'created_by', 'updated_by'];
+    protected array $columns = ['invoice_id', 'applicant_id', 'payment_method', 'payment_date', 'amount', 'reference_number', 'bank_name', 'payment_proof_url', 'status', 'verified_by', 'verification_date', 'refund_date', 'refund_reason', 'notes', 'is_active', 'created_by', 'updated_by'];
 
     /**
      * Build DataTable response.
@@ -138,14 +138,14 @@ class ApplicantPaymentDataTable extends DataTable
                  * Custom Bootstrap 5 layout.
                  */
                 'dom' =>
-                    '<"row mb-3"' .
-                        '<"col-md-6 d-flex align-items-center"B>' .
-                        '<"col-md-6"f>' .
+                '<"row mb-3"' .
+                    '<"col-md-6 d-flex align-items-center"B>' .
+                    '<"col-md-6"f>' .
                     '>' .
                     'rt' .
                     '<"row mt-3"' .
-                        '<"col-md-6"i>' .
-                        '<"col-md-6 d-flex justify-content-md-end"p>' .
+                    '<"col-md-6"i>' .
+                    '<"col-md-6 d-flex justify-content-md-end"p>' .
                     '>',
 
                 /*
@@ -264,12 +264,12 @@ class ApplicantPaymentDataTable extends DataTable
      * explode() dari string literal seperti versi lama, yang rapuh
      * terhadap karakter khusus pada nama kolom.
      */
-     
+
     protected function getColumns(): array
     {
         return collect($this->columns)
-            ->map(fn (string $kolom) => Column::make($kolom)
-                ->title(ucwords(str_replace(['_',"."], [' ',' '], $kolom))))
+            ->map(fn(string $kolom) => Column::make($kolom)
+                ->title(ucwords(str_replace(['_', "."], [' ', ' '], $kolom))))
             // 1. PREPEND: Masukkan kolom No di posisi PALING AWAL (indeks 0)
             ->prepend(
                 Column::make('DT_RowIndex')

@@ -13,9 +13,19 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class GlobalSearch
 {
     protected static array $integerTypes = [
-        'int', 'integer', 'tinyint', 'smallint', 'mediumint', 'bigint',
-        'tinyinteger', 'smallinteger', 'mediuminteger', 'unsignedinteger',
-        'unsignedbiginteger', 'unsignedtinyinteger', 'unsignedsmallinteger',
+        'int',
+        'integer',
+        'tinyint',
+        'smallint',
+        'mediumint',
+        'bigint',
+        'tinyinteger',
+        'smallinteger',
+        'mediuminteger',
+        'unsignedinteger',
+        'unsignedbiginteger',
+        'unsignedtinyinteger',
+        'unsignedsmallinteger',
     ];
 
     protected static function isNumericSearch(string $search): bool
@@ -95,7 +105,7 @@ class GlobalSearch
                     $relatedTable     = $relatedModel->getTable();
 
                     if ($relatedTable === $mainTable) {
-                        dd($relatedTable,$mainTable);
+                        dd($relatedTable, $mainTable);
                         // Relasi self-referencing (mis. parent/child) -> pakai alias
                         self::applySelfReferencingSearch(
                             $query,
@@ -153,7 +163,12 @@ class GlobalSearch
         $alias = $mainTable . '_' . $relationName . '_srch'; // alias unik per relasi
 
         $query->orWhereExists(function ($sub) use (
-            $relationInstance, $relatedModel, $alias, $mainTable, $search, $isNumeric
+            $relationInstance,
+            $relatedModel,
+            $alias,
+            $mainTable,
+            $search,
+            $isNumeric
         ) {
             $sub->from($relatedModel->getTable() . ' as ' . $alias);
 

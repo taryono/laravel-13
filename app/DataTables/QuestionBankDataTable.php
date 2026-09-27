@@ -17,7 +17,7 @@ class QuestionBankDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['school_id', 'subject_id', 'question_type_id', 'difficulty_level_id', 'cognitive_level_id', 'stimulus_id', 'question_text', 'correct_answer_text', 'explanation', 'tags', 'points', 'partial_scoring', 'scoring_type', 'is_public', 'is_active', 'created_at', 'updated_at', 'deleted_at', 'created_by', 'updated_by'];
+    protected array $columns = ['school_id', 'subject_id', 'question_type_id', 'difficulty_level_id', 'cognitive_level_id', 'stimulus_id', 'question_text', 'correct_answer_text', 'explanation', 'tags', 'points', 'partial_scoring', 'scoring_type', 'is_public', 'is_active', 'created_by', 'updated_by'];
 
     /**
      * Build DataTable response.

@@ -17,7 +17,7 @@ class ExtracurricularAttendanceDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['student_extracurricular_id', 'meeting_date', 'status', 'notes', 'recorded_by', 'is_active', 'created_at', 'updated_at', 'deleted_at', 'created_by', 'updated_by'];
+    protected array $columns = ['student_extracurricular_id', 'meeting_date', 'status', 'notes', 'recorded_by', 'is_active', 'created_by', 'updated_by'];
 
     /**
      * Build DataTable response.

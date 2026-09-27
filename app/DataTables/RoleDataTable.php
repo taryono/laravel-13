@@ -2,6 +2,8 @@
 
 namespace App\DataTables;
 
+use App\Filters\DatatableFilter;
+use App\Filters\GlobalSearch;
 use Models\Role;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
@@ -18,6 +20,7 @@ class RoleDataTable extends DataTable
      * opsi --columns.
      */
     protected array $columns = ['code', 'name', 'display_name', 'description', 'is_system', 'is_active', 'parent'];
+
 
     /**
      * Build DataTable response.
@@ -105,9 +108,21 @@ class RoleDataTable extends DataTable
      */
     public function query(Role $model): QueryBuilder
     {
-        return $model->newQuery()->where('organization_id', auth()->user()->active_organization_id)
-            ->with('parent'); // Eager load untuk kolom relasi nanti
-
+        $query = $model->newQuery()
+            ->with('parent')
+            ->when(auth()->user()->active_organization_id, function ($query) {
+                return $query->where(
+                    'organization_id',
+                    auth()->user()->active_organization_id
+                );
+            });
+        DatatableFilter::apply($query, [
+            'is_active' => 'boolean',
+            'is_system' => 'boolean',
+            'parent_id' => 'integer',
+        ]);
+        GlobalSearch::search($query,  ['parent'],  $this->columns);
+        return $query;
     }
 
     /**
@@ -123,9 +138,7 @@ class RoleDataTable extends DataTable
              * Asesor -> asesor-table
              */
             ->setTableId('role-table')
-
             ->columns($this->getColumns())
-
             /*
              * Server-side AJAX endpoint.
              */
@@ -215,6 +228,7 @@ class RoleDataTable extends DataTable
                     ],
                 ],
             ])
+            ->dom('Bfrtip')
 
             /*
              * DataTable buttons.

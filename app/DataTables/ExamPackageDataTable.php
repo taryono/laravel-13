@@ -17,7 +17,7 @@ class ExamPackageDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['school_id', 'subject_id', 'name', 'description', 'duration_minutes', 'total_questions', 'passing_score', 'is_randomized', 'shuffle_options', 'show_results', 'is_active', 'created_at', 'updated_at', 'deleted_at', 'created_by', 'updated_by'];
+    protected array $columns = ['school_id', 'subject_id', 'name', 'description', 'duration_minutes', 'total_questions', 'passing_score', 'is_randomized', 'shuffle_options', 'show_results', 'is_active', 'created_by', 'updated_by'];
 
     /**
      * Build DataTable response.

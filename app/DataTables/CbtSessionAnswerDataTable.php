@@ -2,7 +2,7 @@
 
 namespace App\DataTables;
 
-use \App\Models\CbtSessionAnswer;
+use Models\CbtSessionAnswer;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
@@ -17,7 +17,7 @@ class CbtSessionAnswerDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['cbt_session_id', 'exam_package_question_id', 'student_answer', 'is_correct', 'score', 'answered_at', 'time_spent_seconds', 'graded_by', 'grading_note', 'created_at', 'updated_at', 'deleted_at'];
+    protected array $columns = ['cbt_session_id', 'exam_package_question_id', 'student_answer', 'is_correct', 'score', 'answered_at', 'time_spent_seconds', 'graded_by', 'grading_note', 'deleted_at'];
 
     /**
      * Build DataTable response.
@@ -138,14 +138,14 @@ class CbtSessionAnswerDataTable extends DataTable
                  * Custom Bootstrap 5 layout.
                  */
                 'dom' =>
-                    '<"row mb-3"' .
-                        '<"col-md-6 d-flex align-items-center"B>' .
-                        '<"col-md-6"f>' .
+                '<"row mb-3"' .
+                    '<"col-md-6 d-flex align-items-center"B>' .
+                    '<"col-md-6"f>' .
                     '>' .
                     'rt' .
                     '<"row mt-3"' .
-                        '<"col-md-6"i>' .
-                        '<"col-md-6 d-flex justify-content-md-end"p>' .
+                    '<"col-md-6"i>' .
+                    '<"col-md-6 d-flex justify-content-md-end"p>' .
                     '>',
 
                 /*
@@ -264,12 +264,12 @@ class CbtSessionAnswerDataTable extends DataTable
      * explode() dari string literal seperti versi lama, yang rapuh
      * terhadap karakter khusus pada nama kolom.
      */
-     
+
     protected function getColumns(): array
     {
         return collect($this->columns)
-            ->map(fn (string $kolom) => Column::make($kolom)
-                ->title(ucwords(str_replace(['_',"."], [' ',' '], $kolom))))
+            ->map(fn(string $kolom) => Column::make($kolom)
+                ->title(ucwords(str_replace(['_', "."], [' ', ' '], $kolom))))
             // 1. PREPEND: Masukkan kolom No di posisi PALING AWAL (indeks 0)
             ->prepend(
                 Column::make('DT_RowIndex')

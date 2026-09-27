@@ -24,23 +24,23 @@ class RoleController extends MainController
         if ($request->filled('draw')) {
             return $dataTable->ajax();
         }
-        // Menggunakan namespace kustom modul untuk Blade view
-        return $dataTable->render('Role::index', ['title' => 'Data Role']);
+        $parents = Role::orderBy('name')->get();
+
+        return $dataTable->render('Role::index', ['title' => 'Data Role', 'parents' => $parents]);
     }
 
     public function create()
     {
+        $role = new Role();
         $parentOptions = Role::getFlatTree(Auth::user()->current_organization_id);
-        return view('Role::create', compact('parentOptions'));
+        return view('Role::create', compact('parentOptions', 'role'));
     }
 
 
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-        ]);
+        $validated = $this->validated($request);
 
         try {
             DB::transaction(function () use ($validated) {

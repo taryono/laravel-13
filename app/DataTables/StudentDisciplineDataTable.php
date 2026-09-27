@@ -2,7 +2,7 @@
 
 namespace App\DataTables;
 
-use \App\Models\StudentDiscipline;
+use Models\StudentDiscipline;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
@@ -17,7 +17,7 @@ class StudentDisciplineDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['student_id', 'school_id', 'category', 'description', 'points', 'action_taken', 'incident_date', 'reported_by', 'witness', 'attachment_url', 'parent_notified', 'parent_notified_at', 'is_active', 'created_at', 'updated_at', 'deleted_at', 'created_by', 'updated_by'];
+    protected array $columns = ['student_id', 'school_id', 'category', 'description', 'points', 'action_taken', 'incident_date', 'reported_by', 'witness', 'attachment_url', 'parent_notified', 'parent_notified_at', 'is_active', 'created_by', 'updated_by'];
 
     /**
      * Build DataTable response.
@@ -138,14 +138,14 @@ class StudentDisciplineDataTable extends DataTable
                  * Custom Bootstrap 5 layout.
                  */
                 'dom' =>
-                    '<"row mb-3"' .
-                        '<"col-md-6 d-flex align-items-center"B>' .
-                        '<"col-md-6"f>' .
+                '<"row mb-3"' .
+                    '<"col-md-6 d-flex align-items-center"B>' .
+                    '<"col-md-6"f>' .
                     '>' .
                     'rt' .
                     '<"row mt-3"' .
-                        '<"col-md-6"i>' .
-                        '<"col-md-6 d-flex justify-content-md-end"p>' .
+                    '<"col-md-6"i>' .
+                    '<"col-md-6 d-flex justify-content-md-end"p>' .
                     '>',
 
                 /*
@@ -264,12 +264,12 @@ class StudentDisciplineDataTable extends DataTable
      * explode() dari string literal seperti versi lama, yang rapuh
      * terhadap karakter khusus pada nama kolom.
      */
-     
+
     protected function getColumns(): array
     {
         return collect($this->columns)
-            ->map(fn (string $kolom) => Column::make($kolom)
-                ->title(ucwords(str_replace(['_',"."], [' ',' '], $kolom))))
+            ->map(fn(string $kolom) => Column::make($kolom)
+                ->title(ucwords(str_replace(['_', "."], [' ', ' '], $kolom))))
             // 1. PREPEND: Masukkan kolom No di posisi PALING AWAL (indeks 0)
             ->prepend(
                 Column::make('DT_RowIndex')

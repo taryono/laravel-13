@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Filters\GlobalSearch;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Lib\FormLib;
@@ -9,6 +10,7 @@ use Illuminate\Support\Str;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 // use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 
 class MainController extends Controller implements HasMiddleware
 {
@@ -142,5 +144,31 @@ class MainController extends Controller implements HasMiddleware
             }
         }
         return $result;
+    }
+
+    public function query($model): QueryBuilder
+    {
+        $query = $model->newQuery()
+            ->with('parent');
+
+        if (request()->filled('is_active')) {
+            $query->where('is_active', request('is_active'));
+        }
+
+        if (request()->filled('is_system')) {
+            $query->where('is_system', request('is_system'));
+        }
+
+        if (request()->filled('parent_id')) {
+            $query->where('parent_id', request('parent_id'));
+        }
+
+        GlobalSearch::search(
+            $query,
+            ['parent'],
+            ['code', 'name', 'display_name', 'description']
+        );
+
+        return $query;
     }
 }

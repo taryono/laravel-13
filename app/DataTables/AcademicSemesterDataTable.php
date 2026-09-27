@@ -17,7 +17,7 @@ class AcademicSemesterDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['organization_id', 'school_id', 'academic_year_id', 'code', 'name', 'type', 'start_date', 'end_date', 'krs_start_date', 'krs_end_date', 'is_active', 'is_current', 'created_at', 'updated_at'];
+    protected array $columns = ['organization_id', 'school_id', 'academic_year_id', 'code', 'name', 'type', 'start_date', 'end_date', 'krs_start_date', 'krs_end_date', 'is_active', 'is_current'];
 
     /**
      * Build DataTable response.
@@ -138,14 +138,14 @@ class AcademicSemesterDataTable extends DataTable
                  * Custom Bootstrap 5 layout.
                  */
                 'dom' =>
-                    '<"row mb-3"' .
-                        '<"col-md-6 d-flex align-items-center"B>' .
-                        '<"col-md-6"f>' .
+                '<"row mb-3"' .
+                    '<"col-md-6 d-flex align-items-center"B>' .
+                    '<"col-md-6"f>' .
                     '>' .
                     'rt' .
                     '<"row mt-3"' .
-                        '<"col-md-6"i>' .
-                        '<"col-md-6 d-flex justify-content-md-end"p>' .
+                    '<"col-md-6"i>' .
+                    '<"col-md-6 d-flex justify-content-md-end"p>' .
                     '>',
 
                 /*
@@ -264,12 +264,12 @@ class AcademicSemesterDataTable extends DataTable
      * explode() dari string literal seperti versi lama, yang rapuh
      * terhadap karakter khusus pada nama kolom.
      */
-     
+
     protected function getColumns(): array
     {
         return collect($this->columns)
-            ->map(fn (string $kolom) => Column::make($kolom)
-                ->title(ucwords(str_replace(['_',"."], [' ',' '], $kolom))))
+            ->map(fn(string $kolom) => Column::make($kolom)
+                ->title(ucwords(str_replace(['_', "."], [' ', ' '], $kolom))))
             // 1. PREPEND: Masukkan kolom No di posisi PALING AWAL (indeks 0)
             ->prepend(
                 Column::make('DT_RowIndex')

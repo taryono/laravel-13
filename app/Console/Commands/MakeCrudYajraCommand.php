@@ -401,13 +401,12 @@ class MakeCrudYajraCommand extends Command
             'sort_order' => (\Models\Menu::max('sort_order') ?? 0) + 1,
             'is_active' => 1,
         ];
-
-        // Gunakan updateOrCreate agar tidak duplicate
-        $menu = \Models\Menu::updateOrCreate(
-            ['slug' => $menuData['slug']],
-            $menuData
-        );
-
+        $menu = \Models\Menu::where('slug', $menuData['slug'])->first();
+        if ($menu) {
+            $this->info("✔ Menu '{$menuData['title']}' sudah terdaftar untuk role '{$superAdminRoleName}'");
+        } else {
+            $menu = \Models\Menu::create($menuData);
+        }
         // Assign ke role super-admin
         DB::table('menu_role')->updateOrInsert(
             ['menu_id' => $menu->id, 'role_id' => $role->id],
@@ -557,7 +556,7 @@ class MakeCrudYajraCommand extends Command
             $lines[] = <<<PHP
                 public function {$relationName}()
                 {
-            {$note}        return \$this->belongsTo(\\{$relatedNamespace}\\{$relatedModel}::class, '{$column}');
+            {$note}        return \$this->belongsTo({$relatedModel}::class, '{$column}');
                 }
             PHP;
         }

@@ -17,7 +17,7 @@ class ExpenseDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['expense_number', 'expense_date', 'description', 'amount','tax', 'total_amount', 'payment_method', 'payment_status', 'approved_by', 'approved_at', 'created_at', 'updated_at','created_by', 'updated_at'];
+    protected array $columns = ['expense_number', 'expense_date', 'description', 'amount', 'tax', 'total_amount', 'payment_method', 'payment_status', 'approved_by', 'approved_at', 'created_by', 'updated_at'];
 
     /**
      * Build DataTable response.
@@ -138,14 +138,14 @@ class ExpenseDataTable extends DataTable
                  * Custom Bootstrap 5 layout.
                  */
                 'dom' =>
-                    '<"row mb-3"' .
-                        '<"col-md-6 d-flex align-items-center"B>' .
-                        '<"col-md-6"f>' .
+                '<"row mb-3"' .
+                    '<"col-md-6 d-flex align-items-center"B>' .
+                    '<"col-md-6"f>' .
                     '>' .
                     'rt' .
                     '<"row mt-3"' .
-                        '<"col-md-6"i>' .
-                        '<"col-md-6 d-flex justify-content-md-end"p>' .
+                    '<"col-md-6"i>' .
+                    '<"col-md-6 d-flex justify-content-md-end"p>' .
                     '>',
 
                 /*
@@ -267,8 +267,8 @@ class ExpenseDataTable extends DataTable
     protected function getColumns(): array
     {
         return collect($this->columns)
-            ->map(fn (string $kolom) => Column::make($kolom)
-                ->title(ucwords(str_replace(['_',"."], [' ',' '], $kolom))))
+            ->map(fn(string $kolom) => Column::make($kolom)
+                ->title(ucwords(str_replace(['_', "."], [' ', ' '], $kolom))))
             // 1. PREPEND: Masukkan kolom No di posisi PALING AWAL (indeks 0)
             ->prepend(
                 Column::make('DT_RowIndex')
