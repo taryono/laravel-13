@@ -1373,7 +1373,7 @@ CREATE TABLE `applicant_payments`  (
 
 -- ----------------------------
 -- Records of applicant_payments
--- ----------------------------
+-- ---------------------------
 
 -- ----------------------------
 -- Table structure for applicants
@@ -1422,7 +1422,31 @@ CREATE TABLE `applicants`  (
   CONSTRAINT `applicants_admission_id_foreign` FOREIGN KEY (`admission_id`) REFERENCES `admissions` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `applicants_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+ALTER TABLE `applicants`
+  ADD COLUMN `applicant_category_id` bigint UNSIGNED NULL DEFAULT NULL 
+      COMMENT 'FK ke applicant_categories' AFTER `admission_id`,
+  ADD COLUMN `applicant_status_id` bigint UNSIGNED NULL DEFAULT NULL 
+      COMMENT 'FK ke applicant_statuses' AFTER `applicant_category_id`,
+  ADD COLUMN `status_changed_at` timestamp NULL DEFAULT NULL 
+      COMMENT 'Waktu terakhir status berubah',
+  ADD COLUMN `status_changed_by` bigint UNSIGNED NULL DEFAULT NULL 
+      COMMENT 'User yang terakhir ubah status';
 
+ALTER TABLE `applicants`
+  ADD INDEX `idx_applicants_category`(`applicant_category_id` ASC) USING BTREE,
+  ADD INDEX `idx_applicants_status`(`applicant_status_id` ASC) USING BTREE,
+  ADD INDEX `fk_applicants_status_changed_by`(`status_changed_by` ASC) USING BTREE;
+
+ALTER TABLE `applicants`
+  ADD CONSTRAINT `applicants_category_id_foreign` 
+      FOREIGN KEY (`applicant_category_id`) REFERENCES `applicant_categories` (`id`) 
+      ON DELETE SET NULL ON UPDATE RESTRICT,
+  ADD CONSTRAINT `applicants_status_id_foreign` 
+      FOREIGN KEY (`applicant_status_id`) REFERENCES `applicant_statuses` (`id`) 
+      ON DELETE SET NULL ON UPDATE RESTRICT,
+  ADD CONSTRAINT `applicants_status_changed_by_foreign` 
+      FOREIGN KEY (`status_changed_by`) REFERENCES `users` (`id`) 
+      ON DELETE SET NULL ON UPDATE RESTRICT;
 -- ----------------------------
 -- Records of applicants
 -- ----------------------------
@@ -1462,6 +1486,319 @@ CREATE TABLE `application_documents`  (
 
 -- ----------------------------
 -- Records of application_documents
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for applicant_status_histories
+-- ----------------------------
+
+DROP TABLE IF EXISTS `applicant_status_histories`;
+CREATE TABLE `applicant_status_histories` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `applicant_id` bigint UNSIGNED NOT NULL COMMENT 'FK ke applicants',
+  `from_status_id` bigint UNSIGNED NULL DEFAULT NULL COMMENT 'Status sebelumnya',
+  `to_status_id` bigint UNSIGNED NOT NULL COMMENT 'Status baru',
+  `changed_by` bigint UNSIGNED NULL DEFAULT NULL COMMENT 'User yang ubah',
+  `changed_by_system` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika diubah sistem (cron/auto)',
+  `reason` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT 'Alasan perubahan',
+  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `metadata` json NULL COMMENT 'Data tambahan (IP, user agent, dll)',
+  `created_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_status_history_applicant`(`applicant_id` ASC) USING BTREE,
+  INDEX `idx_status_history_from`(`from_status_id` ASC) USING BTREE,
+  INDEX `idx_status_history_to`(`to_status_id` ASC) USING BTREE,
+  INDEX `idx_status_history_created`(`created_at` ASC) USING BTREE,
+  INDEX `fk_status_history_changed_by`(`changed_by` ASC) USING BTREE,
+  CONSTRAINT `applicant_status_histories_ibfk_1` FOREIGN KEY (`applicant_id`) REFERENCES `applicants` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `applicant_status_histories_ibfk_2` FOREIGN KEY (`from_status_id`) REFERENCES `applicant_statuses` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `applicant_status_histories_ibfk_3` FOREIGN KEY (`to_status_id`) REFERENCES `applicant_statuses` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `applicant_status_histories_ibfk_4` FOREIGN KEY (`changed_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of applicant_status_histories
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for applicant_domiciles
+-- ----------------------------
+
+DROP TABLE IF EXISTS `applicant_domiciles`;
+CREATE TABLE `applicant_domiciles` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `applicant_id` bigint UNSIGNED NOT NULL COMMENT 'FK ke applicants',
+  `address` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `rt` varchar(5) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `rw` varchar(5) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `postal_code` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `province_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `regency_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `district_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `village_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `latitude` decimal(10,8) NULL DEFAULT NULL COMMENT 'Koordinat latitude',
+  `longitude` decimal(11,8) NULL DEFAULT NULL COMMENT 'Koordinat longitude',
+  `distance_to_school_m` decimal(10,2) NULL DEFAULT NULL COMMENT 'Jarak ke sekolah (meter, hasil hitung geodesic)',
+  `distance_calculated_at` timestamp NULL DEFAULT NULL,
+  `is_verified` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika sudah diverifikasi tim survei',
+  `verified_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `verified_at` timestamp NULL DEFAULT NULL,
+  `verification_notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `document_kk_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT 'Upload KK',
+  `document_house_photo_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT 'Foto rumah',
+  `is_primary` tinyint(1) NOT NULL DEFAULT 1 COMMENT '1 jika alamat utama',
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_applicant_domicile_applicant`(`applicant_id` ASC) USING BTREE,
+  INDEX `idx_applicant_domicile_village`(`village_id` ASC) USING BTREE,
+  INDEX `idx_applicant_domicile_distance`(`distance_to_school_m` ASC) USING BTREE,
+  INDEX `idx_applicant_domicile_verified`(`is_verified` ASC) USING BTREE,
+  INDEX `fk_applicant_domicile_verified_by`(`verified_by` ASC) USING BTREE,
+  CONSTRAINT `applicant_domiciles_ibfk_1` FOREIGN KEY (`applicant_id`) REFERENCES `applicants` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `applicant_domiciles_ibfk_2` FOREIGN KEY (`verified_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of applicant_domiciles
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for applicant_parents
+-- ----------------------------
+
+DROP TABLE IF EXISTS `applicant_parents`;
+CREATE TABLE `applicant_parents` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `applicant_id` bigint UNSIGNED NOT NULL COMMENT 'FK ke applicants',
+  `relation_type` enum('father','mother','guardian') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'father',
+  `name` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nik` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `birth_place` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `birth_date` date NULL DEFAULT NULL,
+  `education_level` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `job` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `income_range` enum('below_1m','1m_2m','2m_5m','5m_10m','above_10m','unknown') 
+      CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `phone` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `email` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `address` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `is_alive` tinyint(1) NOT NULL DEFAULT 1,
+  `is_primary_contact` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika kontak utama',
+  `is_verified` tinyint(1) NOT NULL DEFAULT 0,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_applicant_parent_applicant`(`applicant_id` ASC) USING BTREE,
+  INDEX `idx_applicant_parent_relation`(`relation_type` ASC) USING BTREE,
+  CONSTRAINT `applicant_parents_ibfk_1` FOREIGN KEY (`applicant_id`) REFERENCES `applicants` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of applicant_parents
+-- ----------------------------
+
+
+-- ----------------------------
+-- Table structure for applicant_achievements
+-- ----------------------------
+
+DROP TABLE IF EXISTS `applicant_achievements`;
+CREATE TABLE `applicant_achievements` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `applicant_id` bigint UNSIGNED NOT NULL COMMENT 'FK ke applicants',
+  `achievement_type` enum('academic','non_academic','sport','art','science','other') 
+      CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'academic',
+  `title` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Nama prestasi',
+  `level` enum('school','district','regency','province','national','international') 
+      CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'school',
+  `rank` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT 'Juara 1/2/3, dsb',
+  `organizer` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `year` year NULL DEFAULT NULL,
+  `certificate_number` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `certificate_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `score_point` decimal(5,2) NULL DEFAULT NULL COMMENT 'Poin prestasi',
+  `is_verified` tinyint(1) NOT NULL DEFAULT 0,
+  `verified_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `verified_at` timestamp NULL DEFAULT NULL,
+  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_applicant_achievement_applicant`(`applicant_id` ASC) USING BTREE,
+  INDEX `idx_applicant_achievement_type`(`achievement_type` ASC) USING BTREE,
+  INDEX `idx_applicant_achievement_level`(`level` ASC) USING BTREE,
+  CONSTRAINT `applicant_achievements_ibfk_1` FOREIGN KEY (`applicant_id`) REFERENCES `applicants` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of applicant_achievements
+-- ----------------------------
+
+
+-- ----------------------------
+-- Table structure for applicant_support_programs
+-- ----------------------------
+
+DROP TABLE IF EXISTS `applicant_support_programs`;
+CREATE TABLE `applicant_support_programs` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `applicant_id` bigint UNSIGNED NOT NULL COMMENT 'FK ke applicants',
+  `program_type` enum('kip','pip','ketm','abk','yatim','lainnya') 
+      CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'kip',
+  `card_number` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `program_name` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `issuer` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT 'Lembaga penerbit',
+  `valid_from` date NULL DEFAULT NULL,
+  `valid_until` date NULL DEFAULT NULL,
+  `card_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `supporting_document_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `validation_status` enum('pending','valid','invalid','need_verification') 
+      CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
+  `validated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `validated_at` timestamp NULL DEFAULT NULL,
+  `validation_notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_applicant_support_applicant`(`applicant_id` ASC) USING BTREE,
+  INDEX `idx_applicant_support_type`(`program_type` ASC) USING BTREE,
+  INDEX `idx_applicant_support_status`(`validation_status` ASC) USING BTREE,
+  CONSTRAINT `applicant_support_programs_ibfk_1` FOREIGN KEY (`applicant_id`) REFERENCES `applicants` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `applicant_support_programs_ibfk_2` FOREIGN KEY (`validated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+
+-- ----------------------------
+-- Records of applicant_support_programs
+-- ----------------------------
+
+
+-- ----------------------------
+-- Table structure for applicant_notifications
+-- ----------------------------
+DROP TABLE IF EXISTS `applicant_notifications`;
+CREATE TABLE `applicant_notifications` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `applicant_id` bigint UNSIGNED NOT NULL COMMENT 'FK ke applicants',
+  `notification_type` enum('email','sms','whatsapp','push','in_app') 
+      CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'email',
+  `template_code` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `subject` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `body` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `recipient` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Email/no HP',
+  `status` enum('queued','sent','delivered','read','failed','cancelled') 
+      CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'queued',
+  `retry_count` int UNSIGNED NOT NULL DEFAULT 0,
+  `max_retry` int UNSIGNED NOT NULL DEFAULT 3,
+  `provider` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT 'mis: twilio, sendgrid',
+  `provider_message_id` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `provider_response` json NULL,
+  `error_message` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `scheduled_at` timestamp NULL DEFAULT NULL,
+  `sent_at` timestamp NULL DEFAULT NULL,
+  `delivered_at` timestamp NULL DEFAULT NULL,
+  `read_at` timestamp NULL DEFAULT NULL,
+  `metadata` json NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_applicant_notif_applicant`(`applicant_id` ASC) USING BTREE,
+  INDEX `idx_applicant_notif_type`(`notification_type` ASC) USING BTREE,
+  INDEX `idx_applicant_notif_status`(`status` ASC) USING BTREE,
+  INDEX `idx_applicant_notif_scheduled`(`scheduled_at` ASC) USING BTREE,
+  CONSTRAINT `applicant_notifications_ibfk_1` FOREIGN KEY (`applicant_id`) REFERENCES `applicants` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of applicant_notifications
+-- ----------------------------
+
+
+-- ----------------------------
+-- Table structure for activity_logs
+-- ----------------------------
+
+DROP TABLE IF EXISTS `activity_logs`;
+CREATE TABLE `activity_logs` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `user_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `user_role` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `action` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'create/update/delete/login/export/dll',
+  `module` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT 'Nama modul/tabel',
+  `record_id` bigint UNSIGNED NULL DEFAULT NULL COMMENT 'ID record yang diubah',
+  `record_type` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT 'Model/class',
+  `old_values` json NULL COMMENT 'Nilai sebelum',
+  `new_values` json NULL COMMENT 'Nilai sesudah',
+  `changed_fields` json NULL COMMENT 'Field yang berubah',
+  `ip_address` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `user_agent` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `url` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `method` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `status` enum('success','failed','warning') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'success',
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_activity_log_user`(`user_id` ASC) USING BTREE,
+  INDEX `idx_activity_log_action`(`action` ASC) USING BTREE,
+  INDEX `idx_activity_log_module`(`module` ASC) USING BTREE,
+  INDEX `idx_activity_log_record`(`record_type` ASC, `record_id` ASC) USING BTREE,
+  INDEX `idx_activity_log_created`(`created_at` ASC) USING BTREE,
+  CONSTRAINT `activity_logs_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of activity_logs
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for applicant_registrations
+-- ----------------------------
+
+DROP TABLE IF EXISTS `applicant_registrations`;
+CREATE TABLE `applicant_registrations` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `applicant_id` bigint UNSIGNED NOT NULL COMMENT 'FK ke applicants',
+  `admission_id` bigint UNSIGNED NOT NULL,
+  `registration_number` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `registration_date` datetime NULL DEFAULT NULL,
+  `registration_method` enum('online','offline','on_site') 
+      CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'online',
+  `registration_status` enum('pending','confirmed','cancelled','expired') 
+      CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
+  `officer_id` bigint UNSIGNED NULL DEFAULT NULL COMMENT 'Petugas yang memproses',
+  `location` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `proof_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT 'Bukti daftar ulang',
+  `uniform_size` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_applicant_registration_applicant`(`applicant_id` ASC) USING BTREE,
+  INDEX `idx_applicant_registration_admission`(`admission_id` ASC) USING BTREE,
+  INDEX `idx_applicant_registration_status`(`registration_status` ASC) USING BTREE,
+  CONSTRAINT `applicant_registrations_ibfk_1` FOREIGN KEY (`applicant_id`) REFERENCES `applicants` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `applicant_registrations_ibfk_2` FOREIGN KEY (`admission_id`) REFERENCES `admissions` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of applicant_registrations
 -- ----------------------------
 
 -- ----------------------------
@@ -5661,6 +5998,120 @@ CREATE TABLE `enrollment_conversions`  (
 
 -- ----------------------------
 -- Records of enrollment_conversions
+-- ----------------------------
+
+
+-- ----------------------------
+-- Table structure for applicant_categories
+-- ----------------------------
+
+DROP TABLE IF EXISTS `applicant_categories`;
+CREATE TABLE `applicant_categories` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `school_id` bigint UNSIGNED NULL DEFAULT NULL COMMENT 'NULL = global, terisi = spesifik sekolah',
+  `admission_id` bigint UNSIGNED NULL DEFAULT NULL COMMENT 'FK ke admissions (jika kategori per gelombang)',
+  `parent_id` bigint UNSIGNED NULL DEFAULT NULL COMMENT 'Self-reference untuk hierarki kategori',
+  `code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Kode unik kategori, mis: REGULER, KIP, ABK',
+  `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Nama kategori',
+  `slug` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Slug untuk URL',
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT 'Deskripsi kategori',
+  `category_type` enum('general','afirmasi','prestasi','khusus','pindahan','lainnya')
+      CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'general' COMMENT 'Tipe kategori',
+  `priority_level` int UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Prioritas seleksi (kecil = tinggi)',
+  `weight` decimal(5,2) NOT NULL DEFAULT 0.00 COMMENT 'Bobot tambahan untuk skor (jika ada)',
+  `requires_document` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika wajib upload dokumen',
+  `required_document_types` json NULL COMMENT 'Daftar jenis dokumen wajib (array)',
+  `required_fields` json NULL COMMENT 'Field wajib yang harus diisi pendaftar',
+  `icon` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `color` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `badge_class` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `sort_order` int UNSIGNED NOT NULL DEFAULT 0,
+  `is_default` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika kategori default untuk pendaftar baru',
+  `is_system` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika kategori bawaan sistem (tidak bisa dihapus)',
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uk_applicant_category_code`(`school_id` ASC, `code` ASC) USING BTREE,
+  UNIQUE INDEX `uk_applicant_category_slug`(`school_id` ASC, `slug` ASC) USING BTREE,
+  INDEX `idx_applicant_category_school`(`school_id` ASC) USING BTREE,
+  INDEX `idx_applicant_category_admission`(`admission_id` ASC) USING BTREE,
+  INDEX `idx_applicant_category_parent`(`parent_id` ASC) USING BTREE,
+  INDEX `idx_applicant_category_type`(`category_type` ASC) USING BTREE,
+  INDEX `idx_applicant_category_active`(`is_active` ASC) USING BTREE,
+  INDEX `fk_applicant_category_created_by`(`created_by` ASC) USING BTREE,
+  INDEX `fk_applicant_category_updated_by`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `applicant_categories_ibfk_1` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `applicant_categories_ibfk_2` FOREIGN KEY (`admission_id`) REFERENCES `admissions` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `applicant_categories_ibfk_3` FOREIGN KEY (`parent_id`) REFERENCES `applicant_categories` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `applicant_categories_ibfk_4` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `applicant_categories_ibfk_5` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of applicant_categories
+-- ----------------------------
+
+
+-- ----------------------------
+-- Table structure for applicant_statuses
+-- ----------------------------
+
+DROP TABLE IF EXISTS `applicant_statuses`;
+DROP TABLE IF EXISTS `applicant_statuses`;
+CREATE TABLE `applicant_statuses` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `school_id` bigint UNSIGNED NULL DEFAULT NULL COMMENT 'NULL = global, terisi = spesifik sekolah',
+  `code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Kode unik status, mis: DRAFT, SUBMITTED, VERIFIED',
+  `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Nama status',
+  `slug` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Slug untuk URL',
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT 'Deskripsi status',
+  `status_group` enum('registration','verification','selection','announcement','re_registration','enrollment','final')
+      CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'registration' COMMENT 'Kelompok fase status',
+  `status_type` enum('draft','pending','in_progress','success','failed','cancelled','expired','waitlist')
+      CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending' COMMENT 'Tipe status generik',
+  `stage_order` int UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Urutan tahap (0 = paling awal)',
+  `is_final` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika status final (tidak bisa diubah)',
+  `is_success` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika status menunjukkan keberhasilan',
+  `is_failure` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika status menunjukkan kegagalan',
+  `is_default` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika status default saat pendaftar dibuat',
+  `is_system` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika status bawaan sistem',
+  `allow_edit` tinyint(1) NOT NULL DEFAULT 1 COMMENT '1 jika pendaftar masih bisa edit data',
+  `allow_upload_document` tinyint(1) NOT NULL DEFAULT 1 COMMENT '1 jika pendaftar masih bisa upload dokumen',
+  `allow_payment` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika pendaftar bisa bayar',
+  `next_status_ids` json NULL COMMENT 'Daftar status_id yang mungkin berikutnya',
+  `notify_applicant` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 jika perubahan ke status ini trigger notifikasi',
+  `notification_template` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT 'Template notifikasi',
+  `color` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT 'Warna badge',
+  `badge_class` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT 'Class CSS badge',
+  `icon` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `sort_order` int UNSIGNED NOT NULL DEFAULT 0,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uk_applicant_status_code`(`school_id` ASC, `code` ASC) USING BTREE,
+  UNIQUE INDEX `uk_applicant_status_slug`(`school_id` ASC, `slug` ASC) USING BTREE,
+  INDEX `idx_applicant_status_school`(`school_id` ASC) USING BTREE,
+  INDEX `idx_applicant_status_group`(`status_group` ASC) USING BTREE,
+  INDEX `idx_applicant_status_type`(`status_type` ASC) USING BTREE,
+  INDEX `idx_applicant_status_order`(`stage_order` ASC) USING BTREE,
+  INDEX `idx_applicant_status_active`(`is_active` ASC) USING BTREE,
+  INDEX `idx_applicant_status_default`(`is_default` ASC) USING BTREE,
+  INDEX `fk_applicant_status_created_by`(`created_by` ASC) USING BTREE,
+  INDEX `fk_applicant_status_updated_by`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `applicant_statuses_ibfk_1` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `applicant_statuses_ibfk_2` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `applicant_statuses_ibfk_3` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+-- ----------------------------
+-- Records of applicant_statuses
 -- ----------------------------
 
 -- ----------------------------
@@ -14666,7 +15117,7 @@ CREATE TABLE `test_schedules`  (
   `code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `name` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
-  `test_type` enum('tulis','wawancara','praktek','kesehatan','psikotes','lainnya') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'tulis',
+  `test_type_id` bigint UNSIGNED NOT NULL,
   `test_method` enum('offline','online','hybrid') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'offline',
   `test_date` date NOT NULL,
   `start_time` time NOT NULL,
@@ -14712,7 +15163,7 @@ CREATE TABLE `test_schedules`  (
   INDEX `idx_academic_year`(`academic_year_id`) USING BTREE,
   INDEX `idx_test_date`(`test_date`, `start_time`) USING BTREE,
   INDEX `idx_status`(`status`, `is_active`) USING BTREE,
-  INDEX `idx_test_type`(`test_type`) USING BTREE,
+  INDEX `idx_test_type`(`test_type_id`) USING BTREE,
   INDEX `idx_cbt_session`(`cbt_session_id`) USING BTREE,
   INDEX `fk_test_schedules_room`(`room_id`) USING BTREE,
   INDEX `fk_test_schedules_exam_package`(`exam_package_id`) USING BTREE
@@ -14733,7 +15184,7 @@ CREATE TABLE `test_types`  (
   `name_en` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
   `slug` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
-  `category` enum('akademik','non_akademik','kesehatan','administrasi','lainnya') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'akademik',
+  `category` enum('akademik','non_akademik','kesehatan','administrasi','lainnya','tulis','wawancara','praktek','kesehatan','psikotes','lainnya') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'akademik',
   `parent_id` bigint UNSIGNED NULL DEFAULT NULL,
   `icon` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
   `color` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
