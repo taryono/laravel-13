@@ -3,6 +3,12 @@ namespace Models;
 
 class AdmissionQuotaSetting extends BasedModel
 {
+    protected $table = 'admission_quota_settings';
+
+    public static function bootSoftDeletes()
+    {
+        // Table has no deleted_at column
+    }
     // Relasi
         public function admission()
     {

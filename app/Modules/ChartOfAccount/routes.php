@@ -13,19 +13,19 @@ use Illuminate\Support\Facades\Route;
  */
 
 Route::group(['prefix' => 'account', 'namespace' => 'App\Modules\ChartOfAccount\Controllers', 'middleware' => ['web']], function () {
-    Route::get('/', ['as' => 'account.index', 'uses' => 'AccountController@index']);
-    Route::any('/search', ['as' => 'account.search', 'uses' => 'AccountController@search']);
-    Route::get('/create', ['as' => 'account.create', 'uses' => 'AccountController@create']);
-    Route::get('/show/{id}', ['as' => 'account.show', 'uses' => 'AccountController@show']);
-    Route::get('/preview/{id}', ['as' => 'account.preview', 'uses' => 'AccountController@preview']);
-    Route::get('/print/{id}', ['as' => 'account.print', 'uses' => 'AccountController@print']);
+    Route::get('/', ['as' => 'account.index', 'uses' => 'ChartOfAccountController@index']);
+    Route::any('/search', ['as' => 'account.search', 'uses' => 'ChartOfAccountController@search']);
+    Route::get('/create', ['as' => 'account.create', 'uses' => 'ChartOfAccountController@create']);
+    Route::get('/show/{id}', ['as' => 'account.show', 'uses' => 'ChartOfAccountController@show']);
+    Route::get('/preview/{id}', ['as' => 'account.preview', 'uses' => 'ChartOfAccountController@preview']);
+    Route::get('/print/{id}', ['as' => 'account.print', 'uses' => 'ChartOfAccountController@print']);
 
-    Route::post('/store', ['as' => 'account.store', 'uses' => 'AccountController@store']);
-    Route::get('/edit/{id}', ['as' => 'account.edit', 'uses' => 'AccountController@edit']);
-    Route::put('/update/{id}', ['as' => 'account.update', 'uses' => 'AccountController@update']);
-    Route::delete('/delete/{id}', ['as' => 'account.destroy', 'uses' => 'AccountController@destroy']);
-    Route::get('/getDataTree', ['as' => 'account.getDataTree', 'uses' => 'AccountController@getDataTree']);
-    Route::get('/getData', ['as' => 'account.getData', 'uses' => 'AccountController@getData']);
-    Route::get('/tree', ['as' => 'account.getTreeData', 'uses' => 'AccountController@getTreeData']);
-    Route::get('/getDataWithRecursive', ['as' => 'account.Tree', 'uses' => 'AccountController@getDataWithRecursive']);
+    Route::post('/store', ['as' => 'account.store', 'uses' => 'ChartOfAccountController@store']);
+    Route::get('/edit/{id}', ['as' => 'account.edit', 'uses' => 'ChartOfAccountController@edit']);
+    Route::put('/update/{id}', ['as' => 'account.update', 'uses' => 'ChartOfAccountController@update']);
+    Route::delete('/delete/{id}', ['as' => 'account.destroy', 'uses' => 'ChartOfAccountController@destroy']);
+    Route::get('/getDataTree', ['as' => 'account.getDataTree', 'uses' => 'ChartOfAccountController@getDataTree']);
+    Route::get('/getData', ['as' => 'account.getData', 'uses' => 'ChartOfAccountController@getData']);
+    Route::get('/tree', ['as' => 'account.getTreeData', 'uses' => 'ChartOfAccountController@getTreeData']);
+    Route::get('/getDataWithRecursive', ['as' => 'account.Tree', 'uses' => 'ChartOfAccountController@getDataWithRecursive']);
 });
