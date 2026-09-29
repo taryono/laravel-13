@@ -4,6 +4,24 @@ namespace Models;
 
 class AdmissionTimeline extends BasedModel
 {
+    protected $fillable = [
+        'admission_id',
+        'phase_name',
+        'start_date',
+        'end_date',
+        'description',
+        'order_number',
+        'is_active',
+        'created_by',
+        'updated_by',
+    ];
+
+    protected $casts = [
+        'start_date' => 'date',
+        'end_date'   => 'date',
+        'is_active'  => 'boolean',
+    ];
+
     // Relasi
     public function admission()
     {

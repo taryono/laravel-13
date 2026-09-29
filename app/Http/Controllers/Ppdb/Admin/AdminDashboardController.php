@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Dashboard;
+namespace App\Http\Controllers\Ppdb\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -51,8 +51,8 @@ class AdminDashboardController extends Controller
         // 4. KPI Metrics from Database
         $admissionId = $admission ? $admission->id : null;
 
-        $totalApplicants = $admissionId 
-            ? Applicant::where('admission_id', $admissionId)->count() 
+        $totalApplicants = $admissionId
+            ? Applicant::where('admission_id', $admissionId)->count()
             : Applicant::count();
         if ($totalApplicants === 0) {
             $totalApplicants = 1248; // Baseline indicator if no applicants entered yet
@@ -137,11 +137,11 @@ class AdminDashboardController extends Controller
 
         // 6. Quota per Path (Panel 2)
         $paths = $admissionId
-            ? AdmissionPath::with('quotaSettings')->where('admission_id', $admissionId)->orderBy('sort_order')->get()
-            : AdmissionPath::with('quotaSettings')->orderBy('sort_order')->get();
+            ? AdmissionPath::with('quota_settings')->where('admission_id', $admissionId)->orderBy('sort_order')->get()
+            : AdmissionPath::with('quota_settings')->orderBy('sort_order')->get();
 
         $processedPaths = $paths->map(function ($path) use ($totalQuota, $admissionId) {
-            $setting = $path->quotaSettings ? $path->quotaSettings->first() : null;
+            $setting = $path->quota_settings ? $path->quota_settings->first() : null;
             $quota = $path->quota ?: ($setting ? $setting->quota : 100);
             $filled = $setting ? $setting->filled : round($quota * 0.95);
             $applicantsCount = Applicant::where('admission_id', $admissionId)
@@ -188,7 +188,7 @@ class AdminDashboardController extends Controller
             'domicile',
             'documents',
             'verifications',
-            'supportPrograms',
+            'support_programs',
             'achievements',
             'selections',
         ]);

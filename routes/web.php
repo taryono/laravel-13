@@ -4,9 +4,11 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\WelcomeController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LocaleController;
+use App\Http\Controllers\Ppdb\Applicant\RegistrationController;
+use App\Http\Controllers\Ppdb\Applicant\DocumentController;
+use App\Http\Controllers\Ppdb\Applicant\PaymentController;
 
 Route::get('/', [WelcomeController::class, 'index'])->name('welcome.index');
-
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -26,17 +28,37 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return view('dashboard.index');
     })->name('dashboard');
 });
-
-use App\Http\Controllers\Dashboard\AdminDashboardController;
-
-Route::prefix('dashboard/admin')->name('dashboard.admin.')->group(function () {
-    Route::get('/', [AdminDashboardController::class, 'index'])->name('index');
-    Route::post('/verify/{applicantId}', [AdminDashboardController::class, 'updateVerification'])->name('verify');
-    Route::post('/run-selection', [AdminDashboardController::class, 'runSelection'])->name('run-selection');
-    Route::get('/export', [AdminDashboardController::class, 'export'])->name('export');
+// ---------- PUBLIC (tanpa login) ---------- 
+Route::prefix('ppdb')->name('ppdb.')->middleware(['web'])->group(function () {
+    // Form utama
+    Route::get('/', [RegistrationController::class, 'index'])->name('index');
+    Route::get('/daftar/{admission:code}', [RegistrationController::class, 'create'])->name('register');
+    Route::post('/daftar/{admission:code}', [RegistrationController::class, 'store'])->name('register.store');
+    Route::put('/daftar/{applicant:registration_number}', [RegistrationController::class, 'update'])->name('register.update');
+    Route::get('/cek-status', [RegistrationController::class, 'statusForm'])->name('status');
+    Route::post('/cek-status', [RegistrationController::class, 'checkStatus'])->name('status.check');
+    // Draft
+    Route::post('/draft/{applicant?}', [RegistrationController::class, 'saveDraft'])->name('draft');
+    // Dokumen
+    Route::post('/dokumen/{applicant}', [DocumentController::class, 'upload'])->name('document.upload');
+    Route::delete('/dokumen/{document}', [DocumentController::class, 'destroy'])->name('document.destroy');
+    Route::get('/dokumen/{document}/preview', [DocumentController::class, 'preview'])->name('document.preview');
+    // Submit final
+    Route::post('/submit/{applicant}', [RegistrationController::class, 'submit'])->name('submit');
+    // Cek status
+    Route::get('/status', [RegistrationController::class, 'status'])->name('status');
+    // Pembayaran
+    Route::get('/invoice/{applicant}', [PaymentController::class, 'invoice'])->name('invoice');
+    Route::post('/payment/{invoice}', [PaymentController::class, 'store'])->name('payment.store');
+    // API untuk AJAX
+    Route::get('/api/sekolah/{admission}', [RegistrationController::class, 'getSchools'])->name('api.schools');
+    Route::get('/api/jalur/{admission}', [RegistrationController::class, 'getPaths'])->name('api.paths');
+    Route::get('/api/prodi/{school}', [RegistrationController::class, 'getPrograms'])->name('api.programs');
+    Route::post('/api/geocode', [RegistrationController::class, 'geocode'])->name('api.geocode');
 });
 
 Route::post('/organization/switch', [ProfileController::class, 'switch'])
     ->name('organization.switch');
-
+require __DIR__ . '/admin_ppdb.php';
+require __DIR__ . '/applicant.php';
 require __DIR__ . '/auth.php';

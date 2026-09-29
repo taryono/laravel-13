@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
 class AdmissionPath extends BasedModel
-{ 
+{
     protected $table = 'admission_paths';
 
     public function admission()
@@ -11,7 +11,7 @@ class AdmissionPath extends BasedModel
         return $this->belongsTo(Admission::class, 'admission_id');
     }
 
-    public function quotaSettings()
+    public function quota_settings()
     {
         return $this->hasMany(AdmissionQuotaSetting::class, 'admission_path_id');
     }

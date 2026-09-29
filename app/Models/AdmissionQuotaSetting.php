@@ -1,48 +1,44 @@
 <?php
-namespace Models; 
+
+namespace Models;
 
 class AdmissionQuotaSetting extends BasedModel
 {
     protected $table = 'admission_quota_settings';
-
-    public static function bootSoftDeletes()
-    {
-        // Table has no deleted_at column
-    }
     // Relasi
-        public function admission()
+    public function admission()
     {
-        return $this->belongsTo(\App\Models\Admission::class, 'admission_id');
+        return $this->belongsTo(Admission::class, 'admission_id');
     }
 
-    public function admissionPath()
+    public function path()
     {
-        return $this->belongsTo(\App\Models\AdmissionPath::class, 'admission_path_id');
+        return $this->belongsTo(AdmissionPath::class, 'admission_path_id');
     }
 
     public function organization()
     {
-        return $this->belongsTo(\App\Models\Organization::class, 'organization_id');
+        return $this->belongsTo(Organization::class, 'organization_id');
     }
 
-    public function studyProgram()
+    public function study_program()
     {
-        return $this->belongsTo(\App\Models\StudyProgram::class, 'study_program_id');
+        return $this->belongsTo(StudyProgram::class, 'study_program_id');
     }
 
     public function faculty()
     {
-        return $this->belongsTo(\App\Models\Faculty::class, 'faculty_id');
+        return $this->belongsTo(Faculty::class, 'faculty_id');
     }
 
-    public function educationLevel()
+    public function education_level()
     {
-        return $this->belongsTo(\App\Models\EducationLevel::class, 'education_level_id');
+        return $this->belongsTo(EducationLevel::class, 'education_level_id');
     }
 
-    public function classLevel()
+    public function class_level()
     {
-        return $this->belongsTo(\App\Models\ClassLevel::class, 'class_level_id');
+        return $this->belongsTo(ClassLevel::class, 'class_level_id');
     }
 
 
