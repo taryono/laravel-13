@@ -35,63 +35,149 @@ class WelcomeController extends Controller
 
         if (!$registration) {
             $registration = TrialRegistration::create([
-                'token' => Str::uuid(),
+                'token' => (string) Str::uuid(),
                 'current_step' => 1,
             ]);
             $request->session()->put('trial_token', $registration->token);
         }
 
-        $modules = Module::where('is_active', true)->get(['id', 'name']);
+        $modules = Module::where('is_active', true)->get(['id', 'name', 'code']);
         $student_ranges = \Models\StudentRange::where('is_active', true)->get(['id', 'name']);
-        $roles = Role::where('is_active', true)->where('show_to_trial', 1)->get(['id', 'name']);
+        $roles = Role::where('is_active', true)->where('show_to_trial', 1)->get(['id', 'name', 'code']);
         $packages = Package::where('is_active', true)->get(['id', 'name']);
-        return view('trial_signup', compact('registration', 'modules', 'roles', 'student_ranges', 'packages'));
+        $positions = Position::where('is_active', true)->get(['id', 'name', 'code']);
+        $education_levels = EducationLevel::where('is_active', true)->get(['id', 'name', 'code']);
+
+        return view('trial_signup', compact(
+            'registration',
+            'modules',
+            'roles',
+            'student_ranges',
+            'packages',
+            'positions',
+            'education_levels'
+        ));
     }
 
     public function saveStep(Request $request, int $step): JsonResponse
     {
         $registration = $this->currentRegistration($request);
 
-        $data = match ($step) {
-            1 => $request->validate([
-                'nama_sekolah' => 'required|string|max:255',
-                'npsn' => 'nullable|string|max:20',
-                'education_level_id' => 'required|array|min:1',
-                'education_level_id.*' => 'exists:education_levels,code',
-                'total_student' => 'required|string',
-                'address' => 'nullable|string|max:255',
-                'nama_user' => 'required|string|max:255',
-                'position_id' => 'required|in:kepala_sekolah,wakil_kepala_sekolah,guru,tata_usaha,admin_it,lainnya',
-            ]),
-            2 => $request->validate([
-                'modul' => 'required|array|min:1',
-                'modul.*' => 'exists:modules,code',
-            ]),
-            3 => $request->validate([
-                'role' => 'required|array|min:1',
-                'role.*' => 'exists:roles,code',
-            ]),
-            4 => $request->validate([
-                'notif_whatsapp' => 'boolean',
-                'notif_email' => 'boolean',
-                'notif_sms' => 'boolean',
-            ]),
-            default => abort(422, 'Step tidak valid'),
-        };
+        switch ($step) {
+            case 1:
+                $data = $request->validate([
+                    'nama_sekolah' => 'required|string|max:255',
+                    'npsn' => 'nullable|string|max:20',
+                    'education_level_id' => 'required|array|min:1',
+                    'education_level_id.*' => 'string|max:50',
+                    'total_student' => 'required|string|max:100',
+                    'address' => 'nullable|string|max:500',
+                    'nama_user' => 'required|string|max:255',
+                    'position_id' => 'required|string|max:100',
+                ]);
 
-        match ($step) {
-            1 => tap($registration)->fill(collect($data)->except('education_level_id')->toArray())
-                ->modules() && $registration->education_level_ids()->sync(
-                    EducationLevel::whereIn('code', $data['education_level_id'])->pluck('id')
-                ),
-            2 => $registration->modules()->sync(
-                Module::whereIn('code', $data['modul'])->pluck('id')
-            ),
-            3 => $registration->roles()->sync(
-                Role::whereIn('code', $data['role'])->pluck('id')
-            ),
-            default => $registration->fill($data),
-        };
+                $registration->fill([
+                    'nama_sekolah' => $data['nama_sekolah'],
+                    'npsn' => $data['npsn'] ?? null,
+                    'total_student' => $data['total_student'],
+                    'address' => $data['address'] ?? null,
+                    'nama_user' => $data['nama_user'],
+                ]);
+
+                if (is_numeric($data['position_id'])) {
+                    $registration->position_id = (int)$data['position_id'];
+                } else {
+                    $pos = Position::where('code', $data['position_id'])->first();
+                    $registration->position_id = $pos?->id;
+                }
+
+                $eduLevelCodes = (array)$data['education_level_id'];
+                $eduLevelIds = [];
+                foreach ($eduLevelCodes as $code) {
+                    $cleanCode = strtoupper(trim($code));
+                    if ($cleanCode === 'PAUD') $cleanCode = 'TK';
+                    $level = EducationLevel::where('code', $cleanCode)
+                        ->orWhere('code', $code)
+                        ->first();
+                    if ($level) {
+                        $eduLevelIds[] = $level->id;
+                    }
+                }
+                if (!empty($eduLevelIds)) {
+                    $registration->education_level()->sync($eduLevelIds);
+                }
+                break;
+
+            case 2:
+                $data = $request->validate([
+                    'modul' => 'required|array|min:1',
+                    'modul.*' => 'string|max:50',
+                ]);
+
+                $moduleIds = [];
+                foreach ($data['modul'] as $code) {
+                    $cleanCode = strtolower(trim($code));
+                    $module = Module::where('code', $cleanCode)->first();
+                    if (!$module) {
+                        $module = Module::firstOrCreate(
+                            ['code' => $cleanCode],
+                            [
+                                'name' => ucwords(str_replace('_', ' ', $cleanCode)),
+                                'is_active' => true,
+                            ]
+                        );
+                    }
+                    $moduleIds[] = $module->id;
+                }
+                $registration->modules()->sync($moduleIds);
+                break;
+
+            case 3:
+                $data = $request->validate([
+                    'role' => 'required|array|min:1',
+                    'role.*' => 'string|max:50',
+                ]);
+
+                $roleIds = [];
+                foreach ($data['role'] as $code) {
+                    $roleCode = strtolower(trim($code));
+                    $hyphenCode = str_replace('_', '-', $roleCode);
+                    $role = Role::where('code', $roleCode)
+                        ->orWhere('code', $hyphenCode)
+                        ->orWhere('name', $roleCode)
+                        ->orWhere('name', $hyphenCode)
+                        ->first();
+
+                    if (!$role) {
+                        $role = Role::firstOrCreate(
+                            ['code' => $hyphenCode, 'organization_id' => 1],
+                            [
+                                'name' => ucwords(str_replace('-', ' ', $hyphenCode)),
+                                'is_active' => true,
+                                'show_to_trial' => 1,
+                            ]
+                        );
+                    }
+                    $roleIds[] = $role->id;
+                }
+                $registration->roles()->sync($roleIds);
+                break;
+
+            case 4:
+                $request->validate([
+                    'notif_whatsapp' => 'nullable',
+                    'notif_email' => 'nullable',
+                    'notif_sms' => 'nullable',
+                ]);
+
+                $registration->notif_whatsapp = $request->boolean('notif_whatsapp');
+                $registration->notif_email = $request->boolean('notif_email');
+                $registration->notif_sms = $request->boolean('notif_sms');
+                break;
+
+            default:
+                return response()->json(['message' => 'Step tidak valid'], 422);
+        }
 
         $registration->current_step = max($registration->current_step, $step + 1);
         $registration->save();
@@ -110,40 +196,90 @@ class WelcomeController extends Controller
         ]);
 
         $result = DB::transaction(function () use ($registration, $data) {
+            $org = \Models\Organization::first();
+            $orgId = $org ? $org->id : 1;
+
             $school = School::create([
-                'trial_registration_id' => $registration->id,
-                'name' => $registration->nama_sekolah,
+                'organization_id' => $orgId,
+                'name' => $registration->nama_sekolah ?? 'Sekolah Trial',
                 'npsn' => $registration->npsn,
-                'education_level_id' => $registration->education_level_id,
-                'total_student' => $registration->total_student,
-                'alamat' => $registration->address,
+                'total_student' => (string)($registration->total_student ?? ''),
+                'address' => $registration->address,
                 'status' => 'trial',
                 'trial_ends_at' => now()->addDays(14),
             ]);
 
-            $school->education_levels()->sync($registration->education_levels()->pluck('education_levels.id'));
-            $school->modules()->sync(
-                $registration->modules()->pluck('modules.id')->mapWithKeys(
-                    fn($id) => [$id => ['activated_at' => now()]]
-                )
-            );
+            try {
+                if (\Illuminate\Support\Facades\Schema::hasTable('school_education_level')) {
+                    $eduIds = $registration->education_level()->pluck('education_levels.id');
+                    if ($eduIds->isNotEmpty()) {
+                        $school->education_level()->sync($eduIds);
+                    }
+                }
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning('School education level sync failed: ' . $e->getMessage());
+            }
+
+            try {
+                if (\Illuminate\Support\Facades\Schema::hasTable('school_modules')) {
+                    $modIds = $registration->modules()->pluck('modules.id');
+                    if ($modIds->isNotEmpty()) {
+                        $school->modules()->sync(
+                            $modIds->mapWithKeys(fn($id) => [$id => ['activated_at' => now()]])
+                        );
+                    }
+                }
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning('School modules sync failed: ' . $e->getMessage());
+            }
 
             $user = \App\Models\User::create([
-                'school_id' => $school->id,
-                'role_id' => $registration->role_id,
-                'name' => $registration->nama_user,
-                'position_id' => $registration->position_id,
+                'name' => $registration->nama_user ?? 'Admin Trial',
                 'email' => $data['email'],
-                'no_hp' => $data['no_hp'],
                 'password' => Hash::make($data['password']),
-                'is_trial' => true,
+                'current_organization_id' => $orgId,
             ]);
 
-            foreach (['whatsapp' => 'notif_whatsapp', 'email' => 'notif_email', 'sms' => 'notif_sms'] as $channel => $field) {
-                $user->notificationPreferences()->create([
-                    'channel' => $channel,
-                    'is_enabled' => $registration->{$field},
-                ]);
+            try {
+                if (\Illuminate\Support\Facades\Schema::hasTable('organization_user')) {
+                    $user->organizations()->syncWithoutDetaching([
+                        $orgId => ['is_default' => 1, 'is_active' => 1]
+                    ]);
+                }
+
+                if (\Illuminate\Support\Facades\Schema::hasTable('role_user')) {
+                    $regRoleIds = $registration->roles()->pluck('roles.id');
+                    if ($regRoleIds->isNotEmpty()) {
+                        foreach ($regRoleIds as $rId) {
+                            $user->roles()->syncWithoutDetaching([
+                                $rId => ['organization_id' => $orgId, 'is_default' => 1]
+                            ]);
+                        }
+                    }
+                }
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning('User role/org attachment failed: ' . $e->getMessage());
+            }
+
+            try {
+                if (\Illuminate\Support\Facades\Schema::hasTable('notification_preferences')) {
+                    DB::table('notification_preferences')->updateOrInsert(
+                        [
+                            'user_id' => $user->id,
+                            'category' => 'system',
+                        ],
+                        [
+                            'organization_id' => $orgId,
+                            'whatsapp_enabled' => (bool)$registration->notif_whatsapp,
+                            'email_enabled' => (bool)$registration->notif_email,
+                            'sms_enabled' => (bool)$registration->notif_sms,
+                            'updated_at' => now(),
+                            'created_at' => now(),
+                        ]
+                    );
+                }
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning('Notification preferences sync failed: ' . $e->getMessage());
             }
 
             $registration->update([
@@ -154,14 +290,15 @@ class WelcomeController extends Controller
                 'status' => 'completed',
                 'completed_at' => now(),
             ]);
-            $user->roles()->sync($registration->roles()->pluck('roles.id'));
+
             return $user;
         });
 
         Auth::login($result);
         session()->forget('trial_token');
 
-        return response()->json(['success' => true, 'redirect' => route('dashboard')]);
+        $redirectUrl = route('dashboard');
+        return response()->json(['success' => true, 'redirect' => $redirectUrl]);
     }
 
     private function currentRegistration(Request $request): TrialRegistration
