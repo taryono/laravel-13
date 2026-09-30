@@ -42,6 +42,11 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        // ===== Khusus Pendaftar PPDB =====
+        'applicant' => [
+            'driver'   => 'session',
+            'provider' => 'applicants',
+        ],
     ],
 
     /*
@@ -71,6 +76,10 @@ return [
         //     'driver' => 'database',
         //     'table' => 'users',
         // ],
+        'applicants' => [
+            'driver' => 'eloquent',
+            'model'  => \Models\Applicant::class,
+        ],
     ],
 
     /*
@@ -97,6 +106,12 @@ return [
             'provider' => 'users',
             'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
             'expire' => 60,
+            'throttle' => 60,
+        ],
+        'applicants' => [
+            'provider' => 'applicants',
+            'table'    => 'applicant_password_resets',
+            'expire'   => 60,
             'throttle' => 60,
         ],
     ],
