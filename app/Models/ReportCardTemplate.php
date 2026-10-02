@@ -1,40 +1,15 @@
 <?php
-// app/Models/ReportCardTemplate.php
+namespace Models; 
 
-namespace Models;
-
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
-
-class ReportCardTemplate extends Model
+class ReportCardTemplate extends BasedModel
 {
-    use SoftDeletes;
+    // Relasi
+    
 
-    protected $fillable = [
-        'school_id',
-        'name',
-        'code',
-        'template_data',
-        'is_default',
-        'is_active',
-        'version',
-        'created_by',
-        'updated_by',
-    ];
 
-    protected $casts = [
-        'template_data' => 'array',
-        'is_default'    => 'boolean',
-        'is_active'     => 'boolean',
-    ];
-
-    public function curriculums()
+    // Scope
+    public function scopeActive($query)
     {
-        return $this->belongsToMany(
-            Curriculum::class,
-            'report_card_template_curriculums',
-            'report_card_template_id',
-            'curriculum_id'
-        )->withPivot('is_active')->withTimestamps();
+        return $query->where('is_active', true);
     }
 }
