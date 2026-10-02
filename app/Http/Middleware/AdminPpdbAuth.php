@@ -18,7 +18,7 @@ class AdminPpdbAuth
 
         $user = Auth::guard('web')->user();
 
-        if (!$user->hasAnyRole(['admin-ppdb', 'super-admin'])) {
+        if (!$user->isSuperUser() && !$user->hasAnyRole(['admin-ppdb', 'super-admin', 'admin_ppdb', 'super_admin', 'Panitia PPDB', 'Super Administrator'])) {
             abort(403, 'Anda tidak memiliki akses ke panel admin PPDB.');
         }
 

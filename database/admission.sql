@@ -253,6 +253,71 @@ CREATE TABLE `admission_quota_settings` (
   CONSTRAINT `fk_admission_quota_updated_by`     FOREIGN KEY (`updated_by`)          REFERENCES `users` (`id`)             ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
+
+-- ==========================================
+-- 3. REGISTRATION STEPS
+-- ==========================================
+
+CREATE TABLE `registration_steps` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `organization_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `admission_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `step_number` tinyint UNSIGNED NOT NULL,
+  `title` varchar(150) NOT NULL,
+  `description` text NULL,
+  `badge_color` varchar(50) NULL DEFAULT NULL COMMENT 'Warna badge: blue, cyan, green, dark',
+  `icon` varchar(100) NULL DEFAULT NULL COMMENT 'Opsional: nama icon (lucide/heroicon)',
+  `sort_order` int UNSIGNED NOT NULL DEFAULT 0,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uk_registration_steps_number` (`organization_id`, `admission_id`, `step_number`, `deleted_at`) USING BTREE,
+  INDEX `idx_registration_steps_org` (`organization_id`) USING BTREE,
+  INDEX `idx_registration_steps_active` (`is_active`) USING BTREE,
+  CONSTRAINT `fk_registration_steps_organization` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `fk_registration_steps_admission`    FOREIGN KEY (`admission_id`)    REFERENCES `admissions` (`id`)    ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `fk_registration_steps_created_by`   FOREIGN KEY (`created_by`)      REFERENCES `users` (`id`)         ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `fk_registration_steps_updated_by`   FOREIGN KEY (`updated_by`)      REFERENCES `users` (`id`)         ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+
+INSERT INTO `registration_steps`
+(`id`, `organization_id`, `admission_id`, `step_number`, `title`, `description`,
+ `badge_color`, `icon`, `sort_order`, `is_active`,
+ `created_by`, `updated_by`, `created_at`, `updated_at`, `deleted_at`)
+VALUES
+(1, 1, 1, 1,
+ 'Pilih Gelombang & Isi Data',
+ 'Pilih gelombang aktif dan lengkapi formulir pendaftaran: biodata siswa, NIK, NISN, alamat domisili, dan data orang tua/wali.',
+ 'blue', NULL, 1, 1, NULL, NULL, '2026-09-29 15:10:45', '2026-09-29 15:10:45', NULL),
+
+(2, 1, 1, 2,
+ 'Unggah Dokumen Berkas',
+ 'Upload hasil scan/foto dokumen asli (KK, Akta Kelahiran, Rapor/SKL, dan sertifikat prestasi jika ada) dalam format PDF/JPG.',
+ 'cyan', NULL, 2, 1, NULL, NULL, '2026-09-29 15:10:45', '2026-09-29 15:10:45', NULL),
+
+(3, 1, 1, 3,
+ 'Verifikasi oleh Panitia',
+ 'Tim verifikator PPDB memeriksa keabsahan dan kelengkapan dokumen. Calon siswa menerima bukti tanda bukti pendaftaran resmi.',
+ 'green', NULL, 3, 1, NULL, NULL, '2026-09-29 15:10:45', '2026-09-29 15:10:45', NULL),
+
+(4, 1, 1, 4,
+ 'Pengumuman & Daftar Ulang',
+ 'Cek status kelulusan di portal PPDB online dan lakukan registrasi ulang fisik/online sesuai jadwal yang ditentukan.',
+ 'dark', NULL, 4, 1, NULL, NULL, '2026-09-29 15:10:45', '2026-09-29 15:10:45', NULL)
+AS new
+ON DUPLICATE KEY UPDATE
+  `title`       = new.`title`,
+  `description` = new.`description`,
+  `badge_color` = new.`badge_color`,
+  `sort_order`  = new.`sort_order`,
+  `is_active`   = new.`is_active`,
+  `updated_at`  = new.`updated_at`;
+  
 -- ==========================================
 -- 3. PENDAFTAR & DATA TERPISAH (APPLICANTS)
 -- ==========================================
@@ -305,6 +370,7 @@ CREATE TABLE `applicants` (
 
 
 -- ---------- applicant_domiciles ----------
+
 DROP TABLE IF EXISTS `applicant_domiciles`;
 CREATE TABLE `applicant_domiciles` (
   `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,

@@ -23,8 +23,16 @@ class SetRoleSessionOnLogin
     {
         $user = $event->user;
 
+        // Jika bukan instance User utama atau tidak memiliki relasi roles (misal: Applicant), abaikan
+        if (!($user instanceof \App\Models\User) || !method_exists($user, 'roles')) {
+            return;
+        }
+
         // Ambil semua role milik user beserta data pivot-nya
         $roles = $user->roles;
+        if (!$roles) {
+            return;
+        }
 
         // Cari yang ditandai sebagai default di tabel pivot
         $default_role = $roles->firstWhere('pivot.is_default', 1);

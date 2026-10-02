@@ -678,13 +678,13 @@
                         </button>
                     </div>
 
-                    <div class="d-flex align-items-center gap-3 ps-3 border-start"
+                    <div class="d-flex align-items-center gap-2 ps-3 border-start"
                         style="border-color:var(--bs-outline-variant) !important;">
                         <div class="rounded-circle overflow-hidden border d-flex align-items-center justify-content-center bg-primary text-white fw-bold"
                             style="width:2.5rem;height:2.5rem;">
                             {{ substr(auth()->check() ? auth()->user()->name : 'Panitia', 0, 2) }}
                         </div>
-                        <div class="d-none d-sm-block text-start">
+                        <div class="d-none d-sm-block text-start me-2">
                             <p style="font-size:0.75rem; font-weight:700; margin:0; line-height:1.2;">
                                 {{ auth()->check() ? auth()->user()->name : 'Drs. H. Maman Suryaman, M.Pd' }}
                             </p>
@@ -692,6 +692,13 @@
                                 {{ (auth()->check() && auth()->user()->roles && auth()->user()->roles->first()) ? auth()->user()->roles->first()->name : 'Ketua Panitia Pelaksana' }}
                             </p>
                         </div>
+                        <form method="POST" action="{{ route('ppdb-admin.logout') }}" class="m-0">
+                            @csrf
+                            <button type="submit" class="btn btn-sm btn-outline-danger d-flex align-items-center gap-1 py-1 px-2 rounded-2" title="Keluar dari Panel Admin">
+                                <span class="material-symbols-outlined" style="font-size:1.1rem;">logout</span>
+                                <span class="d-none d-md-inline" style="font-size:0.75rem; font-weight:600;">Keluar</span>
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>

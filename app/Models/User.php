@@ -123,7 +123,10 @@ class User extends Authenticatable implements MustVerifyEmail
         return Cache::remember($cacheKey, 3600, function () use ($roles, $orgId) {
             return $this->roles()
                 ->when($orgId, fn($q) => $q->where('organization_id', $orgId))
-                ->whereIn('name', $roles)
+                ->where(function ($q) use ($roles) {
+                    $q->whereIn('roles.name', $roles)
+                      ->orWhereIn('roles.code', $roles);
+                })
                 ->exists();
         });
     }

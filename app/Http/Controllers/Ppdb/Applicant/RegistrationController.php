@@ -22,12 +22,38 @@ use Illuminate\Validation\Rule;
 
 class RegistrationController extends Controller
 {
+
+    public function index()
+    {
+        // show all admission schedules before show registration form 
+        $admissions = Admission::where('is_active', 1)
+            ->with([
+                'academic_year',
+                'school',
+                'paths' => fn($q) => $q->where('is_active', 1)->orderBy('sort_order'),
+                'timelines'
+            ])
+            ->orderBy('id', 'desc')
+            ->get();
+
+        // Ambil data jalur pendaftaran aktif (utamakan dari admission pertama atau seluruh jalur aktif)
+        $firstAdmission = $admissions->first();
+        $admissionPaths = $firstAdmission && $firstAdmission->paths->isNotEmpty()
+            ? $firstAdmission->paths
+            : \Models\AdmissionPath::where('is_active', 1)->orderBy('sort_order')->get();
+
+        return view('ppdb.index', compact('admissions', 'admissionPaths'));
+    }
     /**
      * Tampilkan form registrasi
      */
-    public function create(Admission $admission)
+    public function create($code)
     {
-        // Load relasi
+        $admission = $code instanceof Admission ? $code : Admission::where('code', $code)->first();
+        if (!$admission) {
+            abort(404, 'Pendaftaran tidak ditemukan.');
+        }
+
         $admission->load([
             'paths' => fn($q) => $q->where('is_active', 1)->orderBy('sort_order'),
             'school',
@@ -36,7 +62,7 @@ class RegistrationController extends Controller
             'quota_settings.study_program',
         ]);
 
-        // Ambil data pendaftar jika ada
+        // Get data applicant
         $applicant = null;
         if (auth()->check()) {
             $applicant = Applicant::with([
@@ -78,8 +104,12 @@ class RegistrationController extends Controller
     /**
      * Simpan pendaftaran baru
      */
-    public function store(Request $request, Admission $admission)
+    public function store(Request $request, $admission)
     {
+        if (!$admission instanceof Admission) {
+            $admission = Admission::where('code', $admission)->firstOrFail();
+        }
+
         $validated = $this->validateRegistration($request);
 
         DB::beginTransaction();
@@ -493,13 +523,51 @@ class RegistrationController extends Controller
     }
 
     /**
+     * Tampilkan form cek status (redirect ke section cek status di landing page)
+     */
+    public function statusForm()
+    {
+        return redirect()->to(route('ppdb.index') . '#cek-status');
+    }
+
+    /**
+     * Proses pencarian status pendaftar
+     */
+    public function checkStatus(Request $request)
+    {
+        $request->validate([
+            'registration_number' => 'required|string',
+        ]);
+
+        $applicant = Applicant::with([
+            'status',
+            'admission',
+            'applicant_choices.study_program',
+            '_path'
+        ])
+            ->where('registration_number', trim($request->registration_number))
+            ->orWhere('nik', trim($request->registration_number))
+            ->first();
+
+        if (!$applicant) {
+            return redirect()->to(route('ppdb.index') . '#cek-status')
+                ->withInput()
+                ->with('status_error', 'Data tidak ditemukan! Mohon periksa kembali Nomor Registrasi atau NIK Anda.');
+        }
+
+        return redirect()->to(route('ppdb.index') . '#cek-status')
+            ->withInput()
+            ->with('applicant_result', $applicant);
+    }
+
+    /**
      * Cek status pendaftaran
      */
     public function status(Request $request)
     {
         $request->validate(['registration_number' => 'required|string']);
 
-        $applicant = Applicant::with(['status', 'admission', 'choices.studyProgram'])
+        $applicant = Applicant::with(['status', 'admission', 'applicant_choices.study_program'])
             ->where('registration_number', $request->registration_number)
             ->firstOrFail();
 

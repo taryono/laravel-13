@@ -17,7 +17,6 @@ use Models\ActivityLog;
 use Models\School;
 use Models\AcademicYear;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
 class AdminDashboardController extends Controller
@@ -257,7 +256,22 @@ class AdminDashboardController extends Controller
         $status = $request->input('status', 'verified'); // verified, rejected, revision_required
         $notes = $request->input('notes');
 
-        $applicant = Applicant::findOrFail($applicantId);
+        $applicant = Applicant::find($applicantId);
+        if (!$applicant) {
+            $doc = ApplicationDocument::find($applicantId) ?? AdmissionDocumentVerification::find($applicantId);
+            if ($doc && $doc->applicant_id) {
+                $applicant = Applicant::find($doc->applicant_id);
+            }
+        }
+
+        if (!$applicant) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Data pendaftar tidak ditemukan.'], 404);
+            }
+            return redirect()->back()->with('error', 'Data pendaftar tidak ditemukan.');
+        }
+
+        $applicantId = $applicant->id;
 
         // Update document verification records
         AdmissionDocumentVerification::where('applicant_id', $applicantId)->update([
@@ -379,5 +393,50 @@ class AdminDashboardController extends Controller
         };
 
         return response()->stream($callback, 200, $headers);
+    }
+
+    /**
+     * Dashboard alias method.
+     */
+    public function dashboard(Request $request)
+    {
+        return $this->index($request);
+    }
+
+    /**
+     * Verify document or applicant alias.
+     */
+    public function verify(Request $request, $document)
+    {
+        $request->merge(['status' => 'verified']);
+        return $this->updateVerification($request, $document);
+    }
+
+    /**
+     * Reject document or applicant alias.
+     */
+    public function reject(Request $request, $document)
+    {
+        $request->merge(['status' => 'rejected']);
+        return $this->updateVerification($request, $document);
+    }
+
+    /**
+     * Selection handler (GET displays view, POST / AJAX runs algorithm).
+     */
+    public function selection(Request $request)
+    {
+        if ($request->isMethod('post') || $request->wantsJson()) {
+            return $this->runSelection($request);
+        }
+        return $this->index($request);
+    }
+
+    /**
+     * Reports export alias.
+     */
+    public function reports(Request $request)
+    {
+        return $this->export($request);
     }
 }

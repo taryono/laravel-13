@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AdminLoginController;
 use App\Http\Controllers\Ppdb\Admin\AdminDashboardController;
+use App\Modules\Applicant\Controllers\ApplicantController;
+use App\Modules\Admission\Controllers\AdmissionController;
 
 // ==================================================
 // ADMIN PPDB — prefix /admin-ppdb
@@ -17,19 +19,23 @@ Route::prefix('admin-ppdb')->name('ppdb-admin.')->group(function () {
 
     // ---------- AUTH: ADMIN PPDB ----------
     Route::middleware('ppdb-admin.auth')->group(function () {
-        Route::get('/', [AdminDashboardController::class, 'dashboard'])->name('dashboard');
-        Route::resource('applicants', AdminDashboardController::class);
-        Route::resource('admissions', AdminDashboardController::class);
+        Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
+        Route::resource('applicants', ApplicantController::class);
+        Route::resource('admissions', AdmissionController::class);
 
         Route::get('/verifikasi', [AdminDashboardController::class, 'index'])->name('verification');
         Route::post('/verifikasi/{document}', [AdminDashboardController::class, 'verify'])->name('verification.verify');
         Route::post('/verifikasi/{document}/reject', [AdminDashboardController::class, 'reject'])->name('verification.reject');
 
-        Route::get('/seleksi', [AdminDashboardController::class, 'selection'])->name('selection');
+        Route::match(['get', 'post'], '/seleksi', [AdminDashboardController::class, 'selection'])->name('selection');
         Route::get('/laporan', [AdminDashboardController::class, 'reports'])->name('reports');
     });
 });
-Route::prefix('dashboard/admin')->name('dashboard.admin.')->group(function () {
+
+// ==================================================
+// DASHBOARD ADMIN PPDB (Portal Operasional Admin)
+// ==================================================
+Route::prefix('dashboard/admin')->name('dashboard.admin.')->middleware('ppdb-admin.auth')->group(function () {
     Route::get('/', [AdminDashboardController::class, 'index'])->name('index');
     Route::post('/verify/{applicantId}', [AdminDashboardController::class, 'updateVerification'])->name('verify');
     Route::post('/run-selection', [AdminDashboardController::class, 'runSelection'])->name('run-selection');

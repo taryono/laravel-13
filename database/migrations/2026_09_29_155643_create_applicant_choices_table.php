@@ -13,7 +13,12 @@ return new class extends Migration
     {
         Schema::create('applicant_choices', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('applicant_id');
+            $table->unsignedBigInteger('study_program_id')->nullable();
+            $table->integer('choice_order')->default(1);
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

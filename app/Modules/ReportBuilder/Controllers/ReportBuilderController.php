@@ -1,10 +1,9 @@
 <?php
 
-namespace App\Modules\ReportBuilderComponent\Controllers;
+namespace App\Modules\ReportBuilder\Controllers;
 
-use App\DataTables\ReportBuilderComponentDataTable;
 use App\Http\Controllers\MainController;
-use Models\ReportBuilderComponent;
+use App\Models\ReportTemplate;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -16,13 +15,14 @@ use App\Services\Report\ReportPdfService;
 use App\Services\ReportCompilerService;
 use App\Services\ReportRenderService;
 
-class ReportBuilderComponentController extends MainController
+class ReportBuilderController extends MainController
 {
-    public function __construct( protected ReportCompilerService $compiler,
+    public function __construct(
+        protected ReportCompilerService $compiler,
         protected ReportRenderService $renderer,
-        protected ReportPdfService $pdfService)
-    {
-        parent::__construct(new ReportBuilderComponent());
+        protected ReportPdfService $pdfService
+    ) {
+        parent::__construct(new ReportTemplate());
     }
 
     /**
@@ -32,8 +32,9 @@ class ReportBuilderComponentController extends MainController
      * - Normal page request
      * - Yajra DataTables AJAX request
      */
-    public function index(Request $request ) { 
-         $query = ReportTemplate::with(['creator', 'curriculums', 'signatories'])
+    public function index(Request $request)
+    {
+        $query = ReportTemplate::with(['creator', 'curriculums', 'signatories'])
             ->withCount(['versions', 'assets', 'signatories']);
 
         // Search by name or description
@@ -82,7 +83,6 @@ class ReportBuilderComponentController extends MainController
         ];
 
         return view('ReportBuilderComponent::index', compact('templates', 'stats'));
- 
     }
 
     /**
@@ -95,7 +95,7 @@ class ReportBuilderComponentController extends MainController
         $availableBindings = config('report.available_bindings', []);
         $curriculums = Curriculum::active()->orderBy('name')->get();
         $academicYears = AcademicYear::orderByDesc('start_year')->get();
- 
+
         return view(
             'ReportBuilderComponent::create',
             compact('reportBuilderComponent', 'categories', 'availableBindings', 'curriculums', 'academicYears')
@@ -221,7 +221,6 @@ class ReportBuilderComponentController extends MainController
                 'Data ReportBuilderComponent berhasil ditambahkan.',
                 $model
             );
-
         } catch (Throwable $e) {
 
             Log::error(
@@ -260,7 +259,7 @@ class ReportBuilderComponentController extends MainController
      * Update the specified resource.
      */
     public function update(Request $request, $id)
-    { 
+    {
         try {
             $reportBuilderComponent = $this->model->findOrFail($id);
             $validated = $request->validate([
@@ -286,7 +285,7 @@ class ReportBuilderComponentController extends MainController
             } else {
                 $validated['default_config'] = $this->buildDefaultConfig($validated['type'], $validated['name']);
             }
-            
+
             DB::transaction(function () use (
                 $reportBuilderComponent,
                 $validated
@@ -299,8 +298,7 @@ class ReportBuilderComponentController extends MainController
                 'Data ReportBuilderComponent berhasil diperbarui.',
                 $reportBuilderComponent
             );
-
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui ReportBuilderComponent.',
                 [
@@ -316,7 +314,7 @@ class ReportBuilderComponentController extends MainController
                 'Data ReportBuilderComponent gagal diperbarui.'
             );
         }
-    } 
+    }
 
     protected function buildDefaultConfig(string $type, string $name): array
     {
@@ -436,8 +434,7 @@ class ReportBuilderComponentController extends MainController
                 $request,
                 'Data ReportBuilderComponent berhasil dihapus.'
             );
-
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $reportBuilderComponent->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus ReportBuilderComponent.',
@@ -453,7 +450,7 @@ class ReportBuilderComponentController extends MainController
                 'Data ReportBuilderComponent gagal dihapus.'
             );
         }
-    } 
+    }
 
     public function uploadAsset(Request $request)
     {

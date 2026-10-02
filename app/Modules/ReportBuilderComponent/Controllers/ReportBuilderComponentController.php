@@ -11,6 +11,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
+use Models\AcademicYear;
+use Models\Curriculum;
 use Throwable;
 
 class ReportBuilderComponentController extends MainController
@@ -56,7 +58,7 @@ class ReportBuilderComponentController extends MainController
         $availableBindings = config('report.available_bindings', []);
         $curriculums = Curriculum::active()->orderBy('name')->get();
         $academicYears = AcademicYear::orderByDesc('start_year')->get();
- 
+
         return view(
             'ReportBuilderComponent::create',
             compact('reportBuilderComponent', 'categories', 'availableBindings', 'curriculums', 'academicYears')
@@ -93,7 +95,7 @@ class ReportBuilderComponentController extends MainController
             $validated['default_config'] = $this->buildDefaultConfig($validated['type'], $validated['name']);
         }
 
-         
+
 
         try {
             $model = DB::transaction(function () use ($validated) {
@@ -105,7 +107,6 @@ class ReportBuilderComponentController extends MainController
                 'Data ReportBuilderComponent berhasil ditambahkan.',
                 $model
             );
-
         } catch (Throwable $e) {
 
             Log::error(
@@ -144,7 +145,7 @@ class ReportBuilderComponentController extends MainController
      * Update the specified resource.
      */
     public function update(Request $request, $id)
-    { 
+    {
         try {
             $reportBuilderComponent = $this->model->findOrFail($id);
             $validated = $request->validate([
@@ -170,7 +171,7 @@ class ReportBuilderComponentController extends MainController
             } else {
                 $validated['default_config'] = $this->buildDefaultConfig($validated['type'], $validated['name']);
             }
-            
+
             DB::transaction(function () use (
                 $reportBuilderComponent,
                 $validated
@@ -183,8 +184,7 @@ class ReportBuilderComponentController extends MainController
                 'Data ReportBuilderComponent berhasil diperbarui.',
                 $reportBuilderComponent
             );
-
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui ReportBuilderComponent.',
                 [
@@ -336,8 +336,7 @@ class ReportBuilderComponentController extends MainController
                 $request,
                 'Data ReportBuilderComponent berhasil dihapus.'
             );
-
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $reportBuilderComponent->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus ReportBuilderComponent.',
@@ -353,5 +352,5 @@ class ReportBuilderComponentController extends MainController
                 'Data ReportBuilderComponent gagal dihapus.'
             );
         }
-    } 
+    }
 }

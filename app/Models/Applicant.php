@@ -98,10 +98,18 @@ class Applicant extends Authenticatable
         return $this->hasMany(ApplicantInvoice::class, 'applicant_id');
     }
 
-    // Scope
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
+    }
+
+    public function getAuthPassword()
+    {
+        if (!empty($this->attributes['password'])) {
+            return $this->attributes['password'];
+        }
+        $fallback = $this->nik ?: ($this->birth_date ? \Carbon\Carbon::parse($this->birth_date)->format('dmY') : 'rahasia123');
+        return bcrypt($fallback);
     }
 
     protected $guarded = ['id'];
@@ -135,6 +143,21 @@ class Applicant extends Authenticatable
     public function statusHistories()
     {
         return $this->hasMany(ApplicantStatusHistory::class);
+    }
+
+    public function applicant_choices()
+    {
+        return $this->choices();
+    }
+
+    public function applicant_support_programs()
+    {
+        return $this->support_programs();
+    }
+
+    public function _path()
+    {
+        return $this->path();
     }
     // Accessor
     public function getStatusBadgeAttribute(): string

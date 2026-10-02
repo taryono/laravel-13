@@ -1,8 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\Wali\RaportCetakController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -13,9 +11,9 @@ use App\Http\Controllers\Wali\RaportCetakController;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
- 
-use App\Modules\ReportBuilder\ReportBuilderController;
-use App\Modules\ReportBuilderComponent\ReportBuilderComponentController;
+
+use App\Modules\ReportBuilder\Controllers\ReportBuilderController;
+use App\Modules\ReportBuilderComponent\Controllers\ReportBuilderComponentController;
 
 Route::middleware(['auth'])->group(function () {
     // Admin
@@ -45,6 +43,6 @@ Route::middleware(['auth'])->group(function () {
     });
 
     // Parent Portal
-    Route::get('/parent/report/{student}/print', [ReportPrintController::class, 'print'])
-        ->name('parent.report.print');
+    // Route::get('/parent/report/{student}/print', [ReportPrintController::class, 'print'])
+    //     ->name('parent.report.print');
 });
