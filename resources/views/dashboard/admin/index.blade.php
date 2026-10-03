@@ -77,12 +77,14 @@
             flex-direction: column;
             padding: 1rem;
             overflow-y: auto;
-            transition: transform 0.3s ease;
+            -webkit-overflow-scrolling: touch;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .sidebar .drawer-header {
             display: flex;
             align-items: center;
+            justify-content: space-between;
             gap: 0.75rem;
             padding: 0.75rem 0.5rem;
             border-bottom: 1px solid var(--bs-surface-container);
@@ -217,15 +219,18 @@
             50% { opacity: 0.4; }
         }
 
-        .top-navbar .search-box {
+        .top-navbar .search-box,
+        .mobile-search-bar .search-box {
             position: relative;
             width: 18rem;
         }
 
-        .top-navbar .search-box input {
+        .top-navbar .search-box input,
+        .mobile-search-bar .search-box input {
             width: 100%;
             height: 2.25rem;
             padding-left: 2.25rem;
+            padding-right: 2rem;
             font-size: 0.75rem;
             background: var(--bs-surface-container-low);
             border: 1px solid var(--bs-outline-variant);
@@ -233,14 +238,16 @@
             transition: all 0.2s;
         }
 
-        .top-navbar .search-box input:focus {
+        .top-navbar .search-box input:focus,
+        .mobile-search-bar .search-box input:focus {
             outline: none;
             border-color: var(--bs-primary);
             box-shadow: 0 0 0 2px rgba(0, 40, 142, 0.15);
             background: var(--bs-surface-container-lowest);
         }
 
-        .top-navbar .search-box .material-symbols-outlined {
+        .top-navbar .search-box .search-icon,
+        .mobile-search-bar .search-box .search-icon {
             position: absolute;
             left: 0.6rem;
             top: 50%;
@@ -248,6 +255,46 @@
             font-size: 1.1rem;
             color: var(--bs-outline);
             pointer-events: none;
+        }
+
+        .clear-search-btn {
+            position: absolute;
+            right: 0.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            color: var(--bs-outline);
+            cursor: pointer;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            width: 1.4rem;
+            height: 1.4rem;
+            transition: all 0.15s;
+        }
+
+        .clear-search-btn:hover {
+            color: var(--bs-on-surface);
+            background: var(--bs-surface-container-high);
+        }
+
+        .clear-search-btn .material-symbols-outlined {
+            position: static;
+            transform: none;
+            font-size: 1rem;
+        }
+
+        .mobile-search-bar {
+            background: var(--bs-surface-container-lowest);
+            border-bottom: 1px solid var(--bs-outline-variant);
+            padding: 0.5rem 1rem;
+            position: sticky;
+            top: 3.75rem;
+            z-index: 1018;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
         }
 
         /* ===== CARDS & PANELS ===== */
@@ -515,9 +562,33 @@
             z-index: 1090;
         }
 
+        /* Sidebar Backdrop for Mobile */
+        .sidebar-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(13, 28, 46, 0.5);
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
+            z-index: 1025;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.25s ease, visibility 0.25s ease;
+        }
+
+        .sidebar-backdrop.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
         @media (max-width: 991.98px) {
             .sidebar {
                 transform: translateX(-100%);
+                width: 17rem;
+                max-width: calc(100vw - 3rem);
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             }
 
             .sidebar.show {
@@ -557,16 +628,26 @@
 
 <body>
 
+    <!-- ==================== SIDEBAR BACKDROP (MOBILE) ==================== -->
+    <div class="sidebar-backdrop d-lg-none" id="sidebarBackdrop"></div>
+
     <!-- ==================== SIDEBAR ==================== -->
-    <aside class="sidebar" id="sidebar">
+    <aside class="sidebar" id="sidebar" aria-label="Menu Navigasi Sidebar">
         <div class="drawer-header">
-            <div class="logo-icon">
-                <span class="material-symbols-outlined" style="font-size:1.5rem;">account_balance</span>
+            <div class="d-flex align-items-center gap-2">
+                <div class="logo-icon flex-shrink-0">
+                    <span class="material-symbols-outlined" style="font-size:1.5rem;">account_balance</span>
+                </div>
+                <div>
+                    <h1>PPDB Admin Portal</h1>
+                    <p>Dinas Pendidikan &amp; Kebudayaan</p>
+                </div>
             </div>
-            <div>
-                <h1>PPDB Admin Portal</h1>
-                <p>Dinas Pendidikan &amp; Kebudayaan</p>
-            </div>
+            <!-- Tombol Tutup Sidebar untuk Tampilan Mobile -->
+            <button type="button" class="btn btn-sm d-lg-none p-1 border-0 rounded-circle text-muted d-inline-flex align-items-center justify-content-center" 
+                id="sidebarClose" aria-label="Tutup Menu Navigasi" style="width:2rem; height:2rem; background:var(--bs-surface-container);">
+                <span class="material-symbols-outlined" style="font-size:1.25rem;">close</span>
+            </button>
         </div>
 
         <p class="section-label">Alur Kerja Utama</p>
@@ -629,7 +710,13 @@
         <header class="top-navbar">
             <div class="d-flex justify-content-between align-items-center gap-3">
                 <!-- Left -->
-                <div class="d-flex align-items-center gap-4 flex-wrap">
+                <div class="d-flex align-items-center gap-2 gap-sm-3 flex-wrap">
+                    <!-- Hamburger Toggle Button untuk Mobile / Layar Kecil -->
+                    <button type="button" class="btn btn-sm d-lg-none p-1 border-0 rounded-2 d-inline-flex align-items-center justify-content-center" 
+                        id="sidebarToggle" aria-label="Buka Menu Navigasi" aria-expanded="false" 
+                        style="color:var(--bs-primary); background:var(--bs-surface-container-low); width:2.25rem; height:2.25rem;">
+                        <span class="material-symbols-outlined" style="font-size:1.5rem;">menu</span>
+                    </button>
                     <div>
                         <span class="institution-name">{{ $schoolName ?? 'Portal Panitia PPDB' }}</span>
                         <div class="d-flex align-items-center gap-2 mt-1 flex-wrap">
@@ -647,10 +734,13 @@
                             </span>
                         </div>
                     </div>
-                    <!-- Search -->
-                    <div class="search-box d-none d-xl-block">
-                        <span class="material-symbols-outlined">search</span>
-                        <input type="text" id="searchInput" placeholder="Cari NISN, NIK, atau Nama..." onkeyup="filterTable(this.value)">
+                    <!-- Search Box (Desktop & Tablet: >= 768px) -->
+                    <div class="search-box d-none d-md-block position-relative">
+                        <span class="material-symbols-outlined search-icon">search</span>
+                        <input type="text" id="searchInput" placeholder="Cari NISN, NIK, Nama, No. Daftar..." autocomplete="off">
+                        <button type="button" id="clearSearchBtn" class="clear-search-btn d-none" aria-label="Hapus pencarian" title="Hapus pencarian">
+                            <span class="material-symbols-outlined">close</span>
+                        </button>
                     </div>
                 </div>
 
@@ -666,6 +756,11 @@
                     </div>
 
                     <div class="d-flex align-items-center gap-1">
+                        <!-- Mobile Search Toggle Button (< 768px) -->
+                        <button type="button" class="btn btn-link p-2 text-decoration-none d-md-none" id="mobileSearchToggle" 
+                            style="color:var(--bs-on-surface-variant);" title="Cari Pendaftar" aria-label="Cari Pendaftar">
+                            <span class="material-symbols-outlined" style="font-size:1.35rem;">search</span>
+                        </button>
                         <button class="btn btn-link position-relative p-2 text-decoration-none"
                             style="color:var(--bs-on-surface-variant);" title="Notifikasi Aktivitas">
                             <span class="material-symbols-outlined" style="font-size:1.4rem;">notifications</span>
@@ -703,6 +798,17 @@
                 </div>
             </div>
         </header>
+
+        <!-- Mobile Search Dropdown Bar (< 768px) -->
+        <div class="mobile-search-bar d-md-none" id="mobileSearchBar" style="display:none;">
+            <div class="search-box w-100 position-relative">
+                <span class="material-symbols-outlined search-icon">search</span>
+                <input type="text" id="mobileSearchInput" placeholder="Cari NISN, NIK, Nama, No. Daftar..." autocomplete="off">
+                <button type="button" id="clearMobileSearchBtn" class="clear-search-btn d-none" aria-label="Hapus pencarian" title="Hapus pencarian">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+        </div>
 
         <!-- ==================== MAIN CONTENT ==================== -->
         <main class="flex-grow-1 p-3 p-lg-4" id="overview" style="max-width:1440px; margin:0 auto; width:100%;">
@@ -1051,6 +1157,15 @@
                             style="background:{{ $filter === 'prestasi' ? 'var(--bs-primary)' : 'var(--bs-surface-container-low)' }}; color:{{ $filter === 'prestasi' ? '#fff' : 'var(--bs-on-surface-variant)' }}; border:1px solid var(--bs-outline-variant); font-size:0.7rem;">
                             Prestasi ({{ $countPrestasi }})
                         </a>
+                        <!-- In-table quick search input -->
+                        <div class="search-box position-relative ms-auto" style="min-width: 14rem;">
+                            <span class="material-symbols-outlined search-icon" style="font-size:1rem; position:absolute; left:0.6rem; top:50%; transform:translateY(-50%); color:var(--bs-outline); pointer-events:none;">search</span>
+                            <input type="text" id="panelSearchInput" placeholder="Filter di antrean ini..." autocomplete="off"
+                                style="height: 2rem; font-size: 0.7rem; padding-left: 2rem; padding-right: 1.75rem; border-radius: 0.375rem; background: var(--bs-surface-container-lowest); border: 1px solid var(--bs-outline-variant); width: 100%;">
+                            <button type="button" id="clearPanelSearchBtn" class="clear-search-btn d-none" aria-label="Hapus pencarian" title="Hapus pencarian" style="right: 0.35rem;">
+                                <span class="material-symbols-outlined" style="font-size:0.9rem;">close</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -1196,19 +1311,34 @@
                                     </td>
                                 </tr>
                             @empty
-                                <tr>
+                                <tr id="initialEmptyRow">
                                     <td colspan="7" class="text-center py-4 text-muted">
                                         Tidak ada antrean berkas ditemukan pada filter ini.
                                     </td>
                                 </tr>
                             @endforelse
+
+                            <!-- Row pesan jika pencarian tidak menemukan hasil -->
+                            <tr id="searchEmptyRow" style="display:none;">
+                                <td colspan="7" class="text-center py-5 text-muted">
+                                    <div class="d-flex flex-column align-items-center justify-content-center py-2">
+                                        <span class="material-symbols-outlined text-secondary mb-2" style="font-size:2.5rem; opacity:0.6;">search_off</span>
+                                        <span class="fw-bold" style="font-size:0.9rem;">Tidak ada hasil pencarian</span>
+                                        <span class="small text-muted mt-1" id="searchEmptyKeyword">Tidak ada berkas yang cocok dengan kata kunci pencarian.</span>
+                                        <button type="button" class="btn btn-sm btn-outline-primary mt-3 d-inline-flex align-items-center gap-1" onclick="resetSearch()">
+                                            <span class="material-symbols-outlined" style="font-size:1.1rem;">restart_alt</span>
+                                            <span>Reset Pencarian</span>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
 
                 <div class="d-flex flex-column flex-sm-row align-items-center justify-content-between gap-3 pt-3"
                     style="font-size:0.7rem; color:var(--bs-on-surface-variant);">
-                    <span>Menampilkan 1-{{ $verificationApplicants->count() }} dari {{ $countAll }} antrean verifikasi berkas</span>
+                    <span id="tableVerifCounter">Menampilkan 1-{{ $verificationApplicants->count() }} dari {{ $countAll }} antrean verifikasi berkas</span>
                     <div class="d-flex align-items-center gap-2">
                         <button class="btn btn-sm"
                             style="border:1px solid var(--bs-outline-variant); background:var(--bs-surface-container-lowest); font-size:0.7rem;"
@@ -1491,7 +1621,57 @@
                 }
             }, 10000);
 
-            // Highlight active nav link on click
+            // Mobile Sidebar Toggle and Backdrop handling
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const sidebarClose = document.getElementById('sidebarClose');
+            const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+
+            function openSidebar() {
+                if (sidebar) {
+                    sidebar.classList.add('show');
+                    if (sidebarBackdrop) sidebarBackdrop.classList.add('show');
+                    if (sidebarToggle) sidebarToggle.setAttribute('aria-expanded', 'true');
+                    document.body.style.overflow = 'hidden';
+                }
+            }
+
+            function closeSidebar() {
+                if (sidebar) {
+                    sidebar.classList.remove('show');
+                    if (sidebarBackdrop) sidebarBackdrop.classList.remove('show');
+                    if (sidebarToggle) sidebarToggle.setAttribute('aria-expanded', 'false');
+                    document.body.style.overflow = '';
+                }
+            }
+
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    if (sidebar.classList.contains('show')) {
+                        closeSidebar();
+                    } else {
+                        openSidebar();
+                    }
+                });
+            }
+
+            if (sidebarClose) {
+                sidebarClose.addEventListener('click', closeSidebar);
+            }
+
+            if (sidebarBackdrop) {
+                sidebarBackdrop.addEventListener('click', closeSidebar);
+            }
+
+            // Close on escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && sidebar && sidebar.classList.contains('show')) {
+                    closeSidebar();
+                }
+            });
+
+            // Highlight active nav link on click & auto-close sidebar on mobile
             const navLinks = document.querySelectorAll('.sidebar .nav-link');
             navLinks.forEach(link => {
                 link.addEventListener('click', function(e) {
@@ -1499,7 +1679,17 @@
                         navLinks.forEach(l => l.classList.remove('active'));
                         this.classList.add('active');
                     }
+                    if (window.innerWidth < 992) {
+                        closeSidebar();
+                    }
                 });
+            });
+
+            // Auto-close on resize to desktop
+            window.addEventListener('resize', function() {
+                if (window.innerWidth >= 992 && sidebar && sidebar.classList.contains('show')) {
+                    closeSidebar();
+                }
             });
 
             // Smooth scroll for anchor links
@@ -1519,14 +1709,143 @@
             });
         });
 
-        // Filter table by text search
-        function filterTable(query) {
-            const trs = document.querySelectorAll('#tableVerifikasi tbody tr');
-            query = query.toLowerCase();
-            trs.forEach(tr => {
-                const text = tr.innerText.toLowerCase();
-                tr.style.display = text.includes(query) ? '' : 'none';
+        // ==================== SEARCH & FILTER TABLE ====================
+        const searchInput = document.getElementById('searchInput');
+        const mobileSearchInput = document.getElementById('mobileSearchInput');
+        const panelSearchInput = document.getElementById('panelSearchInput');
+        const mobileSearchToggle = document.getElementById('mobileSearchToggle');
+        const mobileSearchBar = document.getElementById('mobileSearchBar');
+
+        // Toggle mobile search bar
+        if (mobileSearchToggle && mobileSearchBar) {
+            mobileSearchToggle.addEventListener('click', function() {
+                const isHidden = mobileSearchBar.style.display === 'none' || mobileSearchBar.style.display === '';
+                mobileSearchBar.style.display = isHidden ? 'block' : 'none';
+                if (isHidden && mobileSearchInput) {
+                    mobileSearchInput.focus();
+                }
             });
+        }
+
+        // Attach input & keydown listeners
+        [searchInput, mobileSearchInput, panelSearchInput].forEach(input => {
+            if (!input) return;
+
+            input.addEventListener('input', function() {
+                filterTable(this.value);
+            });
+
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    // Scroll down to verifikasi table
+                    const verifEl = document.getElementById('verifikasi');
+                    if (verifEl) {
+                        verifEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                } else if (e.key === 'Escape') {
+                    resetSearch();
+                }
+            });
+        });
+
+        // Clear buttons
+        ['clearSearchBtn', 'clearMobileSearchBtn', 'clearPanelSearchBtn'].forEach(btnId => {
+            const btn = document.getElementById(btnId);
+            if (btn) {
+                btn.addEventListener('click', function() {
+                    resetSearch();
+                });
+            }
+        });
+
+        // Filter table function
+        function filterTable(query) {
+            query = (query || '').trim().toLowerCase();
+
+            // Sync all inputs
+            [searchInput, mobileSearchInput, panelSearchInput].forEach(inp => {
+                if (inp && inp.value !== query) {
+                    inp.value = query;
+                }
+            });
+
+            // Toggle clear buttons
+            const hasQuery = query.length > 0;
+            ['clearSearchBtn', 'clearMobileSearchBtn', 'clearPanelSearchBtn'].forEach(btnId => {
+                const btn = document.getElementById(btnId);
+                if (btn) {
+                    btn.classList.toggle('d-none', !hasQuery);
+                }
+            });
+
+            const rows = document.querySelectorAll('#tableVerifikasi tbody tr[id^="row-applicant-"]');
+            const searchEmptyRow = document.getElementById('searchEmptyRow');
+            const initialEmptyRow = document.getElementById('initialEmptyRow');
+            const tableCounter = document.getElementById('tableVerifCounter');
+
+            let matchedCount = 0;
+            const totalRows = rows.length;
+            const words = query.split(/\s+/).filter(Boolean);
+
+            rows.forEach(tr => {
+                const text = tr.innerText.toLowerCase();
+                // Check if all search words are present in row text
+                const isMatch = words.length === 0 || words.every(w => text.includes(w));
+
+                if (isMatch) {
+                    tr.style.display = '';
+                    matchedCount++;
+                } else {
+                    tr.style.display = 'none';
+                }
+            });
+
+            // Empty state row handling
+            if (searchEmptyRow) {
+                if (hasQuery && matchedCount === 0 && totalRows > 0) {
+                    searchEmptyRow.style.display = '';
+                    const emptyKw = document.getElementById('searchEmptyKeyword');
+                    if (emptyKw) {
+                        emptyKw.innerText = `Tidak ada berkas yang cocok dengan kata kunci "${query}".`;
+                    }
+                } else {
+                    searchEmptyRow.style.display = 'none';
+                }
+            }
+
+            if (initialEmptyRow) {
+                initialEmptyRow.style.display = (totalRows === 0) ? '' : 'none';
+            }
+
+            // Update counter info
+            if (tableCounter) {
+                if (hasQuery) {
+                    tableCounter.innerHTML = `Menemukan <strong>${matchedCount}</strong> dari ${totalRows} antrean (disaring dari kata kunci "<em>${escapeHtml(query)}</em>")`;
+                } else {
+                    tableCounter.innerText = `Menampilkan 1-${totalRows} dari {{ $countAll }} antrean verifikasi berkas`;
+                }
+            }
+        }
+
+        // Reset search
+        function resetSearch() {
+            filterTable('');
+            if (searchInput && window.innerWidth >= 768) {
+                searchInput.focus();
+            } else if (panelSearchInput) {
+                panelSearchInput.focus();
+            }
+        }
+
+        // Helper escape HTML
+        function escapeHtml(str) {
+            return str
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
         }
 
         // View document dummy modal

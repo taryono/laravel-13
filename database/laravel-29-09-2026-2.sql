@@ -5308,6 +5308,84 @@ CREATE TABLE `document_number_sequences`  (
 -- ----------------------------
 
 -- ----------------------------
+-- Table structure for documents
+-- ----------------------------
+DROP TABLE IF EXISTS `documents`;
+CREATE TABLE `documents` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `organization_id` bigint UNSIGNED NULL DEFAULT NULL COMMENT 'FK ke organisasi tempat dokumen berada',
+  `document_type_id` bigint UNSIGNED NOT NULL COMMENT 'FK ke document_types — jenis dokumen ini',
+  
+  -- Pemilik dokumen (bisa dihubungkan ke pengguna, siswa, pegawai, dll)
+  `owner_type` varchar(100) NOT NULL COMMENT 'Model pemilik: User,Student,Employee dll (untuk polimorfik)',
+  `owner_id` bigint UNSIGNED NOT NULL COMMENT 'ID pemilik sesuai model di atas',
+  
+  -- Data berkas
+  `file_name` varchar(255) NOT NULL COMMENT 'Nama berkas asli',
+  `file_path` varchar(255) NOT NULL COMMENT 'Lokasi di server/storage',
+  `file_disk` varchar(50) NOT NULL DEFAULT 'local' COMMENT 'Disk penyimpanan: local,s3,dll',
+  `file_extension` varchar(20) NOT NULL COMMENT 'pdf,jpg,png...',
+  `file_size_kb` int UNSIGNED NULL DEFAULT NULL COMMENT 'Ukuran dalam KB',
+  `mime_type` varchar(100) NULL DEFAULT NULL,
+  `file_hash` varchar(64) NULL DEFAULT NULL COMMENT 'Hash untuk cek integritas',
+  
+  -- Status & validasi
+  `status` enum('draft','pending_verification','verified','rejected','expired') NOT NULL DEFAULT 'pending_verification' COMMENT 'Status proses',
+  `verification_note` text NULL COMMENT 'Catatan admin jika ditolak/diverifikasi',
+  `verified_by` bigint UNSIGNED NULL DEFAULT NULL COMMENT 'Siapa yang memverifikasi',
+  `verified_at` timestamp NULL DEFAULT NULL,
+  `rejected_at` timestamp NULL DEFAULT NULL,
+  
+  -- Masa berlaku
+  `issued_at` timestamp NULL DEFAULT NULL COMMENT 'Tanggal diterbitkan',
+  `valid_until` timestamp NULL DEFAULT NULL COMMENT 'Tanggal kadaluwarsa — isi jika is_expirable = 1',
+  
+  -- Tanda tangan
+  `signed_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `signed_at` timestamp NULL DEFAULT NULL,
+  `signature_data` json NULL COMMENT 'Data tanda tangan digital',
+  
+  -- Tambahan
+  `notes` text NULL COMMENT 'Catatan bebas',
+  `custom_data` json NULL COMMENT 'Data tambahan spesifik dokumen',
+  `is_archived` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Diarsipkan atau tidak',
+  
+  -- Audit
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+
+  PRIMARY KEY (`id`),
+  
+  -- Indeks penting
+  INDEX `idx_documents_org` (`organization_id`),
+  INDEX `idx_documents_type` (`document_type_id`),
+  INDEX `idx_documents_owner` (`owner_type`, `owner_id`),
+  INDEX `idx_documents_status` (`status`),
+  INDEX `idx_documents_validity` (`valid_until`),
+  INDEX `idx_documents_verified_by` (`verified_by`),
+  INDEX `idx_documents_signed_by` (`signed_by`),
+  INDEX `idx_documents_active` (`is_archived`, `deleted_at`),
+
+  -- Kunci asing
+  CONSTRAINT `fk_documents_organization` 
+    FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `fk_documents_type` 
+    FOREIGN KEY (`document_type_id`) REFERENCES `document_types` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `fk_documents_verified_by` 
+    FOREIGN KEY (`verified_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_documents_signed_by` 
+    FOREIGN KEY (`signed_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_documents_created_by` 
+    FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_documents_updated_by` 
+    FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+
+-- ----------------------------
 -- Table structure for document_types
 -- ----------------------------
 DROP TABLE IF EXISTS `document_types`;

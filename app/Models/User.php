@@ -18,6 +18,32 @@ class User extends Authenticatable implements MustVerifyEmail
 
     protected $guarded = ['id'];
     public $timestamps = true;
+    protected $fillable = [
+        'name',
+        'email',
+        'email_verified_at',
+        'password',
+        'remember_token',
+        'two_factor_secret',
+        'two_factor_recovery_codes',
+        'two_factor_confirmed_at',
+        'last_login_at',
+        'last_login_ip',
+        'current_organization_id',
+        'isCheckingRole',
+        'created_by',
+        'updated_by',
+    ];
+
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'two_factor_confirmed_at' => 'datetime',
+        'last_login_at' => 'datetime',
+        'deleted_at' => 'datetime',
+        'isCheckingRole' => 'boolean',
+    ];
+
+
     protected $hidden = [
         'password',
         'remember_token',
@@ -125,7 +151,7 @@ class User extends Authenticatable implements MustVerifyEmail
                 ->when($orgId, fn($q) => $q->where('organization_id', $orgId))
                 ->where(function ($q) use ($roles) {
                     $q->whereIn('roles.name', $roles)
-                      ->orWhereIn('roles.code', $roles);
+                        ->orWhereIn('roles.code', $roles);
                 })
                 ->exists();
         });

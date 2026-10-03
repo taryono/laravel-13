@@ -7,38 +7,46 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
-/**
- * @extends Factory<User>
- */
 class UserFactory extends Factory
 {
-    /**
-     * The current password being used by the factory.
-     */
-    protected static ?string $password;
+    protected $model = User::class;
 
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
-    public function definition(): array
+    public function definition()
     {
         return [
-            'name' => fake()->name(),
-            'email' => fake()->unique()->safeEmail(),
+            'name'              => $this->faker->name(),
+            'email'             => $this->faker->unique()->safeEmail(),
             'email_verified_at' => now(),
-            'password' => static::$password ??= Hash::make('password'),
-            'remember_token' => Str::random(10),
+            'password'          => Hash::make('password123'), // sandi seragam untuk uji coba
+            'remember_token'    => Str::random(10),
+
+            // Kolom khusus tabel kamu
+            'two_factor_secret'         => null,
+            'two_factor_recovery_codes'  => null,
+            'two_factor_confirmed_at'    => null,
+            'last_login_at'              => $this->faker->optional()->dateTimeThisMonth(),
+            'last_login_ip'              => $this->faker->optional()->ipv4(),
+            'current_organization_id'    => $this->faker->optional()->randomElement([1, 2, 3]),
+            'isCheckingRole'             => $this->faker->optional()->randomElement([0, 1]),
+            'created_by'                 => null,
+            'updated_by'                 => null,
         ];
     }
 
-    /**
-     * Indicate that the model's email address should be unverified.
-     */
-    public function unverified(): static
+    // State khusus: Admin Utama / sudah diverifikasi lengkap
+    public function admin()
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
+            'email_verified_at' => now(),
+            'current_organization_id' => 1,
+            'isCheckingRole' => 1,
+        ]);
+    }
+
+    // State: Belum verifikasi email
+    public function unverified()
+    {
+        return $this->state(fn(array $attributes) => [
             'email_verified_at' => null,
         ]);
     }

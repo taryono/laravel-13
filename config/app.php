@@ -123,8 +123,9 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
-    'aliases' => [
+    'aliases' => Illuminate\Support\Facades\Facade::defaultAliases()->merge([
         'Str' => Illuminate\Support\Str::class,
-    ]
+    ])->toArray(),
+
 
 ];
