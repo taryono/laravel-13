@@ -68,7 +68,7 @@ class AcademicSemesterController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'school_id' => ['required', 'integer'],
             'academic_year_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
@@ -94,7 +94,6 @@ class AcademicSemesterController extends MainController
                 'Data AcademicSemester berhasil ditambahkan.',
                 $model
             );
-
         } catch (Throwable $e) {
 
             Log::error(
@@ -118,14 +117,10 @@ class AcademicSemesterController extends MainController
      */
     public function edit($id): View
     {
-        $academicSemester = $this->model->findOrFail($id);
-        $result = $this->getForm($academicSemester);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
-
+        $academic_semester = $this->model->findOrFail($id);
         return view(
             'AcademicSemester::edit',
-            compact('academicSemester', 'forms', 'groupedForms')
+            compact('academic_semester')
         );
     }
 
@@ -135,7 +130,7 @@ class AcademicSemesterController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'school_id' => ['required', 'integer'],
             'academic_year_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
@@ -165,8 +160,7 @@ class AcademicSemesterController extends MainController
                 'Data AcademicSemester berhasil diperbarui.',
                 $academicSemester
             );
-
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui AcademicSemester.',
                 [
@@ -200,8 +194,7 @@ class AcademicSemesterController extends MainController
                 $request,
                 'Data AcademicSemester berhasil dihapus.'
             );
-
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $academicSemester->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus AcademicSemester.',
@@ -217,5 +210,5 @@ class AcademicSemesterController extends MainController
                 'Data AcademicSemester gagal dihapus.'
             );
         }
-    } 
+    }
 }

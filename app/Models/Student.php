@@ -84,3 +84,8 @@ class Student extends BasedModel
         return $query->where('is_active', true);
     }
 }
+
+if (!class_exists('App\Models\Student', false)) {
+    class_alias(Student::class, 'App\Models\Student');
+}
+

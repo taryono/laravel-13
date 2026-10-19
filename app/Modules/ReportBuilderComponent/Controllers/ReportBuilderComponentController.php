@@ -2,17 +2,18 @@
 
 namespace App\Modules\ReportBuilderComponent\Controllers;
 
-use App\DataTables\ReportBuilderComponentDataTable;
 use App\Http\Controllers\MainController;
 use Models\ReportBuilderComponent;
+use Models\ReportDataSource;
+use Models\AcademicYear;
+use Models\Curriculum;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
-use Models\AcademicYear;
-use Models\Curriculum;
 use Throwable;
 
 class ReportBuilderComponentController extends MainController
@@ -23,50 +24,51 @@ class ReportBuilderComponentController extends MainController
     }
 
     /**
-     * Display a listing of the resource.
-     *
-     * Handles both:
-     * - Normal page request
-     * - Yajra DataTables AJAX request
+     * Display a listing of palette components.
      */
-    public function index(
-        Request $request,
-        ReportBuilderComponentDataTable $dataTable
-    ) {
-        /*
-         * Yajra DataTables request contains "draw".
-         *
-         * Example:
-         * /report-builder-component?draw=1&start=0&length=10
-         */
-        if ($request->filled('draw')) {
-            return $dataTable->ajax();
+    public function index(Request $request): View
+    {
+        $category = $request->input('category');
+        $query = ReportBuilderComponent::with(['curriculum', 'academicYear'])->orderBy('order');
+
+        if ($category && $category !== 'all') {
+            $query->where('category', $category);
         }
 
-        return $dataTable->render(
-            'ReportBuilderComponent::index'
-        );
+        $components = $query->paginate(20)->withQueryString();
+        $categories = ReportBuilderComponent::distinct()->whereNotNull('category')->pluck('category')->filter()->values()->toArray();
+
+        $stats = [
+            'total' => ReportBuilderComponent::count(),
+            'active' => ReportBuilderComponent::where('is_active', true)->count(),
+            'inactive' => ReportBuilderComponent::where('is_active', false)->count(),
+        ];
+
+        return view('ReportBuilder::components.index', compact('components', 'categories', 'category', 'stats'));
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Show the form for creating a new component.
      */
     public function create(): View
     {
-        $reportBuilderComponent = new ReportBuilderComponent();
-        $categories = ReportBuilderComponent::distinct()->pluck('category');
+        $component = new ReportBuilderComponent([
+            'order' => (ReportBuilderComponent::max('order') ?? 0) + 1,
+            'is_active' => true,
+            'category' => 'blocks',
+            'type' => 'table',
+        ]);
+        $categories = ReportBuilderComponent::distinct()->whereNotNull('category')->pluck('category')->filter()->values()->toArray();
         $availableBindings = config('report.available_bindings', []);
         $curriculums = Curriculum::active()->orderBy('name')->get();
-        $academicYears = AcademicYear::orderByDesc('start_year')->get();
+        $academicYears = AcademicYear::orderByDesc('start_date')->get();
+        $dataSources = ReportDataSource::active()->orderBy('order')->orderBy('name')->get();
 
-        return view(
-            'ReportBuilderComponent::create',
-            compact('reportBuilderComponent', 'categories', 'availableBindings', 'curriculums', 'academicYears')
-        );
+        return view('ReportBuilder::components.create', compact('component', 'categories', 'availableBindings', 'curriculums', 'academicYears', 'dataSources'));
     }
 
     /**
-     * Store a newly created resource.
+     * Store a newly created component.
      */
     public function store(Request $request)
     {
@@ -79,7 +81,7 @@ class ReportBuilderComponentController extends MainController
             'order'            => 'required|integer|min:0',
             'curriculum_id'    => 'nullable|exists:curriculums,id',
             'academic_year_id' => 'nullable|exists:academic_years,id',
-            'is_active'        => 'boolean',
+            'is_active'        => 'nullable',
             'default_config'   => 'nullable',
         ]);
 
@@ -95,127 +97,173 @@ class ReportBuilderComponentController extends MainController
             $validated['default_config'] = $this->buildDefaultConfig($validated['type'], $validated['name']);
         }
 
-
+        $validated['created_by'] = Auth::id();
+        $validated['updated_by'] = Auth::id();
 
         try {
             $model = DB::transaction(function () use ($validated) {
                 return ReportBuilderComponent::create($validated);
             });
 
-            return $this->successResponse(
-                $request,
-                'Data ReportBuilderComponent berhasil ditambahkan.',
-                $model
-            );
-        } catch (Throwable $e) {
-
-            Log::error(
-                'Gagal menambahkan ReportBuilderComponent.',
-                [
-                    'exception' => $e,
-                    'data' => $validated,
-                    'user_id' => auth()->id(),
-                ]
-            );
-
-            return $this->errorResponse(
-                $request,
-                'Data ReportBuilderComponent gagal ditambahkan.'
-            );
-        }
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit($id): View
-    {
-        $reportBuilderComponent = $this->model->findOrFail($id);
-        $result = $this->getForm($reportBuilderComponent);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
-
-        return view(
-            'ReportBuilderComponent::edit',
-            compact('reportBuilderComponent', 'forms', 'groupedForms')
-        );
-    }
-
-    /**
-     * Update the specified resource.
-     */
-    public function update(Request $request, $id)
-    {
-        try {
-            $reportBuilderComponent = $this->model->findOrFail($id);
-            $validated = $request->validate([
-                'name'             => 'required|string|max:100',
-                'type'             => 'required|string|max:50',
-                'category'         => 'required|string|max:50',
-                'icon'             => 'nullable|string|max:20',
-                'description'      => 'nullable|string|max:255',
-                'order'            => 'required|integer|min:0',
-                'curriculum_id'    => 'nullable|exists:curriculums,id',
-                'academic_year_id' => 'nullable|exists:academic_years,id',
-                'is_active'        => 'boolean',
-                'default_config'   => 'nullable',
-            ]);
-
-            $validated['is_active'] = $request->has('is_active');
-
-            if (!empty($validated['default_config'])) {
-                if (is_string($validated['default_config'])) {
-                    $decoded = json_decode($validated['default_config'], true);
-                    $validated['default_config'] = $decoded ?? ['type' => $validated['type']];
-                }
-            } else {
-                $validated['default_config'] = $this->buildDefaultConfig($validated['type'], $validated['name']);
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Komponen Report Builder berhasil ditambahkan.',
+                    'component' => $model,
+                ]);
             }
 
-            DB::transaction(function () use (
-                $reportBuilderComponent,
-                $validated
-            ) {
-                $reportBuilderComponent->update($validated);
-            });
-
-            return $this->successResponse(
-                $request,
-                'Data ReportBuilderComponent berhasil diperbarui.',
-                $reportBuilderComponent
-            );
+            return redirect()->route('admin.report-builder.components.index')
+                ->with('success', "Komponen '{$model->name}' berhasil ditambahkan ke palette.");
         } catch (Throwable $e) {
-            Log::error(
-                'Gagal memperbarui ReportBuilderComponent.',
-                [
-                    'exception' => $e,
-                    'ReportBuilderComponent_id' => $id,
-                    'data' => $validated,
-                    'user_id' => auth()->id(),
-                ]
-            );
+            Log::error('Gagal menambahkan ReportBuilderComponent.', [
+                'exception' => $e,
+                'data' => $validated,
+                'user_id' => Auth::id(),
+            ]);
 
-            return $this->errorResponse(
-                $request,
-                'Data ReportBuilderComponent gagal diperbarui.'
-            );
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Gagal menambahkan komponen: ' . $e->getMessage(),
+                ], 500);
+            }
+
+            return back()->withInput()->with('error', 'Gagal menambahkan komponen: ' . $e->getMessage());
         }
     }
 
-    public function toggleStatus(Request $request, ReportBuilderComponent $component)
+    /**
+     * Show the form for editing the specified component.
+     */
+    public function edit($component): View
     {
-        $component->is_active = !$component->is_active;
-        $component->save();
+        if (!($component instanceof ReportBuilderComponent)) {
+            $component = ReportBuilderComponent::findOrFail($component);
+        }
 
-        if ($request->wantsJson()) {
+        $categories = ReportBuilderComponent::distinct()->whereNotNull('category')->pluck('category')->filter()->values()->toArray();
+        $availableBindings = config('report.available_bindings', []);
+        $curriculums = Curriculum::active()->orderBy('name')->get();
+        $academicYears = AcademicYear::orderByDesc('start_date')->get();
+        $dataSources = ReportDataSource::active()->orderBy('order')->orderBy('name')->get();
+
+        return view('ReportBuilder::components.edit', compact('component', 'categories', 'availableBindings', 'curriculums', 'academicYears', 'dataSources'));
+    }
+
+    /**
+     * Update the specified component.
+     */
+    public function update(Request $request, $component)
+    {
+        if (!($component instanceof ReportBuilderComponent)) {
+            $component = ReportBuilderComponent::findOrFail($component);
+        }
+
+        $validated = $request->validate([
+            'name'             => 'required|string|max:100',
+            'type'             => 'required|string|max:50',
+            'category'         => 'required|string|max:50',
+            'icon'             => 'nullable|string|max:20',
+            'description'      => 'nullable|string|max:255',
+            'order'            => 'required|integer|min:0',
+            'curriculum_id'    => 'nullable|exists:curriculums,id',
+            'academic_year_id' => 'nullable|exists:academic_years,id',
+            'is_active'        => 'nullable',
+            'default_config'   => 'nullable',
+        ]);
+
+        $validated['is_active'] = $request->has('is_active');
+
+        if (!empty($validated['default_config'])) {
+            if (is_string($validated['default_config'])) {
+                $decoded = json_decode($validated['default_config'], true);
+                $validated['default_config'] = $decoded ?? ['type' => $validated['type']];
+            }
+        } else {
+            $validated['default_config'] = $this->buildDefaultConfig($validated['type'], $validated['name']);
+        }
+
+        $validated['updated_by'] = Auth::id();
+
+        try {
+            DB::transaction(function () use ($component, $validated) {
+                $component->update($validated);
+            });
+
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Komponen berhasil diperbarui.',
+                    'component' => $component,
+                ]);
+            }
+
+            return redirect()->route('admin.report-builder.components.index')
+                ->with('success', "Komponen '{$component->name}' berhasil diperbarui.");
+        } catch (Throwable $e) {
+            Log::error('Gagal memperbarui ReportBuilderComponent.', [
+                'exception' => $e,
+                'id' => $component->id,
+                'data' => $validated,
+                'user_id' => Auth::id(),
+            ]);
+
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Gagal memperbarui komponen: ' . $e->getMessage(),
+                ], 500);
+            }
+
+            return back()->withInput()->with('error', 'Gagal memperbarui komponen: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Remove the specified component.
+     */
+    public function destroy(Request $request, $component)
+    {
+        if (!($component instanceof ReportBuilderComponent)) {
+            $component = ReportBuilderComponent::findOrFail($component);
+        }
+
+        $name = $component->name;
+        $component->delete();
+
+        if ($request->wantsJson() || $request->ajax()) {
             return response()->json([
-                'success'   => true,
-                'is_active' => $component->is_active,
-                'message'   => 'Status komponen diperbarui.'
+                'success' => true,
+                'message' => "Komponen '{$name}' berhasil dihapus.",
             ]);
         }
 
-        return back()->with('success', 'Status komponen "' . $component->name . '" diperbarui.');
+        return redirect()->route('admin.report-builder.components.index')
+            ->with('success', "Komponen '{$name}' berhasil dihapus.");
+    }
+
+    /**
+     * Toggle component active status in palette.
+     */
+    public function toggleStatus(Request $request, $component)
+    {
+        if (!($component instanceof ReportBuilderComponent)) {
+            $component = ReportBuilderComponent::findOrFail($component);
+        }
+
+        $component->update(['is_active' => !$component->is_active]);
+        $status = $component->is_active ? 'diaktifkan' : 'dinonaktifkan';
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'is_active' => $component->is_active,
+                'message' => "Komponen '{$component->name}' berhasil {$status}.",
+            ]);
+        }
+
+        return back()->with('success', "Komponen '{$component->name}' berhasil {$status}.");
     }
 
     protected function buildDefaultConfig(string $type, string $name): array
@@ -242,8 +290,9 @@ class ReportBuilderComponentController extends MainController
                     'dataSource' => 'academic_scores',
                     'columns'    => [
                         ['header' => 'No', 'field' => 'index', 'width' => '10%', 'align' => 'center'],
-                        ['header' => 'Keterangan', 'field' => 'name', 'width' => '50%', 'align' => 'left'],
-                        ['header' => 'Nilai', 'field' => 'score', 'width' => '40%', 'align' => 'center'],
+                        ['header' => 'Mata Pelajaran', 'field' => 'subject.name', 'width' => '50%', 'align' => 'left'],
+                        ['header' => 'Nilai', 'field' => 'numeric_score', 'width' => '20%', 'align' => 'center'],
+                        ['header' => 'Predikat', 'field' => 'predicate', 'width' => '20%', 'align' => 'center'],
                     ],
                     'style'      => [
                         'fontSize'   => 10,
@@ -258,8 +307,10 @@ class ReportBuilderComponentController extends MainController
                 return [
                     'type'   => 'keyvalue',
                     'fields' => [
-                        ['label' => 'Nama', 'binding' => 'student.full_name'],
-                        ['label' => 'NIS', 'binding' => 'student.student_number'],
+                        ['label' => 'Nama Santri', 'binding' => 'student.full_name'],
+                        ['label' => 'NIS / NISN', 'binding' => 'student.student_number'],
+                        ['label' => 'Kelas', 'binding' => 'classroom.name'],
+                        ['label' => 'Asrama', 'binding' => 'dormitory.name'],
                     ],
                     'style'  => [
                         'fontSize'   => 12,
@@ -317,40 +368,6 @@ class ReportBuilderComponentController extends MainController
                     'content' => $name,
                     'style'   => ['fontSize' => 12, 'textAlign' => 'left', 'color' => '#000000']
                 ];
-        }
-    }
-
-    /**
-     * Remove the specified resource.
-     */
-    public function destroy(Request $request, $id): JsonResponse|RedirectResponse
-    {
-        try {
-            $reportBuilderComponent = $this->model->findOrFail($id);
-
-            DB::transaction(function () use ($reportBuilderComponent) {
-                $reportBuilderComponent->delete();
-            });
-
-            return $this->successResponse(
-                $request,
-                'Data ReportBuilderComponent berhasil dihapus.'
-            );
-        } catch (Throwable $e) {
-            // $reportBuilderComponent->getKey() yang bisa undefined.
-            Log::error(
-                'Gagal menghapus ReportBuilderComponent.',
-                [
-                    'exception' => $e,
-                    'ReportBuilderComponent_id' => $id,
-                    'user_id' => auth()->id(),
-                ]
-            );
-
-            return $this->errorResponse(
-                $request,
-                'Data ReportBuilderComponent gagal dihapus.'
-            );
         }
     }
 }

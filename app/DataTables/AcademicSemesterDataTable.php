@@ -17,7 +17,7 @@ class AcademicSemesterDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['organization_id', 'school_id', 'academic_year_id', 'code', 'name', 'type', 'start_date', 'end_date', 'krs_start_date', 'krs_end_date', 'is_active', 'is_current'];
+    protected array $columns = ['organization.name', 'school.name', 'academic_year.name', 'code', 'name', 'type', 'start_date', 'end_date', 'krs_start_date', 'krs_end_date', 'is_active', 'is_current'];
 
     /**
      * Build DataTable response.
@@ -25,11 +25,30 @@ class AcademicSemesterDataTable extends DataTable
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
+            ->addIndexColumn()
+            ->editColumn('organization.name', function ($row) {
+                return $row->organization->name;
+            })
+            ->editColumn('school.name', function ($row) {
+                return $row->school->name;
+            })
+            ->editColumn('academic_year.name', function ($row) {
+                return $row->academic_year->name;
+            })
+            ->editColumn('type', function ($row) {
+                return $row->type;
+            })
+            ->editColumn('is_active', function ($row) {
+                return $row->is_active == 1 ? '<span class="badge badge-success">Ya</span>' : '<span class="badge badge-danger">Tidak</span>';
+            })
+            ->editColumn('is_current', function ($row) {
+                return $row->is_current == 1 ? '<span class="badge badge-success">Ya</span>' : '<span class="badge badge-danger">Tidak</span>';
+            })
             ->addColumn('action', function ($row) {
                 return $this->renderActionButtons($row);
             })
-            ->addIndexColumn()
-            ->rawColumns(['action']) // ✅ Tetap wajib ada!
+
+            ->rawColumns(['action', 'is_active', 'is_current']) // ✅ Tetap wajib ada!
             ->setRowId('id');
     }
 
@@ -100,7 +119,7 @@ class AcademicSemesterDataTable extends DataTable
      */
     public function query(AcademicSemester $model): QueryBuilder
     {
-        return $model->newQuery();
+        return $model->newQuery()->with(['organization', 'school', 'academic_year']);
     }
 
     /**

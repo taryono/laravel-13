@@ -1,14 +1,10 @@
-{{ Form::open(['method' => 'POST', 'route' => ['academic_semester.store'], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
-    <div class="row">
-        <div class="col-md-6 mb-3">
-            @forelse ($forms as $key => $form)
-                <div class="form-group">
-                    <label for="name">{{ say($form['label']) }}</label>
-                    {!! $form['content'] !!}
-                </div>
-            @empty
-                <p>{{ say('Data Tidak Ditemukan') }}</p>
-            @endforelse
-        </div>
+<div class="card">
+    <div class="card-header">
+        <h4 class="card-title mb-0">Tambah {{ say('Academic Semester') }}</h4>
     </div>
-{{ Form::close() }}  
+    <div class="card-body">
+        {{ Form::open(['method' => 'POST', 'route' => ['academic_semester.store'], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data', 'autocomplete' => 'off']) }}
+        @include('AcademicSemester::_form')
+        {{ Form::close() }}
+    </div>
+</div>

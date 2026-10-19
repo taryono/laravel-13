@@ -248,13 +248,25 @@
                                             class="w-full border rounded p-1 text-xs">
                                     </div>
                                     <div>
-                                        <label class="block text-gray-600 mb-1">Data Source</label>
+                                        <div class="flex items-center justify-between mb-1">
+                                            <label class="block text-gray-600 text-xs font-medium">Data Source</label>
+                                            <a href="{{ route('admin.report-builder.data-sources.index') }}" target="_blank" class="text-[10px] text-blue-600 hover:text-blue-800 flex items-center gap-0.5 font-medium">
+                                                <span>⚙️ Kelola</span>
+                                            </a>
+                                        </div>
                                         <select x-model="selectedElement.dataSource" @change="refreshCanvas()"
-                                            class="w-full border rounded p-1 text-xs bg-white">
-                                            <option value="academic_scores">Academic Scores (Nilai Akademik)</option>
-                                            <option value="sorogan">Sorogan</option>
-                                            <option value="memorization">Memorization (Tahfidz)</option>
-                                            <option value="pesantren_scores">Pesantren Scores</option>
+                                            class="w-full border rounded p-1 text-xs bg-white focus:ring-1 focus:ring-blue-500">
+                                            @php
+                                                $builderDataSources = $dataSources ?? \Models\ReportDataSource::active()->orderBy('order')->orderBy('name')->get();
+                                            @endphp
+                                            @forelse($builderDataSources as $ds)
+                                                <option value="{{ $ds->key }}">{{ $ds->name }} ({{ $ds->category_label ?? ucfirst($ds->category) }})</option>
+                                            @empty
+                                                <option value="academic_scores">Academic Scores (Nilai Akademik)</option>
+                                                <option value="sorogan">Sorogan</option>
+                                                <option value="memorization">Memorization (Tahfidz)</option>
+                                                <option value="pesantren_scores">Pesantren Scores</option>
+                                            @endforelse
                                         </select>
                                     </div>
 

@@ -1,5 +1,11 @@
 {{-- Shared Form Component for Create & Edit --}}
-<div x-data="componentForm({{ isset($component) ? json_encode($component) : 'null' }})" class="space-y-6">
+@php
+    $dataSourcesList =
+        isset($dataSources) && $dataSources->isNotEmpty()
+            ? $dataSources
+            : \Models\ReportDataSource::active()->orderBy('order')->orderBy('name')->get();
+@endphp
+<div x-data="componentForm({{ isset($component) ? json_encode($component) : 'null' }}, {{ json_encode($dataSourcesList) }})" class="space-y-6">
 
     @if (isset($errors) && $errors->any())
         <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg shadow-sm">
@@ -119,12 +125,14 @@
                     class="w-full border rounded-lg px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-blue-400 outline-none">
                     <option value="">🌐 Semua Kurikulum (Universal / Global)</option>
                     @foreach ($curriculums ?? [] as $c)
-                        <option value="{{ $c->id }}" {{ (isset($component) && $component->curriculum_id == $c->id) ? 'selected' : '' }}>
+                        <option value="{{ $c->id }}"
+                            {{ isset($component) && $component->curriculum_id == $c->id ? 'selected' : '' }}>
                             {{ $c->name }} ({{ $c->code }})
                         </option>
                     @endforeach
                 </select>
-                <p class="text-[11px] text-gray-400 mt-1">Komponen hanya muncul saat mengedit template kurikulum ini.</p>
+                <p class="text-[11px] text-gray-400 mt-1">Komponen hanya muncul saat mengedit template kurikulum ini.
+                </p>
             </div>
 
             <div>
@@ -135,8 +143,9 @@
                     class="w-full border rounded-lg px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-blue-400 outline-none">
                     <option value="">📅 Semua Tahun Ajaran (Berlaku Selamanya)</option>
                     @foreach ($academicYears ?? [] as $ay)
-                        <option value="{{ $ay->id }}" {{ (isset($component) && $component->academic_year_id == $ay->id) ? 'selected' : '' }}>
-                            {{ $ay->formatted_name ?? ($ay->start_year . '/' . $ay->end_year) }}
+                        <option value="{{ $ay->id }}"
+                            {{ isset($component) && $component->academic_year_id == $ay->id ? 'selected' : '' }}>
+                            {{ $ay->formatted_name ?? $ay->start_year . '/' . $ay->end_year }}
                         </option>
                     @endforeach
                 </select>
@@ -148,7 +157,8 @@
             <label class="inline-flex items-center gap-2 cursor-pointer bg-gray-50 border rounded-lg px-4 py-2.5">
                 <input type="checkbox" name="is_active" value="1" x-model="is_active"
                     class="w-4 h-4 rounded text-blue-600 focus:ring-blue-400">
-                <span class="text-sm font-medium text-gray-800">Aktifkan komponen ini (muncul di panel kiri builder)</span>
+                <span class="text-sm font-medium text-gray-800">Aktifkan komponen ini (muncul di panel kiri
+                    builder)</span>
             </label>
         </div>
     </div>
@@ -167,12 +177,14 @@
 
             <div class="flex items-center gap-1 bg-gray-100 p-1 rounded-lg text-xs font-medium">
                 <button type="button" @click="editorMode = 'visual'"
-                    :class="editorMode === 'visual' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'"
+                    :class="editorMode === 'visual' ? 'bg-white text-blue-600 shadow-sm' :
+                        'text-gray-600 hover:text-gray-900'"
                     class="px-3 py-1.5 rounded-md transition">
                     📝 Form Visual
                 </button>
                 <button type="button" @click="editorMode = 'json'; syncToJson()"
-                    :class="editorMode === 'json' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'"
+                    :class="editorMode === 'json' ? 'bg-white text-blue-600 shadow-sm' :
+                        'text-gray-600 hover:text-gray-900'"
                     class="px-3 py-1.5 rounded-md transition font-mono">
                     { } Raw JSON
                 </button>
@@ -191,8 +203,7 @@
                         <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">
                             Teks Konten Bawaan
                         </label>
-                        <textarea x-model="config.content" rows="4"
-                            placeholder="Ketik teks bawaan atau gunakan [[ binding ]]"
+                        <textarea x-model="config.content" rows="4" placeholder="Ketik teks bawaan atau gunakan [[ binding ]]"
                             class="w-full border rounded-lg p-2.5 text-sm font-mono focus:ring-2 focus:ring-blue-400 outline-none"></textarea>
 
                         <div class="mt-2 flex items-center gap-2">
@@ -289,51 +300,153 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 items-start">
                         <div>
                             <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Judul Tabel</label>
-                            <input type="text" x-model="config.title" placeholder="Contoh: A. NILAI AKADEMIK"
-                                class="w-full border rounded px-3 py-1.5 text-sm bg-white">
+                            <input type="text" x-model="config.title" @input="syncToJson()"
+                                placeholder="Contoh: A. NILAI AKADEMIK"
+                                class="w-full border rounded px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-blue-400 outline-none">
+                            <p class="text-[10px] text-gray-400 mt-1">Judul yang muncul di atas tabel rapor santri.</p>
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Data Source</label>
-                            <select x-model="config.dataSource"
-                                class="w-full border rounded px-3 py-1.5 text-sm bg-white font-mono">
-                                <option value="academic_scores">academic_scores (Nilai Pelajaran)</option>
-                                <option value="sorogan">sorogan (Kitab / Sorogan)</option>
-                                <option value="memorization">memorization (Tahfidz)</option>
-                                <option value="pesantren_scores">pesantren_scores (Nilai Pesantren)</option>
+                            <div class="flex items-center justify-between mb-1">
+                                <label class="block text-xs font-semibold text-gray-700 uppercase">Sumber Data (Data
+                                    Source)</label>
+                                <a href="{{ route('admin.report-builder.data-sources.index') }}" target="_blank"
+                                    class="text-[11px] text-blue-600 hover:text-blue-800 font-semibold flex items-center gap-1 transition"
+                                    title="Buka kelola data source di tab baru">
+                                    <span>⚙️</span> Kelola Sumber Data ↗
+                                </a>
+                            </div>
+
+                            <select x-model="config.dataSource" @change="onDataSourceSelectChange()"
+                                class="w-full border rounded px-3 py-2 text-sm bg-white font-mono text-blue-700 font-semibold focus:ring-2 focus:ring-blue-400 outline-none">
+                                <template x-for="source in dataSources" :key="source.key">
+                                    <option :value="source.key" x-text="source.name + ' (' + source.key + ')'">
+                                    </option>
+                                </template>
                             </select>
+                            <p class="text-[10px] text-gray-400 mt-1">Pilih sumber data yang akan di-looping pada baris
+                                tabel rapor.</p>
                         </div>
                     </div>
 
+                    {{-- Data Source Details & Field Badges Banner --}}
+                    <div x-show="activeDataSource" x-transition
+                        class="bg-gradient-to-r from-blue-50/80 to-indigo-50/80 p-3.5 rounded-xl border border-blue-200/80 space-y-2.5">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <div class="flex items-center gap-2">
+                                <span class="text-lg">📊</span>
+                                <div>
+                                    <span class="text-xs font-bold text-gray-900"
+                                        x-text="activeDataSource?.name"></span>
+                                    <span class="text-[10px] px-2 py-0.5 rounded-full font-semibold uppercase ml-1.5"
+                                        :class="activeDataSource?.category === 'academic' ? 'bg-blue-200 text-blue-800' :
+                                            (activeDataSource?.category === 'pesantren' ?
+                                                'bg-emerald-200 text-emerald-800' :
+                                                (activeDataSource?.category === 'tahfidz' ?
+                                                    'bg-amber-200 text-amber-800' : 'bg-gray-200 text-gray-800'))"
+                                        x-text="activeDataSource?.category"></span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <button type="button" @click="applyDefaultColumnsFromDataSource()"
+                                    class="px-2.5 py-1 text-xs bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold shadow-sm transition flex items-center gap-1">
+                                    <span>⚡</span> Terapkan Kolom Bawaan
+                                </button>
+                                <button type="button" @click="showSampleModal = !showSampleModal"
+                                    class="px-2.5 py-1 text-xs bg-white hover:bg-gray-50 border border-gray-300 text-gray-700 rounded-lg font-medium transition">
+                                    <span x-text="showSampleModal ? 'Sembunyikan Sampel' : '👁️ Contoh Data'"></span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <p class="text-[11px] text-gray-600 leading-relaxed" x-text="activeDataSource?.description"
+                            x-show="activeDataSource?.description"></p>
+
+                        {{-- Available Fields Pills --}}
+                        <div class="border-t border-blue-200/60 pt-2">
+                            <div
+                                class="text-[11px] font-bold text-gray-700 uppercase mb-1.5 flex items-center justify-between">
+                                <span>Field Tersedia (Klik untuk auto-insert kolom):</span>
+                                <span class="text-[10px] text-gray-500 font-normal">Klik chip di bawah untuk menambah
+                                    kolom</span>
+                            </div>
+                            <div class="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto pr-1">
+                                <template x-for="f in (activeDataSource?.fields || [])" :key="f.field">
+                                    <button type="button" @click="addSpecificColumn(f)"
+                                        class="inline-flex items-center gap-1 px-2 py-1 rounded bg-white hover:bg-blue-100 hover:border-blue-400 border border-gray-200 text-[11px] text-gray-800 transition group shadow-2xs">
+                                        <span class="text-blue-500 font-bold group-hover:scale-110 transition">+</span>
+                                        <span class="font-medium" x-text="f.label || f.field"></span>
+                                        <code class="text-[10px] text-blue-600 font-mono"
+                                            x-text="'(' + f.field + ')'"></code>
+                                    </button>
+                                </template>
+                            </div>
+                        </div>
+
+                        {{-- Collapsible Sample Data Box --}}
+                        <div x-show="showSampleModal" x-transition class="mt-2 pt-2 border-t border-blue-200/60">
+                            <div class="text-[11px] font-bold text-gray-700 uppercase mb-1">Contoh Data Sampel (JSON):
+                            </div>
+                            <pre class="bg-gray-900 text-green-400 p-2.5 rounded-lg text-[10px] font-mono max-h-36 overflow-y-auto"
+                                x-text="JSON.stringify(activeDataSource?.sample_data, null, 2)"></pre>
+                        </div>
+                    </div>
+
+                    {{-- Native Datalist for Autocomplete in Column Fields --}}
+                    <datalist id="datasource-fields-options">
+                        <template x-for="f in (activeDataSource?.fields || [])" :key="f.field">
+                            <option :value="f.field"
+                                :label="f.label ? (f.label + ' (' + (f.type || 'string') + ')') : f.field"></option>
+                        </template>
+                    </datalist>
+
                     <div class="border-t pt-3">
                         <div class="flex justify-between items-center mb-2">
-                            <label class="block text-xs font-bold text-gray-700 uppercase">Daftar Kolom Tabel</label>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 uppercase">Daftar Kolom
+                                    Tabel</label>
+                                <p class="text-[10px] text-gray-400">Atur header, field data, lebar kolom, dan perataan
+                                    teks.</p>
+                            </div>
                             <button type="button" @click="addTableColumn()"
-                                class="text-xs bg-blue-600 text-white px-3 py-1 rounded font-medium hover:bg-blue-700 transition">
-                                + Tambah Kolom
+                                class="text-xs bg-blue-600 text-white px-3 py-1.5 rounded-lg font-medium hover:bg-blue-700 transition flex items-center gap-1 shadow-sm">
+                                <span>+</span> Tambah Kolom Kosong
                             </button>
                         </div>
 
                         <div class="space-y-2">
                             <template x-for="(col, idx) in (config.columns || [])" :key="idx">
-                                <div class="bg-white p-2.5 rounded-lg border flex flex-wrap items-center gap-2">
+                                <div
+                                    class="bg-white p-2.5 rounded-lg border border-gray-200 flex flex-wrap items-center gap-2 hover:border-blue-300 transition shadow-2xs">
                                     <div class="w-8 text-center text-xs font-bold text-gray-400 font-mono"
                                         x-text="idx + 1"></div>
-                                    <input type="text" x-model="col.header" placeholder="Header (e.g. Mata Pelajaran)"
-                                        class="flex-1 min-w-[130px] border rounded px-2 py-1 text-xs">
-                                    <input type="text" x-model="col.field" placeholder="Field (e.g. subject.name)"
-                                        class="flex-1 min-w-[130px] border rounded px-2 py-1 text-xs font-mono text-blue-600">
-                                    <input type="text" x-model="col.width" placeholder="Width (e.g. 20%)"
-                                        class="w-24 border rounded px-2 py-1 text-xs">
-                                    <select x-model="col.align" class="border rounded px-2 py-1 text-xs bg-white">
-                                        <option value="left">Left</option>
-                                        <option value="center">Center</option>
-                                        <option value="right">Right</option>
-                                    </select>
+                                    <div class="flex-1 min-w-[130px]">
+                                        <input type="text" x-model="col.header" @input="syncToJson()"
+                                            placeholder="Header (e.g. Mata Pelajaran)"
+                                            class="w-full border rounded px-2.5 py-1 text-xs focus:ring-1 focus:ring-blue-400 outline-none">
+                                    </div>
+                                    <div class="flex-1 min-w-[130px]">
+                                        <input type="text" x-model="col.field" @input="syncToJson()"
+                                            list="datasource-fields-options" placeholder="Field (e.g. subject.name)"
+                                            class="w-full border rounded px-2.5 py-1 text-xs font-mono text-blue-600 focus:ring-1 focus:ring-blue-400 outline-none">
+                                    </div>
+                                    <div class="w-24">
+                                        <input type="text" x-model="col.width" @input="syncToJson()"
+                                            placeholder="Width (e.g. 20%)"
+                                            class="w-full border rounded px-2 py-1 text-xs font-mono text-center">
+                                    </div>
+                                    <div class="w-24">
+                                        <select x-model="col.align" @change="syncToJson()"
+                                            class="w-full border rounded px-2 py-1 text-xs bg-white">
+                                            <option value="left">Left</option>
+                                            <option value="center">Center</option>
+                                            <option value="right">Right</option>
+                                        </select>
+                                    </div>
                                     <button type="button" @click="removeTableColumn(idx)"
-                                        class="text-red-500 hover:text-red-700 px-2 py-1 font-bold"
+                                        class="text-red-500 hover:text-red-700 px-2 py-1 font-bold rounded hover:bg-red-50 transition"
                                         title="Hapus kolom">✕</button>
                                 </div>
                             </template>
@@ -342,29 +455,38 @@
 
                     <div class="border-t pt-3 space-y-3">
                         <label class="inline-flex items-center gap-2 cursor-pointer">
-                            <input type="checkbox" x-model="config.showFooter" @change="syncToJson()" class="rounded text-blue-600">
+                            <input type="checkbox" x-model="config.showFooter" @change="syncToJson()"
+                                class="rounded text-blue-600">
                             <span class="text-xs font-semibold text-gray-700">Tampilkan Baris Footer / Rata-rata</span>
                         </label>
-                        <div x-show="config.showFooter" class="grid grid-cols-1 md:grid-cols-3 gap-3 pl-6 bg-white/70 p-3 rounded-lg border border-gray-200">
+                        <div x-show="config.showFooter"
+                            class="grid grid-cols-1 md:grid-cols-3 gap-3 pl-6 bg-white/70 p-3 rounded-lg border border-gray-200">
                             <div>
                                 <label class="text-[11px] text-gray-600 font-medium block mb-1">Label Footer</label>
-                                <input type="text" x-model="config.footerLabel" @input="syncToJson()" placeholder="Average"
+                                <input type="text" x-model="config.footerLabel" @input="syncToJson()"
+                                    placeholder="Average"
                                     class="w-full border rounded px-2.5 py-1.5 text-xs bg-white focus:ring-1 focus:ring-blue-400 outline-none">
                             </div>
                             <div>
-                                <label class="text-[11px] text-gray-600 font-medium block mb-1">Field Nilai Footer</label>
-                                <input type="text" x-model="config.footerField" @input="syncToJson()" placeholder="average_score"
+                                <label class="text-[11px] text-gray-600 font-medium block mb-1">Field Nilai
+                                    Footer</label>
+                                <input type="text" x-model="config.footerField" @input="syncToJson()"
+                                    placeholder="average_score"
                                     class="w-full border rounded px-2.5 py-1.5 text-xs bg-white font-mono text-blue-600 focus:ring-1 focus:ring-blue-400 outline-none">
                             </div>
                             <div>
-                                <label class="text-[11px] text-gray-600 font-medium block mb-1">Sejajarkan Nilai di Kolom</label>
+                                <label class="text-[11px] text-gray-600 font-medium block mb-1">Sejajarkan Nilai di
+                                    Kolom</label>
                                 <select x-model.number="config.footerTargetIndex" @change="syncToJson()"
                                     class="w-full border rounded px-2.5 py-1.5 text-xs bg-white focus:ring-1 focus:ring-blue-400 outline-none">
                                     <template x-for="(col, idx) in (config.columns || [])" :key="idx">
-                                        <option :value="idx" x-text="'Kolom ' + (idx + 1) + ': ' + (col.header || col.field || ('Kolom ' + (idx + 1)))"></option>
+                                        <option :value="idx"
+                                            x-text="'Kolom ' + (idx + 1) + ': ' + (col.header || col.field || ('Kolom ' + (idx + 1)))">
+                                        </option>
                                     </template>
                                 </select>
-                                <p class="text-[10px] text-gray-400 mt-0.5">Kolom tempat angka rata-rata dimunculkan.</p>
+                                <p class="text-[10px] text-gray-400 mt-0.5">Kolom tempat angka rata-rata dimunculkan.
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -388,7 +510,8 @@
                             <div class="bg-white p-2.5 rounded-lg border flex items-center gap-2">
                                 <input type="text" x-model="f.label" placeholder="Label (e.g. Nama Santri)"
                                     class="w-1/3 border rounded px-2.5 py-1 text-xs font-medium">
-                                <input type="text" x-model="f.binding" placeholder="Binding (e.g. student.full_name)"
+                                <input type="text" x-model="f.binding"
+                                    placeholder="Binding (e.g. student.full_name)"
                                     class="flex-1 border rounded px-2.5 py-1 text-xs font-mono text-blue-600">
                                 <button type="button" @click="removeKeyValueField(idx)"
                                     class="text-red-500 hover:text-red-700 px-2 font-bold"
@@ -414,7 +537,8 @@
                             class="w-full border rounded px-3 py-1.5 text-sm bg-white font-mono">
                             <option value="report_card.homeroom_notes">report_card.homeroom_notes (Catatan Wali Kelas)
                             </option>
-                            <option value="report_card.headmaster_notes">report_card.headmaster_notes (Catatan Pimpinan)
+                            <option value="report_card.headmaster_notes">report_card.headmaster_notes (Catatan
+                                Pimpinan)
                             </option>
                             <option value="content">content (Teks Bebas)</option>
                         </select>
@@ -508,24 +632,55 @@
 </div>
 
 <script>
-    function componentForm(initialData) {
+    function componentForm(initialData, initialDataSources) {
         const defaultTemplates = {
             'text': {
                 type: 'text',
                 content: 'Custom text content here...',
-                style: { fontSize: 12, fontWeight: 'normal', fontStyle: 'normal', textAlign: 'left', color: '#000000', fontFamily: 'Times New Roman' }
+                style: {
+                    fontSize: 12,
+                    fontWeight: 'normal',
+                    fontStyle: 'normal',
+                    textAlign: 'left',
+                    color: '#000000',
+                    fontFamily: 'Times New Roman'
+                }
             },
             'table': {
                 type: 'table',
                 title: 'A. NILAI SANTRI',
                 dataSource: 'academic_scores',
-                columns: [
-                    { header: 'No', field: 'index', width: '8%', align: 'center' },
-                    { header: 'Mata Pelajaran', field: 'subject.name', width: '45%', align: 'left' },
-                    { header: 'Nilai', field: 'numeric_score', width: '20%', align: 'center' },
-                    { header: 'Predikat', field: 'predicate', width: '27%', align: 'center' }
+                columns: [{
+                        header: 'No',
+                        field: 'index',
+                        width: '8%',
+                        align: 'center'
+                    },
+                    {
+                        header: 'Mata Pelajaran',
+                        field: 'subject.name',
+                        width: '45%',
+                        align: 'left'
+                    },
+                    {
+                        header: 'Nilai',
+                        field: 'numeric_score',
+                        width: '20%',
+                        align: 'center'
+                    },
+                    {
+                        header: 'Predikat',
+                        field: 'predicate',
+                        width: '27%',
+                        align: 'center'
+                    }
                 ],
-                style: { fontSize: 10, textAlign: 'left', color: '#000000', fontFamily: 'Times New Roman' },
+                style: {
+                    fontSize: 10,
+                    textAlign: 'left',
+                    color: '#000000',
+                    fontFamily: 'Times New Roman'
+                },
                 showFooter: false,
                 footerLabel: 'Rata-rata',
                 footerField: 'average_score',
@@ -533,35 +688,84 @@
             },
             'keyvalue': {
                 type: 'keyvalue',
-                fields: [
-                    { label: 'Nama Santri', binding: 'student.full_name' },
-                    { label: 'Nomor Induk', binding: 'student.student_number' },
-                    { label: 'Kelas', binding: 'classroom.name' },
-                    { label: 'Asrama', binding: 'dormitory.name' }
+                fields: [{
+                        label: 'Nama Santri',
+                        binding: 'student.full_name'
+                    },
+                    {
+                        label: 'Nomor Induk',
+                        binding: 'student.student_number'
+                    },
+                    {
+                        label: 'Kelas',
+                        binding: 'classroom.name'
+                    },
+                    {
+                        label: 'Asrama',
+                        binding: 'dormitory.name'
+                    }
                 ],
-                style: { fontSize: 12, textAlign: 'left', color: '#000000', fontFamily: 'Times New Roman' }
+                style: {
+                    fontSize: 12,
+                    textAlign: 'left',
+                    color: '#000000',
+                    fontFamily: 'Times New Roman'
+                }
             },
             'text-block': {
                 type: 'text-block',
                 title: 'Catatan Wali Kelas',
                 binding: 'report_card.homeroom_notes',
-                style: { fontSize: 12, fontStyle: 'italic', textAlign: 'left', color: '#000000', fontFamily: 'Times New Roman' }
+                style: {
+                    fontSize: 12,
+                    fontStyle: 'italic',
+                    textAlign: 'left',
+                    color: '#000000',
+                    fontFamily: 'Times New Roman'
+                }
             },
             'signature': {
                 type: 'signature',
-                columns: [
-                    { role: 'homeroom_teacher', label: 'Wali Kelas', source: 'automatic', showImage: true, showEmployeeNumber: true },
-                    { role: 'headmaster', label: 'Kepala Pesantren', source: 'automatic', showImage: true, showEmployeeNumber: false }
+                columns: [{
+                        role: 'homeroom_teacher',
+                        label: 'Wali Kelas',
+                        source: 'automatic',
+                        showImage: true,
+                        showEmployeeNumber: true
+                    },
+                    {
+                        role: 'headmaster',
+                        label: 'Kepala Pesantren',
+                        source: 'automatic',
+                        showImage: true,
+                        showEmployeeNumber: false
+                    }
                 ],
-                style: { fontSize: 11, textAlign: 'center', color: '#000000', fontFamily: 'Times New Roman' }
+                style: {
+                    fontSize: 11,
+                    textAlign: 'center',
+                    color: '#000000',
+                    fontFamily: 'Times New Roman'
+                }
             },
-            'divider': { type: 'divider', style: {} },
-            'pagebreak': { type: 'pagebreak', style: {} }
+            'divider': {
+                type: 'divider',
+                style: {}
+            },
+            'pagebreak': {
+                type: 'pagebreak',
+                style: {}
+            }
         };
 
-        let initialConfig = initialData?.default_config || defaultTemplates[initialData?.type || 'text'] || defaultTemplates['text'];
+        let initialConfig = initialData?.default_config || defaultTemplates[initialData?.type || 'text'] ||
+            defaultTemplates['text'];
         if (typeof initialConfig === 'string') {
-            try { initialConfig = JSON.parse(initialConfig); } catch (e) { initialConfig = defaultTemplates['text']; }
+            try {
+                initialConfig = JSON.parse(initialConfig);
+            } catch (e) {
+                initialConfig = defaultTemplates['text'];
+            }
         }
 
         return {
@@ -578,12 +782,62 @@
             config: initialConfig,
             jsonRaw: JSON.stringify(initialConfig, null, 2),
             bindings: @json($availableBindings ?? []),
+            dataSources: Array.isArray(initialDataSources) ? initialDataSources : [],
+            showSampleModal: false,
+
+            get activeDataSource() {
+                if (!this.config?.dataSource) return null;
+                return this.dataSources.find(ds => ds.key === this.config.dataSource) || null;
+            },
 
             onTypeChange() {
                 if (defaultTemplates[this.type]) {
                     this.config = JSON.parse(JSON.stringify(defaultTemplates[this.type]));
                     this.syncToJson();
                 }
+            },
+
+            onDataSourceSelectChange() {
+                this.syncToJson();
+            },
+
+            applyDefaultColumnsFromDataSource() {
+                const src = this.activeDataSource;
+                if (!src || !Array.isArray(src.fields) || src.fields.length === 0) {
+                    alert('Sumber data ini belum memiliki definisi field kolom bawaan.');
+                    return;
+                }
+
+                if (this.config.columns && this.config.columns.length > 0) {
+                    if (!confirm('Terapkan kolom bawaan dari sumber data ini? Kolom saat ini akan digantikan.')) {
+                        return;
+                    }
+                }
+
+                this.config.columns = src.fields.map(f => ({
+                    header: f.label || f.field,
+                    field: f.field,
+                    width: f.default_width || 'auto',
+                    align: f.default_align || (f.type === 'number' ? 'center' : 'left')
+                }));
+
+                if (!this.config.title || this.config.title.startsWith('A. ') || this.config.title ===
+                    'A. NILAI SANTRI') {
+                    this.config.title = src.name.toUpperCase();
+                }
+
+                this.syncToJson();
+            },
+
+            addSpecificColumn(fieldObj) {
+                if (!this.config.columns) this.config.columns = [];
+                this.config.columns.push({
+                    header: fieldObj.label || fieldObj.field,
+                    field: fieldObj.field,
+                    width: fieldObj.default_width || '20%',
+                    align: fieldObj.default_align || (fieldObj.type === 'number' ? 'center' : 'left')
+                });
+                this.syncToJson();
             },
 
             syncToJson() {
@@ -610,59 +864,141 @@
             // Table helpers
             addTableColumn() {
                 if (!this.config.columns) this.config.columns = [];
-                this.config.columns.push({ header: 'Kolom Baru', field: 'name', width: '20%', align: 'center' });
+                this.config.columns.push({
+                    header: 'Kolom Baru',
+                    field: 'name',
+                    width: '20%',
+                    align: 'center'
+                });
+                this.syncToJson();
             },
             removeTableColumn(idx) {
                 if (this.config.columns) this.config.columns.splice(idx, 1);
+                this.syncToJson();
             },
 
             // Keyvalue helpers
             addKeyValueField() {
                 if (!this.config.fields) this.config.fields = [];
-                this.config.fields.push({ label: 'Label', binding: 'student.full_name' });
+                this.config.fields.push({
+                    label: 'Label',
+                    binding: 'student.full_name'
+                });
+                this.syncToJson();
             },
             removeKeyValueField(idx) {
                 if (this.config.fields) this.config.fields.splice(idx, 1);
+                this.syncToJson();
             },
 
             // Signature helpers
             addSignatureCol() {
                 if (!this.config.columns) this.config.columns = [];
-                this.config.columns.push({ role: 'official', label: 'Pejabat', source: 'automatic', showImage: false, showEmployeeNumber: false });
+                this.config.columns.push({
+                    role: 'official',
+                    label: 'Pejabat',
+                    source: 'automatic',
+                    showImage: false,
+                    showEmployeeNumber: false
+                });
+                this.syncToJson();
             },
             removeSignatureCol(idx) {
                 if (this.config.columns) this.config.columns.splice(idx, 1);
+                this.syncToJson();
             },
             loadPreset(presetType) {
                 if (presetType === 'merdeka') {
                     this.config.title = 'A. NILAI AKADEMIK & CAPAIAN KOMPETENSI';
                     this.config.dataSource = 'academic_scores';
-                    this.config.columns = [
-                        { header: 'No', field: 'index', width: '6%', align: 'center' },
-                        { header: 'Mata Pelajaran', field: 'subject.name', width: '34%', align: 'left' },
-                        { header: 'Nilai Akhir', field: 'numeric_score', width: '15%', align: 'center' },
-                        { header: 'Capaian Kompetensi', field: 'description', width: '45%', align: 'left' },
+                    this.config.columns = [{
+                            header: 'No',
+                            field: 'index',
+                            width: '6%',
+                            align: 'center'
+                        },
+                        {
+                            header: 'Mata Pelajaran',
+                            field: 'subject.name',
+                            width: '34%',
+                            align: 'left'
+                        },
+                        {
+                            header: 'Nilai Akhir',
+                            field: 'numeric_score',
+                            width: '15%',
+                            align: 'center'
+                        },
+                        {
+                            header: 'Capaian Kompetensi',
+                            field: 'description',
+                            width: '45%',
+                            align: 'left'
+                        },
                     ];
                     this.config.footerTargetIndex = 2;
                 } else if (presetType === 'k13') {
                     this.config.title = 'A. NILAI PENGETAHUAN & KETERAMPILAN';
                     this.config.dataSource = 'academic_scores';
-                    this.config.columns = [
-                        { header: 'No', field: 'index', width: '6%', align: 'center' },
-                        { header: 'Mata Pelajaran', field: 'subject.name', width: '34%', align: 'left' },
-                        { header: 'Pengetahuan', field: 'midterm_score', width: '15%', align: 'center' },
-                        { header: 'Keterampilan', field: 'final_score', width: '15%', align: 'center' },
-                        { header: 'Predikat', field: 'predicate', width: '15%', align: 'center' },
+                    this.config.columns = [{
+                            header: 'No',
+                            field: 'index',
+                            width: '6%',
+                            align: 'center'
+                        },
+                        {
+                            header: 'Mata Pelajaran',
+                            field: 'subject.name',
+                            width: '34%',
+                            align: 'left'
+                        },
+                        {
+                            header: 'Pengetahuan',
+                            field: 'midterm_score',
+                            width: '15%',
+                            align: 'center'
+                        },
+                        {
+                            header: 'Keterampilan',
+                            field: 'final_score',
+                            width: '15%',
+                            align: 'center'
+                        },
+                        {
+                            header: 'Predikat',
+                            field: 'predicate',
+                            width: '15%',
+                            align: 'center'
+                        },
                     ];
                     this.config.footerTargetIndex = 3;
                 } else if (presetType === 'pesantren') {
                     this.config.title = 'B. CAPAIAN KAJIAN KITAB (SOROGAN)';
                     this.config.dataSource = 'sorogan';
-                    this.config.columns = [
-                        { header: 'No', field: 'index', width: '8%', align: 'center' },
-                        { header: 'Nama Kitab', field: 'book.title', width: '42%', align: 'left' },
-                        { header: 'Nilai Bacaan', field: 'reading_score', width: '25%', align: 'center' },
-                        { header: 'Pemahaman', field: 'translation_score', width: '25%', align: 'center' },
+                    this.config.columns = [{
+                            header: 'No',
+                            field: 'index',
+                            width: '8%',
+                            align: 'center'
+                        },
+                        {
+                            header: 'Nama Kitab',
+                            field: 'book.title',
+                            width: '42%',
+                            align: 'left'
+                        },
+                        {
+                            header: 'Nilai Bacaan',
+                            field: 'reading_score',
+                            width: '25%',
+                            align: 'center'
+                        },
+                        {
+                            header: 'Pemahaman',
+                            field: 'translation_score',
+                            width: '25%',
+                            align: 'center'
+                        },
                     ];
                     this.config.footerTargetIndex = 2;
                 }
