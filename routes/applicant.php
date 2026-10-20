@@ -15,7 +15,7 @@ Route::prefix('ppdb')->name('ppdb.')->middleware(['web'])->group(function () {
     Route::post('/daftar/{admission:code}', [RegistrationController::class, 'store'])->name('register.store');
     Route::put('/daftar/{applicant:registration_number}', [RegistrationController::class, 'update'])->name('register.update');
     Route::get('/cek-status', [RegistrationController::class, 'statusForm'])->name('status');
-    Route::post('/cek-status', [RegistrationController::class, 'checkStatus'])->name('status.check');
+    Route::post('/cek-status', [RegistrationController::class, 'checkStatus'])->name('checkStatus');
     // Draft
     Route::post('/draft/{applicant?}', [RegistrationController::class, 'saveDraft'])->name('draft');
     // Dokumen
@@ -25,7 +25,7 @@ Route::prefix('ppdb')->name('ppdb.')->middleware(['web'])->group(function () {
     // Submit final
     Route::post('/submit/{applicant}', [RegistrationController::class, 'submit'])->name('submit');
     // Cek status
-    Route::get('/status', [RegistrationController::class, 'status'])->name('status');
+    // Route::get('/status', [RegistrationController::class, 'status'])->name('status');
     // Pembayaran
     Route::get('/invoice/{applicant}', [PaymentController::class, 'invoice'])->name('invoice');
     Route::post('/payment/{invoice}', [PaymentController::class, 'store'])->name('payment.store');
