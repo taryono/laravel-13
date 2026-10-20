@@ -28,7 +28,7 @@ class BudgetController extends MainController
             return $dataTable->ajax();
         }
 
-        return $dataTable->render('Finance::budget.index');
+        return $dataTable->render('Budget::index');
     }
 
     public function create(): View
@@ -41,7 +41,7 @@ class BudgetController extends MainController
         $forms = $result['forms'];
         $groupedForms = $result['grouped'];
 
-        return view('Finance::budget.edit', compact('budget', 'forms', 'groupedForms', 'accounts', 'departments'));
+        return view('Budget::edit', compact('budget', 'forms', 'groupedForms', 'accounts', 'departments'));
     }
 
     public function store(Request $request)
@@ -81,7 +81,7 @@ class BudgetController extends MainController
         $forms = $result['forms'];
         $groupedForms = $result['grouped'];
 
-        return view('Finance::budget.edit', compact('budget', 'forms', 'groupedForms', 'accounts', 'departments'));
+        return view('Budget::edit', compact('budget', 'forms', 'groupedForms', 'accounts', 'departments'));
     }
 
     public function update(Request $request, $id)

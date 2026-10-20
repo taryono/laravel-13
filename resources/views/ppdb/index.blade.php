@@ -1602,7 +1602,7 @@
                     </div>
 
                     <div class="col-lg-6">
-                        <form action="{{ route('ppdb.status.check') }}" method="POST">
+                        <form action="{{ route('ppdb.checkStatus') }}" method="POST">
                             @csrf
                             <div class="search-input-group">
                                 <input type="text" name="registration_number"

@@ -1,0 +1,23 @@
+<?php
+namespace Models; 
+
+class StudentPayment extends BasedModel
+{
+    // Relasi
+        public function invoice()
+    {
+        return $this->belongsTo(Invoice::class, 'invoice_id');
+    }
+
+    public function student()
+    {
+        return $this->belongsTo(Student::class, 'student_id');
+    }
+
+
+    // Scope
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
+}
