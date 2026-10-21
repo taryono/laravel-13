@@ -1,15 +1,16 @@
 <?php
 namespace Models; 
 
-class CmsTag extends BasedModel
+use Illuminate\Database\Eloquent\Model;
+
+class CmsTag extends Model
 {
+    protected $table = 'cms_tags';
+    protected $guarded = ['id'];
+
     // Relasi
-    
-
-
-    // Scope
-    public function scopeActive($query)
+    public function posts()
     {
-        return $query->where('is_active', true);
+        return $this->belongsToMany(CmsPost::class, 'cms_post_tag', 'tag_id', 'post_id');
     }
 }

@@ -17,7 +17,7 @@ class CmsPostDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['user_id', 'category_id', 'title', 'slug', 'excerpt', 'content', 'featured_image', 'status', 'published_at', 'is_featured', 'allow_comments', 'view_count', 'meta_title', 'meta_description', 'meta_keywords'];
+    protected array $columns = ['title', 'category_id', 'status', 'published_at', 'view_count'];
 
     /**
      * Build DataTable response.
@@ -28,8 +28,23 @@ class CmsPostDataTable extends DataTable
             ->addColumn('action', function ($row) {
                 return $this->renderActionButtons($row);
             })
+            ->editColumn('category_id', function ($row) {
+                return $row->category->name ?? '-';
+            })
+            ->editColumn('status', function ($row) {
+                $color = match($row->status) {
+                    'published' => 'success',
+                    'scheduled' => 'info',
+                    'archived'  => 'secondary',
+                    default     => 'warning'
+                };
+                return '<span class="badge bg-' . $color . '">' . ucfirst($row->status ?? 'draft') . '</span>';
+            })
+            ->editColumn('published_at', function ($row) {
+                return $row->published_at ? $row->published_at->format('d M Y H:i') : '-';
+            })
             ->addIndexColumn()
-            ->rawColumns(['action']) // ✅ Tetap wajib ada!
+            ->rawColumns(['action', 'status'])
             ->setRowId('id');
     }
 
@@ -48,7 +63,7 @@ class CmsPostDataTable extends DataTable
      */
     protected function renderActionButtons($row): string
     {
-        $title = e('Detail CmsPost ' . $row->name);
+        $title = e('Detail CmsPost ' . ($row->title ?? ''));
 
         $context = htmlspecialchars(
             json_encode([
@@ -100,7 +115,7 @@ class CmsPostDataTable extends DataTable
      */
     public function query(CmsPost $model): QueryBuilder
     {
-        return $model->newQuery();
+        return $model->newQuery()->with(['user', 'category']);
     }
 
     /**

@@ -118,9 +118,24 @@ class RelationDataResolver
      */
     public function getRelationType($ownerModel, string $method): string
     {
-        $relation = $ownerModel->{$method}();
-        $class = get_class($relation);
+        if (!method_exists($ownerModel, $method)) {
+            $camel = Str::camel($method);
+            if (method_exists($ownerModel, $camel)) {
+                $method = $camel;
+            } else {
+                return 'belongsTo';
+            }
+        }
 
-        return str_replace("Illuminate\\Database\\Eloquent\\Relations\\", "", $class);
+        try {
+            $relation = $ownerModel->{$method}();
+            if (!is_object($relation)) {
+                return 'belongsTo';
+            }
+            $class = get_class($relation);
+            return str_replace("Illuminate\\Database\\Eloquent\\Relations\\", "", $class);
+        } catch (\Throwable $e) {
+            return 'belongsTo';
+        }
     }
 }
