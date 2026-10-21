@@ -5,6 +5,7 @@ namespace Models;
 class ActivityLog extends BasedModel
 {
     protected $table = 'activity_logs';
+    const UPDATED_AT = null;
 
     public static function bootSoftDeletes()
     {

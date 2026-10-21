@@ -4,11 +4,19 @@ namespace Models;
 
 class ApplicationDocument extends BasedModel
 { 
-    // Relasi
-    // public function user()
-    // {
-    //     return $this->belongsTo(User::class);
-    // }
+    protected $table = 'application_documents';
+    protected $guarded = ['id'];
+
+    protected $casts = [
+        'uploaded_at' => 'datetime',
+        'is_active'   => 'boolean',
+        'verified'    => 'boolean',
+    ];
+
+    public function applicant()
+    {
+        return $this->belongsTo(Applicant::class, 'applicant_id');
+    }
 
     // Scope
     public function scopeActive($query)

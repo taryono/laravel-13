@@ -34,7 +34,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         @endif
-        @if ($errors->any())
+        @if (isset($errors) && $errors->any())
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                 <i class="bi bi-exclamation-triangle-fill me-2"></i>
                 <strong>Periksa kembali data Anda:</strong>

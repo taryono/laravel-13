@@ -154,8 +154,8 @@
                                 </h4>
                                 <p class="mb-0 text-truncate"
                                     style="font-size:0.7rem; color:var(--bs-on-surface-variant);">
-                                    {{ number_format($doc->file_size / 1024 / 1024, 2) }} MB • Diunggah
-                                    {{ $doc->uploaded_at?->format('d M Y') }}
+                                    {{ number_format(($doc->file_size ?? 0) / 1024 / 1024, 2) }} MB • Diunggah
+                                    {{ !empty($doc->uploaded_at) ? \Carbon\Carbon::parse($doc->uploaded_at)->format('d M Y') : '-' }}
                                 </p>
                             </div>
                         </div>

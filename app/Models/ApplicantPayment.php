@@ -4,11 +4,18 @@ namespace Models;
 
 class ApplicantPayment extends BasedModel
 { 
-    // Relasi
-    // public function user()
-    // {
-    //     return $this->belongsTo(User::class);
-    // }
+    protected $table = 'applicant_payments';
+    protected $guarded = ['id'];
+
+    public function invoice()
+    {
+        return $this->belongsTo(ApplicantInvoice::class, 'invoice_id');
+    }
+
+    public function applicant()
+    {
+        return $this->belongsTo(Applicant::class, 'applicant_id');
+    }
 
     // Scope
     public function scopeActive($query)

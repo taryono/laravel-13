@@ -120,6 +120,16 @@ class Applicant extends Authenticatable
         return $this->belongsTo(ApplicantStatus::class, 'applicant_status_id');
     }
 
+    public function statusRel()
+    {
+        return $this->belongsTo(ApplicantStatus::class, 'applicant_status_id');
+    }
+
+    public function applicantStatus()
+    {
+        return $this->belongsTo(ApplicantStatus::class, 'applicant_status_id');
+    }
+
     // Relasi Pivot Multi Kategori (BelongsToMany)
     public function categories()
     {

@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Route;
 // ==================================================
 use App\Http\Controllers\Ppdb\Applicant\RegistrationController;
 use App\Http\Controllers\Ppdb\Applicant\ApplicantDashboardController;
+use App\Http\Controllers\Ppdb\Applicant\DocumentController;
+use App\Http\Controllers\Ppdb\Applicant\PaymentController;
 use App\Http\Controllers\Auth\ApplicantLoginController;
 // ---------- PUBLIC (tanpa login) ---------- 
 Route::prefix('ppdb')->name('ppdb.')->middleware(['web'])->group(function () {
@@ -14,6 +16,7 @@ Route::prefix('ppdb')->name('ppdb.')->middleware(['web'])->group(function () {
     Route::get('/daftar/{admission:code}', [RegistrationController::class, 'create'])->name('register');
     Route::post('/daftar/{admission:code}', [RegistrationController::class, 'store'])->name('register.store');
     Route::put('/daftar/{applicant:registration_number}', [RegistrationController::class, 'update'])->name('register.update');
+    Route::get('/daftar-edit/{applicant:registration_number}', [RegistrationController::class, 'edit'])->name('register.edit');
     Route::get('/cek-status', [RegistrationController::class, 'statusForm'])->name('status');
     Route::post('/cek-status', [RegistrationController::class, 'checkStatus'])->name('checkStatus');
     // Draft

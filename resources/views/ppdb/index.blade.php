@@ -1655,7 +1655,7 @@
                                     };
                                 @endphp
                                 <span class="badge {{ $badgeColor }} px-3 py-2 rounded-pill fs-6 fw-bold">
-                                    {{ $res->status->name ?? $statusName }}
+                                    {{ is_object($res->status) ? ($res->status->name ?? $statusName) : $statusName }}
                                 </span>
                             </div>
                         </div>

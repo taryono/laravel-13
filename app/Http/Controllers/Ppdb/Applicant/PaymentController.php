@@ -37,17 +37,16 @@ class PaymentController extends Controller
             }
 
             $payment = ApplicantPayment::create([
-                'applicant_invoice_id' => $invoice->id,
-                'applicant_id'         => $invoice->applicant_id,
-                'invoice_no'           => $invoice->invoice_number,
-                'payment_method'       => $request->payment_method,
-                'amount'               => $request->amount,
-                'payment_date'         => now(),
-                'bank_name'            => $request->bank_name,
-                'reference_code'       => $request->reference_code,
-                'attachment'           => $path,
-                'status'               => 'pending',
-                'created_by'           => Auth::id(),
+                'invoice_id'         => $invoice->id,
+                'applicant_id'       => $invoice->applicant_id,
+                'payment_method'     => $request->payment_method,
+                'amount'             => $request->amount,
+                'payment_date'       => now(),
+                'bank_name'          => $request->bank_name,
+                'reference_number'   => $request->reference_code ?? $request->reference_number,
+                'payment_proof_url'  => $path ? \Illuminate\Support\Facades\Storage::url($path) : null,
+                'status'             => 'pending',
+                'created_by'         => Auth::id(),
             ]);
 
             DB::commit();

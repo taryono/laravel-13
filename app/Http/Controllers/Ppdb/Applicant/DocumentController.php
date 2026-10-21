@@ -74,11 +74,16 @@ class DocumentController extends Controller
      */
     public function destroy(ApplicationDocument $document)
     {
-        if ($document->applicant->created_by !== Auth::id() && !Auth::user()->hasRole('admin')) {
-            abort(403);
+        if (Auth::check() && $document->applicant && $document->applicant->created_by && $document->applicant->created_by !== Auth::id()) {
+            if (!Auth::user()->isSuperUser() && !Auth::user()->hasAnyRole(['admin', 'admin-ppdb', 'super-admin'])) {
+                abort(403);
+            }
         }
 
-        Storage::disk('public')->delete($document->document_url);
+        if (!empty($document->document_url)) {
+            $relativePath = str_replace('/storage/', '', $document->document_url);
+            Storage::disk('public')->delete($relativePath);
+        }
         $document->delete();
 
         return response()->json(['success' => true]);
@@ -89,6 +94,17 @@ class DocumentController extends Controller
      */
     public function preview(ApplicationDocument $document)
     {
-        return response()->file(storage_path('app/public/' . $document->document_url));
+        $relativePath = str_replace('/storage/', '', $document->document_url);
+        $path = storage_path('app/public/' . $relativePath);
+
+        if (!file_exists($path)) {
+            $path = storage_path('app/public/' . $document->document_url);
+        }
+
+        if (!file_exists($path)) {
+            abort(404, 'Dokumen tidak ditemukan.');
+        }
+
+        return response()->file($path);
     }
 }

@@ -25,7 +25,7 @@
             </div>
         @endif
 
-        @if ($errors->any())
+        @if (isset($errors) && $errors->any())
             <div class="alert alert-danger d-flex align-items-center gap-2 py-2 px-3 mb-3" style="font-size:.83rem; border-radius:10px;">
                 <i class="bi bi-exclamation-circle-fill flex-shrink-0"></i>
                 <span>{{ $errors->first() }}</span>
