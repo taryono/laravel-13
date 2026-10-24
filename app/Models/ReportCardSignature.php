@@ -1,35 +1,21 @@
 <?php
-
-namespace Models;
+namespace Models; 
 
 class ReportCardSignature extends BasedModel
 {
-    protected $fillable = [
-        'school_id',
-        'generated_report_id',
-        'role_id',
-        'user_id',
-    ];
+    // Relasi
+        public function reportCard()
+    {
+        return $this->belongsTo(ReportCard::class, 'report_card_id');
+    }
 
     public function user()
     {
-        return $this->belongsTo(\App\Models\User::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function role()
-    {
-        return $this->belongsTo(Role::class);
-    }
 
-    public function school()
-    {
-        return $this->belongsTo(School::class);
-    }
-
-    public function generatedReport()
-    {
-        return $this->belongsTo(GeneratedReport::class);
-    }
+    // Scope
     public function scopeActive($query)
     {
         return $query->where('is_active', true);

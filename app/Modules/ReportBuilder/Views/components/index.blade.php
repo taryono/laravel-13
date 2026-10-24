@@ -9,7 +9,9 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <style>
-        [x-cloak] { display: none !important; }
+        [x-cloak] {
+            display: none !important;
+        }
     </style>
 </head>
 
@@ -39,7 +41,8 @@
                     <span>🧩</span> Kelola Komponen Palette
                 </h1>
                 <p class="text-sm text-gray-600 mt-1">
-                    Atur komponen yang muncul di panel kiri builder, termasuk konfigurasi konten bawaan (*default content*).
+                    Atur komponen yang muncul di panel kiri builder, termasuk konfigurasi konten bawaan (*default
+                    content*).
                 </p>
             </div>
             <div class="flex items-center gap-2">
@@ -52,19 +55,22 @@
 
         {{-- Flash Messages --}}
         @if (session('success'))
-            <div class="mb-6 bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg shadow-sm flex items-center justify-between">
+            <div
+                class="mb-6 bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg shadow-sm flex items-center justify-between">
                 <div class="flex items-center gap-2 text-green-800 text-sm font-medium">
                     <span>✅</span>
                     <span>{{ session('success') }}</span>
                 </div>
-                <button type="button" onclick="this.parentElement.remove()" class="text-green-600 hover:text-green-800 text-sm font-bold">✕</button>
+                <button type="button" onclick="this.parentElement.remove()"
+                    class="text-green-600 hover:text-green-800 text-sm font-bold">✕</button>
             </div>
         @endif
 
         {{-- Statistics Cards --}}
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
             <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex items-center gap-4">
-                <div class="w-12 h-12 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-xl font-bold">
+                <div
+                    class="w-12 h-12 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-xl font-bold">
                     📦
                 </div>
                 <div>
@@ -74,7 +80,8 @@
             </div>
 
             <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex items-center gap-4">
-                <div class="w-12 h-12 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl font-bold">
+                <div
+                    class="w-12 h-12 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl font-bold">
                     ✅
                 </div>
                 <div>
@@ -84,7 +91,8 @@
             </div>
 
             <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex items-center gap-4">
-                <div class="w-12 h-12 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-xl font-bold">
+                <div
+                    class="w-12 h-12 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-xl font-bold">
                     ⏸️
                 </div>
                 <div>
@@ -95,7 +103,8 @@
         </div>
 
         {{-- Filter Tabs --}}
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 mb-6 p-2 flex flex-wrap items-center justify-between gap-3">
+        <div
+            class="bg-white rounded-xl shadow-sm border border-gray-200 mb-6 p-2 flex flex-wrap items-center justify-between gap-3">
             <div class="flex flex-wrap items-center gap-1">
                 <a href="{{ route('admin.report-builder.components.index') }}"
                     class="px-3.5 py-1.5 rounded-lg text-xs font-medium transition {{ empty($category) || $category === 'all' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100' }}">
@@ -119,7 +128,8 @@
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse text-sm">
                     <thead>
-                        <tr class="bg-gray-50/80 border-b border-gray-200 text-xs text-gray-500 uppercase tracking-wider font-semibold">
+                        <tr
+                            class="bg-gray-50/80 border-b border-gray-200 text-xs text-gray-500 uppercase tracking-wider font-semibold">
                             <th class="py-3.5 px-4 text-center w-16">Urutan</th>
                             <th class="py-3.5 px-4">Komponen</th>
                             <th class="py-3.5 px-4">Kategori</th>
@@ -138,7 +148,8 @@
 
                                 <td class="py-3.5 px-4">
                                     <div class="flex items-center gap-3">
-                                        <span class="w-9 h-9 rounded-lg bg-gray-100 border border-gray-200 flex items-center justify-center text-lg flex-shrink-0">
+                                        <span
+                                            class="w-9 h-9 rounded-lg bg-gray-100 border border-gray-200 flex items-center justify-center text-lg flex-shrink-0">
                                             {{ $comp->icon ?: '📄' }}
                                         </span>
                                         <div>
@@ -149,7 +160,8 @@
                                 </td>
 
                                 <td class="py-3.5 px-4">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                                    <span
+                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
                                         {{ $comp->category === 'blocks' ? 'bg-blue-100 text-blue-800' : ($comp->category === 'text' ? 'bg-green-100 text-green-800' : 'bg-purple-100 text-purple-800') }}">
                                         {{ ucfirst($comp->category) }}
                                     </span>
@@ -159,7 +171,8 @@
                                     <code class="bg-gray-100 px-1.5 py-0.5 rounded">{{ $comp->type }}</code>
                                 </td>
 
-                                <td class="py-3.5 px-4 text-xs text-gray-500 max-w-xs truncate" title="{{ $comp->description }}">
+                                <td class="py-3.5 px-4 text-xs text-gray-500 max-w-xs truncate"
+                                    title="{{ $comp->description }}">
                                     {{ $comp->description ?: '—' }}
                                 </td>
 
@@ -168,7 +181,8 @@
                                         :class="statuses[{{ $comp->id }}] ? 'bg-emerald-500' : 'bg-gray-300'"
                                         class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
                                         <span class="sr-only">Toggle Active</span>
-                                        <span :class="statuses[{{ $comp->id }}] ? 'translate-x-5' : 'translate-x-0'"
+                                        <span
+                                            :class="statuses[{{ $comp->id }}] ? 'translate-x-5' : 'translate-x-0'"
                                             class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
                                     </button>
                                 </td>
@@ -179,8 +193,9 @@
                                         ✏️ Edit
                                     </a>
 
-                                    <form action="{{ route('admin.report-builder.components.destroy', $comp->id) }}" method="POST"
-                                        class="inline" onsubmit="return confirm('Hapus komponen &quot;{{ $comp->name }}&quot;?')">
+                                    <form action="{{ route('admin.report-builder.components.destroy', $comp->id) }}"
+                                        method="POST" class="inline"
+                                        onsubmit="return confirm('Hapus komponen &quot;{{ $comp->name }}&quot;?')">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit"
@@ -195,7 +210,8 @@
                                 <td colspan="7" class="py-12 text-center text-gray-500">
                                     <div class="text-3xl mb-2">🧩</div>
                                     <div class="font-medium text-gray-700">Belum ada komponen di kategori ini</div>
-                                    <p class="text-xs text-gray-400 mt-1">Klik tombol "Tambah Komponen Baru" di atas untuk menambahkan.</p>
+                                    <p class="text-xs text-gray-400 mt-1">Klik tombol "Tambah Komponen Baru" di atas
+                                        untuk menambahkan.</p>
                                 </td>
                             </tr>
                         @endforelse
@@ -216,7 +232,7 @@
         function componentsIndex() {
             return {
                 statuses: {
-                    @foreach($components as $c)
+                    @foreach ($components as $c)
                         {{ $c->id }}: {{ $c->is_active ? 'true' : 'false' }},
                     @endforeach
                 },

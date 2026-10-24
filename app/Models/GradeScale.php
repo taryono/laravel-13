@@ -1,10 +1,23 @@
 <?php
+namespace Models; 
 
-namespace Models;
-
-use Illuminate\Database\Eloquent\Model;
-
-class GradeScale extends Model
+class GradeScale extends BasedModel
 {
-    //
+    // Relasi
+        public function school()
+    {
+        return $this->belongsTo(School::class, 'school_id');
+    }
+
+    public function curriculum()
+    {
+        return $this->belongsTo(Curriculum::class, 'curriculum_id');
+    }
+
+
+    // Scope
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
 }

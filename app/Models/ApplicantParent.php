@@ -1,13 +1,18 @@
 <?php
-
-namespace Models;
+namespace Models; 
 
 class ApplicantParent extends BasedModel
 {
-    protected $table = 'applicant_parents';
-
-    public function applicant()
+    // Relasi
+        public function applicant()
     {
-        return $this->belongsTo(Applicant::class);
+        return $this->belongsTo(Applicant::class, 'applicant_id');
+    }
+
+
+    // Scope
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
     }
 }

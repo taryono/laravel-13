@@ -229,7 +229,8 @@
 <body>
   <div class="app-shell">
     {{-- ISI KONTEN HALAMAN AKAN MUNCUL DI SINI --}}
-    {{ $slot }}
+    {{ $slot ?? '' }}
+    @yield('content')
   </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 @stack('scripts')

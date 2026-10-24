@@ -311,8 +311,53 @@ class WelcomeController extends Controller
     public function requestDemo()
     {
         $roles = Role::all();
-        $positions = Position::where('is_active', true)->pluck('id', 'name')->toArray();
-        $packages = Package::where('is_active', true)->pluck('id', 'name')->toArray();
+        $positions = Position::where('is_active', true)->pluck('name', 'id')->toArray();
+        $packages = Package::where('is_active', true)->pluck('name', 'id')->toArray();
         return view('request-demo', compact('roles', 'positions', 'packages'));
+    }
+
+    public function submitRequestDemo(Request $request)
+    {
+        $data = $request->validate([
+            'school_name' => 'required|string|max:255',
+            'person_name' => 'required|string|max:255',
+            'position' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'phone' => 'required|string|max:25',
+            'package' => 'required|string|max:100',
+            'demo_datetime' => 'required|date',
+            'message' => 'nullable|string|max:2000',
+        ], [
+            'school_name.required' => 'Nama sekolah wajib diisi.',
+            'person_name.required' => 'Nama penanggung jawab wajib diisi.',
+            'position.required' => 'Jabatan wajib diisi.',
+            'email.required' => 'Email wajib diisi.',
+            'email.email' => 'Format email tidak valid.',
+            'phone.required' => 'Nomor telepon/WhatsApp wajib diisi.',
+            'package.required' => 'Silakan pilih paket demo.',
+            'demo_datetime.required' => 'Tanggal dan waktu demo wajib ditentukan.',
+        ]);
+
+        try {
+            \Models\DemoRequest::create([
+                'school_name' => $data['school_name'],
+                'person_name' => $data['person_name'],
+                'position' => $data['position'],
+                'email' => $data['email'],
+                'phone' => $data['phone'],
+                'package' => $data['package'],
+                'demo_datetime' => $data['demo_datetime'],
+                'message' => $data['message'] ?? null,
+                'status' => 'pending',
+            ]);
+
+            return redirect()->route('request_demo.form')
+                ->with('success', 'Terima kasih! Jadwal demo Anda berhasil didaftarkan. Tim kami akan segera menghubungi Anda dalam waktu 1×24 jam.');
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Demo Request submission failed: ' . $e->getMessage());
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Terjadi kesalahan saat memproses permintaan demo. Silakan coba beberapa saat lagi.');
+        }
     }
 }

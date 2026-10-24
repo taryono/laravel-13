@@ -1,14 +1,11 @@
 <?php
+namespace Models; 
 
-namespace Models;
- 
 class StudentRange extends BasedModel
-{ 
+{
     // Relasi
-    // public function user()
-    // {
-    //     return $this->belongsTo(User::class);
-    // }
+    
+
 
     // Scope
     public function scopeActive($query)

@@ -205,11 +205,17 @@ class MakeCrudYajraCommand extends Command
         $this->line('📌 Kolom    : ' . implode(', ', $columnsArray));
 
         $this->newLine();
-        Artisan::call('cache:clear');
-        Artisan::call('config:clear');
-        Artisan::call('route:clear');
-        Artisan::call('view:clear');
-        Artisan::call('optimize');
+        if (!$this->option('no-menu')) {
+            try {
+                Artisan::call('cache:clear');
+                Artisan::call('config:clear');
+                Artisan::call('route:clear');
+                Artisan::call('view:clear');
+                Artisan::call('optimize');
+            } catch (\Throwable $e) {
+                $this->warn('⚠ Gagal membersihkan cache (database offline): ' . $e->getMessage());
+            }
+        }
 
         return Command::SUCCESS;
     }

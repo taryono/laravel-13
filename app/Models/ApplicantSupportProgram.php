@@ -1,13 +1,18 @@
 <?php
-
-namespace Models;
+namespace Models; 
 
 class ApplicantSupportProgram extends BasedModel
 {
-    protected $table = 'applicant_support_programs';
-
-    public function applicant()
+    // Relasi
+        public function applicant()
     {
-        return $this->belongsTo(Applicant::class);
+        return $this->belongsTo(Applicant::class, 'applicant_id');
+    }
+
+
+    // Scope
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
     }
 }

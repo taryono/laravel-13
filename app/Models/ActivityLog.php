@@ -1,19 +1,23 @@
 <?php
-
-namespace Models;
+namespace Models; 
 
 class ActivityLog extends BasedModel
 {
-    protected $table = 'activity_logs';
-    const UPDATED_AT = null;
-
-    public static function bootSoftDeletes()
+    // Relasi
+        public function user()
     {
-        // Table has no deleted_at column
+        return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function user()
+    public function record()
     {
-        return $this->belongsTo(\App\Models\User::class);
+        return $this->belongsTo(Record::class, 'record_id');
+    }
+
+
+    // Scope
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
     }
 }

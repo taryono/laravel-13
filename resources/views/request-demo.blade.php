@@ -1,4 +1,4 @@
-@extends('layouts.guest')
+@extends('layouts.front')
 
 @section('content')
 <section class="hero" style="padding: 3rem 0 5rem;">
@@ -12,6 +12,37 @@
 
                 {{-- CARD FORM — menggunakan Laravel Collective --}}
                 <div class="demo-card p-4 p-md-5">
+                    @if (session('success'))
+                        <div class="alert alert-success d-flex align-items-center mb-4" role="alert">
+                            <i class="bi bi-check-circle-fill fs-4 me-3 text-success"></i>
+                            <div>
+                                <h6 class="alert-heading mb-1 fw-bold">Permintaan Terkirim!</h6>
+                                <p class="mb-0">{{ session('success') }}</p>
+                            </div>
+                        </div>
+                    @endif
+
+                    @if (session('error'))
+                        <div class="alert alert-danger d-flex align-items-center mb-4" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill fs-4 me-3 text-danger"></i>
+                            <div>
+                                <h6 class="alert-heading mb-1 fw-bold">Terjadi Kesalahan</h6>
+                                <p class="mb-0">{{ session('error') }}</p>
+                            </div>
+                        </div>
+                    @endif
+
+                    @if ($errors->any())
+                        <div class="alert alert-warning mb-4" role="alert">
+                            <h6 class="alert-heading mb-2 fw-bold">Mohon periksa data formulir:</h6>
+                            <ul class="mb-0 ps-3">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
                     {!! Form::open(['route' => 'submit_request_demo.form', 'method' => 'POST']) !!}
                         @csrf
 
