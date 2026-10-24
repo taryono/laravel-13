@@ -5763,41 +5763,56 @@ CREATE TABLE `drivers`  (
 -- Table structure for education_levels
 -- ----------------------------
 DROP TABLE IF EXISTS `education_levels`;
-CREATE TABLE `education_levels`  (
+CREATE TABLE `education_levels` (
   `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `organization_id` bigint UNSIGNED NOT NULL,
-  `code` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `code` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_en` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `stage` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `sort_order` int NOT NULL DEFAULT 0,
+  `duration_years` tinyint UNSIGNED NULL DEFAULT NULL,
+  `min_age` tinyint UNSIGNED NULL DEFAULT NULL,
+  `max_age` tinyint UNSIGNED NULL DEFAULT NULL,
   `is_active` tinyint(1) NOT NULL DEFAULT 1,
-  `level` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
   `created_by` bigint UNSIGNED NULL DEFAULT NULL,
   `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `education_levels_org_code_unique`(`organization_id` ASC, `code` ASC) USING BTREE,
-  INDEX `education_levels_is_active_index`(`is_active` ASC) USING BTREE,
-  INDEX `education_levels_deleted_at_index`(`deleted_at` ASC) USING BTREE,
-  CONSTRAINT `education_levels_org_fk` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 12 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+  UNIQUE INDEX `education_levels_org_code_unique` (`organization_id`, `code`) USING BTREE,
+  INDEX `education_levels_org_active_sort_index` (`organization_id`, `is_active`, `sort_order`) USING BTREE,
+  INDEX `education_levels_stage_index` (`stage`) USING BTREE,
+  INDEX `education_levels_deleted_at_index` (`deleted_at`) USING BTREE,
+  CONSTRAINT `education_levels_org_fk` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `education_levels_stage_check` CHECK (`stage` IN ('paud', 'dasar', 'menengah', 'tinggi'))
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of education_levels
 -- ----------------------------
-INSERT INTO `education_levels` VALUES (1, 1, 'TK', 'Taman Kanak-kanak', NULL, 1, 1, '1', NULL, '2026-09-16 12:13:56', NULL, NULL, NULL);
-INSERT INTO `education_levels` VALUES (2, 1, 'SD', 'Sekolah Dasar / Sederajat', NULL, 2, 1, '2', '2026-09-16 12:15:49', '2026-09-16 12:15:49', NULL, NULL, NULL);
-INSERT INTO `education_levels` VALUES (3, 1, 'SMP', 'Sekolah Menengah Pertama / Sederajat', NULL, 3, 1, '3', '2026-09-16 12:15:49', '2026-09-16 12:15:49', NULL, NULL, NULL);
-INSERT INTO `education_levels` VALUES (4, 1, 'SMA', 'Sekolah Menengah Atas / Sederajat', NULL, 4, 1, '4', '2026-09-16 12:15:49', '2026-09-16 12:15:49', NULL, NULL, NULL);
-INSERT INTO `education_levels` VALUES (5, 1, 'D1', 'Diploma I', NULL, 5, 1, '5', '2026-09-16 12:15:49', '2026-09-16 12:15:49', NULL, NULL, NULL);
-INSERT INTO `education_levels` VALUES (6, 1, 'D2', 'Diploma II', NULL, 6, 1, '6', '2026-09-16 12:15:49', '2026-09-16 12:15:49', NULL, NULL, NULL);
-INSERT INTO `education_levels` VALUES (7, 1, 'D3', 'Diploma III', NULL, 7, 1, '7', '2026-09-16 12:15:49', '2026-09-16 12:15:49', NULL, NULL, NULL);
-INSERT INTO `education_levels` VALUES (8, 1, 'D4', 'Diploma IV / Sarjana Terapan', NULL, 8, 1, '8', '2026-09-16 12:15:49', '2026-09-16 12:15:49', NULL, NULL, NULL);
-INSERT INTO `education_levels` VALUES (9, 1, 'S1', 'Sarjana (S1)', NULL, 9, 1, '9', '2026-09-16 12:15:49', '2026-09-16 12:15:49', NULL, NULL, NULL);
-INSERT INTO `education_levels` VALUES (10, 1, 'S2', 'Magister (S2)', NULL, 10, 1, '10', '2026-09-16 12:15:49', '2026-09-16 12:15:49', NULL, NULL, NULL);
-INSERT INTO `education_levels` VALUES (11, 1, 'S3', 'Doktor (S3)', NULL, 11, 1, '11', '2026-09-16 12:15:49', '2026-09-16 12:15:49', NULL, NULL, NULL);
+INSERT INTO education_levels
+  (id, code, name, name_en, stage, sort_order, duration_years, min_age, max_age)
+VALUES
+  (1,  'TPA',  'Taman Penitipan Anak',             'Daycare',                 'paud',     1,  NULL, 0,  6),
+  (2,  'KB',   'Kelompok Bermain',                 'Playgroup',               'paud',     2,  2,    2,  4),
+  (3,  'TK',   'Taman Kanak-kanak / RA',           'Kindergarten',            'paud',     3,  2,    4,  6),
+  (4,  'SD',   'Sekolah Dasar / MI',               'Elementary School',       'dasar',    4,  6,    6,  12),
+  (5,  'SMP',  'Sekolah Menengah Pertama / MTs',   'Junior High School',      'dasar',    5,  3,    12, 15),
+  (6,  'SMA',  'Sekolah Menengah Atas / MA',       'Senior High School',      'menengah', 6,  3,    15, 18),
+  (7,  'SMK',  'Sekolah Menengah Kejuruan / MAK',  'Vocational High School',  'menengah', 7,  3,    15, 19),
+  (8,  'D1',   'Diploma 1',                        'Diploma 1',               'tinggi',   8,  1,    18, NULL),
+  (9,  'D2',   'Diploma 2',                        'Diploma 2',               'tinggi',   9,  2,    18, NULL),
+  (10, 'D3',   'Diploma 3',                        'Associate Degree',        'tinggi',   10, 3,    18, NULL),
+  (11, 'D4',   'Sarjana Terapan',                  'Applied Bachelor',        'tinggi',   11, 4,    18, NULL),
+  (12, 'S1',   'Sarjana',                          'Bachelor',                'tinggi',   12, 4,    18, NULL),
+  (13, 'PROF', 'Profesi',                          'Professional Program',    'tinggi',   13, 1,    22, NULL),
+  (14, 'S2',   'Magister',                         'Master',                  'tinggi',   14, 2,    22, NULL),
+  (15, 'SP',   'Spesialis',                        'Specialist',              'tinggi',   15, NULL, 24, NULL),
+  (16, 'S3',   'Doktor',                           'Doctorate',               'tinggi',   16, 3,    24, NULL);
+
 
 -- ----------------------------
 -- Table structure for email_logs

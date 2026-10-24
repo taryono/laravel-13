@@ -39,6 +39,151 @@
             cursor: pointer;
             user-select: none;
         }
+
+        /* STEP 2: Module Picker & Billing Styles */
+        .module-category-nav {
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+            scrollbar-width: thin;
+        }
+        .module-category-nav::-webkit-scrollbar {
+            height: 4px;
+        }
+        .module-category-nav::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .category-pill {
+            white-space: nowrap;
+            padding: 0.4rem 0.85rem;
+            border-radius: 50px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            color: #475569;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .category-pill:hover {
+            border-color: #2f5ce0;
+            color: #2f5ce0;
+            background: #eff6ff;
+        }
+        .category-pill.active {
+            background: #2f5ce0;
+            color: #fff;
+            border-color: #2f5ce0;
+            box-shadow: 0 4px 12px rgba(47, 92, 224, 0.25);
+        }
+
+        .module-scroll-container {
+            max-height: 450px;
+            overflow-y: auto;
+            padding-right: 6px;
+            margin-bottom: 1.25rem;
+            scrollbar-width: thin;
+        }
+        .module-scroll-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        .module-scroll-container::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 6px;
+        }
+
+        .module-option {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+            min-height: 140px;
+            padding: 1rem;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 14px;
+            background: #ffffff;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .module-option:hover {
+            border-color: #93c5fd;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(47, 92, 224, 0.08);
+        }
+        .module-option:has(input:checked) {
+            border-color: #2f5ce0;
+            background: #f0f7ff;
+            box-shadow: 0 6px 18px rgba(47, 92, 224, 0.12);
+        }
+        .module-option .check-mark {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            border: 1.5px solid #cbd5e1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            color: transparent;
+            background: #ffffff;
+            transition: all 0.2s ease;
+        }
+        .module-option input:checked ~ .check-mark {
+            background: #2f5ce0;
+            border-color: #2f5ce0;
+            color: #ffffff;
+        }
+
+        .mod-price-pill {
+            display: inline-flex;
+            align-items: baseline;
+            gap: 4px;
+            padding: 0.3rem 0.65rem;
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.84rem;
+            font-weight: 700;
+            color: #1e293b;
+            transition: all 0.2s ease;
+        }
+        .module-option:has(input:checked) .mod-price-pill {
+            background: #e0edff;
+            border-color: #bfdbfe;
+            color: #1d4ed8;
+        }
+
+        /* Sticky / Prominent Billing Summary Card */
+        .billing-summary-card {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #ffffff;
+            border-radius: 16px;
+            padding: 1.25rem 1.5rem;
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.18);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .billing-summary-card .badge-trial {
+            background: rgba(34, 197, 94, 0.18);
+            color: #4ade80;
+            border: 1px solid rgba(74, 222, 128, 0.35);
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.25rem 0.6rem;
+            border-radius: 50px;
+        }
+        .billing-summary-card .amount-display {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: #38bdf8;
+            line-height: 1;
+        }
     </style>
 </head>
 
@@ -143,12 +288,12 @@
                                 <label class="chip-option">
                                     <input type="checkbox" name="education_level_id[]" value="SMA"
                                         {{ in_array('SMA', $savedLevels) ? 'checked' : '' }}>
-                                    <span>SMA / MA</span>
+                                    <span>SMA / SMK / Sederajat</span>
                                 </label>
                                 <label class="chip-option">
-                                    <input type="checkbox" name="education_level_id[]" value="SMK"
-                                        {{ in_array('SMK', $savedLevels) ? 'checked' : '' }}>
-                                    <span>SMK</span>
+                                    <input type="checkbox" name="education_level_id[]" value="universitas"
+                                        {{ in_array('universitas', $savedLevels) ? 'checked' : '' }}>
+                                    <span>Perguruan Tinggi / Universitas</span>
                                 </label>
                             </div>
                             <div class="form-text mt-1" id="jenjangError" style="display:none;color:#dc3545;">
@@ -221,73 +366,155 @@
                 <!-- STEP 2 -->
                 <div class="wizard-step d-none" data-step="2">
                     <div class="step-eyebrow">Langkah 2 dari 5</div>
-                    <h3 class="step-heading">Pilih Modul yang Anda Butuhkan</h3>
-                    <p class="step-desc">Centang modul yang ingin Anda coba. Anda bisa menambah modul lain kapan saja nanti.</p>
+                    <div class="d-flex flex-wrap justify-content-between align-items-center mb-2 gap-2">
+                        <h3 class="step-heading mb-0">Pilih Modul yang Anda Butuhkan</h3>
+                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 rounded-pill fw-semibold">
+                            <i class="fa-solid fa-cube me-1"></i> {{ isset($modules) ? $modules->count() : 0 }} Modul Siap Digunakan
+                        </span>
+                    </div>
+                    <p class="step-desc mb-3">Centang modul yang ingin Anda aktifkan. Setiap modul memiliki harga lisensi bulanan yang otomatis dihitung di bawah sebagai acuan tagihan setelah masa trial gratis berakhir.</p>
 
-                    <div class="row g-3" id="moduleGrid">
-                        <div class="col-md-6">
-                            <label class="module-option">
-                                <input type="checkbox" name="modul[]" value="akademik"
-                                    {{ in_array('akademik', $savedModules) ? 'checked' : '' }}>
-                                <div class="mod-icon"><i class="fa-solid fa-book-open"></i></div>
-                                <div class="mod-title">Akademik</div>
-                                <div class="mod-desc">Kurikulum Merdeka, e-Learning, Rapor Digital.</div>
-                                <div class="check-mark"><i class="fa-solid fa-check"></i></div>
-                            </label>
+                    <!-- Toolbar: Pencarian & Aksi Cepat -->
+                    <div class="row g-2 align-items-center mb-3">
+                        <div class="col-md-7">
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 text-muted"><i class="fa-solid fa-magnifying-glass"></i></span>
+                                <input type="text" id="moduleSearch" class="form-control border-start-0 ps-0" placeholder="Ketik nama modul, tabel, atau fitur (misal: Rapor, SPP, Presensi, CBT)...">
+                                <button type="button" class="btn btn-outline-secondary border" id="btnClearSearch" style="display:none;"><i class="fa-solid fa-xmark"></i></button>
+                            </div>
                         </div>
-                        <div class="col-md-6">
-                            <label class="module-option">
-                                <input type="checkbox" name="modul[]" value="kesiswaan"
-                                    {{ in_array('kesiswaan', $savedModules) ? 'checked' : '' }}>
-                                <div class="mod-icon"><i class="fa-solid fa-user-group"></i></div>
-                                <div class="mod-title">Kesiswaan</div>
-                                <div class="mod-desc">PPDB Online, profil siswa, alumni &amp; prestasi.</div>
-                                <div class="check-mark"><i class="fa-solid fa-check"></i></div>
-                            </label>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="module-option">
-                                <input type="checkbox" name="modul[]" value="keuangan"
-                                    {{ in_array('keuangan', $savedModules) ? 'checked' : '' }}>
-                                <div class="mod-icon"><i class="fa-solid fa-wallet"></i></div>
-                                <div class="mod-title">Keuangan</div>
-                                <div class="mod-desc">SPP Online (QRIS/VA), laporan BOS &amp; RKAS.</div>
-                                <div class="check-mark"><i class="fa-solid fa-check"></i></div>
-                            </label>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="module-option">
-                                <input type="checkbox" name="modul[]" value="absensi"
-                                    {{ in_array('absensi', $savedModules) ? 'checked' : '' }}>
-                                <div class="mod-icon"><i class="fa-solid fa-calendar-check"></i></div>
-                                <div class="mod-title">Absensi</div>
-                                <div class="mod-desc">QR Code, RFID, Face Recognition, notifikasi WA.</div>
-                                <div class="check-mark"><i class="fa-solid fa-check"></i></div>
-                            </label>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="module-option">
-                                <input type="checkbox" name="modul[]" value="parent_portal"
-                                    {{ in_array('parent_portal', $savedModules) ? 'checked' : '' }}>
-                                <div class="mod-icon"><i class="fa-solid fa-people-roof"></i></div>
-                                <div class="mod-title">Parent Portal</div>
-                                <div class="mod-desc">Dashboard orang tua: nilai, absensi, pembayaran.</div>
-                                <div class="check-mark"><i class="fa-solid fa-check"></i></div>
-                            </label>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="module-option">
-                                <input type="checkbox" name="modul[]" value="analitik_ai"
-                                    {{ in_array('analitik_ai', $savedModules) ? 'checked' : '' }}>
-                                <div class="mod-icon"><i class="fa-solid fa-chart-line"></i></div>
-                                <div class="mod-title">Analitik AI</div>
-                                <div class="mod-desc">Prediksi kelulusan &amp; analisis akademik berbasis AI.</div>
-                                <div class="check-mark"><i class="fa-solid fa-check"></i></div>
-                            </label>
+                        <div class="col-md-5 text-md-end">
+                            <button type="button" class="btn btn-sm btn-outline-primary me-1" id="btnSelectAllVisible">
+                                <i class="fa-solid fa-check-double me-1"></i>Pilih Semua di Kategori
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" id="btnUnselectAllVisible">
+                                <i class="fa-solid fa-rotate-left me-1"></i>Reset
+                            </button>
                         </div>
                     </div>
-                    <div class="form-text mt-2" id="moduleError" style="display:none;color:#dc3545;">
-                        Pilih minimal satu modul untuk melanjutkan.
+
+                    <!-- Category Filter Pills -->
+                    @php
+                        $categories = isset($modules) ? $modules->pluck('category')->filter()->unique()->values() : collect();
+                        $featuredCodes = ['akademik', 'kesiswaan', 'keuangan', 'absensi', 'cbt', 'perpustakaan', 'pesantren', 'kepegawaian', 'parent_portal', 'analitik_ai', 'sarpras', 'layanan_kesehatan'];
+                    @endphp
+                    <div class="module-category-nav" id="categoryNav">
+                        <button type="button" class="category-pill active" data-category="featured">
+                            <i class="fa-solid fa-star text-warning me-1"></i>Modul Unggulan (12)
+                        </button>
+                        <button type="button" class="category-pill" data-category="all">
+                            <i class="fa-solid fa-layer-group me-1"></i>Semua Modul ({{ isset($modules) ? $modules->count() : 0 }})
+                        </button>
+                        @foreach($categories as $cat)
+                            @php
+                                $catCount = $modules->where('category', $cat)->count();
+                            @endphp
+                            <button type="button" class="category-pill" data-category="{{ $cat }}">
+                                {{ $cat }} ({{ $catCount }})
+                            </button>
+                        @endforeach
+                    </div>
+
+                    <!-- Scrollable Module Cards Container -->
+                    <div class="module-scroll-container">
+                        <div class="row g-3" id="moduleGrid">
+                            @if(isset($modules) && $modules->count())
+                                @foreach ($modules as $mod)
+                                    @php
+                                        $isFeatured = in_array(strtolower($mod->code), $featuredCodes);
+                                        $isChecked = in_array(strtolower($mod->code), $savedModules) || in_array((string)$mod->id, $savedModules);
+                                        $cat = $mod->category ?? 'Umum';
+                                        $icon = $mod->icon ?: ($isFeatured ? 'fa-solid fa-star' : 'fa-solid fa-cube');
+                                        $price = (float)$mod->price;
+                                    @endphp
+                                    <div class="col-md-6 module-item"
+                                         data-category="{{ $cat }}"
+                                         data-featured="{{ $isFeatured ? '1' : '0' }}"
+                                         data-name="{{ strtolower($mod->name) }}"
+                                         data-desc="{{ strtolower($mod->description ?? '') }}"
+                                         data-code="{{ strtolower($mod->code) }}">
+                                        <label class="module-option">
+                                            <input type="checkbox" name="modul[]" value="{{ $mod->code }}"
+                                                data-price="{{ $price }}"
+                                                data-name="{{ $mod->name }}"
+                                                data-code="{{ $mod->code }}"
+                                                {{ $isChecked ? 'checked' : '' }}>
+                                            <div>
+                                                <div class="d-flex justify-content-between align-items-start mb-2 pe-4">
+                                                    <div class="mod-icon mb-0 me-2 flex-shrink-0">
+                                                        <i class="{{ $icon }}"></i>
+                                                    </div>
+                                                    <div class="flex-grow-1">
+                                                        <div class="mod-title">{{ $mod->name }}</div>
+                                                        <div class="d-flex flex-wrap gap-1 mt-1">
+                                                            <span class="badge bg-light text-secondary border" style="font-size:0.7rem; font-weight:600;">
+                                                                {{ $cat }}
+                                                            </span>
+                                                            @if($isFeatured)
+                                                                <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle" style="font-size:0.7rem;">
+                                                                    <i class="fa-solid fa-star me-1 text-warning"></i>Populer
+                                                                </span>
+                                                            @endif
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="mod-desc text-muted mb-2">
+                                                    {{ $mod->description ?: 'Modul pengelolaan operasional sekolah terintegrasi.' }}
+                                                </div>
+                                            </div>
+                                            <div class="d-flex justify-content-between align-items-center pt-2 border-top mt-auto">
+                                                <span class="text-muted small">Biaya Lisensi:</span>
+                                                <div class="mod-price-pill">
+                                                    <span>Rp {{ number_format($price, 0, ',', '.') }}</span>
+                                                    <span class="text-muted fw-normal" style="font-size:0.75rem;">/ bln</span>
+                                                </div>
+                                            </div>
+                                            <div class="check-mark"><i class="fa-solid fa-check"></i></div>
+                                        </label>
+                                    </div>
+                                @endforeach
+                            @else
+                                <div class="col-12 text-center py-4">
+                                    <p class="text-muted">Tidak ada modul yang tersedia.</p>
+                                </div>
+                            @endif
+                        </div>
+
+                        <div id="noModuleMatch" class="text-center py-5 d-none">
+                            <i class="fa-solid fa-box-open text-muted fs-1 mb-2"></i>
+                            <h6 class="text-secondary fw-bold">Modul tidak ditemukan</h6>
+                            <p class="text-muted small mb-0">Coba ubah kata kunci pencarian atau pilih kategori modul lainnya.</p>
+                        </div>
+                    </div>
+
+                    <!-- Panel Total Tagihan Bulanan / Estimasi Biaya -->
+                    <div class="billing-summary-card">
+                        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                            <div>
+                                <div class="d-flex align-items-center gap-2 mb-1">
+                                    <span class="badge-trial"><i class="fa-solid fa-gift me-1"></i>14 Hari Trial Gratis</span>
+                                    <span class="badge bg-white bg-opacity-25 text-white" id="selectedCountBadge">0 Modul Dipilih</span>
+                                </div>
+                                <h5 class="fw-bold mb-0 text-white">Estimasi Tagihan Bulanan</h5>
+                                <small class="text-white-50" style="font-size:0.8rem;">
+                                    *Nilai ini merupakan acuan tagihan rutin jika Anda melanjutkan langganan setelah masa uji coba berakhir.
+                                </small>
+                            </div>
+                            <div class="text-md-end">
+                                <div class="text-white-50 small mb-1">Total Biaya Lisensi:</div>
+                                <div class="d-flex align-items-baseline gap-1 justify-content-md-end">
+                                    <span class="amount-display" id="totalMonthlyPrice">Rp 0</span>
+                                    <span class="text-white-50 small">/ bulan</span>
+                                </div>
+                                <div class="text-success small fw-semibold mt-1">
+                                    <i class="fa-solid fa-circle-check me-1"></i>Rp 0 Ditagihkan Selama Trial
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-text mt-2 text-danger fw-semibold" id="moduleError" style="display:none;">
+                        <i class="fa-solid fa-triangle-exclamation me-1"></i>Pilih minimal satu modul untuk melanjutkan pendaftaran trial.
                     </div>
                 </div>
 
@@ -840,6 +1067,160 @@
                 if (err) err.remove();
             });
         });
+
+        // ==========================================
+        // STEP 2: MODULE SELECTION, FILTER & PRICING
+        // ==========================================
+        const moduleSearchInput = document.getElementById('moduleSearch');
+        const btnClearSearch = document.getElementById('btnClearSearch');
+        const categoryNav = document.getElementById('categoryNav');
+        const moduleItems = document.querySelectorAll('.module-item');
+        const noModuleMatch = document.getElementById('noModuleMatch');
+        const totalMonthlyPriceEl = document.getElementById('totalMonthlyPrice');
+        const selectedCountBadge = document.getElementById('selectedCountBadge');
+        const btnSelectAllVisible = document.getElementById('btnSelectAllVisible');
+        const btnUnselectAllVisible = document.getElementById('btnUnselectAllVisible');
+
+        let activeCategory = 'featured';
+
+        // 1. Calculate & Update Total Billing Preview
+        function updateModuleBillingSummary() {
+            const checkedInputs = document.querySelectorAll('input[name="modul[]"]:checked');
+            let total = 0;
+
+            checkedInputs.forEach(input => {
+                const price = parseFloat(input.dataset.price) || 0;
+                total += price;
+            });
+
+            if (selectedCountBadge) {
+                selectedCountBadge.textContent = `${checkedInputs.length} Modul Dipilih`;
+            }
+
+            if (totalMonthlyPriceEl) {
+                totalMonthlyPriceEl.textContent = 'Rp ' + total.toLocaleString('id-ID');
+            }
+
+            if (checkedInputs.length > 0 && moduleError) {
+                moduleError.style.display = 'none';
+            }
+        }
+
+        // 2. Filter Modules by Category & Search Keyword
+        function filterModules() {
+            const query = (moduleSearchInput?.value || '').trim().toLowerCase();
+            let visibleCount = 0;
+
+            if (btnClearSearch) {
+                btnClearSearch.style.display = query ? 'block' : 'none';
+            }
+
+            moduleItems.forEach(item => {
+                const cat = item.dataset.category || '';
+                const isFeatured = item.dataset.featured === '1';
+                const name = item.dataset.name || '';
+                const desc = item.dataset.desc || '';
+                const code = item.dataset.code || '';
+
+                // Category match
+                let matchCategory = false;
+                if (activeCategory === 'all') {
+                    matchCategory = true;
+                } else if (activeCategory === 'featured') {
+                    matchCategory = isFeatured;
+                } else {
+                    matchCategory = (cat === activeCategory);
+                }
+
+                // Search query match
+                let matchQuery = true;
+                if (query) {
+                    matchQuery = name.includes(query) || desc.includes(query) || code.includes(query) || cat.toLowerCase().includes(query);
+                }
+
+                if (matchCategory && matchQuery) {
+                    item.classList.remove('d-none');
+                    visibleCount++;
+                } else {
+                    item.classList.add('d-none');
+                }
+            });
+
+            if (noModuleMatch) {
+                noModuleMatch.classList.toggle('d-none', visibleCount > 0);
+            }
+        }
+
+        // Category Pills Click Handler
+        if (categoryNav) {
+            categoryNav.addEventListener('click', (e) => {
+                const pill = e.target.closest('.category-pill');
+                if (!pill) return;
+
+                categoryNav.querySelectorAll('.category-pill').forEach(p => p.classList.remove('active'));
+                pill.classList.add('active');
+
+                activeCategory = pill.dataset.category || 'all';
+                filterModules();
+            });
+        }
+
+        // Search Input Handler
+        if (moduleSearchInput) {
+            moduleSearchInput.addEventListener('input', () => {
+                filterModules();
+            });
+        }
+
+        // Clear Search Button
+        if (btnClearSearch) {
+            btnClearSearch.addEventListener('click', () => {
+                moduleSearchInput.value = '';
+                filterModules();
+                moduleSearchInput.focus();
+            });
+        }
+
+        // Select All Visible Button
+        if (btnSelectAllVisible) {
+            btnSelectAllVisible.addEventListener('click', () => {
+                moduleItems.forEach(item => {
+                    if (!item.classList.contains('d-none')) {
+                        const input = item.querySelector('input[name="modul[]"]');
+                        if (input && !input.checked) {
+                            input.checked = true;
+                        }
+                    }
+                });
+                updateModuleBillingSummary();
+            });
+        }
+
+        // Unselect All Visible Button
+        if (btnUnselectAllVisible) {
+            btnUnselectAllVisible.addEventListener('click', () => {
+                moduleItems.forEach(item => {
+                    if (!item.classList.contains('d-none')) {
+                        const input = item.querySelector('input[name="modul[]"]');
+                        if (input && input.checked) {
+                            input.checked = false;
+                        }
+                    }
+                });
+                updateModuleBillingSummary();
+            });
+        }
+
+        // Checkbox change listener for all module options
+        document.querySelectorAll('input[name="modul[]"]').forEach(input => {
+            input.addEventListener('change', () => {
+                updateModuleBillingSummary();
+            });
+        });
+
+        // Initialize display & calculation
+        filterModules();
+        updateModuleBillingSummary();
 
         renderStep();
     </script>

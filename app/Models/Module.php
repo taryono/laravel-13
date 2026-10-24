@@ -8,6 +8,7 @@ class Module extends BasedModel
         'organization_id',
         'code',
         'name',
+        'category',
         'description',
         'icon',
         'is_active',

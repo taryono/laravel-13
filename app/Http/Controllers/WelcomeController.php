@@ -41,7 +41,9 @@ class WelcomeController extends Controller
             $request->session()->put('trial_token', $registration->token);
         }
 
-        $modules = Module::where('is_active', true)->get(['id', 'name', 'code']);
+        $modules = Module::where('is_active', true)
+            ->orderBy('id', 'asc')
+            ->get(['id', 'name', 'code', 'category', 'description', 'icon', 'price']);
         $student_ranges = \Models\StudentRange::where('is_active', true)->get(['id', 'name']);
         $roles = Role::where('is_active', true)->where('show_to_trial', 1)->get(['id', 'name', 'code']);
         $packages = Package::where('is_active', true)->get(['id', 'name']);
@@ -111,13 +113,15 @@ class WelcomeController extends Controller
             case 2:
                 $data = $request->validate([
                     'modul' => 'required|array|min:1',
-                    'modul.*' => 'string|max:50',
+                    'modul.*' => 'string|max:100',
                 ]);
 
                 $moduleIds = [];
                 foreach ($data['modul'] as $code) {
                     $cleanCode = strtolower(trim($code));
-                    $module = Module::where('code', $cleanCode)->first();
+                    $module = Module::where('code', $cleanCode)
+                        ->orWhere('id', $code)
+                        ->first();
                     if (!$module) {
                         $module = Module::firstOrCreate(
                             ['code' => $cleanCode],
@@ -313,7 +317,16 @@ class WelcomeController extends Controller
         $roles = Role::all();
         $positions = Position::where('is_active', true)->pluck('name', 'id')->toArray();
         $packages = Package::where('is_active', true)->pluck('name', 'id')->toArray();
-        return view('request-demo', compact('roles', 'positions', 'packages'));
+        
+        $demoRequests = \Models\DemoRequest::latest()->paginate(15);
+        $stats = [
+            'total' => \Models\DemoRequest::count(),
+            'pending' => \Models\DemoRequest::where('status', 'pending')->count(),
+            'scheduled' => \Models\DemoRequest::where('status', 'scheduled')->count(),
+            'completed' => \Models\DemoRequest::where('status', 'completed')->count(),
+        ];
+
+        return view('request-demo', compact('roles', 'positions', 'packages', 'demoRequests', 'stats'));
     }
 
     public function submitRequestDemo(Request $request)
@@ -339,7 +352,7 @@ class WelcomeController extends Controller
         ]);
 
         try {
-            \Models\DemoRequest::create([
+            $demo = \Models\DemoRequest::create([
                 'school_name' => $data['school_name'],
                 'person_name' => $data['person_name'],
                 'position' => $data['position'],
@@ -351,8 +364,9 @@ class WelcomeController extends Controller
                 'status' => 'pending',
             ]);
 
-            return redirect()->route('request_demo.form')
-                ->with('success', 'Terima kasih! Jadwal demo Anda berhasil didaftarkan. Tim kami akan segera menghubungi Anda dalam waktu 1×24 jam.');
+            return redirect()->to(route('request_demo.form') . '#daftar-demo')
+                ->with('success', 'Terima kasih! Jadwal demo untuk ' . $data['school_name'] . ' berhasil didaftarkan. Tim kami akan segera menghubungi Anda dalam waktu 1×24 jam.')
+                ->with('new_id', $demo->id);
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('Demo Request submission failed: ' . $e->getMessage());
             return redirect()->back()

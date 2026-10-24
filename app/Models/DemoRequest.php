@@ -1,19 +1,15 @@
 <?php
-
-namespace Models;
+namespace Models; 
 
 class DemoRequest extends BasedModel
 {
-    protected $table = 'demo_requests';
+    // Relasi
+    
 
-    protected $guarded = [];
 
-    protected $casts = [
-        'demo_datetime' => 'datetime',
-    ];
-
-    public function scopePending($query)
+    // Scope
+    public function scopeActive($query)
     {
-        return $query->where('status', 'pending');
+        return $query->where('is_active', true);
     }
 }
