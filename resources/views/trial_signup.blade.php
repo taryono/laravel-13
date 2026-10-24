@@ -184,6 +184,85 @@
             color: #38bdf8;
             line-height: 1;
         }
+
+        /* STEP 4: Akses Modul per Role */
+        .access-summary {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 0.9rem 1rem;
+            margin-bottom: 1.25rem;
+        }
+        .access-summary .access-summary-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: .04em;
+            text-transform: uppercase;
+            color: #64748b;
+            margin-bottom: 0.4rem;
+        }
+        .access-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0.25rem 0.65rem;
+            margin: 0 0.35rem 0.35rem 0;
+            border-radius: 50px;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: #334155;
+        }
+        .access-card {
+            border: 1.5px solid #e2e8f0;
+            border-radius: 14px;
+            background: #fff;
+            overflow: hidden;
+        }
+        .access-card-head {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            padding: 0.9rem 1rem;
+            cursor: pointer;
+            user-select: none;
+        }
+        .access-card-head:hover { background: #f8fafc; }
+        .access-icon {
+            width: 40px;
+            height: 40px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            background: #eff6ff;
+            color: #2f5ce0;
+        }
+        .access-title { font-weight: 700; font-size: 0.95rem; color: #1e293b; }
+        .access-count { font-size: 0.8rem; color: #64748b; }
+        .access-card-body {
+            padding: 0.25rem 1rem 1rem;
+            border-top: 1px solid #f1f5f9;
+            padding-top: 1rem;
+        }
+        .access-module {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.55rem 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            cursor: pointer;
+            height: 100%;
+            transition: all 0.15s ease;
+        }
+        .access-module:hover { border-color: #93c5fd; background: #f8fbff; }
+        .access-module:has(input:checked) { border-color: #2f5ce0; background: #f0f7ff; }
+        .access-module input { flex-shrink: 0; }
+        .access-module-name { font-size: 0.85rem; font-weight: 600; color: #1e293b; }
+        .access-module-cat { margin-left: auto; font-size: 0.68rem; color: #94a3b8; white-space: nowrap; }
     </style>
 </head>
 
@@ -219,10 +298,14 @@
             </div>
             <div class="step-node" data-step="4">
                 <div class="step-circle">4</div>
-                <div class="step-label">Notifikasi</div>
+                <div class="step-label">Akses Modul</div>
             </div>
             <div class="step-node" data-step="5">
                 <div class="step-circle">5</div>
+                <div class="step-label">Notifikasi</div>
+            </div>
+            <div class="step-node" data-step="6">
+                <div class="step-circle">6</div>
                 <div class="step-label">Akun Anda</div>
             </div>
         </div>
@@ -247,7 +330,7 @@
 
                 <!-- STEP 1 -->
                 <div class="wizard-step fade-step" data-step="1">
-                    <div class="step-eyebrow">Langkah 1 dari 5</div>
+                    <div class="step-eyebrow">Langkah 1 dari 6</div>
                     <h3 class="step-heading">Informasi Yayasan/Sekolah &amp; Jabatan Anda</h3>
                     <p class="step-desc">Ceritakan sedikit tentang Yayasan/Sekolah Anda supaya kami bisa menyiapkan akun yang tepat.</p>
 
@@ -365,7 +448,7 @@
 
                 <!-- STEP 2 -->
                 <div class="wizard-step d-none" data-step="2">
-                    <div class="step-eyebrow">Langkah 2 dari 5</div>
+                    <div class="step-eyebrow">Langkah 2 dari 6</div>
                     <div class="d-flex flex-wrap justify-content-between align-items-center mb-2 gap-2">
                         <h3 class="step-heading mb-0">Pilih Modul yang Anda Butuhkan</h3>
                         <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 rounded-pill fw-semibold">
@@ -520,7 +603,7 @@
 
                 <!-- STEP 3 -->
                 <div class="wizard-step d-none" data-step="3">
-                    <div class="step-eyebrow">Langkah 3 dari 5</div>
+                    <div class="step-eyebrow">Langkah 3 dari 6</div>
                     <h3 class="step-heading">Pilih Role Pengguna</h3>
                     <p class="step-desc">Role ini akan melekat pada akun pengguna pertama yang mengelola sistem. Bisa pilih lebih dari satu, dan Anda dapat menambah pengguna lain setelah aktif.</p>
 
@@ -580,10 +663,26 @@
                         Pilih minimal satu role untuk melanjutkan.
                     </div>
                 </div>
-
-                <!-- STEP 4 -->
+                <!-- STEP 4: AKSES MODUL PER ROLE -->
                 <div class="wizard-step d-none" data-step="4">
-                    <div class="step-eyebrow">Langkah 4 dari 5</div>
+                    <div class="step-eyebrow">Langkah 4 dari 6</div>
+                    <h3 class="step-heading">Atur Akses Modul per Role</h3>
+                    <p class="step-desc">Tentukan modul apa saja yang dapat diakses oleh setiap role. Anda dapat mengubahnya kapan saja setelah akun aktif.</p>
+
+                    <div class="access-summary">
+                        <div class="access-summary-title">Role yang Anda pilih</div>
+                        <div id="accessRoleChips"></div>
+                        <div class="access-summary-title mt-2">Modul yang Anda pilih</div>
+                        <div id="accessModuleChips"></div>
+                    </div>
+
+                    <div class="d-flex flex-column gap-3" id="accessRoleList"></div>
+
+                    <div class="form-text mt-2 text-danger fw-semibold" id="accessError" style="display:none;"></div>
+                </div>
+                <!-- STEP 5: Notifikasi -->
+                <div class="wizard-step d-none" data-step="5">
+                    <div class="step-eyebrow">Langkah 5 dari 6</div>
                     <h3 class="step-heading">Pilih Notifikasi yang Ingin Diaktifkan</h3>
                     <p class="step-desc">Kami akan mengirimkan pengingat dan informasi penting lewat kanal yang Anda pilih.</p>
 
@@ -627,9 +726,9 @@
                     </div>
                 </div>
 
-                <!-- STEP 5 -->
-                <div class="wizard-step d-none" data-step="5">
-                    <div class="step-eyebrow">Langkah 5 dari 5</div>
+                <!-- STEP 6 -->
+                <div class="wizard-step d-none" data-step="6">
+                    <div class="step-eyebrow">Langkah 6 dari 6</div>
                     <h3 class="step-heading">Buat Akun Anda</h3>
                     <p class="step-desc">Langkah terakhir. Data ini akan digunakan untuk masuk ke dashboard EduPulse Anda.</p>
 
@@ -711,8 +810,8 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        const totalSteps = 5;
-        let currentStep = {{ min(5, max(1, (int)($registration->current_step ?? 1))) }};
+        const totalSteps = 6;
+        let currentStep = {{ min(6, max(1, (int)($registration->current_step ?? 1))) }};
 
         const stepsWrap = document.querySelectorAll('.wizard-step');
         const stepNodes = document.querySelectorAll('.step-node');
@@ -728,7 +827,8 @@
         const passwordMismatchError = document.getElementById('passwordMismatchError');
         const termsError = document.getElementById('termsError');
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
-
+        const accessError = document.getElementById('accessError');
+        
         function renderStep() {
             stepsWrap.forEach(s => s.classList.toggle('d-none', parseInt(s.dataset.step) !== currentStep));
 
@@ -745,7 +845,7 @@
             btnPrev.style.visibility = currentStep === 1 ? 'hidden' : 'visible';
             btnNext.classList.toggle('d-none', currentStep === totalSteps);
             btnSubmit.classList.toggle('d-none', currentStep !== totalSteps);
-
+            if (currentStep === 4) renderAccessMatrix();
             window.scrollTo({
                 top: 0,
                 behavior: 'smooth'
@@ -808,11 +908,26 @@
             }
 
             if (step === 4) {
+                const roles = getSelectedRoles();
+                const empty = roles.filter(r => !(accessState[r.key] && accessState[r.key].allowed.size));
+                if (!roles.length || empty.length) {
+                    accessError.innerHTML = '<i class="fa-solid fa-triangle-exclamation me-1"></i>' +
+                        (empty.length
+                            ? 'Role berikut belum memiliki akses modul: ' + empty.map(r => escHtml(r.title)).join(', ') + '.'
+                            : 'Pilih minimal satu role dan satu modul pada langkah sebelumnya.');
+                    accessError.style.display = 'block';
+                    return false;
+                }
+                accessError.style.display = 'none';
                 return true;
             }
 
             if (step === 5) {
-                const required = document.querySelectorAll('.wizard-step[data-step="5"] [required]');
+                return true; // Notifikasi opsional
+            } 
+
+            if (step === 6) {
+                const required = document.querySelectorAll('.wizard-step[data-step="6"] [required]');
                 let valid = true;
                 required.forEach(f => {
                     if (!f.checkValidity()) {
@@ -822,23 +937,23 @@
                     }
                 });
 
-                const pw = form.password.value;
-                const pwc = form.password_confirmation.value;
+                const pw = form.password?.value || '';
+                const pwc = form.password_confirmation?.value || '';
 
                 if (pw && pwc && pw !== pwc) {
-                    passwordMismatchError.style.display = 'block';
-                    form.password_confirmation.classList.add('is-invalid');
+                    if (passwordMismatchError) passwordMismatchError.style.display = 'block';
+                    form.password_confirmation?.classList.add('is-invalid');
                     valid = false;
-                } else {
+                } else if (passwordMismatchError) {
                     passwordMismatchError.style.display = 'none';
                 }
 
                 const agree = document.getElementById('agreeTerms');
-                if (!agree.checked) {
-                    termsError.style.display = 'block';
+                if (agree && !agree.checked) {
+                    if (termsError) termsError.style.display = 'block';
                     agree.classList.add('is-invalid');
                     valid = false;
-                } else {
+                } else if (termsError) {
                     termsError.style.display = 'none';
                 }
 
@@ -854,7 +969,8 @@
             if (step === 1 && jenjangError) jenjangError.style.display = 'none';
             if (step === 2 && moduleError) moduleError.style.display = 'none';
             if (step === 3 && roleError) roleError.style.display = 'none';
-            if (step === 5) {
+            if (step === 4 && accessError) accessError.style.display = 'none';
+            if (step === 6) {
                 if (passwordMismatchError) passwordMismatchError.style.display = 'none';
                 if (termsError) termsError.style.display = 'none';
             }
@@ -879,6 +995,9 @@
                 } else if (cleanField === 'role') {
                     roleError.textContent = messages[0];
                     roleError.style.display = 'block';
+                } else if (cleanField.startsWith('access')) {
+                    accessError.textContent = messages[0];
+                    accessError.style.display = 'block';
                 } else if (cleanField === 'password_confirmation' || cleanField === 'password') {
                     input?.classList.add('is-invalid');
                     input?.closest('.col-12, .col-md-6, .col-md-4, .col-md-8')?.appendChild(msg);
@@ -970,10 +1089,10 @@
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             if (isSubmitting) return;
-            if (!validateStep(5)) return;
+            if (!validateStep(6)) return;
 
             isSubmitting = true;
-            clearServerErrors(5);
+            clearServerErrors(6);
             setButtonLoading(btnSubmit, true, 'Memproses Akun...');
 
             const formData = new FormData(form);
@@ -990,7 +1109,7 @@
 
                 if (res.status === 422) {
                     const data = await res.json();
-                    showServerErrors(5, data.errors || {});
+                    showServerErrors(6, data.errors || {});
                     setButtonLoading(btnSubmit, false);
                     isSubmitting = false;
                     return;
@@ -1221,7 +1340,165 @@
         // Initialize display & calculation
         filterModules();
         updateModuleBillingSummary();
+        // ==========================================
+        // STEP 4: AKSES MODUL PER ROLE
+        // ==========================================
+        const accessRoleList = document.getElementById('accessRoleList');
+        const accessModuleChips = document.getElementById('accessModuleChips');
+        const accessRoleChips = document.getElementById('accessRoleChips');
+        const savedAccess = @json((object)($savedAccess ?? []));
+        const accessState = {}; // { roleKey: { known:Set, allowed:Set } }
 
+        function escHtml(str) {
+            return String(str).replace(/[&<>"']/g, c => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            }[c]));
+        }
+
+        function getSelectedRoles() {
+            return [...document.querySelectorAll('input[name="role[]"]:checked')].map(i => {
+                const label = i.closest('.role-option');
+                return {
+                    key: i.value,
+                    title: label?.querySelector('.role-title')?.textContent.trim() || i.value,
+                    icon: label?.querySelector('.role-icon i')?.className || 'fa-solid fa-user'
+                };
+            });
+        }
+
+        function getSelectedModules() {
+            return [...document.querySelectorAll('input[name="modul[]"]:checked')].map(i => ({
+                code: i.value,
+                key: i.value.toLowerCase(),
+                name: i.dataset.name || i.value,
+                category: i.closest('.module-item')?.dataset.category || 'Umum'
+            }));
+        }
+
+        // Menjaga pilihan lama saat user kembali ke step 2/3 lalu maju lagi.
+        // Modul baru default tercentang, modul yang dibuang otomatis hilang.
+        function syncAccessState(roles, modules) {
+            const modKeys = new Set(modules.map(m => m.key));
+
+            roles.forEach(r => {
+                let st = accessState[r.key];
+                if (!st) {
+                    st = savedAccess[r.key]
+                        ? { known: new Set(modKeys), allowed: new Set(savedAccess[r.key].filter(k => modKeys.has(k))) }
+                        : { known: new Set(), allowed: new Set() };
+                    accessState[r.key] = st;
+                }
+                modKeys.forEach(k => {
+                    if (!st.known.has(k)) { st.known.add(k); st.allowed.add(k); }
+                });
+                [...st.known].forEach(k => {
+                    if (!modKeys.has(k)) { st.known.delete(k); st.allowed.delete(k); }
+                });
+            });
+
+            Object.keys(accessState).forEach(k => {
+                if (!roles.some(r => r.key === k)) {
+                    delete accessState[k];
+                    delete savedAccess[k];
+                }
+            });
+        }
+
+        function refreshAccessCount(roleKey) {
+            const card = accessRoleList.querySelector(`[data-role-card="${CSS.escape(roleKey)}"]`);
+            if (!card || !accessState[roleKey]) return;
+            const total = card.querySelectorAll('input[type="checkbox"]').length;
+            card.querySelector('.access-count').textContent =
+                `${accessState[roleKey].allowed.size} dari ${total} modul dapat diakses`;
+        }
+
+        function renderAccessMatrix() {
+            const roles = getSelectedRoles();
+            const modules = getSelectedModules();
+            syncAccessState(roles, modules);
+
+            accessRoleChips.innerHTML = roles.map(r =>
+                `<span class="access-chip"><i class="${escHtml(r.icon)}"></i>${escHtml(r.title)}</span>`).join('');
+            accessModuleChips.innerHTML = modules.map(m =>
+                `<span class="access-chip">${escHtml(m.name)}</span>`).join('');
+
+            if (!roles.length || !modules.length) {
+                accessRoleList.innerHTML =
+                    '<div class="alert alert-warning mb-0">Pilih minimal satu modul (langkah 2) dan satu role (langkah 3) terlebih dahulu.</div>';
+                return;
+            }
+
+            accessRoleList.innerHTML = roles.map((r, ri) => {
+                const st = accessState[r.key];
+                const open = ri === 0;
+
+                const items = modules.map((m, mi) => {
+                    const id = `acc_${ri}_${mi}`;
+                    return `
+                    <div class="col-md-6">
+                        <label class="access-module" for="${id}">
+                            <input type="checkbox" class="form-check-input mt-0" id="${id}"
+                                name="access[${escHtml(r.key)}][]" value="${escHtml(m.code)}"
+                                data-role="${escHtml(r.key)}" data-module="${escHtml(m.key)}"
+                                ${st.allowed.has(m.key) ? 'checked' : ''}>
+                            <span class="access-module-name">${escHtml(m.name)}</span>
+                            <span class="access-module-cat">${escHtml(m.category)}</span>
+                        </label>
+                    </div>`;
+                }).join('');
+
+                return `
+                <div class="access-card" data-role-card="${escHtml(r.key)}">
+                    <div class="access-card-head" data-bs-toggle="collapse"
+                        data-bs-target="#accessCollapse${ri}" role="button" aria-expanded="${open}">
+                        <div class="access-icon"><i class="${escHtml(r.icon)}"></i></div>
+                        <div class="flex-grow-1">
+                            <div class="access-title">${escHtml(r.title)}</div>
+                            <div class="access-count">${st.allowed.size} dari ${modules.length} modul dapat diakses</div>
+                        </div>
+                        <i class="fa-solid fa-chevron-down text-muted"></i>
+                    </div>
+                    <div class="collapse ${open ? 'show' : ''}" id="accessCollapse${ri}">
+                        <div class="access-card-body">
+                            <div class="d-flex gap-2 mb-3">
+                                <button type="button" class="btn btn-sm btn-outline-primary"
+                                    data-access-action="all" data-role="${escHtml(r.key)}">Pilih semua</button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary"
+                                    data-access-action="none" data-role="${escHtml(r.key)}">Kosongkan</button>
+                            </div>
+                            <div class="row g-2">${items}</div>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        accessRoleList.addEventListener('change', (e) => {
+            const cb = e.target.closest('input[type="checkbox"][data-role]');
+            if (!cb || !accessState[cb.dataset.role]) return;
+            const st = accessState[cb.dataset.role];
+            if (cb.checked) st.allowed.add(cb.dataset.module);
+            else st.allowed.delete(cb.dataset.module);
+            refreshAccessCount(cb.dataset.role);
+            accessError.style.display = 'none';
+        });
+
+        accessRoleList.addEventListener('click', (e) => {
+            const btn = e.target.closest('[data-access-action]');
+            if (!btn) return;
+            const roleKey = btn.dataset.role;
+            const st = accessState[roleKey];
+            if (!st) return;
+            const selectAll = btn.dataset.accessAction === 'all';
+
+            accessRoleList.querySelectorAll(`input[data-role="${CSS.escape(roleKey)}"]`).forEach(cb => {
+                cb.checked = selectAll;
+                if (selectAll) st.allowed.add(cb.dataset.module);
+                else st.allowed.delete(cb.dataset.module);
+            });
+            refreshAccessCount(roleKey);
+            accessError.style.display = 'none';
+        });
         renderStep();
     </script>
 </body>

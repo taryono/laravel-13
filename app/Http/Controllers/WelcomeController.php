@@ -11,14 +11,16 @@ use App\Services\SliderService;
 use Models\EducationLevel;
 use Models\Module;
 use Models\Role;
-use Models\User;
+use App\Models\User;
 use Models\School;
 use Models\Position;
 use Models\Package;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\DB;
-
+use Illuminate\Support\Facades\DB; 
+use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 class WelcomeController extends Controller
 {
     public function index(SliderService $sliderService)
@@ -49,7 +51,14 @@ class WelcomeController extends Controller
         $packages = Package::where('is_active', true)->get(['id', 'name']);
         $positions = Position::where('is_active', true)->get(['id', 'name', 'code']);
         $education_levels = EducationLevel::where('is_active', true)->get(['id', 'name', 'code']);
-
+        $savedAccess = DB::table('trial_registration_role_modules as trm')
+            ->join('roles', 'roles.id', '=', 'trm.role_id')
+            ->join('modules', 'modules.id', '=', 'trm.module_id')
+            ->where('trm.trial_registration_id', $registration->id)
+            ->get(['roles.code as role_code', 'roles.name as role_name', 'modules.code as module_code'])
+            ->groupBy(fn ($r) => str_replace('-', '_', strtolower((string)($r->role_code ?: $r->role_name))))
+            ->map(fn ($rows) => $rows->pluck('module_code')->map(fn ($c) => strtolower($c))->values()->all())
+            ->all();
         return view('trial_signup', compact(
             'registration',
             'modules',
@@ -57,7 +66,8 @@ class WelcomeController extends Controller
             'student_ranges',
             'packages',
             'positions',
-            'education_levels'
+            'education_levels',
+            'savedAccess'
         ));
     }
 
@@ -134,6 +144,10 @@ class WelcomeController extends Controller
                     $moduleIds[] = $module->id;
                 }
                 $registration->modules()->sync($moduleIds);
+                DB::table('trial_registration_role_modules')
+                ->where('trial_registration_id', $registration->id)
+                ->whereNotIn('module_id', $moduleIds)
+                ->delete();
                 break;
 
             case 3:
@@ -165,9 +179,105 @@ class WelcomeController extends Controller
                     $roleIds[] = $role->id;
                 }
                 $registration->roles()->sync($roleIds);
+                DB::table('trial_registration_role_modules')
+                ->where('trial_registration_id', $registration->id)
+                ->whereNotIn('role_id', $roleIds)
+                ->delete();
                 break;
+                case 4:
+                    $request->validate([
+                        'access'     => 'required|array|min:1',
+                        'access.*'   => 'required|array|min:1',
+                        'access.*.*' => 'string|max:100',
+                    ], [
+                        'access.required'  => 'Atur akses modul untuk setiap role.',
+                        'access.*.required' => 'Setiap role harus memiliki minimal satu modul.',
+                        'access.*.min'      => 'Setiap role harus memiliki minimal satu modul.',
+                    ]);
 
-            case 4:
+                    $normalize = fn ($v) => str_replace('-', '_', strtolower(trim((string) $v)));
+
+                    // Petakan role yang dipilih dengan berbagai format key
+                    $rolesByKey = collect();
+                    $registeredRoles = $registration->roles()->get(['roles.id', 'roles.code', 'roles.name']);
+                    foreach ($registeredRoles as $r) {
+                        if ($r->code) {
+                            $rolesByKey->put($normalize($r->code), $r);
+                            $rolesByKey->put(strtolower(trim($r->code)), $r);
+                        }
+                        if ($r->name) {
+                            $rolesByKey->put($normalize($r->name), $r);
+                        }
+                        $rolesByKey->put((string)$r->id, $r);
+                    }
+
+                    // Petakan modul yang dipilih
+                    $modulesByKey = collect();
+                    $registeredModules = $registration->modules()->get(['modules.id', 'modules.code', 'modules.name']);
+                    foreach ($registeredModules as $m) {
+                        if ($m->code) {
+                            $modulesByKey->put(strtolower(trim($m->code)), $m);
+                            $modulesByKey->put($normalize($m->code), $m);
+                        }
+                        $modulesByKey->put((string)$m->id, $m);
+                    }
+
+                    $access = $request->input('access', []);
+                    $now = now();
+                    $rows = [];
+
+                    foreach ($access as $roleKey => $moduleCodes) {
+                        $role = $rolesByKey->get($normalize($roleKey)) ?: $rolesByKey->get(strtolower(trim($roleKey)));
+                        if (!$role) {
+                            throw ValidationException::withMessages([
+                                'access' => "Role '{$roleKey}' tidak termasuk dalam pilihan Anda.",
+                            ]);
+                        }
+
+                        foreach (array_unique((array)$moduleCodes) as $code) {
+                            $module = $modulesByKey->get(strtolower(trim($code))) ?: $modulesByKey->get($normalize($code));
+                            if (!$module) {
+                                throw ValidationException::withMessages([
+                                    'access' => "Modul '{$code}' tidak termasuk dalam pilihan Anda.",
+                                ]);
+                            }
+
+                            $rows[] = [
+                                'trial_registration_id' => $registration->id,
+                                'role_id'               => $role->id,
+                                'module_id'             => $module->id,
+                                'created_at'            => $now,
+                                'updated_at'            => $now,
+                            ];
+                        }
+                    }
+
+                    // Setiap role yang dipilih wajib punya entri akses.
+                    $selectedRoleKeys = collect(array_keys($access))->map($normalize);
+                    $missingRoles = $registeredRoles->filter(function ($role) use ($selectedRoleKeys, $normalize) {
+                        $normCode = $role->code ? $normalize($role->code) : '';
+                        $normName = $role->name ? $normalize($role->name) : '';
+                        return !$selectedRoleKeys->contains($normCode)
+                            && !$selectedRoleKeys->contains((string)$role->id)
+                            && !$selectedRoleKeys->contains($normName);
+                    });
+
+                    if ($missingRoles->isNotEmpty()) {
+                        throw ValidationException::withMessages([
+                            'access' => 'Role berikut belum memiliki akses modul: ' . $missingRoles->pluck('name')->implode(', ') . '.',
+                        ]);
+                    }
+
+                    DB::transaction(function () use ($registration, $rows) {
+                        DB::table('trial_registration_role_modules')
+                            ->where('trial_registration_id', $registration->id)
+                            ->delete();
+                        if (!empty($rows)) {
+                            DB::table('trial_registration_role_modules')->insert($rows);
+                        }
+                    });
+                    break; 
+            case 5:
                 $request->validate([
                     'notif_whatsapp' => 'nullable',
                     'notif_email' => 'nullable',
@@ -243,6 +353,29 @@ class WelcomeController extends Controller
                 'password' => Hash::make($data['password']),
                 'current_organization_id' => $orgId,
             ]);
+
+            try {
+            if (Schema::hasTable('school_role_modules')) {
+                $now = now();
+                $accessRows = DB::table('trial_registration_role_modules')
+                    ->where('trial_registration_id', $registration->id)
+                    ->get(['role_id', 'module_id'])
+                    ->map(fn ($r) => [
+                        'organization_id' => $orgId,
+                        'school_id'       => $school->id,
+                        'role_id'         => $r->role_id,
+                        'module_id'       => $r->module_id,
+                        'created_at'      => $now,
+                        'updated_at'      => $now,
+                    ])->all();
+
+                if (!empty($accessRows)) {
+                    DB::table('school_role_modules')->insert($accessRows);
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::warning('School role modules sync failed: ' . $e->getMessage());
+        }
 
             try {
                 if (\Illuminate\Support\Facades\Schema::hasTable('organization_user')) {
