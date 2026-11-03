@@ -17,14 +17,19 @@ class AuthenticatedSessionController extends Controller
     }
 
     public function store(LoginRequest $request): RedirectResponse
-    {
-        $request->authenticate();
+    {   
+        $request->authenticate(); 
+
+        $user = Auth::user();
 
         // Set organisasi aktif SEBELUM regenerate sesi
-        $this->authenticated($request, Auth::user());
+        $this->authenticated($request, $user);
+
+        if (!Auth::check()) {
+            return redirect()->route('login');
+        }
 
         $request->session()->regenerate();
-
         return redirect()->intended(route('dashboard', absolute: false));
     }
 
@@ -37,7 +42,7 @@ class AuthenticatedSessionController extends Controller
         $organizations = $user->organizations()
             ->wherePivot('is_active', 1)
             ->get();
-
+        
         if ($organizations->isEmpty()) {
             // Tidak ada organisasi aktif — hapus sesi & tolak
             Auth::logout();

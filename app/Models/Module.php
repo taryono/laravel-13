@@ -4,8 +4,7 @@ namespace Models;
 
 class Module extends BasedModel
 {
-    protected $fillable = [
-        'organization_id',
+    protected $fillable = [ 
         'code',
         'name',
         'category',

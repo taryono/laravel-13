@@ -4,9 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\WelcomeController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LocaleController;
-use App\Http\Controllers\Ppdb\Applicant\RegistrationController;
-use App\Http\Controllers\Ppdb\Applicant\DocumentController;
-use App\Http\Controllers\Ppdb\Applicant\PaymentController;
+use App\Modules\Dashboard\Controllers\DashboardController;
 
 Route::get('/', [WelcomeController::class, 'index'])->name('welcome.index');
 Route::middleware('auth')->group(function () {
@@ -24,11 +22,7 @@ Route::get('/locale/{locale}', [LocaleController::class, 'switch'])->name('local
 Route::get('/request_demo', [WelcomeController::class, 'requestDemo'])->name('request_demo.form');
 Route::post('/submit_request_demo', [WelcomeController::class, 'submitRequestDemo'])->name('submit_request_demo.form');
 Route::get('/submit_request_demo', fn() => redirect()->route('request_demo.form'));
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard.index');
-    })->name('dashboard');
-});
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware(['auth', 'verified']);
 
 Route::post('/organization/switch', [ProfileController::class, 'switch'])
     ->name('organization.switch');

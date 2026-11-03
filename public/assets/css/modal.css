@@ -287,3 +287,93 @@
 .modal-custom .modal-body::-webkit-scrollbar-thumb:hover {
     background: #a8b5d6;
 }
+
+/* ============================================
+   DARK MODE FOR MODAL CUSTOM
+   Supports: body.dark-mode & [data-bs-theme="dark"]
+============================================ */
+
+body.dark-mode .modal-custom .modal-content,
+[data-bs-theme="dark"] .modal-custom .modal-content {
+    background-color: #1e222b;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #f1f5f9;
+}
+
+body.dark-mode .modal-custom .modal-body,
+[data-bs-theme="dark"] .modal-custom .modal-body {
+    background: #16191f;
+    color: #e2e8f0;
+}
+
+body.dark-mode .modal-custom .modal-footer,
+[data-bs-theme="dark"] .modal-custom .modal-footer {
+    background: #1e222b;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .modal-custom .section-title,
+[data-bs-theme="dark"] .modal-custom .section-title {
+    color: #f1f5f9;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .modal-custom .form-label,
+[data-bs-theme="dark"] .modal-custom .form-label {
+    color: #e2e8f0;
+}
+
+body.dark-mode .modal-custom .form-control,
+body.dark-mode .modal-custom .form-select,
+[data-bs-theme="dark"] .modal-custom .form-control,
+[data-bs-theme="dark"] .modal-custom .form-select {
+    background-color: #1e222b;
+    border: 2px solid #333a46;
+    color: #f1f5f9;
+}
+
+body.dark-mode .modal-custom .form-control:focus,
+body.dark-mode .modal-custom .form-select:focus,
+[data-bs-theme="dark"] .modal-custom .form-control:focus,
+[data-bs-theme="dark"] .modal-custom .form-select:focus {
+    background-color: #1e222b;
+    border-color: #6366f1;
+    color: #ffffff;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
+}
+
+body.dark-mode .modal-custom .form-control:hover,
+body.dark-mode .modal-custom .form-select:hover,
+[data-bs-theme="dark"] .modal-custom .form-control:hover,
+[data-bs-theme="dark"] .modal-custom .form-select:hover {
+    border-color: #4f5869;
+}
+
+body.dark-mode .modal-custom .employee-card,
+[data-bs-theme="dark"] .modal-custom .employee-card {
+    background: #1e222b;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .modal-custom .employee-card .card-header,
+[data-bs-theme="dark"] .modal-custom .employee-card .card-header {
+    background: #252b36;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    color: #f1f5f9;
+}
+
+body.dark-mode .modal-custom .badge-status,
+[data-bs-theme="dark"] .modal-custom .badge-status {
+    background: #252b36;
+    color: #cbd5e1;
+}
+
+body.dark-mode .modal-custom .modal-body::-webkit-scrollbar-track,
+[data-bs-theme="dark"] .modal-custom .modal-body::-webkit-scrollbar-track {
+    background: #16191f;
+}
+
+body.dark-mode .modal-custom .modal-body::-webkit-scrollbar-thumb,
+[data-bs-theme="dark"] .modal-custom .modal-body::-webkit-scrollbar-thumb {
+    background: #333a46;
+}

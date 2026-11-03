@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('sorogan_schedules', function (Blueprint $table) {
+        if (!Schema::hasTable('sorogan_schedules')) {
+            Schema::create('sorogan_schedules', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
         });
+        }
     }
 
     /**

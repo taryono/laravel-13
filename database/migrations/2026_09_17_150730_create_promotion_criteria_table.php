@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('promotion_criteria', function (Blueprint $table) {
+        if (!Schema::hasTable('promotion_criteria')) {
+            Schema::create('promotion_criteria', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
         });
+        }
     }
 
     /**

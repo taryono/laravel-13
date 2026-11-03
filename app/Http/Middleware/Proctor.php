@@ -9,48 +9,34 @@ use Symfony\Component\HttpFoundation\Response;
 class Proctor
 {
     /**
-     * Daftar nama peran yang DIIZINKAN mengakses dasbor pengawas
-     * SESUAIKAN dengan nama/nilai kolom `name` di tabel `roles` Anda!
+     * Daftar peran yang diizinkan mengakses dasbor pengawas.
      */
     protected array $allowedRoles = ['proctor', 'pengawas', 'admin', 'supervisor'];
 
-    // public function handle(Request $request, Closure $next): Response
-    // {
-    //     $user = $request->user();
-
-    //     // 1. Pastikan pengguna sudah terautentikasi
-    //     if (!$user) {
-    //         abort(401, 'Silakan login terlebih dahulu.');
-    //     }
-
-    //     // 2. Muat relasi roles jika belum dimuat
-    //     if (!$user->relationLoaded('roles')) {
-    //         $user->load('roles');
-    //     }
-
-    //     // 3. Cek apakah pengguna memiliki salah satu peran yang diizinkan
-    //     $hasProctorRole = $user->roles->pluck('name')
-    //         ->intersect($this->allowedRoles)
-    //         ->isNotEmpty();
-
-    //     if (!$hasProctorRole) {
-    //         abort(403, 'Akses ditolak: Hanya pengguna berperan Pengawas yang dapat mengakses halaman ini.');
-    //     }
-
-    //     return $next($request);
-    // }
-
-    /**
-     * Jika Anda ingin kode yang lebih ringkas:
-     */
     public function handle(Request $request, Closure $next): Response
     {
-        $allowed = ['proctor', 'pengawas', 'admin'];
+        $user = $request->user();
 
-        if (!optional($request->user())->roles->pluck('name')->contains(fn($n) => in_array($n, $allowed))) {
-            abort(403, 'Akses hanya untuk Pengawas.');
+        if (! $user) {
+            if ($request->expectsJson()) {
+                return response()->json(['error' => 'Silakan login terlebih dahulu.'], 401);
+            }
+            return redirect()->route('login');
         }
 
-        return $next($request);
+        // SuperUser bypass (selaras dengan Gate::before di AuthServiceProvider)
+        if ($user->isSuperUser()) {
+            return $next($request);
+        }
+
+        if ($user->hasAnyRole($this->allowedRoles)) {
+            return $next($request);
+        }
+
+        if ($request->expectsJson()) {
+            return response()->json(['error' => 'Akses hanya untuk Pengawas.'], 403);
+        }
+
+        abort(403, 'Akses hanya untuk Pengawas.');
     }
 }

@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('promotion_batches', function (Blueprint $table) {
+        if (!Schema::hasTable('promotion_batches')) {
+            Schema::create('promotion_batches', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
         });
+        }
     }
 
     /**

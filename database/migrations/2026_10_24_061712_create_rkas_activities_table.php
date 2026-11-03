@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('rkas_activities', function (Blueprint $table) {
+        if (!Schema::hasTable('rkas_activities')) {
+            Schema::create('rkas_activities', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
         });
+        }
     }
 
     /**

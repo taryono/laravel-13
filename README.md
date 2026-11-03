@@ -61,3 +61,18 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 # php artisan sentry:publish --dsn=https://80a81a78f6f40f2831900b3247e37f61@o4512014542831616.ingest.us.sentry.io/4512014549909504
 # SENTRY_LARAVEL_DSN=https://80a81a78f6f40f2831900b3247e37f61@o4512014542831616.ingest.us.sentry.io/4512014549909504
 
+<!-- print semua ability yang user punya -->
+$user = Auth::user();
+        
+session(['active_organization_id' => $user->current_organization_id]); // samakan dengan org yang mau dicek
+
+$gate = Gate::forUser($user);
+
+$ability = collect(Gate::abilities())
+    ->keys()
+    ->mapWithKeys(fn ($ability) => [$ability => $gate->allows($ability)])
+    ->filter()          // hanya yang true
+    ->keys()
+    ->sort()
+    ->values();
+dd($ability);

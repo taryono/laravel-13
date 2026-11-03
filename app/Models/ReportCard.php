@@ -127,3 +127,8 @@ class ReportCard extends BasedModel
         return $query->where('is_active', true);
     }
 }
+
+if (!class_exists('App\Models\ReportCard', false)) {
+    class_alias(ReportCard::class, 'App\Models\ReportCard');
+}
+

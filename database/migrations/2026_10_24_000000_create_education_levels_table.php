@@ -9,7 +9,8 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('education_levels', function (Blueprint $table) {
+        if (!Schema::hasTable('education_levels')) {
+            Schema::create('education_levels', function (Blueprint $table) {
             $table->id();
 
             $table->foreignId('organization_id')
@@ -39,6 +40,7 @@ return new class extends Migration
             $table->index(['organization_id', 'is_active', 'sort_order'], 'education_levels_org_active_sort_index');
             $table->index('stage', 'education_levels_stage_index');
         });
+        }
 
         // CHECK constraint: ditegakkan di MySQL 8.0.16+ (versi lama mengabaikannya).
         DB::statement(

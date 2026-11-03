@@ -4,6 +4,7 @@
 namespace Tests\Unit\Services\ReportCard;
 
 use App\Services\ReportCard\ReportCardCalculator;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class ReportCardCalculatorTest extends TestCase
@@ -16,7 +17,7 @@ class ReportCardCalculatorTest extends TestCase
         $this->calc = new ReportCardCalculator();
     }
 
-    /** @test */
+    #[Test]
     public function average_menghitung_rata_rata_nilai_valid()
     {
         $grades = [
@@ -29,7 +30,7 @@ class ReportCardCalculatorTest extends TestCase
         $this->assertEquals(86.50, $this->calc->average($grades));
     }
 
-    /** @test */
+    #[Test]
     public function average_mengabaikan_nilai_null()
     {
         $grades = [
@@ -41,7 +42,7 @@ class ReportCardCalculatorTest extends TestCase
         $this->assertEquals(89.25, $this->calc->average($grades));
     }
 
-    /** @test */
+    #[Test]
     public function average_return_null_jika_semua_nilai_null()
     {
         $grades = [
@@ -52,13 +53,13 @@ class ReportCardCalculatorTest extends TestCase
         $this->assertNull($this->calc->average($grades));
     }
 
-    /** @test */
+    #[Test]
     public function average_return_null_jika_array_kosong()
     {
         $this->assertNull($this->calc->average([]));
     }
 
-    /** @test */
+    #[Test]
     public function total_menjumlahkan_semua_nilai_valid()
     {
         $grades = [

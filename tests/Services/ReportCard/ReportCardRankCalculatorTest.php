@@ -4,7 +4,8 @@
 namespace Tests\Unit\Services\ReportCard;
 
 use App\Services\ReportCard\ReportCardRankCalculator;
-use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
 
 class ReportCardRankCalculatorTest extends TestCase
 {
@@ -16,7 +17,7 @@ class ReportCardRankCalculatorTest extends TestCase
         $this->calc = new ReportCardRankCalculator();
     }
 
-    /** @test */
+    #[Test]
     public function assign_ranks_memberi_rank_berurutan()
     {
         $items = collect([
@@ -26,7 +27,6 @@ class ReportCardRankCalculatorTest extends TestCase
         ]);
 
         $method = new \ReflectionMethod($this->calc, 'assignRanks');
-        $method->setAccessible(true);
         $result = $method->invoke($this->calc, $items);
 
         $this->assertEquals([
@@ -36,7 +36,7 @@ class ReportCardRankCalculatorTest extends TestCase
         ], $result);
     }
 
-    /** @test */
+    #[Test]
     public function assign_ranks_menangani_tie_dengan_rank_sama()
     {
         $items = collect([
@@ -46,7 +46,6 @@ class ReportCardRankCalculatorTest extends TestCase
         ]);
 
         $method = new \ReflectionMethod($this->calc, 'assignRanks');
-        $method->setAccessible(true);
         $result = $method->invoke($this->calc, $items);
 
         $this->assertEquals([
@@ -56,7 +55,7 @@ class ReportCardRankCalculatorTest extends TestCase
         ], $result);
     }
 
-    /** @test */
+    #[Test]
     public function assign_ranks_menangani_tie_break_dengan_total_score()
     {
         $items = collect([
@@ -65,7 +64,6 @@ class ReportCardRankCalculatorTest extends TestCase
         ]);
 
         $method = new \ReflectionMethod($this->calc, 'assignRanks');
-        $method->setAccessible(true);
         $result = $method->invoke($this->calc, $items);
 
         $this->assertEquals([

@@ -2,7 +2,7 @@
 
 namespace App\DataTables;
 
-use \App\Models\AssetDepreciationLog;
+use Models\AssetDepreciationLog;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;

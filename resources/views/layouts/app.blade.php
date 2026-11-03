@@ -13,6 +13,7 @@
     <meta name="login_as" content="{{ session('user_auth.role_as') ?? '' }}">
     <meta name="app-url" content="{{ config('app.url') }}">
     <meta name="env" content="{{ app()->environment() }}">
+    <meta name="color-scheme" content="light dark">
 
     <title>@yield('title', config('app.name', 'Dashboard'))</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])

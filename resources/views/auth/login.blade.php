@@ -17,6 +17,30 @@
             <span id="loginAlertMsg">Invalid email or password.</span>
         </div>
 
+        @if ($errors->any())
+            <div class="alert alert-danger d-flex align-items-center gap-2 py-2 px-3 mb-3"
+                style="font-size:.83rem; border-radius:10px;">
+                <i class="bi bi-exclamation-circle-fill"></i>
+                <span>{{ $errors->first() }}</span>
+            </div>
+        @endif
+
+        @if (session('error'))
+            <div class="alert alert-danger d-flex align-items-center gap-2 py-2 px-3 mb-3"
+                style="font-size:.83rem; border-radius:10px;">
+                <i class="bi bi-exclamation-circle-fill"></i>
+                <span>{{ session('error') }}</span>
+            </div>
+        @endif
+
+        @if (session('status'))
+            <div class="alert alert-success d-flex align-items-center gap-2 py-2 px-3 mb-3"
+                style="font-size:.83rem; border-radius:10px;">
+                <i class="bi bi-check-circle-fill"></i>
+                <span>{{ session('status') }}</span>
+            </div>
+        @endif
+
         <form method="POST" action="{{ route('login') }}" id="loginForm">
             @csrf
 
@@ -25,7 +49,7 @@
             <div class="input-group-custom">
                 <i class="bi bi-person input-icon"></i>
                 <input type="text" id="loginEmail" name="email" class="form-control"
-                    placeholder="Enter your email or ID" value="{{ old('email') }}" required autofocus />
+                    placeholder="Enter your email or ID" value="{{ old('email', 'admin@contoh.id') }}" required autofocus />
             </div>
             <div class="invalid-msg" id="emailErr">Please enter your email or Student ID.</div>
 

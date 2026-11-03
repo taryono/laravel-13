@@ -17,7 +17,8 @@ function initFlyoutTitles() {
 
 initFlyoutTitles();
 function bindNavParentClicks(container, respectSidebarCollapse) {
-    const topLevelNav = respectSidebarCollapse ? sidebar.querySelector(':scope > nav') : null;
+    if (!container) return;
+    const topLevelNav = (respectSidebarCollapse && sidebar) ? sidebar.querySelector(':scope > nav') : null;
     console.log('bindNavParentClicks topLevelNav ', topLevelNav);
     // Tangani SEMUA .bnsp-nav-parent, tidak hanya level atas
     container.querySelectorAll('.bnsp-nav-parent').forEach(link => {
@@ -26,7 +27,7 @@ function bindNavParentClicks(container, respectSidebarCollapse) {
 
         // ===== KLIK =====
         link.addEventListener('click', (e) => {
-            if (respectSidebarCollapse && sidebar.classList.contains('collapsed') && isDesktop()) {
+            if (respectSidebarCollapse && sidebar && sidebar.classList.contains('collapsed') && isDesktop()) {
                 // Di mode collapsed, parent TIDAK mencegah default — biarkan submenu terbuka via hover
                 e.preventDefault();
                 return;
@@ -224,64 +225,72 @@ function applyLayoutMode(mode) {
     document.body.classList.toggle('bnsp-layout-topbar', isTopbar);
     layoutToggleIcon.textContent = isTopbar ? 'view_sidebar' : 'view_agenda';
     layoutToggleBtn.title = isTopbar ? 'Ganti ke tampilan sidebar' : 'Ganti ke tampilan menu atas';
-    if (isTopbar) {
+    if (isTopbar && sidebar) {
         sidebar.classList.remove('mobile-open');
-        backdrop.classList.remove('show');
+        if (backdrop) backdrop.classList.remove('show');
     }
 }
 
 function applySideBarMode(mode) {
+    if (!sidebar) return;
     const isCollapsed = mode === 'collapsed';
     sidebar.classList.toggle('collapsed', isCollapsed);
-    mainWrapper.classList.toggle('collapsed', isCollapsed);
+    if (mainWrapper) mainWrapper.classList.toggle('collapsed', isCollapsed);
 }
 
 const savedLayoutMode = localStorage.getItem(LAYOUT_STORAGE_KEY) || 'sidebar';
 applyLayoutMode(savedLayoutMode);
 const savedSidebarMode = localStorage.getItem(COLLAPSED_STORAGE_KEY) || 'expanded';
 applySideBarMode(savedSidebarMode);
-layoutToggleBtn.addEventListener('click', () => {
-    const nextMode = document.body.classList.contains('bnsp-layout-topbar') ? 'sidebar' : 'topbar';
-    applyLayoutMode(nextMode);
-    localStorage.setItem(LAYOUT_STORAGE_KEY, nextMode);
-    window.location.reload();
-});
+if (layoutToggleBtn) {
+    layoutToggleBtn.addEventListener('click', () => {
+        const nextMode = document.body.classList.contains('bnsp-layout-topbar') ? 'sidebar' : 'topbar';
+        applyLayoutMode(nextMode);
+        localStorage.setItem(LAYOUT_STORAGE_KEY, nextMode);
+        window.location.reload();
+    });
+}
 
-hamburger.addEventListener('click', () => {
-    if (isDesktop()) {
-        sidebar.classList.toggle('collapsed');
-        mainWrapper.classList.toggle('collapsed');
-    } else {
-        sidebar.classList.toggle('mobile-open');
-        backdrop.classList.toggle('show');
-    }
-    let nextSidebarMode = sidebar.classList.contains('collapsed') ? 'collapsed' : 'expanded';
-    applySideBarMode(nextSidebarMode);
-    localStorage.setItem(COLLAPSED_STORAGE_KEY, nextSidebarMode);
+if (hamburger && sidebar) {
+    hamburger.addEventListener('click', () => {
+        if (isDesktop()) {
+            sidebar.classList.toggle('collapsed');
+            if (mainWrapper) mainWrapper.classList.toggle('collapsed');
+        } else {
+            sidebar.classList.toggle('mobile-open');
+            if (backdrop) backdrop.classList.toggle('show');
+        }
+        let nextSidebarMode = sidebar.classList.contains('collapsed') ? 'collapsed' : 'expanded';
+        applySideBarMode(nextSidebarMode);
+        localStorage.setItem(COLLAPSED_STORAGE_KEY, nextSidebarMode);
+    });
+}
 
-});
-
-backdrop.addEventListener('click', () => {
-    sidebar.classList.remove('mobile-open');
-    backdrop.classList.remove('show');
-});
+if (backdrop && sidebar) {
+    backdrop.addEventListener('click', () => {
+        sidebar.classList.remove('mobile-open');
+        backdrop.classList.remove('show');
+    });
+}
 
 // reset mobile drawer state when resizing back to desktop
 window.addEventListener('resize', () => {
-    if (isDesktop()) {
+    if (isDesktop() && sidebar) {
         sidebar.classList.remove('mobile-open');
-        backdrop.classList.remove('show');
+        if (backdrop) backdrop.classList.remove('show');
     }
 });
-bindNavParentClicks(sidebar, true);
-sidebar.querySelectorAll('.bnsp-nav-link:not(.bnsp-nav-parent)').forEach(link => {
-    link.addEventListener('click', () => {
-        if (!isDesktop()) {
-            sidebar.classList.remove('mobile-open');
-            backdrop.classList.remove('show');
-        }
+if (sidebar) {
+    bindNavParentClicks(sidebar, true);
+    sidebar.querySelectorAll('.bnsp-nav-link:not(.bnsp-nav-parent)').forEach(link => {
+        link.addEventListener('click', () => {
+            if (!isDesktop()) {
+                sidebar.classList.remove('mobile-open');
+                if (backdrop) backdrop.classList.remove('show');
+            }
+        });
     });
-});
+}
 document.querySelectorAll('button, a').forEach(el => {
     // Skip dropdown toggle & item dropdown
     if (el.closest('.dropdown') || el.hasAttribute('data-bs-toggle')) return;
@@ -861,15 +870,17 @@ document.addEventListener('mousemove', (e) => {
         currentTarget = null;
     });
 
-    sidebar.addEventListener('scroll', () => {
-        portal.classList.remove('show');
-        currentTarget = null;
-    }, true);
+    if (sidebar) {
+        sidebar.addEventListener('scroll', () => {
+            portal.classList.remove('show');
+            currentTarget = null;
+        }, true);
 
-    sidebar.addEventListener('transitionend', () => {
-        portal.classList.remove('show');
-        currentTarget = null;
-    });
+        sidebar.addEventListener('transitionend', () => {
+            portal.classList.remove('show');
+            currentTarget = null;
+        });
+    }
 
     window.addEventListener('resize', () => {
         portal.classList.remove('show');

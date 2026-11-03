@@ -9,7 +9,8 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('tax_types', function (Blueprint $table) {
+        if (!Schema::hasTable('tax_types')) {
+            Schema::create('tax_types', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('organization_id');
             $table->string('code', 20)->unique(); // pph21, pph23, pph25, ppn, ppnbm, other
@@ -20,6 +21,7 @@ return new class extends Migration
             $table->softDeletes();
             $table->foreign('organization_id')->references('id')->on('organizations')->onDelete('cascade');
         });
+        }
 
         // Isi data awal sesuai enum lama
         DB::table('tax_types')->insert([

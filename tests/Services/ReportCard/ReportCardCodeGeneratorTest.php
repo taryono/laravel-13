@@ -5,11 +5,12 @@ namespace Tests\Unit\Services\ReportCard;
 
 use App\Services\ReportCard\ReportCardCodeGenerator;
 use Illuminate\Support\Facades\DB;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class ReportCardCodeGeneratorTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function generate_menghasilkan_format_yang_benar()
     {
         DB::shouldReceive('table')->andReturnSelf();

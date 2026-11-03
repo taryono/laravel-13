@@ -12,6 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('schools', function (Blueprint $table) {
+            $table->id();
             $table->foreignId('trial_registration_id')->nullable()->constrained();
             $table->string('name');
             $table->string('npsn')->nullable();

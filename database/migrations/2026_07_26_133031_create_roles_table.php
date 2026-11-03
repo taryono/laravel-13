@@ -20,7 +20,6 @@ return new class extends Migration
                 ->after('id'); // posisi strategis
             $table->string('name');
             $table->string('display_name');
-            $table->string('description');
             $table->foreignId('parent_id')
                 ->nullable()
                 ->constrained('roles')

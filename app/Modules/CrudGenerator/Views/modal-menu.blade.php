@@ -114,11 +114,16 @@
                              <div class="card-body">
 
                                  @foreach ($roles->chunk(3) ?? [] as $news)
-                                     <div class="row">
+                                     <div class="row g-2 mb-2">
                                          @foreach ($news as $role)
                                              <div class="col-4">
-                                                 <input type="checkbox" name="role_ids[]" id="role_ids"
-                                                     value="{{ $role->id }}"> {{ $role->display_name }}
+                                                 <div class="form-check">
+                                                     <input class="form-check-input" type="checkbox" name="role_ids[]" id="role_{{ $role->id }}"
+                                                         value="{{ $role->id }}">
+                                                     <label class="form-check-label small" for="role_{{ $role->id }}">
+                                                         {{ $role->display_name }}
+                                                     </label>
+                                                 </div>
                                              </div>
                                          @endforeach
                                      </div>

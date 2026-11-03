@@ -9248,7 +9248,6 @@ INSERT INTO `migrations` VALUES (2, '2026_09_19_154734_create_sliders_table', 2)
 DROP TABLE IF EXISTS `modules`;
 CREATE TABLE `modules`  (
   `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
-  `organization_id` bigint UNSIGNED NULL DEFAULT NULL,
   `code` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,

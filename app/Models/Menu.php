@@ -123,4 +123,9 @@ class Menu extends BasedModel
     {
         return $this->hasMany(MenuRole::class, 'menu_id');
     }
+
+    public function menuCategory()
+    {
+        return $this->belongsTo(MenuCategory::class, 'menu_category_id');
+    }
 }

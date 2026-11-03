@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('document_number_sequences', function (Blueprint $table) {
+        if (!Schema::hasTable('document_number_sequences')) {
+            Schema::create('document_number_sequences', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
         });
+        }
     }
 
     /**

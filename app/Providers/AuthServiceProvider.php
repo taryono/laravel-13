@@ -84,20 +84,40 @@ class AuthServiceProvider extends ServiceProvider
 
             foreach ($allMenus as $menuId => $menuSlug) {
                 // Menu induk (tidak punya route) — cek apakah ada anak yang bisa diakses
-                Gate::define("menu-{$menuSlug}.view", function ($user) use ($menuId) {
-                    return $this->checkMenuViewPermission($user, $menuId);
-                });
+                if($menuSlug){
 
-                // CRUD hanya untuk menu yang punya rute
-                Gate::define("menu-{$menuSlug}.create", function ($user) use ($menuId) {
-                    return $this->checkMenuActionPermission($user, $menuId, 'is_create');
-                });
-                Gate::define("menu-{$menuSlug}.edit", function ($user) use ($menuId) {
-                    return $this->checkMenuActionPermission($user, $menuId, 'is_edit');
-                });
-                Gate::define("menu-{$menuSlug}.delete", function ($user) use ($menuId) {
-                    return $this->checkMenuActionPermission($user, $menuId, 'is_delete');
-                });
+                    Gate::define("{$menuSlug}.view", function ($user) use ($menuId) {
+                        return $this->checkMenuViewPermission($user, $menuId);
+                    });
+    
+                    // CRUD hanya untuk menu yang punya rute
+                    Gate::define("{$menuSlug}.create", function ($user) use ($menuId) {
+                        return $this->checkMenuActionPermission($user, $menuId, 'is_create');
+                    });
+    
+                    Gate::define("{$menuSlug}.edit", function ($user) use ($menuId) {
+                        return $this->checkMenuActionPermission($user, $menuId, 'is_edit');
+                    });
+                    Gate::define("{$menuSlug}.delete", function ($user) use ($menuId) {
+                        return $this->checkMenuActionPermission($user, $menuId, 'is_delete');
+                    });
+                }else{
+                    Gate::define("menu.view", function ($user) use ($menuId) {
+                        return $this->checkMenuViewPermission($user, $menuId);
+                    });
+    
+                    // CRUD hanya untuk menu yang punya rute
+                    Gate::define("menu.create", function ($user) use ($menuId) {
+                        return $this->checkMenuActionPermission($user, $menuId, 'is_create');
+                    });
+    
+                    Gate::define("menu.edit", function ($user) use ($menuId) {
+                        return $this->checkMenuActionPermission($user, $menuId, 'is_edit');
+                    });
+                    Gate::define("menu.delete", function ($user) use ($menuId) {
+                        return $this->checkMenuActionPermission($user, $menuId, 'is_delete');
+                    });
+                }
             }
         } catch (\Exception $e) {
             logger()->error('Error memuat ACL: ' . $e->getMessage());
@@ -124,6 +144,7 @@ class AuthServiceProvider extends ServiceProvider
         $childMenuIds = \Models\Menu::where('parent_id', $menuId)
             ->where('is_active', 1)
             ->whereNull('deleted_at')
+            ->where('organization_id', $orgId)
             ->pluck('id');
 
         if ($childMenuIds->isEmpty()) {

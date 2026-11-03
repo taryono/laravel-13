@@ -8,7 +8,8 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('p5_assessment_details', function (Blueprint $table) {
+        if (!Schema::hasTable('p5_assessment_details')) {
+            Schema::create('p5_assessment_details', function (Blueprint $table) {
             $table->id();
             $table->foreignId('assessment_id')
                 ->constrained('p5_assessments')
@@ -39,6 +40,7 @@ return new class extends Migration
 
             $table->index(['assessment_id', 'dimension_id'], 'idx_assessment_dimension');
         });
+        }
     }
 
     public function down(): void

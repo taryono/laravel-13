@@ -1,26 +1,33 @@
 <?php
-// app/Http/Middleware/ApplicantAuth.php
 
 namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 
 class ApplicantAuth
 {
     public function handle(Request $request, Closure $next)
     {
+        $loginRoute = Route::has('ppdb.login') ? 'ppdb.login' : 'login';
+
         if (!Auth::guard('applicant')->check()) {
-            return redirect()->route('ppdb.login')
+            if ($request->expectsJson()) {
+                return response()->json(['error' => 'Silakan login terlebih dahulu.'], 401);
+            }
+            return redirect()->route($loginRoute)
                 ->with('error', 'Silakan login terlebih dahulu.');
         }
 
-        // Cek status applicant masih aktif
         $applicant = Auth::guard('applicant')->user();
-        if (!$applicant->is_active) {
+        if (!$applicant || !($applicant->is_active ?? true)) {
             Auth::guard('applicant')->logout();
-            return redirect()->route('ppdb.login')
+            if ($request->expectsJson()) {
+                return response()->json(['error' => 'Akun Anda tidak aktif.'], 403);
+            }
+            return redirect()->route($loginRoute)
                 ->with('error', 'Akun Anda tidak aktif.');
         }
 

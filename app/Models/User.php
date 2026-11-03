@@ -71,7 +71,7 @@ class User extends Authenticatable implements MustVerifyEmail
     // Peran dengan filter organisasi aktif
     public function roles()
     {
-        return $this->belongsToMany(\Models\Role::class, 'role_user')
+        return $this->belongsToMany(\Models\Role::class, 'role_user', 'user_id', 'role_id')
             ->withPivot(['organization_id', 'is_default'])
             ->withTimestamps();
     }
@@ -79,7 +79,7 @@ class User extends Authenticatable implements MustVerifyEmail
     // Organisasi yang diikuti user
     public function organizations()
     {
-        return $this->belongsToMany(\Models\Organization::class, 'organization_user')
+        return $this->belongsToMany(\Models\Organization::class, 'organization_user', 'user_id', 'organization_id')
             ->withPivot(['is_default', 'is_active', 'id'])
             ->wherePivot('is_active', 1)
             ->withTimestamps();
@@ -107,6 +107,13 @@ class User extends Authenticatable implements MustVerifyEmail
     public function getCurrentOrganizationIdAttribute()
     {
         return $this->activeOrganization()?->id;
+    }
+
+    public function getActiveOrganizationIdAttribute()
+    {
+        return session('active_organization_id')
+            ?? ($this->attributes['active_organization_id'] ?? null)
+            ?? $this->activeOrganization()?->id;
     }
 
     public function activeOrganization()
@@ -241,7 +248,7 @@ class User extends Authenticatable implements MustVerifyEmail
     public function setAuthSession($role, $roles)
     {
         session()->put('user_auth', [
-            'login_as'        => $role->name,
+            'login_as'        => $role->code,
             'active_role_id'  => $role->id,
             'auth_role_ids'   => $roles->pluck('id'),
             'auth_roles'      => $roles->pluck('name'),

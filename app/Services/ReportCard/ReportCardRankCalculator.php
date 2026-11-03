@@ -185,35 +185,36 @@ class ReportCardRankCalculator
     }
 }
 
+
 // 3. Cara Pakai
 // 3.1 Hitung Ranking 1 Kelas
-$calculator = app(\App\Services\ReportCard\ReportCardRankCalculator::class);
+// $calculator = app(\App\Services\ReportCard\ReportCardRankCalculator::class);
 
-$calculator->calculateForClass(
-    classLevelId: 7,   // kelas 7
-    periodId: 1        // semester 1
-);
+// $calculator->calculateForClass(
+//     classLevelId: 7,   // kelas 7
+//     periodId: 1        // semester 1
+// );
 
 // 3.2 Hitung Ranking 1 Level (Angkatan)
 
 // Contoh untuk SMP (kelas 7, 8, 9)
-$levelGroups = [
-    [7, 8, 9],
-];
+// $levelGroups = [
+//     [7, 8, 9],
+// ];
 
-$calculator->calculateForLevel($levelGroups, periodId: 1);
+// $calculator->calculateForLevel($levelGroups, periodId: 1);
 
 // 3.3 Hitung Semua untuk 1 Periode (Kelas + Level)
 
-$levelGroups = [
-    [7, 8, 9],    // SMP
-    [10, 11, 12], // SMA
-];
+// $levelGroups = [
+//     [7, 8, 9],    // SMP
+//     [10, 11, 12], // SMA
+// ];
 
-$result = $calculator->calculateForPeriod(
-    periodId: 1,
-    levelGroups: $levelGroups
-);
+// $result = $calculator->calculateForPeriod(
+//     periodId: 1,
+//     levelGroups: $levelGroups
+// );
 
-echo "Kelas: " . $result['classes'] . " report_cards\n";
-echo "Level: " . $result['levels'] . " report_cards\n";
+// echo "Kelas: " . $result['classes'] . " report_cards\n";
+// echo "Level: " . $result['levels'] . " report_cards\n";

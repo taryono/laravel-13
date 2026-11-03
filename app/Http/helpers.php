@@ -1,8 +1,12 @@
 <?php
 if (!function_exists('isSuperUser')) {
-    function isSuperUser()
+    function isSuperUser($user = null)
     {
-        return session()->get('user_auth.login_as') == "super-admin";
+        $user = $user ?? (auth()->check() ? auth()->user() : null);
+        if ($user && method_exists($user, 'isSuperUser') && $user->isSuperUser()) {
+            return true;
+        }
+        return session()->get('user_auth.login_as') === "super-admin";
     }
 }
 

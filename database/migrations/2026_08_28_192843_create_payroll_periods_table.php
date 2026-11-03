@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('payroll_periods', function (Blueprint $table) {
+        if (!Schema::hasTable('payroll_periods')) {
+            Schema::create('payroll_periods', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
         });
+        }
     }
 
     /**
