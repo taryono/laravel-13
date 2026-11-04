@@ -24,6 +24,14 @@ Route::post('/submit_request_demo', [WelcomeController::class, 'submitRequestDem
 Route::get('/submit_request_demo', fn() => redirect()->route('request_demo.form'));
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware(['auth', 'verified']);
 
+Route::post('/dashboard/select-category/{id?}', [DashboardController::class, 'selectCategory'])
+    ->name('dashboard.select-category')
+    ->middleware(['auth']);
+
+Route::get('/dashboard/select-category/{id?}', [DashboardController::class, 'selectCategory'])
+    ->name('dashboard.select-category.get')
+    ->middleware(['auth']);
+
 Route::post('/organization/switch', [ProfileController::class, 'switch'])
     ->name('organization.switch');
 require __DIR__ . '/admin_ppdb.php';

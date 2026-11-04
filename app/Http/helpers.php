@@ -117,3 +117,19 @@ if (!function_exists('dateFormat')) {
         return date('Y-m-d', strtotime($date));
     }
 }
+
+if (!function_exists('greetings')) {
+    function greetings()
+    {
+        $now  = \Carbon\Carbon::now('Asia/Jakarta')->locale('id');
+        $hour = $now->hour;
+
+        $greeting = match (true) {
+            $hour < 11 => 'Selamat Pagi',
+            $hour < 15 => 'Selamat Siang',
+            $hour < 18 => 'Selamat Sore',
+            default    => 'Selamat Malam',
+        };
+        return $greeting;
+    }
+}

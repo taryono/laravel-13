@@ -268,6 +268,47 @@
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 0.75rem;
+            transition: opacity 0.25s ease, transform 0.25s ease;
+        }
+
+        .menu-grid.is-loading {
+            opacity: 0.35;
+            pointer-events: none;
+            transform: scale(0.995);
+        }
+
+        .btn-primary-edu {
+            background-color: var(--c-primary);
+            color: #ffffff !important;
+            border: 1px solid var(--c-primary);
+            transition: all 0.2s ease;
+            font-weight: 600;
+        }
+
+        .btn-primary-edu:hover, .btn-primary-edu:focus {
+            background-color: var(--c-primary-container);
+            border-color: var(--c-primary-container);
+            color: #ffffff !important;
+            transform: translateY(-1px);
+        }
+
+        .btn-outline-edu {
+            background-color: transparent;
+            color: var(--c-on-surface) !important;
+            border: 1px solid var(--c-outline-variant);
+            transition: all 0.2s ease;
+            font-weight: 600;
+        }
+
+        .btn-outline-edu:hover, .btn-outline-edu:focus {
+            background-color: var(--c-surface-container);
+            border-color: var(--c-outline);
+            color: var(--c-on-surface) !important;
+            transform: translateY(-1px);
+        }
+
+        .menu-pagination-bar {
+            border-color: var(--c-outline-variant) !important;
         }
 
         @media (min-width: 400px) {
@@ -318,6 +359,7 @@
             min-height: 44px;
             transition: box-shadow 0.2s ease, border-color 0.2s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
             outline: none;
+            cursor: pointer;
         }
 
         .menu-card:hover {
@@ -325,6 +367,20 @@
             box-shadow: 0 0.5rem 1.25rem rgba(0, 0, 0, 0.08) !important;
             transform: translateY(-2px);
             color: var(--c-on-surface);
+        }
+
+        .menu-card.active-category {
+            border: 2px solid var(--c-primary) !important;
+            background-color: var(--c-surface-container) !important;
+            box-shadow: 0 0.5rem 1.25rem rgba(2, 16, 100, 0.15) !important;
+        }
+
+        .ring-active {
+            box-shadow: 0 0 0 3px rgba(2, 16, 100, 0.25);
+        }
+
+        body.dark-mode .ring-active {
+            box-shadow: 0 0 0 3px rgba(138, 180, 248, 0.35);
         }
 
         .menu-card:active {
@@ -634,28 +690,61 @@
             </section>
 
             {{-- Menu Utama --}}
-            <section class="menu-section mb-4">
+            <section class="menu-section mb-4" id="main-menu-section">
                 <div class="d-flex align-items-center justify-content-between mb-3">
                     <div>
-                        <h2 class="t-headline-md text-primary-edu mb-0">Menu Utama</h2>
-                        <p class="t-body-sm text-variant mb-0">Akses modul operasional sekolah</p>
+                        <div class="d-flex align-items-center gap-2">
+                            <h2 class="t-headline-md text-primary-edu mb-0">Menu Utama</h2>
+                            @if (session('active_menu_category_id'))
+                                <a href="{{ route('dashboard.select-category.get', ['id' => 'all']) }}"
+                                    class="badge bg-secondary-subtle text-secondary-emphasis text-decoration-none d-inline-flex align-items-center gap-1 px-2.5 py-1 rounded-pill t-label-sm"
+                                    title="Klik untuk mereset filter dan menampilkan semua modul pada sidebar">
+                                    <span>Filter Sidebar Aktif</span>
+                                    <span class="material-symbols-outlined icon-14">close</span>
+                                </a>
+                            @endif
+                        </div>
+                        <p class="t-body-sm text-variant mb-0">Akses modul operasional sekolah (klik card untuk memfilter menu sidebar)</p>
                     </div>
-                    <span class="pill-soft px-2.5 py-1 rounded-pill t-label-sm">{{ $menus->count() }} Modul</span>
+                    <span class="pill-soft px-2.5 py-1 rounded-pill t-label-sm" id="menu-total-pill">
+                        <span id="menu-total-count">{{ isset($menuPagination) ? $menuPagination->total() : $menus->count() }}</span> Modul
+                    </span>
                 </div>
 
-                <div class="menu-grid">
-                    @foreach ($menus as $menu)
-                        <a href="{{ $menu->url }}"
-                            class="menu-card d-flex flex-column align-items-center text-center p-3 rounded-4 shadow-sm">
-                            <div
-                                class="menu-icon tone-{{ $menu->tone }} rounded-3 d-flex align-items-center justify-content-center mb-2">
-                                <span class="material-symbols-outlined icon-26">{{ $menu->icon }}</span>
-                            </div>
-                            <span class="t-label-md lh-sm">{{ $menu->title }}</span>
-                            <span class="t-label-sm text-variant mt-1 line-clamp-1">{{ $menu->subtitle }}</span>
-                        </a>
-                    @endforeach
+                <div class="position-relative">
+                    <div class="menu-grid" id="menu-grid-container">
+                        @include('Dashboard::partials.menu_cards', ['menus' => $menus])
+                    </div>
                 </div>
+
+                {{-- Pagination / Navigation Bar di Bagian Bawah --}}
+                @if (isset($menuPagination) && $menuPagination->total() > $menuPagination->perPage())
+                    <div class="menu-pagination-bar d-flex flex-wrap align-items-center justify-content-between gap-2 mt-3 pt-3 border-top">
+                        <div class="t-label-sm text-variant" id="menu-page-info">
+                            Menampilkan <span id="menu-from-count">{{ $menuPagination->firstItem() }}</span>–<span id="menu-to-count">{{ $menuPagination->lastItem() }}</span> dari <span id="menu-total-info">{{ $menuPagination->total() }}</span> modul (Halaman <span id="menu-current-page">{{ $menuPagination->currentPage() }}</span> / <span id="menu-last-page">{{ $menuPagination->lastPage() }}</span>)
+                        </div>
+
+                        <div class="d-flex align-items-center gap-2 ms-auto">
+                            <button type="button" 
+                                class="btn btn-sm btn-outline-edu d-inline-flex align-items-center gap-1 rounded-pill px-3 py-1.5"
+                                id="btn-menu-prev"
+                                style="{{ $menuPagination->currentPage() <= 1 ? 'display: none !important;' : '' }}"
+                                data-page="{{ $menuPagination->currentPage() - 1 }}">
+                                <span class="material-symbols-outlined icon-18">arrow_back</span>
+                                <span>Sebelumnya</span>
+                            </button>
+
+                            <button type="button" 
+                                class="btn btn-sm btn-primary-edu d-inline-flex align-items-center gap-1 rounded-pill px-3 py-1.5 shadow-sm"
+                                id="btn-menu-next"
+                                style="{{ !$menuPagination->hasMorePages() ? 'display: none !important;' : '' }}"
+                                data-page="{{ $menuPagination->currentPage() + 1 }}">
+                                <span>Selanjutnya</span>
+                                <span class="material-symbols-outlined icon-18">arrow_forward</span>
+                            </button>
+                        </div>
+                    </div>
+                @endif
             </section>
         </div>
 
@@ -696,3 +785,168 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const btnNext = document.getElementById('btn-menu-next');
+            const btnPrev = document.getElementById('btn-menu-prev');
+            const container = document.getElementById('menu-grid-container');
+            const fromCount = document.getElementById('menu-from-count');
+            const toCount = document.getElementById('menu-to-count');
+            const totalInfo = document.getElementById('menu-total-info');
+            const currentPageSpan = document.getElementById('menu-current-page');
+            const lastPageSpan = document.getElementById('menu-last-page');
+            const totalCountPill = document.getElementById('menu-total-count');
+
+            let isLoading = false;
+
+            function fetchMenuPage(page, btnClicked) {
+                if (isLoading || !page) return;
+                isLoading = true;
+
+                if (container) container.classList.add('is-loading');
+
+                let originalHtml = '';
+                if (btnClicked) {
+                    btnClicked.disabled = true;
+                    originalHtml = btnClicked.innerHTML;
+                    btnClicked.innerHTML = `
+                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="width: 0.9rem; height: 0.9rem;"></span>
+                        <span>Memuat...</span>
+                    `;
+                }
+
+                const url = new URL(window.location.href);
+                url.searchParams.set('page', page);
+                url.searchParams.set('ajax_menus', '1');
+
+                fetch(url.toString(), {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Gagal memuat menu (' + response.status + ')');
+                    }
+                    return response.json();
+                })
+                .then(res => {
+                    if (res.status === 'success' && res.html) {
+                        if (container) {
+                            container.innerHTML = res.html;
+                        }
+
+                        const p = res.pagination;
+                        if (p) {
+                            if (fromCount) fromCount.textContent = p.from;
+                            if (toCount) toCount.textContent = p.to;
+                            if (totalInfo) totalInfo.textContent = p.total;
+                            if (currentPageSpan) currentPageSpan.textContent = p.current_page;
+                            if (lastPageSpan) lastPageSpan.textContent = p.last_page;
+                            if (totalCountPill) totalCountPill.textContent = p.total;
+
+                            // Update tombol Selanjutnya (Next)
+                            if (btnNext) {
+                                btnNext.setAttribute('data-page', p.current_page + 1);
+                                if (p.has_more) {
+                                    btnNext.style.removeProperty('display');
+                                } else {
+                                    btnNext.style.setProperty('display', 'none', 'important');
+                                }
+                            }
+
+                            // Update tombol Sebelumnya (Prev)
+                            if (btnPrev) {
+                                btnPrev.setAttribute('data-page', p.current_page - 1);
+                                if (p.has_prev) {
+                                    btnPrev.style.removeProperty('display');
+                                } else {
+                                    btnPrev.style.setProperty('display', 'none', 'important');
+                                }
+                            }
+                        }
+                    }
+                })
+                .catch(err => {
+                    console.error('Error fetching menus:', err);
+                })
+                .finally(() => {
+                    isLoading = false;
+                    if (container) container.classList.remove('is-loading');
+                    if (btnClicked) {
+                        btnClicked.disabled = false;
+                        btnClicked.innerHTML = originalHtml;
+                    }
+                });
+            }
+
+            if (btnNext) {
+                btnNext.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const page = this.getAttribute('data-page');
+                    fetchMenuPage(page, this);
+                });
+            }
+
+            if (btnPrev) {
+                btnPrev.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const page = this.getAttribute('data-page');
+                    fetchMenuPage(page, this);
+                });
+            }
+
+            // Event listener saat user klik menu card untuk memfilter sidebar
+            document.addEventListener('click', function(e) {
+                const card = e.target.closest('.menu-card');
+                if (!card) return;
+
+                const categoryId = card.getAttribute('data-menu-category-id');
+                const targetUrl = card.getAttribute('data-target-url') || card.getAttribute('href');
+
+                if (!categoryId) return;
+
+                e.preventDefault();
+
+                // Feedback visual: kurangi opacity sesaat
+                card.style.opacity = '0.6';
+
+                // Simpan menu_category_id ke session via AJAX
+                fetch('{{ route('dashboard.select-category') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        menu_category_id: categoryId
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    // Jika URL adalah rute modul tujuan (bukan '#' dan bukan select-category), arahkan ke URL tersebut
+                    if (targetUrl && targetUrl !== '#' && !targetUrl.startsWith('javascript:') && !targetUrl.includes('select-category')) {
+                        window.location.href = targetUrl;
+                    } else {
+                        // Reload halaman agar sidebar langsung terupdate sesuai kategori menu yang dipilih
+                        window.location.reload();
+                    }
+                })
+                .catch(err => {
+                    console.error('Error saving menu category:', err);
+                    if (targetUrl && targetUrl !== '#' && !targetUrl.startsWith('javascript:') && !targetUrl.includes('select-category')) {
+                        window.location.href = targetUrl;
+                    } else {
+                        window.location.reload();
+                    }
+                });
+            });
+        });
+    </script>
+@endpush

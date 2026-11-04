@@ -12,16 +12,18 @@ class MenuService
     protected Collection $allowedMenus;
     protected Collection $allowedActions;
     protected MenuTreeBuilder $treeBuilder;
+    protected MenuRepository $menuRepository;
 
-    public function __construct(MenuTreeBuilder $treeBuilder)
+    public function __construct(MenuTreeBuilder $treeBuilder, ?MenuRepository $menuRepository = null)
     {
         $this->treeBuilder = $treeBuilder;
+        $this->menuRepository = $menuRepository ?? new MenuRepository();
         // ✅ Inisialisasi di konstruktor
         $this->allowedMenus = collect();
         $this->allowedActions = collect();
     }
 
-    public function getSplitMenu(string $currentUrl, $user = null): array
+    public function getSplitMenu(string $currentUrl, $user = null, ?int $menuCategoryId = null): array
     {
         if (!$user) {
             return ['menu' => collect(), 'topnavMenu' => collect()];
@@ -38,9 +40,20 @@ class MenuService
             $this->loadPermissions($user, $orgId);
         }
 
+        $menuCategoryId = $menuCategoryId
+            ?? session('active_menu_category_id')
+            ?? session('selected_menu_category_id')
+            ?? request('menu_category_id');
+
         // ✅ Ambil menu — is_publish boleh null/1, is_active=1
         $query = Menu::where('is_active', 1)
             ->whereNull('deleted_at');
+
+        // Filter berdasarkan menu_category_id terpilih melalui MenuRepository
+        if ($menuCategoryId) {
+            $categoryMenuIds = $this->menuRepository->getMenuIdsForCategory((int) $menuCategoryId);
+            $query->whereIn('id', $categoryMenuIds);
+        }
 
         // Terapkan filter izin (kecuali Super Admin)
         if (!$user->isSuperUser() && $this->allowedMenus->isNotEmpty()) {

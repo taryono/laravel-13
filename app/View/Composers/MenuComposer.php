@@ -1,5 +1,5 @@
 <?php
-// app/View/Composers/MenuComposer.php
+
 namespace App\View\Composers;
 
 use App\Core\Menu\MenuService;
@@ -22,7 +22,14 @@ class MenuComposer
             Auth::user()
         );
 
+        $activeCategoryId = session('active_menu_category_id');
+        $activeCategory = null;
+        if ($activeCategoryId && class_exists(\Models\MenuCategory::class)) {
+            $activeCategory = \Models\MenuCategory::find($activeCategoryId);
+        }
+
         $view->with('menu', $split['menu'] ?? collect());
         $view->with('topnavMenu', $split['topnavMenu'] ?? collect());
+        $view->with('activeMenuCategory', $activeCategory);
     }
 }
