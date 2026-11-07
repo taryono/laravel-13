@@ -105,14 +105,14 @@ class QuestionTypeController extends MainController
      */
     public function edit($id): View
     {
-        $questionType = $this->model->findOrFail($id);
-        $result = $this->getForm($questionType);
+        $question_type = $this->model->findOrFail($id);
+        $result = $this->getForm($question_type);
         $forms = $result['forms'];
         $groupedForms = $result['grouped'];
 
         return view(
             'QuestionType::edit',
-            compact('questionType', 'forms', 'groupedForms')
+            compact('question_type', 'forms', 'groupedForms')
         );
     }
 
