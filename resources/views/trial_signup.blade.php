@@ -35,6 +35,15 @@
         .step-node.done {
             cursor: pointer;
         }
+        @if(app()->environment('local', 'development', 'testing') || config('app.debug'))
+        .step-node {
+            cursor: pointer !important;
+        }
+        .dev-toolbar {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+        }
+        @endif
         .notif-option {
             cursor: pointer;
             user-select: none;
@@ -314,18 +323,48 @@
     <!-- WIZARD -->
     <div class="wizard-wrap">
         <div class="wizard-card">
+            @php
+                $isDev = app()->environment('local', 'development', 'testing') || config('app.debug');
+            @endphp
+
+            @if($isDev)
+                <div class="dev-toolbar py-2 px-3 mb-4 rounded-3 d-flex flex-wrap justify-content-between align-items-center gap-2 shadow-sm">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge bg-primary text-white"><i class="fa-solid fa-flask me-1"></i>DEV MODE</span>
+                        <span class="small fw-semibold text-secondary">Semua form terisi otomatis untuk pengujian cepat.</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <span class="small text-muted fw-semibold">Lompat:</span>
+                        <div class="btn-group btn-group-sm" role="group">
+                            <button type="button" class="btn btn-outline-primary" onclick="goToStep(1)">1. Info</button>
+                            <button type="button" class="btn btn-outline-primary" onclick="goToStep(2)">2. Modul</button>
+                            <button type="button" class="btn btn-outline-primary" onclick="goToStep(3)">3. Role</button>
+                            <button type="button" class="btn btn-outline-primary" onclick="goToStep(4)">4. Akses</button>
+                            <button type="button" class="btn btn-outline-primary" onclick="goToStep(5)">5. Notif</button>
+                            <button type="button" class="btn btn-outline-primary" onclick="goToStep(6)">6. Akun</button>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-dark" onclick="devResetForm()" title="Isi ulang data default form">
+                            <i class="fa-solid fa-rotate-left me-1"></i>Reset Form
+                        </button>
+                    </div>
+                </div>
+            @endif
+
             <form id="trialForm" novalidate>
 
                 @php
-                    $savedLevels = isset($registration)
+                    $savedLevels = isset($registration) && $registration->education_level->isNotEmpty()
                         ? $registration->education_level->pluck('code')->map(fn($c) => strtoupper($c))->toArray()
-                        : [];
-                    $savedModules = isset($registration)
+                        : ($isDev ? ['SMA'] : []);
+                    $savedModules = isset($registration) && $registration->modules->isNotEmpty()
                         ? $registration->modules->pluck('code')->map(fn($c) => strtolower($c))->toArray()
-                        : ['akademik'];
-                    $savedRoles = isset($registration)
+                        : ($isDev ? ['akademik', 'kesiswaan', 'keuangan', 'absensi', 'cbt'] : ['akademik']);
+                    $savedRoles = isset($registration) && $registration->roles->isNotEmpty()
                         ? $registration->roles->pluck('code')->map(fn($c) => strtolower(str_replace('-', '_', $c)))->toArray()
-                        : ['admin_sekolah'];
+                        : ($isDev ? ['admin_sekolah', 'guru'] : ['admin_sekolah']);
+                    $selectedTotalStudent = old('total_student', $registration->total_student ?? ($isDev ? '300 - 600' : ''));
+                    $selectedPositionId = old('position_id', $registration->position_id ?? ($isDev ? 'kepala_sekolah' : ''));
+                    $devEmail = old('email', $registration->email ?? ($isDev ? ('trial.' . (isset($registration->id) ? $registration->id : date('dHis')) . '@edupulse.sch.id') : ''));
                 @endphp
 
                 <!-- STEP 1 -->
@@ -338,13 +377,13 @@
                         <div class="col-md-8">
                             <label class="form-label">Nama Yayasan / Sekolah <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" name="nama_sekolah"
-                                value="{{ old('nama_sekolah', $registration->nama_sekolah ?? '') }}"
+                                value="{{ old('nama_sekolah', $registration->nama_sekolah ?? ($isDev ? 'SMA Nusantara Smart School' : '')) }}"
                                 placeholder="Contoh: SMA Harapan Bangsa" required>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">NPSN</label>
                             <input type="text" class="form-control" name="npsn"
-                                value="{{ old('npsn', $registration->npsn ?? '') }}"
+                                value="{{ old('npsn', $registration->npsn ?? ($isDev ? '20123456' : '')) }}"
                                 placeholder="Contoh: 20123456">
                         </div>
                         <div class="col-12">
@@ -389,20 +428,20 @@
                         <div class="col-md-6">
                             <label class="form-label">Jumlah Siswa <span class="text-danger">*</span></label>
                             <select class="form-select" name="total_student" required>
-                                <option value="" {{ empty($registration->total_student) ? 'selected' : '' }} disabled>Pilih rentang</option>
+                                <option value="" {{ empty($selectedTotalStudent) ? 'selected' : '' }} disabled>Pilih rentang</option>
                                 @if(isset($student_ranges) && $student_ranges->count())
                                     @foreach ($student_ranges as $range)
                                         <option value="{{ $range->name }}"
-                                            {{ ($registration->total_student ?? '') == $range->name || ($registration->total_student ?? '') == $range->id ? 'selected' : '' }}>
+                                            {{ $selectedTotalStudent == $range->name || $selectedTotalStudent == $range->id ? 'selected' : '' }}>
                                             {{ $range->name }} Siswa
                                         </option>
                                     @endforeach
                                 @else
-                                    <option value="< 100" {{ ($registration->total_student ?? '') == '< 100' ? 'selected' : '' }}>&lt; 100 Siswa</option>
-                                    <option value="100 - 300" {{ ($registration->total_student ?? '') == '100 - 300' ? 'selected' : '' }}>100 - 300 Siswa</option>
-                                    <option value="300 - 600" {{ ($registration->total_student ?? '') == '300 - 600' ? 'selected' : '' }}>300 - 600 Siswa</option>
-                                    <option value="600-1000" {{ ($registration->total_student ?? '') == '600-1000' || ($registration->total_student ?? '') == '600 - 1000' ? 'selected' : '' }}>600 - 1000 Siswa</option>
-                                    <option value="> 1000" {{ ($registration->total_student ?? '') == '> 1000' ? 'selected' : '' }}>&gt; 1000 Siswa</option>
+                                    <option value="< 100" {{ $selectedTotalStudent == '< 100' ? 'selected' : '' }}>&lt; 100 Siswa</option>
+                                    <option value="100 - 300" {{ $selectedTotalStudent == '100 - 300' ? 'selected' : '' }}>100 - 300 Siswa</option>
+                                    <option value="300 - 600" {{ $selectedTotalStudent == '300 - 600' ? 'selected' : '' }}>300 - 600 Siswa</option>
+                                    <option value="600-1000" {{ $selectedTotalStudent == '600-1000' || $selectedTotalStudent == '600 - 1000' ? 'selected' : '' }}>600 - 1000 Siswa</option>
+                                    <option value="> 1000" {{ $selectedTotalStudent == '> 1000' ? 'selected' : '' }}>&gt; 1000 Siswa</option>
                                 @endif
                             </select>
                         </div>
@@ -411,7 +450,7 @@
                         </div>
                         <div class="col-12">
                             <label class="form-label">Alamat Sekolah</label>
-                            <textarea class="form-control" name="address" rows="3" placeholder="Jalan, Kelurahan, Kecamatan, Kota">{{ old('address', $registration->address ?? '') }}</textarea>
+                            <textarea class="form-control" name="address" rows="3" placeholder="Jalan, Kelurahan, Kecamatan, Kota">{{ old('address', $registration->address ?? ($isDev ? 'Jl. Pendidikan No. 45, Kebayoran Baru, Jakarta Selatan' : '')) }}</textarea>
                         </div>
                         <div class="col-12">
                             <hr class="my-2">
@@ -419,27 +458,27 @@
                         <div class="col-md-6">
                             <label class="form-label">Nama Lengkap Anda <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" name="nama_user"
-                                value="{{ old('nama_user', $registration->nama_user ?? '') }}"
+                                value="{{ old('nama_user', $registration->nama_user ?? ($isDev ? 'Budi Pratama, S.Pd., M.M.' : '')) }}"
                                 placeholder="Nama lengkap Anda" required>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Jabatan di Sekolah <span class="text-danger">*</span></label>
                             <select class="form-select" name="position_id" required>
-                                <option value="" {{ empty($registration->position_id) ? 'selected' : '' }} disabled>Pilih jabatan</option>
+                                <option value="" {{ empty($selectedPositionId) ? 'selected' : '' }} disabled>Pilih jabatan</option>
                                 @if(isset($positions) && $positions->count())
                                     @foreach ($positions as $position)
                                         <option value="{{ $position->code ?? $position->id }}"
-                                            {{ ($registration->position_id ?? '') == ($position->code ?? $position->id) || ($registration->position_id ?? '') == $position->id ? 'selected' : '' }}>
+                                            {{ $selectedPositionId == ($position->code ?? $position->id) || $selectedPositionId == $position->id ? 'selected' : '' }}>
                                             {{ $position->name }}
                                         </option>
                                     @endforeach
                                 @else
-                                    <option value="kepala_sekolah" {{ ($registration->position_id ?? '') == 'kepala_sekolah' ? 'selected' : '' }}>Kepala Sekolah</option>
-                                    <option value="wakil_kepala_sekolah" {{ ($registration->position_id ?? '') == 'wakil_kepala_sekolah' ? 'selected' : '' }}>Wakil Kepala Sekolah</option>
-                                    <option value="guru" {{ ($registration->position_id ?? '') == 'guru' ? 'selected' : '' }}>Guru / Tenaga Pendidik</option>
-                                    <option value="tata_usaha" {{ ($registration->position_id ?? '') == 'tata_usaha' ? 'selected' : '' }}>Tata Usaha / Administrasi / Keuangan</option>
-                                    <option value="admin_it" {{ ($registration->position_id ?? '') == 'admin_it' ? 'selected' : '' }}>Admin IT / Operator</option>
-                                    <option value="lainnya" {{ ($registration->position_id ?? '') == 'lainnya' ? 'selected' : '' }}>Lainnya</option>
+                                    <option value="kepala_sekolah" {{ $selectedPositionId == 'kepala_sekolah' ? 'selected' : '' }}>Kepala Sekolah</option>
+                                    <option value="wakil_kepala_sekolah" {{ $selectedPositionId == 'wakil_kepala_sekolah' ? 'selected' : '' }}>Wakil Kepala Sekolah</option>
+                                    <option value="guru" {{ $selectedPositionId == 'guru' ? 'selected' : '' }}>Guru / Tenaga Pendidik</option>
+                                    <option value="tata_usaha" {{ $selectedPositionId == 'tata_usaha' ? 'selected' : '' }}>Tata Usaha / Administrasi / Keuangan</option>
+                                    <option value="admin_it" {{ $selectedPositionId == 'admin_it' ? 'selected' : '' }}>Admin IT / Operator</option>
+                                    <option value="lainnya" {{ $selectedPositionId == 'lainnya' ? 'selected' : '' }}>Lainnya</option>
                                 @endif
                             </select>
                         </div>
@@ -689,7 +728,7 @@
                     @php
                         $notifWa = old('notif_whatsapp', $registration->notif_whatsapp ?? true);
                         $notifEmail = old('notif_email', $registration->notif_email ?? true);
-                        $notifSms = old('notif_sms', $registration->notif_sms ?? false);
+                        $notifSms = old('notif_sms', $registration->notif_sms ?? ($isDev ? true : false));
                     @endphp
 
                     <div class="notif-option {{ $notifWa ? 'active' : '' }}" id="notifWhatsapp">
@@ -736,13 +775,13 @@
                         <div class="col-12">
                             <label class="form-label">Email Login <span class="text-danger">*</span></label>
                             <input type="email" class="form-control" name="email"
-                                value="{{ old('email', $registration->email ?? '') }}"
+                                value="{{ $devEmail }}"
                                 placeholder="nama@sekolah.sch.id" required autocomplete="username">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">No. Handphone / WhatsApp <span class="text-danger">*</span></label>
                             <input type="tel" class="form-control" name="no_hp"
-                                value="{{ old('no_hp', $registration->no_hp ?? '') }}"
+                                value="{{ old('no_hp', $registration->no_hp ?? ($isDev ? '081234567890' : '')) }}"
                                 placeholder="08xxxxxxxxxx" required autocomplete="tel">
                         </div>
                         <div class="col-md-6"></div>
@@ -750,6 +789,7 @@
                             <label class="form-label">Buat Password <span class="text-danger">*</span></label>
                             <div class="input-group-password">
                                 <input type="password" class="form-control pe-5" name="password" id="passwordInput"
+                                    value="{{ $isDev ? 'Password123!' : '' }}"
                                     placeholder="Minimal 8 karakter" minlength="8" required autocomplete="new-password">
                                 <button type="button" class="btn-toggle-password" data-target="passwordInput" aria-label="Toggle password visibility">
                                     <i class="fa-regular fa-eye"></i>
@@ -760,6 +800,7 @@
                             <label class="form-label">Konfirmasi Password <span class="text-danger">*</span></label>
                             <div class="input-group-password">
                                 <input type="password" class="form-control pe-5" name="password_confirmation" id="passwordConfirmInput"
+                                    value="{{ $isDev ? 'Password123!' : '' }}"
                                     placeholder="Ulangi password" minlength="8" required autocomplete="new-password">
                                 <button type="button" class="btn-toggle-password" data-target="passwordConfirmInput" aria-label="Toggle password confirmation visibility">
                                     <i class="fa-regular fa-eye"></i>
@@ -771,7 +812,7 @@
                         </div>
                         <div class="col-12 mt-2">
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="agree_terms" id="agreeTerms" required>
+                                <input class="form-check-input" type="checkbox" name="agree_terms" id="agreeTerms" {{ $isDev ? 'checked' : '' }} required>
                                 <label class="form-check-label" for="agreeTerms" style="font-size:.87rem;color:var(--muted);">
                                     Saya menyetujui <a href="javascript:void(0)" class="text-decoration-underline" onclick="alert('Syarat & Ketentuan berlaku untuk penggunaan masa uji coba EduPulse selama 14 hari.')">Syarat &amp; Ketentuan</a> dan <a href="javascript:void(0)" class="text-decoration-underline" onclick="alert('Privasi dan data sekolah Anda dijaga keamanannya sesuai standar enkripsi.')">Kebijakan Privasi</a> EduPulse.
                                 </label>
@@ -852,14 +893,19 @@
             });
         }
 
-        // Allow navigation by clicking on completed step nodes
+        // Allow navigation by clicking on completed step nodes (or any step in dev mode)
         stepNodes.forEach(node => {
             node.addEventListener('click', () => {
                 const targetStep = parseInt(node.dataset.step);
-                if (targetStep < currentStep) {
+                @if($isDev)
                     currentStep = targetStep;
                     renderStep();
-                }
+                @else
+                    if (targetStep < currentStep) {
+                        currentStep = targetStep;
+                        renderStep();
+                    }
+                @endif
             });
         });
 
@@ -1499,6 +1545,73 @@
             refreshAccessCount(roleKey);
             accessError.style.display = 'none';
         });
+
+        // Global navigation helper
+        window.goToStep = function(step) {
+            const target = parseInt(step);
+            if (target >= 1 && target <= totalSteps) {
+                currentStep = target;
+                renderStep();
+            }
+        };
+
+        @if($isDev)
+        window.devResetForm = function() {
+            // Step 1
+            const namaSekolah = form.querySelector('[name="nama_sekolah"]');
+            if (namaSekolah) namaSekolah.value = 'SMA Nusantara Smart School';
+            const npsn = form.querySelector('[name="npsn"]');
+            if (npsn) npsn.value = '20123456';
+            const smaCb = form.querySelector('input[name="education_level_id[]"][value="SMA"]');
+            if (smaCb) smaCb.checked = true;
+            const totalStudent = form.querySelector('[name="total_student"]');
+            if (totalStudent) totalStudent.value = '300 - 600';
+            const address = form.querySelector('[name="address"]');
+            if (address) address.value = 'Jl. Pendidikan No. 45, Kebayoran Baru, Jakarta Selatan';
+            const namaUser = form.querySelector('[name="nama_user"]');
+            if (namaUser) namaUser.value = 'Budi Pratama, S.Pd., M.M.';
+            const pos = form.querySelector('[name="position_id"]');
+            if (pos) pos.value = 'kepala_sekolah';
+
+            // Step 2
+            const defaultMods = ['akademik', 'kesiswaan', 'keuangan', 'absensi', 'cbt'];
+            form.querySelectorAll('input[name="modul[]"]').forEach(cb => {
+                cb.checked = defaultMods.includes(cb.value.toLowerCase());
+            });
+            if (typeof updateModuleBillingSummary === 'function') updateModuleBillingSummary();
+
+            // Step 3
+            const defaultRoles = ['admin_sekolah', 'guru'];
+            form.querySelectorAll('input[name="role[]"]').forEach(cb => {
+                cb.checked = defaultRoles.includes(cb.value.toLowerCase().replace('-', '_'));
+            });
+
+            // Step 5
+            ['notifWhatsapp', 'notifEmail', 'notifSms'].forEach(id => {
+                const wrap = document.getElementById(id);
+                const input = wrap?.querySelector('input[type="checkbox"]');
+                if (input) {
+                    input.checked = true;
+                    wrap.classList.add('active');
+                }
+            });
+
+            // Step 6
+            const email = form.querySelector('[name="email"]');
+            if (email) email.value = 'trial.' + Math.floor(Date.now() / 1000) + '@edupulse.sch.id';
+            const noHp = form.querySelector('[name="no_hp"]');
+            if (noHp) noHp.value = '081234567890';
+            const pw = form.querySelector('[name="password"]');
+            if (pw) pw.value = 'Password123!';
+            const pwc = form.querySelector('[name="password_confirmation"]');
+            if (pwc) pwc.value = 'Password123!';
+            const agree = document.getElementById('agreeTerms');
+            if (agree) agree.checked = true;
+
+            renderStep();
+        };
+        @endif
+
         renderStep();
     </script>
 </body>

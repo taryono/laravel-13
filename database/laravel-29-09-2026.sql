@@ -3425,6 +3425,7 @@ CREATE TABLE `canteen_settlements`  (
   `journal_entry_id` bigint UNSIGNED NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
   `created_by` bigint UNSIGNED NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `settlement_num_unique`(`settlement_number` ASC) USING BTREE,

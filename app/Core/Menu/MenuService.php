@@ -55,8 +55,13 @@ class MenuService
             $query->whereIn('id', $categoryMenuIds);
         }
 
-        // Terapkan filter izin (kecuali Super Admin)
-        if (!$user->isSuperUser() && $this->allowedMenus->isNotEmpty()) {
+        // Terapkan filter izin:
+        // Khusus Trial User: hanya tampilkan menu dari modul terpilih & sesuai role
+        $trialResolver = new TrialMenuResolver();
+        if ($trialResolver->isTrialUser($user)) {
+            $trialMenuIds = $trialResolver->getAllowedMenuIds($user);
+            $query->whereIn('id', $trialMenuIds);
+        } elseif (!$user->isSuperUser() && $this->allowedMenus->isNotEmpty()) {
             $query->whereIn('id', $this->allowedMenus);
         }
 

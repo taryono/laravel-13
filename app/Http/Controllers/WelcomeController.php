@@ -352,6 +352,7 @@ class WelcomeController extends Controller
                 'email' => $data['email'],
                 'password' => Hash::make($data['password']),
                 'current_organization_id' => $orgId,
+                'is_trial_user' => 1,
             ]);
 
             try {
@@ -420,6 +421,7 @@ class WelcomeController extends Controller
             }
 
             $registration->update([
+                'organization_id' => $orgId,
                 'email' => $data['email'],
                 'no_hp' => $data['no_hp'],
                 'school_id' => $school->id,

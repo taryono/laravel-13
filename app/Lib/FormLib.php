@@ -145,7 +145,7 @@ class FormLib
             'label' => str_replace("_", " ", ucfirst(say($label))),
             'content' => Form::select(
                 $formName,
-                collect(['' => say('-- Pilih --')])->merge($relationData[$field] ?? []),
+                collect(['' => say('-- Pilih --')])->merge($relationData[$field] ?? [])->toArray(),
                 $default,
                 $this->cleanAttributes([
                     'class' => "form-control selectpicker required {$darkMode}",
@@ -186,7 +186,7 @@ class FormLib
             'label' => str_replace("_", " ", ucfirst(say($label))),
             'content' => Form::select(
                 $field,
-                collect(['' => say('-- Pilih --')])->merge($selectData),
+                collect(['' => say('-- Pilih --')])->merge($selectData)->toArray(),
                 $default,
                 $this->cleanAttributes([
                     'class' => 'selectpicker form-select form-control text-p-black font-weight-600 p-shadow-3 area',

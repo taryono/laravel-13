@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
 use App\Core\Menu\MenuService;
 use App\Core\Menu\MenuTreeBuilder;
+use Models\Organization;
+
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -50,6 +52,10 @@ class AppServiceProvider extends ServiceProvider
 
         View::composer('*', function ($view) {
             $view->with('assetVersion', config('app.asset_version', time()));
+        });
+
+         View::composer('layouts.*', function ($view) {
+            $view->with('organization', Organization::first());
         });
     }
 

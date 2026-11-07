@@ -17,7 +17,7 @@ class AssessmentTypeDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['school_id', 'name', 'code', 'method', 'weight_default', 'description', 'is_active', 'created_by', 'updated_by'];
+    protected array $columns = ['school.name', 'name', 'code', 'method', 'weight_default', 'description', 'is_active', 'created_by', 'updated_by'];
 
     /**
      * Build DataTable response.
@@ -100,7 +100,7 @@ class AssessmentTypeDataTable extends DataTable
      */
     public function query(AssessmentType $model): QueryBuilder
     {
-        return $model->newQuery();
+        return $model->newQuery()->with('school');
     }
 
     /**

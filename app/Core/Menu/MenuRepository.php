@@ -34,7 +34,11 @@ class MenuRepository
             $user = Auth::user();
             $orgId = session('active_organization_id') ?? $user->active_organization_id;
 
-            if (!$user->isSuperUser()) {
+            $trialResolver = new TrialMenuResolver();
+            if ($trialResolver->isTrialUser($user)) {
+                $trialMenuIds = $trialResolver->getAllowedMenuIds($user);
+                $query->whereIn('id', $trialMenuIds);
+            } elseif (!$user->isSuperUser()) {
                 $roleIds = DB::table('role_user')
                     ->where('user_id', $user->id)
                     ->where('organization_id', $orgId)
@@ -47,7 +51,9 @@ class MenuRepository
                     ->whereNull('deleted_at')
                     ->pluck('menu_id');
 
-                $query->whereIn('id', $allowedMenuIds);
+                if ($allowedMenuIds->isNotEmpty()) {
+                    $query->whereIn('id', $allowedMenuIds);
+                }
             }
         }
 

@@ -21,6 +21,7 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $fillable = [
         'name',
         'email',
+        'is_trial_user',
         'email_verified_at',
         'password',
         'remember_token',
@@ -41,6 +42,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'last_login_at' => 'datetime',
         'deleted_at' => 'datetime',
         'isCheckingRole' => 'boolean',
+        'is_trial_user' => 'boolean',
     ];
 
 
@@ -55,7 +57,18 @@ class User extends Authenticatable implements MustVerifyEmail
             'email_verified_at' => 'datetime',
             'password'          => 'hashed',
             'deleted_at'         => 'datetime',
+            'is_trial_user'     => 'boolean',
         ];
+    }
+
+    public function isTrialUser(): bool
+    {
+        return (bool) ($this->is_trial_user ?? false);
+    }
+
+    public function trialRegistration()
+    {
+        return $this->hasOne(\Models\TrialRegistration::class, 'user_id');
     }
 
     // =====================================================

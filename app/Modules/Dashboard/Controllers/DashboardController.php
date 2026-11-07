@@ -62,8 +62,19 @@ class DashboardController extends MainController
             $menuQuery->forOrganization($organizationId);
         }
 
+        // Filter untuk pengguna trial: hanya card kategori modul yang dipilih & sesuai role
+        $trialResolver = new \App\Core\Menu\TrialMenuResolver();
+        if ($authUser && $trialResolver->isTrialUser($authUser)) {
+            $allowedCatCodes = $trialResolver->getAllowedCategoryCodes($authUser);
+            if (!empty($allowedCatCodes)) {
+                $menuQuery->whereIn('code', $allowedCatCodes);
+            } else {
+                $menuQuery->whereRaw('0 = 1');
+            }
+        }
+
         // Batasi kemunculan card menu secara proporsional (default 8 per halaman)
-        $perPage = (int) $request->input('per_page', 8);
+        $perPage = (int) $request->input('per_page', 10);
         $page    = (int) $request->input('page', 1);
         $paginatedCategories = $menuQuery->paginate($perPage, ['*'], 'page', $page);
 
