@@ -2,7 +2,7 @@
 
 namespace App\DataTables;
 
-use App\Models\Curriculum;
+use Models\Curriculum;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
@@ -17,7 +17,7 @@ class CurriculumDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['code', 'name'];
+    protected array $columns = ['code', 'school.name', 'name', 'type', 'description', 'start_year', 'end_year','is_active'];
 
     /**
      * Build DataTable response.
@@ -100,7 +100,7 @@ class CurriculumDataTable extends DataTable
      */
     public function query(Curriculum $model): QueryBuilder
     {
-        return $model->newQuery();
+        return $model->newQuery()->with('school');
     }
 
     /**

@@ -2,7 +2,7 @@
 
 namespace App\DataTables;
 
-use App\Models\SubjectCategory;
+use Models\SubjectCategory;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
@@ -17,7 +17,14 @@ class SubjectCategoryDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['name'];
+    protected array $columns = [
+        'organization.name',
+        'code',
+        'name',
+        'description',
+        'is_active',
+        'sort_order'
+    ];
 
     /**
      * Build DataTable response.
@@ -100,7 +107,7 @@ class SubjectCategoryDataTable extends DataTable
      */
     public function query(SubjectCategory $model): QueryBuilder
     {
-        return $model->newQuery();
+        return $model->newQuery()->with(['organization','school']);
     }
 
     /**

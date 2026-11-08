@@ -10,6 +10,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Throwable;
 
@@ -101,7 +102,7 @@ class GradeScaleController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => Auth::id(),
                 ]
             );
 
@@ -171,7 +172,7 @@ class GradeScaleController extends MainController
                     'exception' => $e,
                     'GradeScale_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => Auth::id(),
                 ]
             );
 
@@ -206,7 +207,7 @@ class GradeScaleController extends MainController
                 [
                     'exception' => $e,
                     'GradeScale_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => Auth::id(),
                 ]
             );
 

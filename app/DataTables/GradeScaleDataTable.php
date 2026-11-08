@@ -17,7 +17,7 @@ class GradeScaleDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['school_id', 'curriculum_id', 'name', 'code', 'min_score', 'max_score', 'grade_letter', 'grade_point', 'description', 'order', 'is_active', 'created_by', 'updated_by'];
+    protected array $columns = ['school.name', 'curriculum.name', 'name', 'code', 'min_score', 'max_score', 'grade_letter', 'grade_point', 'description', 'order', 'is_active', 'created_by', 'updated_by'];
 
     /**
      * Build DataTable response.
@@ -27,9 +27,27 @@ class GradeScaleDataTable extends DataTable
         return (new EloquentDataTable($query))
             ->addColumn('action', function ($row) {
                 return $this->renderActionButtons($row);
-            })
+            })// Badge untuk is_active
+        ->addColumn('is_active', function ($row) {
+            if ($row->is_active == 1) {
+                return '<span class="badge bg-success">Active</span>';
+            }
+            return '<span class="badge bg-danger">Inactive</span>';
+        })
+
+        // Nama untuk created_by
+        ->addColumn('created_by', function ($row) {
+            return $row->creator?->name ?? '-';
+        })
+
+        // Nama untuk updated_by
+        ->addColumn('updated_by', function ($row) {
+            return $row->updater?->name ?? '-';
+        })
+
+        // ⚠️ PENTING: Masukkan semua kolom yang pakai HTML ke rawColumns
+        ->rawColumns(['action', 'is_active'])
             ->addIndexColumn()
-            ->rawColumns(['action']) // ✅ Tetap wajib ada!
             ->setRowId('id');
     }
 
@@ -100,7 +118,7 @@ class GradeScaleDataTable extends DataTable
      */
     public function query(GradeScale $model): QueryBuilder
     {
-        return $model->newQuery();
+        return $model->newQuery()->with('school', 'curriculum');
     }
 
     /**

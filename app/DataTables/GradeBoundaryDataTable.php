@@ -17,7 +17,7 @@ class GradeBoundaryDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['school_id', 'curriculum_id', 'assessment_id', 'academic_year_id', 'grade_letter', 'min_score', 'max_score', 'description', 'is_active', 'created_by', 'updated_by'];
+    protected array $columns = ['school.name', 'curriculum.name', 'assessment.name', 'academic_year.name', 'grade_letter', 'min_score', 'max_score', 'description', 'is_active', 'created_by', 'updated_by'];
 
     /**
      * Build DataTable response.
@@ -100,7 +100,7 @@ class GradeBoundaryDataTable extends DataTable
      */
     public function query(GradeBoundary $model): QueryBuilder
     {
-        return $model->newQuery();
+        return $model->newQuery()->with('school', 'curriculum', 'assessment', 'academicYear');
     }
 
     /**

@@ -6,7 +6,7 @@ class AssessmentComponent extends BasedModel
     // Relasi
         public function assessment()
     {
-        return $this->belongsTo(\App\Models\Assessment::class, 'assessment_id');
+        return $this->belongsTo(Assessment::class, 'assessment_id');
     }
 
 

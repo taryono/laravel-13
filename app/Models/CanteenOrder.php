@@ -13,13 +13,6 @@ class CanteenOrder extends BasedModel
     {
         return $this->belongsTo(DigitalWallet::class, 'digital_wallet_id');
     }
-
-    public function settlement()
-    {
-        return $this->belongsTo(Settlement::class, 'settlement_id');
-    }
-
-
     // Scope
     public function scopeActive($query)
     {

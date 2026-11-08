@@ -13,23 +13,11 @@ class BankMutation extends BasedModel
     {
         return $this->belongsTo(BankAccount::class, 'bank_account_id');
     }
-
-    public function importBatch()
-    {
-        return $this->belongsTo(ImportBatch::class, 'import_batch_id');
-    }
-
+ 
     public function currency()
     {
         return $this->belongsTo(Currency::class, 'currency_id');
-    }
-
-    public function matchedJournalEntry()
-    {
-        return $this->belongsTo(MatchedJournalEntry::class, 'matched_journal_entry_id');
-    }
-
-
+    } 
     // Scope
     public function scopeActive($query)
     {

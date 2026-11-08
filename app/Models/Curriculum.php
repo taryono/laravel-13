@@ -6,6 +6,25 @@ class Curriculum extends BasedModel
 {
     protected $table = 'curriculums';
     // Relasi
+    protected $fillable = [
+        'school_id',
+        'report_card_id',
+        'name',
+        'code',
+        'type',
+        'description',
+        'start_year',
+        'end_year',
+        'is_active',
+    ];
+    protected $casts = [
+        'is_active' => 'boolean',
+    ];
+    public function school()
+    {
+        return $this->belongsTo(School::class);
+    }
+    
     public function report_card()
     {
         return $this->hasMany(ReportCard::class);

@@ -11,14 +11,8 @@ class AuditTrail extends BasedModel
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(\App\Models\User::class, 'user_id');
     }
-
-    public function record()
-    {
-        return $this->belongsTo(Record::class, 'record_id');
-    }
-
 
     // Scope
     public function scopeActive($query)

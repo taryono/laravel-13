@@ -17,7 +17,7 @@ class StudentHealthRecordDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['student_id', 'school_id', 'record_date', 'complaint', 'diagnosis', 'treatment', 'height_cm', 'weight_kg', 'blood_type', 'blood_pressure', 'allergies', 'vaccination_notes', 'handled_by', 'referred_to', 'is_active', 'created_by', 'updated_by'];
+    protected array $columns = ['student.name', 'school.name', 'record_date', 'complaint', 'diagnosis', 'treatment', 'height_cm', 'weight_kg', 'blood_type', 'blood_pressure', 'allergies', 'vaccination_notes', 'handled_by', 'referred_to', 'is_active', 'created_by', 'updated_by'];
 
     /**
      * Build DataTable response.
@@ -100,7 +100,7 @@ class StudentHealthRecordDataTable extends DataTable
      */
     public function query(StudentHealthRecord $model): QueryBuilder
     {
-        return $model->newQuery();
+        return $model->newQuery()->with('student', 'school');
     }
 
     /**

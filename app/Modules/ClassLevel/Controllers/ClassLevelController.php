@@ -10,6 +10,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Throwable;
 
@@ -52,9 +53,12 @@ class ClassLevelController extends MainController
     public function create(): View
     {
         $class_level = new ClassLevel();
+        $organizations = \Models\Organization::active()->pluck('name', 'id')->toArray();
+        $schools = \Models\School::active()->pluck('name', 'id')->toArray();
+
         return view(
             'ClassLevel::create',
-            compact('class_level')
+            compact('class_level', 'organizations', 'schools')
         );
     }
 
@@ -94,7 +98,7 @@ class ClassLevelController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => Auth::id(),
                 ]
             );
 
@@ -111,9 +115,12 @@ class ClassLevelController extends MainController
     public function edit($id): View
     {
         $class_level = $this->model->findOrFail($id);
+        $organizations = \Models\Organization::active()->pluck('name', 'id')->toArray();
+        $schools = \Models\School::active()->pluck('name', 'id')->toArray();
+
         return view(
             'ClassLevel::edit',
-            compact('class_level')
+            compact('class_level', 'organizations', 'schools')
         );
     }
 
@@ -157,7 +164,7 @@ class ClassLevelController extends MainController
                     'exception' => $e,
                     'ClassLevel_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => Auth::id(),
                 ]
             );
 
@@ -191,7 +198,7 @@ class ClassLevelController extends MainController
                 [
                     'exception' => $e,
                     'ClassLevel_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => Auth::id(),
                 ]
             );
 
