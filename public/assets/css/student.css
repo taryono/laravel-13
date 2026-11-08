@@ -1,0 +1,478 @@
+/* ============================================================
+           Modul Student Management — Bootstrap 5 + Dark Mode
+           Scope: .students
+           Dark mode otomatis via prefers-color-scheme (tanpa JS)
+           ============================================================ */
+
+/* ---------- Light Tokens ---------- */
+:root {
+    --c-primary: #021064;
+    --c-primary-container: #1e2a78;
+    --c-primary-fixed: #dfe0ff;
+    --c-on-primary-fixed-variant: #343f8d;
+    --c-secondary: #006a61;
+    --c-secondary-container: #86f2e4;
+    --c-on-secondary-container: #006f66;
+    --c-on-secondary-fixed-variant: #005049;
+    --c-tertiary: #291c00;
+    --c-tertiary-fixed: #ffdea2;
+    --c-tertiary-fixed-dim: #f7bd38;
+    --c-on-tertiary-fixed: #261900;
+    --c-on-tertiary-fixed-variant: #5c4200;
+    --c-on-tertiary-container: #c69300;
+    --c-error: #ba1a1a;
+    --c-error-container: #ffdad6;
+    --c-on-error-container: #93000a;
+    --c-outline: #767682;
+    --c-outline-variant: #c6c5d3;
+    --c-surface: #f9f9ff;
+    --c-surface-lowest: #ffffff;
+    --c-surface-low: #f0f3ff;
+    --c-surface-container: #e7eeff;
+    --c-surface-high: #dee9ff;
+    --c-on-surface: #111c2c;
+    --c-on-surface-variant: #454651;
+    --c-line-rgb: 198, 197, 211;
+    --c-secondary-rgb: 0, 106, 97;
+    --c-primary-rgb: 2, 16, 100;
+    --c-error-rgb: 186, 26, 26;
+}
+
+/* ---------- Dark Tokens ---------- */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --c-primary: #bcc3ff;
+        --c-primary-container: #4c58a6;
+        --c-primary-fixed: #dfe0ff;
+        --c-on-primary-fixed-variant: #aab3ff;
+        --c-secondary: #6bd8cb;
+        --c-secondary-container: #005049;
+        --c-on-secondary-container: #89f5e7;
+        --c-on-secondary-fixed-variant: #6bd8cb;
+        --c-tertiary: #ffdea2;
+        --c-tertiary-fixed: #443000;
+        --c-tertiary-fixed-dim: #f7bd38;
+        --c-on-tertiary-fixed: #ffdea2;
+        --c-on-tertiary-fixed-variant: #ffdea2;
+        --c-on-tertiary-container: #f7bd38;
+        --c-error: #ffb4ab;
+        --c-error-container: #93000a;
+        --c-on-error-container: #ffdad6;
+        --c-outline: #8f909c;
+        --c-outline-variant: #454651;
+        --c-surface: #0d1522;
+        --c-surface-lowest: #141d2c;
+        --c-surface-low: #1a2536;
+        --c-surface-container: #212d42;
+        --c-surface-high: #2a3750;
+        --c-on-surface: #dfe8fb;
+        --c-on-surface-variant: #b4bccd;
+        --c-line-rgb: 143, 144, 156;
+        --c-secondary-rgb: 107, 216, 203;
+        --c-primary-rgb: 188, 195, 255;
+        --c-error-rgb: 255, 180, 171;
+    }
+}
+
+/* ---------- Base ---------- */
+body.students {
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    color: var(--c-on-surface);
+    background-color: var(--c-surface);
+    min-height: 100dvh;
+    padding-bottom: 6rem;
+    transition: background-color .2s, color .2s;
+    user-select: none;
+}
+
+.students .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    line-height: 1;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.students .material-symbols-outlined[data-weight="fill"] {
+    font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* ---------- Text Colors ---------- */
+.students .tc-primary {
+    color: var(--c-primary) !important;
+}
+
+.students .tc-secondary {
+    color: var(--c-secondary) !important;
+}
+
+.students .tc-tertiary {
+    color: var(--c-tertiary) !important;
+}
+
+.students .tc-variant {
+    color: var(--c-on-surface-variant) !important;
+}
+
+.students .tc-on-surface {
+    color: var(--c-on-surface) !important;
+}
+
+.students .tc-outline {
+    color: var(--c-outline) !important;
+}
+
+.students .tc-error {
+    color: var(--c-error) !important;
+}
+
+.students .tc-on-secondary-fixed-variant {
+    color: var(--c-on-secondary-fixed-variant) !important;
+}
+
+.students .tc-on-tertiary-fixed-variant {
+    color: var(--c-on-tertiary-fixed-variant) !important;
+}
+
+/* ---------- Backgrounds ---------- */
+.students .bg-surface {
+    background-color: var(--c-surface) !important;
+}
+
+.students .bg-lowest {
+    background-color: var(--c-surface-lowest) !important;
+}
+
+.students .bg-low {
+    background-color: var(--c-surface-low) !important;
+}
+
+.students .bg-container {
+    background-color: var(--c-surface-container) !important;
+}
+
+.students .bg-high {
+    background-color: var(--c-surface-high) !important;
+}
+
+.students .bg-primary-c {
+    background-color: var(--c-primary-container) !important;
+}
+
+.students .bg-primary-soft {
+    background-color: rgba(var(--c-primary-rgb), .1) !important;
+}
+
+.students .bg-secondary-c {
+    background-color: var(--c-secondary) !important;
+}
+
+.students .bg-secondary-soft {
+    background-color: rgba(var(--c-secondary-rgb), .1) !important;
+}
+
+.students .bg-secondary-container {
+    background-color: var(--c-secondary-container) !important;
+}
+
+.students .bg-secondary-container-50 {
+    background-color: rgba(var(--c-secondary-rgb), .5) !important;
+}
+
+.students .bg-tertiary-fixed {
+    background-color: var(--c-tertiary-fixed) !important;
+}
+
+.students .bg-error-container {
+    background-color: var(--c-error-container) !important;
+}
+
+.students .bg-error-c {
+    background-color: var(--c-error) !important;
+}
+
+/* ---------- Borders ---------- */
+.students .border-soft {
+    border: 1px solid rgba(var(--c-line-rgb), .3) !important;
+}
+
+.students .border-soft-t {
+    border-top: 1px solid rgba(var(--c-line-rgb), .5) !important;
+}
+
+.students .border-soft-b {
+    border-bottom: 1px solid rgba(var(--c-line-rgb), .2) !important;
+}
+
+.students .border-variant {
+    border: 1px solid var(--c-outline-variant) !important;
+}
+
+/* KPI accent border-left */
+.students .kpi-accent-primary {
+    border-left: 4px solid var(--c-primary-container) !important;
+}
+
+.students .kpi-accent-secondary {
+    border-left: 4px solid var(--c-secondary) !important;
+}
+
+.students .kpi-accent-error {
+    border-left: 4px solid var(--c-error) !important;
+}
+
+.students .kpi-accent-gold {
+    border-left: 4px solid var(--c-tertiary-fixed-dim) !important;
+}
+
+/* ---------- Cards ---------- */
+.students .stu-card {
+    background: var(--c-surface-lowest);
+    border: 1px solid rgba(var(--c-line-rgb), .3);
+    border-radius: 1rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
+    transition: box-shadow .2s, border-color .15s, background-color .2s;
+}
+
+.students .stu-card:hover {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, .1);
+}
+
+/* Hero card */
+.students .hero-card {
+    background: var(--c-surface-lowest);
+    border: 1px solid rgba(var(--c-line-rgb), .3);
+    border-radius: 1rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
+    position: relative;
+    overflow: hidden;
+    padding: 1rem;
+}
+
+/* Timeline item (penanganan & prestasi) */
+.students .timeline-item {
+    background: var(--c-surface-lowest);
+    border: 1px solid rgba(var(--c-line-rgb), .3);
+    border-radius: 1rem;
+    padding: 1rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
+    position: relative;
+    overflow: hidden;
+    transition: box-shadow .2s;
+}
+
+.students .timeline-item:hover {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, .1);
+}
+
+.students .timeline-item::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 6px;
+    background: var(--timeline-accent, var(--c-primary-container));
+}
+
+/* Quick action card */
+.students .quick-card {
+    background: var(--c-surface-lowest);
+    border: 1px solid rgba(var(--c-line-rgb), .3);
+    border-radius: 1rem;
+    padding: .75rem;
+    text-align: left;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
+    transition: all .15s;
+    display: flex;
+    align-items: flex-start;
+    gap: .625rem;
+    width: 100%;
+}
+
+.students .quick-card:hover {
+    border-color: var(--c-secondary);
+}
+
+.students .quick-card:active {
+    transform: scale(.95);
+}
+
+.students .quick-card.accent-error:hover {
+    border-color: var(--c-error);
+}
+
+.students .quick-card.accent-primary:hover {
+    border-color: var(--c-primary-container);
+}
+
+.students .quick-card:hover .ibox {
+    transform: scale(1.05);
+}
+
+/* ---------- Icon Box ---------- */
+.students .ibox {
+    width: 32px;
+    height: 32px;
+    border-radius: .5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: transform .15s, background-color .15s, color .15s;
+}
+
+.students .ibox-md {
+    width: 36px;
+    height: 36px;
+    border-radius: .75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.students .ibox-lg {
+    width: 44px;
+    height: 44px;
+    border-radius: .75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+/* ---------- Avatar ---------- */
+.students .avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 13px;
+    flex-shrink: 0;
+}
+
+/* ---------- Pill / Badge ---------- */
+.students .bpill {
+    display: inline-flex;
+    align-items: center;
+    gap: .25rem;
+    border-radius: 50rem;
+    padding: .125rem .625rem;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 14px;
+}
+
+.students .tagpill {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 50rem;
+    padding: .125rem .5rem;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 14px;
+}
+
+/* ---------- Buttons ---------- */
+.students .btn-link-edu {
+    border: 0;
+    background: transparent;
+    color: var(--c-primary);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 0;
+}
+
+.students .btn-link-edu:hover {
+    text-decoration: underline;
+}
+
+/* ---------- Header sticky ---------- */
+.students .app-header {
+    background: var(--c-surface);
+    border-bottom: 1px solid rgba(var(--c-line-rgb), .2);
+    height: 64px;
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
+}
+
+/* ---------- Bottom Nav ---------- */
+.students .bottom-nav {
+    background: var(--c-surface);
+    border-top: 1px solid rgba(var(--c-line-rgb), .2);
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, .05);
+    z-index: 50;
+}
+
+.students .bottom-nav a {
+    color: var(--c-on-surface-variant);
+    text-decoration: none;
+}
+
+.students .bottom-nav a:hover {
+    background: var(--c-surface-high);
+    border-radius: .75rem;
+}
+
+.students .bottom-nav a.active {
+    background: var(--c-primary-container);
+    color: #fff;
+    border-radius: .75rem;
+}
+
+/* ---------- Utility ---------- */
+.students .pressable {
+    transition: transform .15s, background-color .15s, opacity .15s;
+}
+
+.students .pressable:active {
+    transform: scale(.95);
+}
+
+.students .fs-10 {
+    font-size: 10px !important;
+    line-height: 14px;
+}
+
+.students .fs-11 {
+    font-size: 11px !important;
+    line-height: 14px;
+}
+
+.students .fs-12 {
+    font-size: 12px !important;
+    line-height: 16px;
+}
+
+.students .fs-13 {
+    font-size: 13px !important;
+    line-height: 18px;
+}
+
+.students .fs-14 {
+    font-size: 14px !important;
+    line-height: 20px;
+}
+
+.students .fs-20 {
+    font-size: 20px !important;
+    line-height: 28px;
+}
+
+.students .fs-22 {
+    font-size: 22px !important;
+    line-height: 30px;
+}
+
+.students .leading-snug {
+    line-height: 1.3 !important;
+}
+
+.students .leading-tight {
+    line-height: 1.2 !important;
+}

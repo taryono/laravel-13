@@ -31,7 +31,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'student.auth'    => \App\Http\Middleware\StudentAuth::class,
             'parent.auth'     => \App\Http\Middleware\ParentAuth::class,
             'ppdb-admin.auth' => \App\Http\Middleware\AdminPpdbAuth::class,
-
+            'tenant.role'     => \App\Http\Middleware\EnsureTenantRole::class,
             // Generic role middleware
             'role'            => \App\Http\Middleware\RoleMiddleware::class,
         ]);

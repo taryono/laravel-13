@@ -149,7 +149,12 @@ class DashboardController extends MainController
             ['label' => 'Profil',   'icon' => 'person',                 'url' => '#', 'active' => false],
         ])->map(fn (array $item) => (object) $item);
         $today = $now->translatedFormat('l, d F Y');
-        return view('Dashboard::index', compact('app', 'school', 'user', 'greeting', 'today', 'attendance', 'menus', 'menuPagination', 'agendas', 'navItems'));
+        // return view('Dashboard::index', compact('app', 'school', 'user', 'greeting', 'today', 'attendance', 'menus', 'menuPagination', 'agendas', 'navItems'));
+        if(! session()->has('active_menu_category_id')){
+            return view('Dashboard::index', compact('app', 'school', 'user', 'greeting', 'today', 'attendance', 'menus', 'menuPagination', 'agendas', 'navItems'));
+        }else{
+            return $this->selectCategoryResolver(session('active_menu_category_id'), $request);
+        }
     }
 
     /**
@@ -179,5 +184,88 @@ class DashboardController extends MainController
         }
 
         return redirect()->back();
+    }
+
+    private function selectCategoryResolver($categoryId, $request){
+         $category = \Models\MenuCategory::findOrFail($categoryId);
+        return $this->{$category->code . "View"}($request);
+    }
+
+    private function financeView($request){
+        return view('Dashboard::dashboard.finance.index');
+    }
+
+    private function academicView($request){
+        return view('Dashboard::dashboard.academic.index');
+    }
+
+    private function absenceView($request){
+        return view('Dashboard::dashboard.absence.index');
+    }
+
+    private function accountingView($request){
+        return view('Dashboard::dashboard.accounting.index');
+    }
+
+    private function cbtView($request){
+        return view('Dashboard::dashboard.cbt.index');
+    }
+
+    private function transportView($request){
+        return view('Dashboard::dashboard.transport.index');
+    }
+
+    private function alumniView($request){
+        return view('Dashboard::dashboard.alumni.index');
+    }
+
+    private function settingsView($request){
+        return view('Dashboard::dashboard.settings.index');
+    }  
+
+    private function assessmentView($request){
+        return view('Dashboard::dashboard.assessment.index');
+    }  
+
+    private function budgetingView($request){
+        return view('Dashboard::dashboard.budgeting.index');
+    }  
+
+    private function canteenView($request){
+        return view('Dashboard::dashboard.canteen.index');
+    }  
+
+    private function employeeView($request){
+        return view('Dashboard::dashboard.employee.index');
+    }  
+
+    private function inventoryView($request){
+        return view('Dashboard::dashboard.inventory.index');
+    }  
+
+    private function libraryView($request){
+        return view('Dashboard::dashboard.library.index');
+    }  
+
+    private function menuManagmentView($request){
+        return view('Dashboard::dashboard.menu-managment.index');
+    }
+
+    private function parentView($request){
+        return view('Dashboard::dashboard.parent.index');
+    } 
+
+    private function ppdbView($request){
+        return view('Dashboard::dashboard.ppdb.index');
+    } 
+
+    private function recruitmentView($request){
+        return view('Dashboard::dashboard.recruitment.index');
+    }  
+    private function studentView($request){
+        return view('Dashboard::dashboard.student.index');
+    } 
+    private function proctoringView($request){
+        return view('Dashboard::dashboard.proctoring.index');
     }
 }

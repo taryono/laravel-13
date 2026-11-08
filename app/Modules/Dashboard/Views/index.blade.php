@@ -285,7 +285,8 @@
             font-weight: 600;
         }
 
-        .btn-primary-edu:hover, .btn-primary-edu:focus {
+        .btn-primary-edu:hover,
+        .btn-primary-edu:focus {
             background-color: var(--c-primary-container);
             border-color: var(--c-primary-container);
             color: #ffffff !important;
@@ -300,7 +301,8 @@
             font-weight: 600;
         }
 
-        .btn-outline-edu:hover, .btn-outline-edu:focus {
+        .btn-outline-edu:hover,
+        .btn-outline-edu:focus {
             background-color: var(--c-surface-container);
             border-color: var(--c-outline);
             color: var(--c-on-surface) !important;
@@ -704,10 +706,13 @@
                                 </a>
                             @endif
                         </div>
-                        <p class="t-body-sm text-variant mb-0">Akses modul operasional sekolah (klik card untuk memfilter menu sidebar)</p>
+                        <p class="t-body-sm text-variant mb-0">Akses modul operasional sekolah (klik card untuk memfilter
+                            menu sidebar)</p>
                     </div>
                     <span class="pill-soft px-2.5 py-1 rounded-pill t-label-sm" id="menu-total-pill">
-                        <span id="menu-total-count">{{ isset($menuPagination) ? $menuPagination->total() : $menus->count() }}</span> Modul
+                        <span
+                            id="menu-total-count">{{ isset($menuPagination) ? $menuPagination->total() : $menus->count() }}</span>
+                        Modul
                     </span>
                 </div>
 
@@ -719,13 +724,18 @@
 
                 {{-- Pagination / Navigation Bar di Bagian Bawah --}}
                 @if (isset($menuPagination) && $menuPagination->total() > $menuPagination->perPage())
-                    <div class="menu-pagination-bar d-flex flex-wrap align-items-center justify-content-between gap-2 mt-3 pt-3 border-top">
+                    <div
+                        class="menu-pagination-bar d-flex flex-wrap align-items-center justify-content-between gap-2 mt-3 pt-3 border-top">
                         <div class="t-label-sm text-variant" id="menu-page-info">
-                            Menampilkan <span id="menu-from-count">{{ $menuPagination->firstItem() }}</span>–<span id="menu-to-count">{{ $menuPagination->lastItem() }}</span> dari <span id="menu-total-info">{{ $menuPagination->total() }}</span> modul (Halaman <span id="menu-current-page">{{ $menuPagination->currentPage() }}</span> / <span id="menu-last-page">{{ $menuPagination->lastPage() }}</span>)
+                            Menampilkan <span id="menu-from-count">{{ $menuPagination->firstItem() }}</span>–<span
+                                id="menu-to-count">{{ $menuPagination->lastItem() }}</span> dari <span
+                                id="menu-total-info">{{ $menuPagination->total() }}</span> modul (Halaman <span
+                                id="menu-current-page">{{ $menuPagination->currentPage() }}</span> / <span
+                                id="menu-last-page">{{ $menuPagination->lastPage() }}</span>)
                         </div>
 
                         <div class="d-flex align-items-center gap-2 ms-auto">
-                            <button type="button" 
+                            <button type="button"
                                 class="btn btn-sm btn-outline-edu d-inline-flex align-items-center gap-1 rounded-pill px-3 py-1.5"
                                 id="btn-menu-prev"
                                 style="{{ $menuPagination->currentPage() <= 1 ? 'display: none !important;' : '' }}"
@@ -734,7 +744,7 @@
                                 <span>Sebelumnya</span>
                             </button>
 
-                            <button type="button" 
+                            <button type="button"
                                 class="btn btn-sm btn-primary-edu d-inline-flex align-items-center gap-1 rounded-pill px-3 py-1.5 shadow-sm"
                                 id="btn-menu-next"
                                 style="{{ !$menuPagination->hasMorePages() ? 'display: none !important;' : '' }}"
@@ -822,66 +832,66 @@
                 url.searchParams.set('ajax_menus', '1');
 
                 fetch(url.toString(), {
-                    method: 'GET',
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json'
-                    }
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Gagal memuat menu (' + response.status + ')');
-                    }
-                    return response.json();
-                })
-                .then(res => {
-                    if (res.status === 'success' && res.html) {
-                        if (container) {
-                            container.innerHTML = res.html;
+                        method: 'GET',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json'
                         }
-
-                        const p = res.pagination;
-                        if (p) {
-                            if (fromCount) fromCount.textContent = p.from;
-                            if (toCount) toCount.textContent = p.to;
-                            if (totalInfo) totalInfo.textContent = p.total;
-                            if (currentPageSpan) currentPageSpan.textContent = p.current_page;
-                            if (lastPageSpan) lastPageSpan.textContent = p.last_page;
-                            if (totalCountPill) totalCountPill.textContent = p.total;
-
-                            // Update tombol Selanjutnya (Next)
-                            if (btnNext) {
-                                btnNext.setAttribute('data-page', p.current_page + 1);
-                                if (p.has_more) {
-                                    btnNext.style.removeProperty('display');
-                                } else {
-                                    btnNext.style.setProperty('display', 'none', 'important');
-                                }
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Gagal memuat menu (' + response.status + ')');
+                        }
+                        return response.json();
+                    })
+                    .then(res => {
+                        if (res.status === 'success' && res.html) {
+                            if (container) {
+                                container.innerHTML = res.html;
                             }
 
-                            // Update tombol Sebelumnya (Prev)
-                            if (btnPrev) {
-                                btnPrev.setAttribute('data-page', p.current_page - 1);
-                                if (p.has_prev) {
-                                    btnPrev.style.removeProperty('display');
-                                } else {
-                                    btnPrev.style.setProperty('display', 'none', 'important');
+                            const p = res.pagination;
+                            if (p) {
+                                if (fromCount) fromCount.textContent = p.from;
+                                if (toCount) toCount.textContent = p.to;
+                                if (totalInfo) totalInfo.textContent = p.total;
+                                if (currentPageSpan) currentPageSpan.textContent = p.current_page;
+                                if (lastPageSpan) lastPageSpan.textContent = p.last_page;
+                                if (totalCountPill) totalCountPill.textContent = p.total;
+
+                                // Update tombol Selanjutnya (Next)
+                                if (btnNext) {
+                                    btnNext.setAttribute('data-page', p.current_page + 1);
+                                    if (p.has_more) {
+                                        btnNext.style.removeProperty('display');
+                                    } else {
+                                        btnNext.style.setProperty('display', 'none', 'important');
+                                    }
+                                }
+
+                                // Update tombol Sebelumnya (Prev)
+                                if (btnPrev) {
+                                    btnPrev.setAttribute('data-page', p.current_page - 1);
+                                    if (p.has_prev) {
+                                        btnPrev.style.removeProperty('display');
+                                    } else {
+                                        btnPrev.style.setProperty('display', 'none', 'important');
+                                    }
                                 }
                             }
                         }
-                    }
-                })
-                .catch(err => {
-                    console.error('Error fetching menus:', err);
-                })
-                .finally(() => {
-                    isLoading = false;
-                    if (container) container.classList.remove('is-loading');
-                    if (btnClicked) {
-                        btnClicked.disabled = false;
-                        btnClicked.innerHTML = originalHtml;
-                    }
-                });
+                    })
+                    .catch(err => {
+                        console.error('Error fetching menus:', err);
+                    })
+                    .finally(() => {
+                        isLoading = false;
+                        if (container) container.classList.remove('is-loading');
+                        if (btnClicked) {
+                            btnClicked.disabled = false;
+                            btnClicked.innerHTML = originalHtml;
+                        }
+                    });
             }
 
             if (btnNext) {
@@ -917,35 +927,37 @@
 
                 // Simpan menu_category_id ke session via AJAX
                 fetch('{{ route('dashboard.select-category') }}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        menu_category_id: categoryId
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            menu_category_id: categoryId
+                        })
                     })
-                })
-                .then(res => res.json())
-                .then(data => {
-                    // Jika URL adalah rute modul tujuan (bukan '#' dan bukan select-category), arahkan ke URL tersebut
-                    if (targetUrl && targetUrl !== '#' && !targetUrl.startsWith('javascript:') && !targetUrl.includes('select-category')) {
-                        window.location.href = targetUrl;
-                    } else {
-                        // Reload halaman agar sidebar langsung terupdate sesuai kategori menu yang dipilih
-                        window.location.reload();
-                    }
-                })
-                .catch(err => {
-                    console.error('Error saving menu category:', err);
-                    if (targetUrl && targetUrl !== '#' && !targetUrl.startsWith('javascript:') && !targetUrl.includes('select-category')) {
-                        window.location.href = targetUrl;
-                    } else {
-                        window.location.reload();
-                    }
-                });
+                    .then(res => res.json())
+                    .then(data => {
+                        // Jika URL adalah rute modul tujuan (bukan '#' dan bukan select-category), arahkan ke URL tersebut
+                        if (targetUrl && targetUrl !== '#' && !targetUrl.startsWith('javascript:') && !
+                            targetUrl.includes('select-category')) {
+                            window.location.href = targetUrl;
+                        } else {
+                            // Reload halaman agar sidebar langsung terupdate sesuai kategori menu yang dipilih
+                            window.location.reload();
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Error saving menu category:', err);
+                        if (targetUrl && targetUrl !== '#' && !targetUrl.startsWith('javascript:') && !
+                            targetUrl.includes('select-category')) {
+                            window.location.href = targetUrl;
+                        } else {
+                            window.location.reload();
+                        }
+                    });
             });
         });
     </script>

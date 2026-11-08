@@ -16,7 +16,7 @@
     <meta name="color-scheme" content="light dark">
 
     <title>@yield('title', config('app.name', 'Dashboard'))</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
     {{-- ============================================= --}}
     {{-- 2. STYLESHEETS (Optimized) --}}
     {{-- ============================================= --}}
@@ -79,6 +79,9 @@
         <main class="flex-grow-1 p-4 mx-auto w-100 main-content" id="mainContent" style="max-width:1320px;">
             @yield('content')
         </main>
+
+        {{-- Bottom Navigation --}}
+        @yield('bottom_navigation')
 
         <x-footer />
     </div>

@@ -3387,6 +3387,7 @@ CREATE TABLE `canteen_menus`  (
   `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `canteen_tenant_id` bigint UNSIGNED NOT NULL,
   `name` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `barcode` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `category` enum('food','drink','snack','stationery','other') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'food',
   `price` decimal(15, 2) NOT NULL,
   `cost_price` decimal(15, 2) NOT NULL DEFAULT 0.00,

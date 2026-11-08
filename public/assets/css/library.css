@@ -1,0 +1,445 @@
+/* ============================================================
+           Modul Perpustakaan & E-Library — Bootstrap 5 + Dark Mode
+           Scope: .lib
+           ============================================================ */
+
+/* ---------- Light Tokens ---------- */
+:root {
+    --c-primary: #021064;
+    --c-primary-container: #1e2a78;
+    --c-primary-fixed: #dfe0ff;
+    --c-on-primary-fixed-variant: #343f8d;
+    --c-secondary: #006a61;
+    --c-secondary-container: #86f2e4;
+    --c-on-secondary-container: #006f66;
+    --c-on-secondary-fixed-variant: #005049;
+    --c-tertiary-fixed: #ffdea2;
+    --c-tertiary-fixed-dim: #f7bd38;
+    --c-on-tertiary-fixed-variant: #5c4200;
+    --c-on-tertiary-container: #c69300;
+    --c-error: #ba1a1a;
+    --c-error-container: #ffdad6;
+    --c-on-error-container: #93000a;
+    --c-outline: #767682;
+    --c-outline-variant: #c6c5d3;
+    --c-surface: #f9f9ff;
+    --c-surface-lowest: #ffffff;
+    --c-surface-low: #f0f3ff;
+    --c-surface-container: #e7eeff;
+    --c-surface-high: #dee9ff;
+    --c-on-surface: #111c2c;
+    --c-on-surface-variant: #454651;
+    --c-line-rgb: 198, 197, 211;
+    --c-secondary-rgb: 0, 106, 97;
+}
+
+/* ---------- Dark Tokens ---------- */
+:root[data-bs-theme="dark"] {
+    --c-primary: #bcc3ff;
+    --c-primary-container: #4c58a6;
+    --c-primary-fixed: #dfe0ff;
+    --c-on-primary-fixed-variant: #aab3ff;
+    --c-secondary: #6bd8cb;
+    --c-secondary-container: #005049;
+    --c-on-secondary-container: #89f5e7;
+    --c-on-secondary-fixed-variant: #6bd8cb;
+    --c-tertiary-fixed: #443000;
+    --c-tertiary-fixed-dim: #f7bd38;
+    --c-on-tertiary-fixed-variant: #ffdea2;
+    --c-on-tertiary-container: #f7bd38;
+    --c-error: #ffb4ab;
+    --c-error-container: #93000a;
+    --c-on-error-container: #ffdad6;
+    --c-outline: #8f909c;
+    --c-outline-variant: #454651;
+    --c-surface: #0d1522;
+    --c-surface-lowest: #141d2c;
+    --c-surface-low: #1a2536;
+    --c-surface-container: #212d42;
+    --c-surface-high: #2a3750;
+    --c-on-surface: #dfe8fb;
+    --c-on-surface-variant: #b4bccd;
+    --c-line-rgb: 143, 144, 156;
+    --c-secondary-rgb: 107, 216, 203;
+}
+
+/* ---------- Base ---------- */
+body.lib {
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    color: var(--c-on-surface);
+    background-color: var(--c-surface);
+    min-height: 100dvh;
+    padding-bottom: 6rem;
+    transition: background-color .2s, color .2s;
+}
+
+.lib .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    line-height: 1;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.lib .material-symbols-outlined[data-weight="fill"] {
+    font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* ---------- Text Colors ---------- */
+.lib .tc-primary {
+    color: var(--c-primary) !important;
+}
+
+.lib .tc-secondary {
+    color: var(--c-secondary) !important;
+}
+
+.lib .tc-variant {
+    color: var(--c-on-surface-variant) !important;
+}
+
+.lib .tc-on-surface {
+    color: var(--c-on-surface) !important;
+}
+
+.lib .tc-outline {
+    color: var(--c-outline) !important;
+}
+
+.lib .tc-error {
+    color: var(--c-error) !important;
+}
+
+.lib .tc-gold {
+    color: var(--c-on-tertiary-container) !important;
+}
+
+.lib .tc-on-secondary-fixed-variant {
+    color: var(--c-on-secondary-fixed-variant) !important;
+}
+
+.lib .tc-on-tertiary-fixed-variant {
+    color: var(--c-on-tertiary-fixed-variant) !important;
+}
+
+/* ---------- Backgrounds ---------- */
+.lib .bg-surface {
+    background-color: var(--c-surface) !important;
+}
+
+.lib .bg-lowest {
+    background-color: var(--c-surface-lowest) !important;
+}
+
+.lib .bg-low {
+    background-color: var(--c-surface-low) !important;
+}
+
+.lib .bg-container {
+    background-color: var(--c-surface-container) !important;
+}
+
+.lib .bg-high {
+    background-color: var(--c-surface-high) !important;
+}
+
+.lib .bg-primary-c {
+    background-color: var(--c-primary-container) !important;
+}
+
+.lib .bg-secondary-c {
+    background-color: var(--c-secondary) !important;
+}
+
+.lib .bg-secondary-container {
+    background-color: var(--c-secondary-container) !important;
+}
+
+.lib .bg-secondary-container-40 {
+    background-color: rgba(var(--c-secondary-rgb), .4) !important;
+}
+
+.lib .bg-secondary-container-50 {
+    background-color: rgba(var(--c-secondary-rgb), .5) !important;
+}
+
+.lib .bg-tertiary-fixed {
+    background-color: var(--c-tertiary-fixed) !important;
+}
+
+.lib .bg-error-container {
+    background-color: var(--c-error-container) !important;
+}
+
+.lib .bg-error-c {
+    background-color: var(--c-error) !important;
+}
+
+/* ---------- Borders ---------- */
+.lib .border-soft {
+    border: 1px solid rgba(var(--c-line-rgb), .3) !important;
+}
+
+.lib .border-soft-t {
+    border-top: 1px solid rgba(var(--c-line-rgb), .5) !important;
+}
+
+.lib .border-soft-b {
+    border-bottom: 1px solid rgba(var(--c-line-rgb), .2) !important;
+}
+
+.lib .border-variant {
+    border: 1px solid var(--c-outline-variant) !important;
+}
+
+/* KPI accent border-left */
+.lib .kpi-accent-primary {
+    border-left: 4px solid var(--c-primary) !important;
+}
+
+.lib .kpi-accent-secondary {
+    border-left: 4px solid var(--c-secondary) !important;
+}
+
+.lib .kpi-accent-error {
+    border-left: 4px solid var(--c-error) !important;
+}
+
+.lib .kpi-accent-gold {
+    border-left: 4px solid var(--c-tertiary-fixed-dim) !important;
+}
+
+/* ---------- Cards ---------- */
+.lib .lib-card {
+    background: var(--c-surface-lowest);
+    border: 1px solid rgba(var(--c-line-rgb), .3);
+    border-radius: 1rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
+    transition: box-shadow .2s, border-color .15s, background-color .2s;
+    height: 100%;
+}
+
+.lib .lib-card:hover {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, .1);
+}
+
+.lib .circ-item {
+    background: var(--c-surface-lowest);
+    border: 1px solid rgba(var(--c-line-rgb), .3);
+    border-radius: 1rem;
+    padding: 1rem;
+    transition: border-color .15s, background-color .2s;
+}
+
+.lib .circ-item:hover {
+    border-color: var(--c-secondary);
+}
+
+.lib .book-row {
+    background: var(--c-surface-lowest);
+    border: 1px solid rgba(var(--c-line-rgb), .3);
+    border-radius: 1rem;
+    padding: .875rem;
+    transition: box-shadow .2s, background-color .2s;
+}
+
+.lib .book-row:hover {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, .1);
+}
+
+/* ---------- Icon Box ---------- */
+.lib .ibox {
+    width: 32px;
+    height: 32px;
+    border-radius: .5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.lib .ibox-sm {
+    width: 36px;
+    height: 36px;
+    border-radius: .75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.lib .ibox-lg {
+    width: 44px;
+    height: 44px;
+    border-radius: .75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+/* ---------- Pill / Badge ---------- */
+.lib .bpill {
+    display: inline-flex;
+    align-items: center;
+    gap: .25rem;
+    border-radius: 50rem;
+    padding: .125rem .625rem;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 14px;
+}
+
+/* ---------- Buttons ---------- */
+.lib .btn-edu {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
+    padding: .5rem .75rem;
+    border-radius: .75rem;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 16px;
+    transition: all .15s;
+}
+
+.lib .btn-edu:active {
+    transform: scale(.95);
+}
+
+.lib .btn-edu-primary {
+    border: 0;
+    background: var(--c-primary-container);
+    color: #fff;
+}
+
+.lib .btn-edu-primary:hover {
+    opacity: .95;
+    color: #fff;
+}
+
+.lib .btn-edu-outline {
+    border: 1px solid var(--c-outline-variant);
+    background: transparent;
+    color: var(--c-primary);
+}
+
+.lib .btn-edu-outline:hover {
+    background: var(--c-surface-low);
+    color: var(--c-primary);
+}
+
+.lib .btn-chip {
+    padding: .25rem .625rem;
+    border-radius: .5rem;
+    font-size: 11px;
+    font-weight: 700;
+    border: 0;
+    transition: all .15s;
+}
+
+.lib .btn-chip:active {
+    transform: scale(.95);
+}
+
+/* ---------- Progress ---------- */
+.lib .progress-edu {
+    height: 6px;
+    border-radius: 50rem;
+    background: rgba(var(--c-line-rgb), .3);
+    overflow: hidden;
+    display: flex;
+}
+
+.lib .progress-edu>div {
+    height: 100%;
+    border-radius: 50rem;
+    transition: width .5s;
+}
+
+/* ---------- Utility ---------- */
+.lib .pressable {
+    transition: transform .15s, background-color .15s, opacity .15s;
+}
+
+.lib .pressable:active {
+    transform: scale(.95);
+}
+
+.lib .truncate-1 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+}
+
+.lib .fs-11 {
+    font-size: 11px !important;
+    line-height: 14px;
+}
+
+.lib .fs-12 {
+    font-size: 12px !important;
+    line-height: 16px;
+}
+
+.lib .fs-13 {
+    font-size: 13px !important;
+    line-height: 18px;
+}
+
+.lib .fs-20 {
+    font-size: 20px !important;
+    line-height: 28px;
+}
+
+.lib .fs-22 {
+    font-size: 22px !important;
+    line-height: 30px;
+}
+
+/* ---------- Header sticky ---------- */
+.lib .app-header {
+    background: var(--c-surface);
+    border-bottom: 1px solid rgba(var(--c-line-rgb), .2);
+    height: 64px;
+    position: sticky;
+    top: 0;
+    z-index: 40;
+}
+
+/* ---------- Bottom Nav ---------- */
+.lib .bottom-nav {
+    background: var(--c-surface);
+    border-top: 1px solid rgba(var(--c-line-rgb), .2);
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, .05);
+    z-index: 50;
+}
+
+.lib .bottom-nav a {
+    color: var(--c-on-surface-variant);
+    text-decoration: none;
+}
+
+.lib .bottom-nav a.active {
+    background: var(--c-primary-container);
+    color: #fff;
+    border-radius: .75rem;
+}
+
+/* ---------- Theme toggle ---------- */
+.lib .theme-toggle {
+    width: 36px;
+    height: 36px;
+    border-radius: .75rem;
+    background: var(--c-surface-low);
+    border: 1px solid rgba(var(--c-line-rgb), .3);
+    color: var(--c-primary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all .15s;
+}
+
+.lib .theme-toggle:hover {
+    background: var(--c-surface-container);
+}
