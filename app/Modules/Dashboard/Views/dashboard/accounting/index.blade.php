@@ -4,7 +4,20 @@
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <meta name="color-scheme" content="light dark" />
     <title>Modul Akuntansi Sekolah - EduPortal SMA</title>
+
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-bs-theme', theme);
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark-mode');
+            }
+        })();
+    </script>
 
     <!-- Bootstrap 5.3 CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
@@ -59,6 +72,48 @@
             --inverse-surface: #263142;
             --inverse-primary: #bcc3ff;
             --surface-tint: #4c58a6;
+        }
+
+        :root[data-bs-theme="dark"],
+        body.dark-mode {
+            --primary: #bcc3ff;
+            --primary-container: #4c58a6;
+            --on-primary: #021064;
+            --on-primary-container: #dfe0ff;
+            --primary-fixed: #dfe0ff;
+            --primary-fixed-dim: #bcc3ff;
+            --secondary: #6bd8cb;
+            --secondary-container: #005049;
+            --secondary-fixed: #89f5e7;
+            --secondary-fixed-dim: #6bd8cb;
+            --on-secondary: #003732;
+            --on-secondary-container: #89f5e7;
+            --on-secondary-fixed: #00201d;
+            --on-secondary-fixed-variant: #6bd8cb;
+            --tertiary: #ffdea2;
+            --tertiary-container: #443000;
+            --tertiary-fixed: #ffdea2;
+            --tertiary-fixed-dim: #f7bd38;
+            --error: #ffb4ab;
+            --error-container: #93000a;
+            --on-error: #690005;
+            --on-error-container: #ffdad6;
+            --surface: #0f172a;
+            --surface-container-lowest: #141d2c;
+            --surface-container-low: #1e293b;
+            --surface-container: #243247;
+            --surface-container-high: #2d3d56;
+            --surface-container-highest: #374966;
+            --surface-variant: #334155;
+            --on-surface: #f1f5f9;
+            --on-background: #f1f5f9;
+            --on-surface-variant: #cbd5e1;
+            --outline: #8f909c;
+            --outline-variant: #475569;
+            --background: #0b1120;
+            --inverse-surface: #f1f5f9;
+            --inverse-primary: #1e2a78;
+            --surface-tint: #bcc3ff;
         }
 
         body {
@@ -666,6 +721,66 @@
         .link-secondary:hover {
             color: var(--on-secondary-container);
         }
+
+        [data-bs-theme="dark"] .card-soft,
+        body.dark-mode .card-soft {
+            border-color: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.4);
+        }
+
+        [data-bs-theme="dark"] .app-bar,
+        body.dark-mode .app-bar {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        [data-bs-theme="dark"] .bottom-nav,
+        body.dark-mode .bottom-nav {
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.4);
+        }
+
+        [data-bs-theme="dark"] .web-nav a,
+        body.dark-mode .web-nav a {
+            color: var(--on-surface-variant);
+        }
+
+        [data-bs-theme="dark"] .web-nav a:hover,
+        body.dark-mode .web-nav a:hover {
+            color: var(--primary);
+        }
+
+        [data-bs-theme="dark"] .badge-trend-success,
+        body.dark-mode .badge-trend-success {
+            background: rgba(4, 120, 87, 0.22);
+            color: #6ee7b7;
+        }
+
+        [data-bs-theme="dark"] .kpi-icon-error,
+        body.dark-mode .kpi-icon-error {
+            background: rgba(185, 28, 28, 0.22);
+            color: #fca5a5;
+        }
+
+        [data-bs-theme="dark"] .table,
+        body.dark-mode .table {
+            --bs-table-color: var(--on-surface);
+            --bs-table-bg: transparent;
+            --bs-table-border-color: rgba(255, 255, 255, 0.08);
+            color: var(--on-surface);
+        }
+
+        [data-bs-theme="dark"] .border-surface-variant,
+        body.dark-mode .border-surface-variant {
+            border-color: rgba(255, 255, 255, 0.1) !important;
+        }
+
+        [data-bs-theme="dark"] .divide-surface> :not(caption)>*>*,
+        [data-bs-theme="dark"] .divide-surface> :not(:last-child),
+        body.dark-mode .divide-surface> :not(caption)>*>*,
+        body.dark-mode .divide-surface> :not(:last-child) {
+            border-color: rgba(255, 255, 255, 0.08);
+        }
     </style>
 </head>
 
@@ -693,6 +808,9 @@
         </nav>
 
         <div class="d-flex align-items-center gap-2">
+            <button type="button" class="notif-btn" id="themeToggleBtn" aria-label="Ganti Tema" title="Ganti Tema">
+                <span class="material-symbols-outlined" id="themeToggleIcon">dark_mode</span>
+            </button>
             <button type="button" class="notif-btn" aria-label="Notifikasi">
                 <span class="material-symbols-outlined">notifications</span>
             </button>
@@ -1166,6 +1284,34 @@
 
     <!-- Bootstrap 5 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        (function() {
+            const toggleBtn = document.getElementById('themeToggleBtn');
+            const toggleIcon = document.getElementById('themeToggleIcon');
+            function syncIcon(theme) {
+                if (!toggleIcon) return;
+                toggleIcon.textContent = theme === 'dark' ? 'light_mode' : 'dark_mode';
+            }
+            const currentTheme = document.documentElement.getAttribute('data-bs-theme') || 'light';
+            syncIcon(currentTheme);
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', function() {
+                    const isDark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
+                    const nextTheme = isDark ? 'light' : 'dark';
+                    document.documentElement.setAttribute('data-bs-theme', nextTheme);
+                    if (nextTheme === 'dark') {
+                        document.documentElement.classList.add('dark-mode');
+                        document.body && document.body.classList.add('dark-mode');
+                    } else {
+                        document.documentElement.classList.remove('dark-mode');
+                        document.body && document.body.classList.remove('dark-mode');
+                    }
+                    localStorage.setItem('theme', nextTheme);
+                    syncIcon(nextTheme);
+                });
+            }
+        })();
+    </script>
 </body>
 
 </html>

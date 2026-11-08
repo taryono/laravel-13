@@ -1,11 +1,11 @@
 @extends('layouts.app')
-@section('title', 'Budgeting & RAPBS')
+@section('title', 'Perpustakaan & E-Library')
 @push('styles')
     <link rel="stylesheet" href="{{ asset('assets/css/dashboard.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/library.css') }}">
 @endpush
 @section('content')
-
+<div class="lib">
     <!-- ===================== TOP APP BAR ===================== -->
     <header class="app-header d-flex justify-content-between align-items-center px-3">
         <div class="d-flex align-items-center gap-3">
@@ -504,4 +504,5 @@
             <span class="text-label-sm mt-1">Profil</span>
         </a>
     </nav>
+</div>
 @endsection

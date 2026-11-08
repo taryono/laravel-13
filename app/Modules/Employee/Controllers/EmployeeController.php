@@ -7,12 +7,18 @@ use App\Http\Controllers\MainController;
 use Models\Employee;
 use Models\Department;
 use Models\Position;
+use Models\EmploymentStatus;
+use Models\SalaryStructure;
+use Models\BankAccount;
+use App\Http\Requests\StoreEmployeeRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use App\Support\EmployeeNumberGenerator;
 use Throwable;
 class EmployeeController extends MainController
 {
@@ -37,51 +43,57 @@ class EmployeeController extends MainController
      * Show form to create new employee.
      */
     public function create(): View
-    {
-        $employee = new Employee();
-        
-        // Get dropdown data
-        $departments = Department::where('is_active', 1)
-            ->orderBy('name')
-            ->pluck('name', 'id');
-        
-        $positions = Position::where('is_active', 1)
-            ->orderBy('name')
-            ->pluck('name', 'id');
-        
-        $supervisors = Employee::where('is_active', 1)
-            ->orderBy('name')
-            ->pluck('name', 'id');
-
-        // Get form builder from MainController
-        $result = $this->getForm($employee);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
-
-        return view('Employee::edit', compact(
-            'employee', 
-            'forms', 
-            'groupedForms',
-            'departments',
-            'positions',
-            'supervisors'
-        ));
+    { 
+        return view('Employee::create', [
+            'employee'            => new Employee(),
+            'departments'         => Department::pluck('name', 'id')->toArray(),
+            'positions'           => Position::pluck('name', 'id')->toArray(),
+            'supervisors'         => Employee::where('is_active', 1)->pluck('name', 'id')->toArray(),
+            'employmentStatuses'  => EmploymentStatus::where('is_active', 1)->pluck('name', 'id')->toArray(),
+            'salaryStructures'    => SalaryStructure::pluck('name', 'id')->toArray(),
+            'bankAccounts'        => BankAccount::where('is_active', 1)->pluck('bank_name', 'id')->toArray(),
+        ]);
     }
 
     /**
      * Store a newly created employee.
      */
-    public function store(Request $request)
+    public function store(StoreEmployeeRequest $request)
     {
         $validated = $this->validateEmployee($request);
 
         try {
-            $employee = DB::transaction(function () use ($validated) {
-                // Set default values
-                $validated['is_active'] = $validated['is_active'] ?? true;
-                $validated['employment_status'] = $validated['employment_status'] ?? 'probation';
-                
-                return Employee::create($validated);
+            $employee = DB::transaction(function () use ($validated, $request) {
+                // Handle photo
+                if ($request->hasFile('photo')) {
+                    $validated['photo_path'] = $request->file('photo')->store('employees/photos', 'public');
+                }
+
+                // organization_id dari auth (jangan percaya input)
+                $validated['organization_id'] = Auth::user()->organization_id;
+                $validated['created_by']      = Auth::id();
+
+                // Auto-generate employee_number (via observer lebih baik)
+                $validated['employee_number'] = $validated['employee_number']
+                    ?? EmployeeNumberGenerator::generate($validated['organization_id']);
+
+                $employee = Employee::create($validated);
+
+                // Simpan bank accounts
+                foreach ($request->input('bank_accounts', []) as $bank) {
+                    if (empty($bank['bank_name']) && empty($bank['account_number'])) {
+                        continue; // skip baris kosong
+                    }
+                    $employee->bankAccounts()->create([
+                        'organization_id' => $employee->organization_id,
+                        'bank_name'       => $bank['bank_name'] ?? null,
+                        'account_number'  => $bank['account_number'] ?? null,
+                        'account_name'    => $bank['account_name'] ?? null,
+                        'is_primary'      => !empty($bank['is_primary']),
+                    ]);
+                }
+
+                return $employee;
             });
 
             return $this->successResponse(
@@ -94,7 +106,7 @@ class EmployeeController extends MainController
             Log::error('Gagal menambahkan karyawan.', [
                 'exception' => $e,
                 'data' => $validated,
-                'user_id' => auth()->id(),
+                'user_id' => Auth::id(),
             ]);
 
             return $this->errorResponse(
@@ -111,33 +123,18 @@ class EmployeeController extends MainController
     {
         $employee = $this->model->findOrFail($id);
         
-        // Get dropdown data
-        $departments = Department::where('is_active', 1)
-            ->orderBy('name')
-            ->pluck('name', 'id');
-        
-        $positions = Position::where('is_active', 1)
-            ->orderBy('name')
-            ->pluck('name', 'id');
-        
-        $supervisors = Employee::where('is_active', 1)
-            ->where('id', '!=', $id)
-            ->orderBy('name')
-            ->pluck('name', 'id');
+         $employee->load('bankAccounts');
 
-        // Get form builder from MainController
-        $result = $this->getForm($employee);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
-
-        return view('Employee::edit', compact(
-            'employee', 
-            'forms', 
-            'groupedForms',
-            'departments',
-            'positions',
-            'supervisors'
-        ));
+        return view('Employee::edit', [
+            'employee'            => $employee,
+            'departments'         => Department::pluck('name', 'id'),
+            'positions'           => Position::pluck('name', 'id'),
+            'supervisors'         => Employee::where('id', '!=', $employee->id)
+                                            ->where('is_active', 1)
+                                            ->pluck('name', 'id'),
+            'employmentStatuses'  => EmploymentStatus::where('is_active', 1)->pluck('name', 'id'),
+            'salaryStructures'    => SalaryStructure::pluck('name', 'id'),
+        ]);
     }
 
     /**
@@ -164,7 +161,7 @@ class EmployeeController extends MainController
                 'exception' => $e,
                 'nik' => $id,
                 'data' => $validated,
-                'user_id' => auth()->id(),
+                'user_id' => Auth::id(),
             ]);
 
             return $this->errorResponse(
@@ -234,7 +231,7 @@ class EmployeeController extends MainController
             Log::error('Gagal menghapus karyawan.', [
                 'exception' => $e,
                 'nik' => $id,
-                'user_id' => auth()->id(),
+                'user_id' => Auth::id(),
             ]);
 
             return $this->errorResponse(

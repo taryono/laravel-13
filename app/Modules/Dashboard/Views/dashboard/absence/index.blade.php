@@ -1,8 +1,9 @@
 @extends('layouts.app')
-@section('title', 'Dashboard')
-@section('styles')
+@section('title', 'Presensi & Absensi')
+@push('styles')
     <link rel="stylesheet" href="{{ asset('assets/css/dashboard.css') }}">
-@endsection
+    <link rel="stylesheet" href="{{ asset('assets/css/absence.css') }}">
+@endpush
 @section('content')
     <!-- KPI Bento -->
     <section>

@@ -6270,18 +6270,30 @@ CREATE TABLE `employee_shifts`  (
 -- ----------------------------
 -- Table structure for employees
 -- ----------------------------
+ 
 DROP TABLE IF EXISTS `employees`;
-CREATE TABLE `employees`  (
+CREATE TABLE `employees` (
   `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `organization_id` bigint UNSIGNED NOT NULL,
-  `nik` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+
+  -- Identitas kepegawaian
   `employee_number` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nik` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `npwp` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `bpjs_ketenagakerjaan` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `bpjs_kesehatan` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+
+  -- Relasi organisasi
   `user_id` bigint UNSIGNED NULL DEFAULT NULL,
   `department_id` bigint UNSIGNED NULL DEFAULT NULL,
   `position_id` bigint UNSIGNED NULL DEFAULT NULL,
   `supervisor_id` bigint UNSIGNED NULL DEFAULT NULL,
   `salary_structure_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `employment_status_id` bigint UNSIGNED NOT NULL,
+
+  -- Data pribadi
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `full_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
   `nick_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
   `gender` enum('L','P') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
   `birth_place` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
@@ -6289,43 +6301,97 @@ CREATE TABLE `employees`  (
   `address` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
   `phone` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
   `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `photo_path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+
+  -- Masa kerja
   `join_date` date NOT NULL,
   `resign_date` date NULL DEFAULT NULL,
-  `employment_status` enum('tetap','kontrak','probation','freelance') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'probation',
-  `bank_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `bank_account_number` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `bank_account_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `npwp` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `bpjs_ketenagakerjaan` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `bpjs_kesehatan` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+
+  -- Status
   `is_active` tinyint(1) NOT NULL DEFAULT 1,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
   `created_by` bigint UNSIGNED NULL DEFAULT NULL,
   `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `employees_org_number_unique`(`organization_id` ASC, `employee_number` ASC) USING BTREE,
-  UNIQUE INDEX `employees_org_nik_unique`(`organization_id` ASC, `nik` ASC) USING BTREE,
-  UNIQUE INDEX `employees_email_unique`(`email` ASC) USING BTREE,
-  INDEX `employees_user_id_index`(`user_id` ASC) USING BTREE,
-  INDEX `employees_department_id_index`(`department_id` ASC) USING BTREE,
-  INDEX `employees_position_id_index`(`position_id` ASC) USING BTREE,
-  INDEX `employees_supervisor_id_index`(`supervisor_id` ASC) USING BTREE,
-  INDEX `employees_salary_structure_id_index`(`salary_structure_id` ASC) USING BTREE,
-  INDEX `employees_join_date_index`(`join_date` ASC) USING BTREE,
-  INDEX `employees_is_active_index`(`is_active` ASC) USING BTREE,
-  INDEX `employees_deleted_at_index`(`deleted_at` ASC) USING BTREE,
-  CONSTRAINT `employees_department_fk` FOREIGN KEY (`department_id`) REFERENCES `departments` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+
+  -- Unique per organisasi (multi-tenant)
+  UNIQUE INDEX `employees_org_number_unique`(`organization_id`, `employee_number`) USING BTREE,
+  UNIQUE INDEX `employees_org_nik_unique`(`organization_id`, `nik`) USING BTREE,
+  UNIQUE INDEX `employees_org_email_unique`(`organization_id`, `email`) USING BTREE,
+  UNIQUE INDEX `employees_org_user_unique`(`organization_id`, `user_id`) USING BTREE,
+
+  -- Index untuk query umum
+  INDEX `employees_org_active_index`(`organization_id`, `is_active`, `deleted_at`) USING BTREE,
+  INDEX `employees_org_join_date_index`(`organization_id`, `join_date`) USING BTREE,
+  INDEX `employees_department_id_index`(`department_id`) USING BTREE,
+  INDEX `employees_position_id_index`(`position_id`) USING BTREE,
+  INDEX `employees_supervisor_id_index`(`supervisor_id`) USING BTREE,
+  INDEX `employees_salary_structure_id_index`(`salary_structure_id`) USING BTREE,
+  INDEX `employees_employment_status_id_index`(`employment_status_id`) USING BTREE,
+  INDEX `employees_name_index`(`name`) USING BTREE,
+  INDEX `employees_phone_index`(`phone`) USING BTREE,
+  INDEX `employees_deleted_at_index`(`deleted_at`) USING BTREE,
+
+  -- Foreign keys
   CONSTRAINT `employees_org_fk` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `employees_department_fk` FOREIGN KEY (`department_id`) REFERENCES `departments` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
   CONSTRAINT `employees_position_fk` FOREIGN KEY (`position_id`) REFERENCES `positions` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
   CONSTRAINT `employees_salary_structure_fk` FOREIGN KEY (`salary_structure_id`) REFERENCES `salary_structures` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
-  CONSTRAINT `employees_supervisor_fk` FOREIGN KEY (`supervisor_id`) REFERENCES `employees` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+  CONSTRAINT `employees_supervisor_fk` FOREIGN KEY (`supervisor_id`) REFERENCES `employees` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `employees_employment_status_fk` FOREIGN KEY (`employment_status_id`) REFERENCES `employment_statuses` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+
+  -- Validasi data
+  CONSTRAINT `chk_employees_resign_after_join` CHECK (`resign_date` IS NULL OR `resign_date` >= `join_date`),
+  CONSTRAINT `chk_employees_birth_before_join` CHECK (`birth_date` IS NULL OR `birth_date` < `join_date`)
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
 
 -- ----------------------------
 -- Records of employees
 -- ----------------------------
+DROP TABLE IF EXISTS `employee_bank_accounts`;
+CREATE TABLE `employee_bank_accounts` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `employee_id` bigint UNSIGNED NOT NULL,
+  `organization_id` bigint UNSIGNED NOT NULL,
+  `bank_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `account_number` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL, -- disimpan terenkripsi di app
+  `account_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `is_primary` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `employee_bank_primary_unique`(`employee_id`, `is_primary`, `deleted_at`),
+  INDEX `employee_bank_org_index`(`organization_id`),
+  CONSTRAINT `employee_bank_employee_fk` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `employee_bank_org_fk` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
+
+DROP TABLE IF EXISTS `employee_salary_histories`;
+CREATE TABLE `employee_salary_histories` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `employee_id` bigint UNSIGNED NOT NULL,
+  `organization_id` bigint UNSIGNED NOT NULL,
+  `salary_structure_id` bigint UNSIGNED NOT NULL,
+  `effective_date` date NOT NULL,
+  `end_date` date NULL DEFAULT NULL,
+  `notes` text NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `esh_employee_date_index`(`employee_id`, `effective_date`),
+  INDEX `esh_org_index`(`organization_id`),
+  CONSTRAINT `esh_employee_fk` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `esh_org_fk` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `esh_salary_fk` FOREIGN KEY (`salary_structure_id`) REFERENCES `salary_structures` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `chk_esh_date` CHECK (`end_date` IS NULL OR `end_date` >= `effective_date`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
 -- ----------------------------
 -- Table structure for enrollment_conversions
@@ -17591,7 +17657,9 @@ CREATE TABLE `workflow_approvers`  (
   `role_id` bigint UNSIGNED NULL DEFAULT NULL,
   `user_id` bigint UNSIGNED NULL DEFAULT NULL,
   `is_mandatory` tinyint(1) NOT NULL DEFAULT 1,
-  `created_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NOT NULL,
+  `updated_at` timestamp NULL DEFAULT NOT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `wf_appr_step_index`(`workflow_step_id` ASC) USING BTREE,
   INDEX `wf_appr_role_index`(`role_id` ASC) USING BTREE,
@@ -17650,8 +17718,9 @@ CREATE TABLE `workflow_steps`  (
   `max_amount` decimal(15, 2) NULL DEFAULT NULL,
   `action_type` enum('approve_reject','review','acknowledge') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'approve_reject',
   `auto_notify` tinyint(1) NOT NULL DEFAULT 1,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NOT NULL,
+  `updated_at` timestamp NULL DEFAULT NOT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `wf_step_order_unique`(`workflow_definition_id` ASC, `step_order` ASC) USING BTREE,
   CONSTRAINT `wf_step_def_fk` FOREIGN KEY (`workflow_definition_id`) REFERENCES `workflow_definitions` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -17674,8 +17743,9 @@ CREATE TABLE `yudisiums`  (
   `national_diploma_number` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
   `graduation_date` date NOT NULL,
   `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NOT NULL,
+  `updated_at` timestamp NULL DEFAULT NOT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `yudisium_student_unique`(`student_id` ASC) USING BTREE,
   INDEX `yudisium_year_index`(`academic_year_id` ASC) USING BTREE,
@@ -17686,5 +17756,44 @@ CREATE TABLE `yudisiums`  (
 -- ----------------------------
 -- Records of yudisiums
 -- ----------------------------
+CREATE TABLE IF NOT EXISTS `employee_number_sequences` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `organization_id` BIGINT UNSIGNED NOT NULL,
+  `last_number` BIGINT UNSIGNED NOT NULL DEFAULT 0,
+  `created_at` TIMESTAMP NULL DEFAULT NULL,
+  `updated_at` TIMESTAMP NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `employee_number_sequences_organization_id_unique` (`organization_id`),
+  CONSTRAINT `employee_number_sequences_organization_id_foreign` 
+    FOREIGN KEY (`organization_id`)
+    REFERENCES `organizations` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT
+) ENGINE = InnoDB 
+  DEFAULT CHARSET = utf8mb4 
+  COLLATE = utf8mb4_unicode_ci;
+
+
+DROP TABLE IF EXISTS `employment_statuses`;
+CREATE TABLE `employment_statuses` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `code` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NOT NULL,
+  `updated_at` timestamp NOT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `employment_statuses_code_unique`(`code`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
+INSERT INTO `employment_statuses` (`code`, `name`, `is_active`, `created_at`, `updated_at`) VALUES
+('tetap',     'Karyawan Tetap',     1, NOW(), NOW()),
+('kontrak',   'Karyawan Kontrak',   1, NOW(), NOW()),
+('probation', 'Masa Percobaan',     1, NOW(), NOW()),
+('freelance', 'Freelance',          1, NOW(), NOW()),
+('magang',    'Magang',             1, NOW(), NOW()),
+('outsourcing', 'Outsourcing',      1, NOW(), NOW());
+
 
 SET FOREIGN_KEY_CHECKS = 1;

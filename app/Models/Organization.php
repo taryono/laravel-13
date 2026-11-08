@@ -21,6 +21,12 @@ class Organization extends BasedModel
     protected $casts = [
         'config' => 'array',
     ];
+
+    public function teachers()
+    {
+        return $this->hasMany(Teacher::class);
+    }
+
     public function organizationType()
     {
         return $this->belongsTo(OrganizationType::class);

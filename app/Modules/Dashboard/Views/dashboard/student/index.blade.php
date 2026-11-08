@@ -1,10 +1,11 @@
 @extends('layouts.app')
-@section('title', 'Student Management')
+@section('title', 'Manajemen Siswa')
 @push('styles')
     <link rel="stylesheet" href="{{ asset('assets/css/dashboard.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/payroll.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/student.css') }}">
 @endpush
 @section('content')
+<div class="students">
     <!-- ---------- HERO MODULE HEADER ---------- -->
     <section class="hero-card">
         <div class="position-absolute bg-high rounded-circle"
@@ -310,4 +311,5 @@
             <span class="text-label-sm mt-1">Profil</span>
         </a>
     </nav>
+</div>
 @endsection

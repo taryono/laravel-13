@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Budgeting & RAPBS')
+@section('title', 'Keuangan & Kas')
 @push('styles')
     <link rel="stylesheet" href="{{ asset('assets/css/dashboard.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/finance.css') }}">

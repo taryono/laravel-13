@@ -2,6 +2,7 @@
 
 namespace Models;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Teacher extends BasedModel
@@ -31,6 +32,11 @@ class Teacher extends BasedModel
         'office_extension',
         'teach_subject_ids',
     ];
+
+    protected $casts = [
+        'join_date' => 'date',
+        'is_active' => 'boolean',
+    ];
     // Relasi
     public function employee(): BelongsTo
     {
@@ -41,6 +47,32 @@ class Teacher extends BasedModel
     {
         return $this->hasMany(HomeroomTeacher::class);
     }
+
+    public function organization()
+    {
+        return $this->belongsTo(Organization::class);
+    }
+
+    public function school()
+    {
+        return $this->belongsTo(School::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function updater()
+    {
+        return $this->belongsTo(User::class, 'updated_by');
+    }
+
     // Scope
     public function scopeActive($query)
     {

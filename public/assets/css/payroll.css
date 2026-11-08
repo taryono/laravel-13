@@ -35,38 +35,75 @@
      --c-primary-rgb: 2, 16, 100;
  }
 
- /* ---------- Dark Tokens (otomatis via prefers-color-scheme) ---------- */
- @media (prefers-color-scheme: dark) {
-     :root {
-         --c-primary: #bcc3ff;
-         --c-primary-container: #4c58a6;
-         --c-primary-fixed: #dfe0ff;
-         --c-on-primary-fixed-variant: #aab3ff;
-         --c-secondary: #6bd8cb;
-         --c-secondary-container: #005049;
-         --c-on-secondary-container: #89f5e7;
-         --c-on-secondary-fixed-variant: #6bd8cb;
-         --c-tertiary-fixed: #443000;
-         --c-tertiary-fixed-dim: #f7bd38;
-         --c-on-tertiary-fixed-variant: #ffdea2;
-         --c-on-tertiary-container: #f7bd38;
-         --c-error: #ffb4ab;
-         --c-error-container: #93000a;
-         --c-on-error-container: #ffdad6;
-         --c-outline: #8f909c;
-         --c-outline-variant: #454651;
-         --c-surface: #0d1522;
-         --c-surface-lowest: #141d2c;
-         --c-surface-low: #1a2536;
-         --c-surface-container: #212d42;
-         --c-surface-high: #2a3750;
-         --c-on-surface: #dfe8fb;
-         --c-on-surface-variant: #b4bccd;
-         --c-line-rgb: 143, 144, 156;
-         --c-secondary-rgb: 107, 216, 203;
-         --c-primary-rgb: 188, 195, 255;
-     }
- }
+/* ---------- Dark Tokens ---------- */
+:root[data-bs-theme="dark"],
+:root[data-theme="dark"],
+html.dark,
+body.dark,
+html.dark-mode,
+body.dark-mode,
+[data-bs-theme="dark"] .payroll,
+body.dark-mode .payroll {
+    --c-primary: #bcc3ff;
+    --c-primary-container: #4c58a6;
+    --c-primary-fixed: #dfe0ff;
+    --c-on-primary-fixed-variant: #aab3ff;
+    --c-secondary: #6bd8cb;
+    --c-secondary-container: #005049;
+    --c-on-secondary-container: #89f5e7;
+    --c-on-secondary-fixed-variant: #6bd8cb;
+    --c-tertiary-fixed: #443000;
+    --c-tertiary-fixed-dim: #f7bd38;
+    --c-on-tertiary-fixed-variant: #ffdea2;
+    --c-on-tertiary-container: #f7bd38;
+    --c-error: #ffb4ab;
+    --c-error-container: #93000a;
+    --c-on-error-container: #ffdad6;
+    --c-outline: #8f909c;
+    --c-outline-variant: #454651;
+    --c-surface: #0d1522;
+    --c-surface-lowest: #141d2c;
+    --c-surface-low: #1a2536;
+    --c-surface-container: #212d42;
+    --c-surface-high: #2a3750;
+    --c-on-surface: #dfe8fb;
+    --c-on-surface-variant: #b4bccd;
+    --c-line-rgb: 143, 144, 156;
+    --c-secondary-rgb: 107, 216, 203;
+    --c-primary-rgb: 188, 195, 255;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-bs-theme="light"]):not(.light-mode) {
+        --c-primary: #bcc3ff;
+        --c-primary-container: #4c58a6;
+        --c-primary-fixed: #dfe0ff;
+        --c-on-primary-fixed-variant: #aab3ff;
+        --c-secondary: #6bd8cb;
+        --c-secondary-container: #005049;
+        --c-on-secondary-container: #89f5e7;
+        --c-on-secondary-fixed-variant: #6bd8cb;
+        --c-tertiary-fixed: #443000;
+        --c-tertiary-fixed-dim: #f7bd38;
+        --c-on-tertiary-fixed-variant: #ffdea2;
+        --c-on-tertiary-container: #f7bd38;
+        --c-error: #ffb4ab;
+        --c-error-container: #93000a;
+        --c-on-error-container: #ffdad6;
+        --c-outline: #8f909c;
+        --c-outline-variant: #454651;
+        --c-surface: #0d1522;
+        --c-surface-lowest: #141d2c;
+        --c-surface-low: #1a2536;
+        --c-surface-container: #212d42;
+        --c-surface-high: #2a3750;
+        --c-on-surface: #dfe8fb;
+        --c-on-surface-variant: #b4bccd;
+        --c-line-rgb: 143, 144, 156;
+        --c-secondary-rgb: 107, 216, 203;
+        --c-primary-rgb: 188, 195, 255;
+    }
+}
 
  /* ---------- Base ---------- */
  body.payroll {

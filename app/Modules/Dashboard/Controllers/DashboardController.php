@@ -268,4 +268,5 @@ class DashboardController extends MainController
     private function proctoringView($request){
         return view('Dashboard::dashboard.proctoring.index');
     }
+
 }

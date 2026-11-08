@@ -1,8 +1,9 @@
 @extends('layouts.app')
-@section('title', 'Dashboard')
-@section('styles')
+@section('title', 'Fasilitas & Sarpras')
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('assets/css/dashboard.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/facility.css') }}">
-@endsection
+@endpush
 @section('content')
     <!-- KPI Section -->
     <section aria-labelledby="kpi-heading" class="mb-4">

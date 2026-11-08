@@ -34,7 +34,14 @@
 }
 
 /* ---------- Dark Tokens ---------- */
-:root[data-bs-theme="dark"] {
+:root[data-bs-theme="dark"],
+:root[data-theme="dark"],
+html.dark,
+body.dark,
+html.dark-mode,
+body.dark-mode,
+[data-bs-theme="dark"] .lib,
+body.dark-mode .lib {
     --c-primary: #bcc3ff;
     --c-primary-container: #4c58a6;
     --c-primary-fixed: #dfe0ff;

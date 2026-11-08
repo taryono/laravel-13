@@ -52,13 +52,12 @@ class TeacherController extends MainController
     public function create(): View
     {
         $teacher = new Teacher();
-        $result = $this->getForm($teacher);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
-
+        $organizations = \Models\Organization::select('id', 'name')->get();
+        $schools = \Models\School::select('id', 'name')->get();
+        $users = \App\Models\User::select('id', 'email')->get();
         return view(
             'Teacher::create',
-            compact('teacher', 'forms', 'groupedForms')
+            compact('teacher', 'organizations', 'schools', 'users')
         );
     }
 
@@ -110,13 +109,12 @@ class TeacherController extends MainController
     public function edit($id): View
     {
         $teacher = $this->model->findOrFail($id);
-        $result = $this->getForm($teacher);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
-
+        $organizations = \Models\Organization::select('id', 'name')->get();
+        $schools = \Models\School::select('id', 'name')->get();
+        $users = \App\Models\User::select('id', 'email')->get();
         return view(
             'Teacher::edit',
-            compact('teacher', 'forms', 'groupedForms')
+            compact('teacher', 'organizations', 'schools', 'users')
         );
     }
 

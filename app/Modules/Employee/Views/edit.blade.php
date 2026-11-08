@@ -1,293 +1,429 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
-    <div class="card">
-        <div class="card-header">
-            <h5 class="mb-0">{{ isset($employee->id) ? 'Edit Karyawan' : 'Tambah Karyawan Baru' }}</h5>
-        </div>
-        <div class="card-body">
-            <form action="{{ isset($employee->id) ? route('employee.update', $employee->id) : route('employee.store') }}" 
-                  method="POST" id="employee-form">
-                @csrf
-                @if(isset($employee->id))
-                    @method('PUT')
-                @endif
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">{{ isset($employee->id) ? 'Edit Karyawan' : 'Tambah Karyawan Baru' }}</h5>
+            </div>
+            <div class="card-body">
+                {{ Form::model($employee ?? null, [
+                    'route' => isset($employee->id) ? ['employee.update', $employee->id] : ['employee.store'],
+                    'method' => isset($employee->id) ? 'PUT' : 'POST',
+                    'id' => 'employee-form',
+                    'class' => 'form-horizontal',
+                    'files' => true,
+                ]) }}
+
+                {{-- organization_id di-handle di backend, tapi kalau perlu eksplisit: --}}
+                {{-- <input type="hidden" name="organization_id" value="{{ old('organization_id', $employee->organization_id ?? auth()->user()->organization_id) }}"> --}}
 
                 <div class="row">
-                    <!-- Informasi Dasar -->
                     <div class="col-12">
                         <h6 class="border-bottom pb-2 mb-3">Informasi Dasar</h6>
                     </div>
 
+                    {{-- Employee Number (readonly, auto-generate) --}}
+                    @if (isset($employee->id))
+                        <div class="col-md-4 mb-3">
+                            {{ Form::label('employee_number', 'Nomor Karyawan', ['class' => 'form-label']) }}
+                            {{ Form::text('employee_number', null, [
+                                'class' => 'form-control',
+                                'id' => 'employee_number',
+                                'readonly' => true,
+                            ]) }}
+                            <small class="text-muted">Dibuat otomatis oleh sistem</small>
+                        </div>
+                    @endif
+
+                    {{-- NIK --}}
                     <div class="col-md-4 mb-3">
-                        <label for="nik" class="form-label">NIK <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control @error('nik') is-invalid @enderror" 
-                               id="nik" name="nik" 
-                               value="{{ old('nik', $employee->nik ?? '') }}" required>
+                        {{ Form::label('nik', 'NIK', ['class' => 'form-label']) }}
+                        {{ Form::text('nik', null, [
+                            'class' => 'form-control' . ($errors->has('nik') ? ' is-invalid' : ''),
+                            'id' => 'nik',
+                            'maxlength' => 20,
+                            'placeholder' => 'Opsional, untuk karyawan kontrak/freelance',
+                        ]) }}
                         @error('nik')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
 
+                    {{-- Nama Lengkap --}}
                     <div class="col-md-4 mb-3">
-                        <label for="name" class="form-label">Nama Lengkap <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control @error('name') is-invalid @enderror" 
-                               id="name" name="name" 
-                               value="{{ old('name', $employee->name ?? '') }}" required>
+                        {{ Form::label('name', 'Nama Lengkap', ['class' => 'form-label']) }}
+                        <span class="text-danger">*</span>
+                        {{ Form::text('name', null, [
+                            'class' => 'form-control' . ($errors->has('name') ? ' is-invalid' : ''),
+                            'id' => 'name',
+                            'required' => true,
+                            'maxlength' => 255,
+                        ]) }}
                         @error('name')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
 
+                    {{-- Nama Sesuai KTP --}}
                     <div class="col-md-4 mb-3">
-                        <label for="nick_name" class="form-label">Nama Panggilan</label>
-                        <input type="text" class="form-control @error('nick_name') is-invalid @enderror" 
-                               id="nick_name" name="nick_name" 
-                               value="{{ old('nick_name', $employee->nick_name ?? '') }}">
+                        {{ Form::label('full_name', 'Nama Sesuai KTP', ['class' => 'form-label']) }}
+                        {{ Form::text('full_name', null, [
+                            'class' => 'form-control' . ($errors->has('full_name') ? ' is-invalid' : ''),
+                            'id' => 'full_name',
+                            'maxlength' => 255,
+                            'placeholder' => 'Nama lengkap sesuai dokumen resmi',
+                        ]) }}
+                        @error('full_name')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    {{-- Nama Panggilan --}}
+                    <div class="col-md-4 mb-3">
+                        {{ Form::label('nick_name', 'Nama Panggilan', ['class' => 'form-label']) }}
+                        {{ Form::text('nick_name', null, [
+                            'class' => 'form-control' . ($errors->has('nick_name') ? ' is-invalid' : ''),
+                            'id' => 'nick_name',
+                            'maxlength' => 255,
+                        ]) }}
                         @error('nick_name')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
 
-                    <!-- Departemen & Jabatan -->
+                    {{-- Foto --}}
+                    <div class="col-md-4 mb-3">
+                        {{ Form::label('photo', 'Foto', ['class' => 'form-label']) }}
+                        {{ Form::file('photo', [
+                            'class' => 'form-control' . ($errors->has('photo') ? ' is-invalid' : ''),
+                            'id' => 'photo',
+                            'accept' => 'image/*',
+                        ]) }}
+                        @error('photo')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                        @if (!empty($employee->photo_path))
+                            <div class="mt-2">
+                                <img src="{{ Storage::url($employee->photo_path) }}" alt="Foto" class="img-thumbnail"
+                                    width="100">
+                            </div>
+                        @endif
+                    </div>
+
+                    <!-- ================= Penempatan ================= -->
+                    <!-- ================= Penempatan ================= -->
                     <div class="col-12 mt-2">
                         <h6 class="border-bottom pb-2 mb-3">Penempatan</h6>
                     </div>
 
                     <div class="col-md-4 mb-3">
-                        <label for="department_id" class="form-label">Departemen</label>
-                        <select class="form-select @error('department_id') is-invalid @enderror" 
-                                id="department_id" name="department_id">
-                            <option value="">Pilih Departemen</option>
-                            @foreach($departments as $id => $name)
-                                <option value="{{ $id }}" 
-                                    {{ old('department_id', $employee->department_id ?? '') == $id ? 'selected' : '' }}>
-                                    {{ $name }}
-                                </option>
-                            @endforeach
-                        </select>
+                        {{ Form::label('department_id', 'Departemen', ['class' => 'form-label']) }}
+                        {{ Form::select('department_id', $departments, null, [
+                            'class' => 'form-select' . ($errors->has('department_id') ? ' is-invalid' : ''),
+                            'id' => 'department_id',
+                            'placeholder' => 'Pilih Departemen',
+                        ]) }}
                         @error('department_id')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
 
                     <div class="col-md-4 mb-3">
-                        <label for="position_id" class="form-label">Jabatan</label>
-                        <select class="form-select @error('position_id') is-invalid @enderror" 
-                                id="position_id" name="position_id">
-                            <option value="">Pilih Jabatan</option>
-                            @foreach($positions as $id => $name)
-                                <option value="{{ $id }}" 
-                                    {{ old('position_id', $employee->position_id ?? '') == $id ? 'selected' : '' }}>
-                                    {{ $name }}
-                                </option>
-                            @endforeach
-                        </select>
+                        {{ Form::label('position_id', 'Jabatan', ['class' => 'form-label']) }}
+                        {{ Form::select('position_id', $positions, null, [
+                            'class' => 'form-select' . ($errors->has('position_id') ? ' is-invalid' : ''),
+                            'id' => 'position_id',
+                            'placeholder' => 'Pilih Jabatan',
+                        ]) }}
                         @error('position_id')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
 
                     <div class="col-md-4 mb-3">
-                        <label for="supervisor_id" class="form-label">Atasan Langsung</label>
-                        <select class="form-select @error('supervisor_id') is-invalid @enderror" 
-                                id="supervisor_id" name="supervisor_id">
-                            <option value="">Pilih Atasan</option>
-                            @foreach($supervisors as $id => $name)
-                                <option value="{{ $id }}" 
-                                    {{ old('supervisor_id', $employee->supervisor_id ?? '') == $id ? 'selected' : '' }}>
-                                    {{ $name }}
-                                </option>
-                            @endforeach
-                        </select>
+                        {{ Form::label('supervisor_id', 'Atasan Langsung', ['class' => 'form-label']) }}
+                        {{ Form::select('supervisor_id', $supervisors, null, [
+                            'class' => 'form-select' . ($errors->has('supervisor_id') ? ' is-invalid' : ''),
+                            'id' => 'supervisor_id',
+                            'placeholder' => 'Pilih Atasan',
+                        ]) }}
                         @error('supervisor_id')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
 
-                    <!-- Data Pribadi -->
+                    <!-- ================= Data Pribadi ================= -->
+                    <!-- ================= Data Pribadi ================= -->
                     <div class="col-12 mt-2">
                         <h6 class="border-bottom pb-2 mb-3">Data Pribadi</h6>
                     </div>
 
                     <div class="col-md-3 mb-3">
-                        <label for="gender" class="form-label">Jenis Kelamin</label>
-                        <select class="form-select @error('gender') is-invalid @enderror" 
-                                id="gender" name="gender">
-                            <option value="">Pilih</option>
-                            <option value="L" {{ old('gender', $employee->gender ?? '') == 'L' ? 'selected' : '' }}>Laki-laki</option>
-                            <option value="P" {{ old('gender', $employee->gender ?? '') == 'P' ? 'selected' : '' }}>Perempuan</option>
-                        </select>
+                        {{ Form::label('gender', 'Jenis Kelamin', ['class' => 'form-label']) }}
+                        {{ Form::select('gender', ['L' => 'Laki-laki', 'P' => 'Perempuan'], null, [
+                            'class' => 'form-select' . ($errors->has('gender') ? ' is-invalid' : ''),
+                            'id' => 'gender',
+                            'placeholder' => 'Pilih',
+                        ]) }}
                         @error('gender')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
 
                     <div class="col-md-3 mb-3">
-                        <label for="birth_place" class="form-label">Tempat Lahir</label>
-                        <input type="text" class="form-control @error('birth_place') is-invalid @enderror" 
-                               id="birth_place" name="birth_place" 
-                               value="{{ old('birth_place', $employee->birth_place ?? '') }}">
+                        {{ Form::label('birth_place', 'Tempat Lahir', ['class' => 'form-label']) }}
+                        {{ Form::text('birth_place', null, [
+                            'class' => 'form-control' . ($errors->has('birth_place') ? ' is-invalid' : ''),
+                            'id' => 'birth_place',
+                            'maxlength' => 255,
+                        ]) }}
                         @error('birth_place')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
 
                     <div class="col-md-3 mb-3">
-                        <label for="birth_date" class="form-label">Tanggal Lahir</label>
-                        <input type="date" class="form-control @error('birth_date') is-invalid @enderror" 
-                               id="birth_date" name="birth_date" 
-                               value="{{ old('birth_date', isset($employee->birth_date) ? $employee->birth_date->format('Y-m-d') : '') }}">
+                        {{ Form::label('birth_date', 'Tanggal Lahir', ['class' => 'form-label']) }}
+                        {{ Form::date('birth_date', null, [
+                            'class' => 'form-control' . ($errors->has('birth_date') ? ' is-invalid' : ''),
+                            'id' => 'birth_date',
+                        ]) }}
                         @error('birth_date')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
 
                     <div class="col-md-3 mb-3">
-                        <label for="phone" class="form-label">No. Telepon</label>
-                        <input type="text" class="form-control @error('phone') is-invalid @enderror" 
-                               id="phone" name="phone" 
-                               value="{{ old('phone', $employee->phone ?? '') }}">
+                        {{ Form::label('phone', 'No. Telepon', ['class' => 'form-label']) }}
+                        {{ Form::text('phone', null, [
+                            'class' => 'form-control' . ($errors->has('phone') ? ' is-invalid' : ''),
+                            'id' => 'phone',
+                            'maxlength' => 20,
+                            'placeholder' => 'Contoh: 081234567890',
+                        ]) }}
                         @error('phone')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control @error('email') is-invalid @enderror" 
-                               id="email" name="email" 
-                               value="{{ old('email', $employee->email ?? '') }}">
+                        {{ Form::label('email', 'Email', ['class' => 'form-label']) }}
+                        {{ Form::email('email', null, [
+                            'class' => 'form-control' . ($errors->has('email') ? ' is-invalid' : ''),
+                            'id' => 'email',
+                            'maxlength' => 255,
+                            'placeholder' => 'email@contoh.com',
+                        ]) }}
                         @error('email')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="address" class="form-label">Alamat</label>
-                        <textarea class="form-control @error('address') is-invalid @enderror" 
-                                  id="address" name="address" rows="2">{{ old('address', $employee->address ?? '') }}</textarea>
+                        {{ Form::label('address', 'Alamat', ['class' => 'form-label']) }}
+                        {{ Form::textarea('address', null, [
+                            'class' => 'form-control' . ($errors->has('address') ? ' is-invalid' : ''),
+                            'id' => 'address',
+                            'rows' => 2,
+                        ]) }}
                         @error('address')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
 
-                    <!-- Status Kepegawaian -->
+                    <!-- ================= Status Kepegawaian ================= -->
                     <div class="col-12 mt-2">
                         <h6 class="border-bottom pb-2 mb-3">Status Kepegawaian</h6>
                     </div>
 
                     <div class="col-md-3 mb-3">
-                        <label for="join_date" class="form-label">Tanggal Bergabung <span class="text-danger">*</span></label>
-                        <input type="date" class="form-control @error('join_date') is-invalid @enderror" 
-                               id="join_date" name="join_date" 
-                               value="{{ old('join_date', isset($employee->join_date) ? $employee->join_date->format('Y-m-d') : '') }}" required>
+                        {{ Form::label('join_date', 'Tanggal Bergabung', ['class' => 'form-label']) }}
+                        <span class="text-danger">*</span>
+                        {{ Form::date('join_date', null, [
+                            'class' => 'form-control' . ($errors->has('join_date') ? ' is-invalid' : ''),
+                            'id' => 'join_date',
+                            'required' => true,
+                        ]) }}
                         @error('join_date')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
 
                     <div class="col-md-3 mb-3">
-                        <label for="resign_date" class="form-label">Tanggal Resign</label>
-                        <input type="date" class="form-control @error('resign_date') is-invalid @enderror" 
-                               id="resign_date" name="resign_date" 
-                               value="{{ old('resign_date', isset($employee->resign_date) ? $employee->resign_date->format('Y-m-d') : '') }}">
+                        {{ Form::label('resign_date', 'Tanggal Resign', ['class' => 'form-label']) }}
+                        {{ Form::date('resign_date', null, [
+                            'class' => 'form-control' . ($errors->has('resign_date') ? ' is-invalid' : ''),
+                            'id' => 'resign_date',
+                        ]) }}
                         @error('resign_date')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
 
+                    {{-- employment_status_id (lookup table) --}}
                     <div class="col-md-3 mb-3">
-                        <label for="employment_status" class="form-label">Status Karyawan <span class="text-danger">*</span></label>
-                        <select class="form-select @error('employment_status') is-invalid @enderror" 
-                                id="employment_status" name="employment_status" required>
-                            <option value="probation" {{ old('employment_status', $employee->employment_status ?? '') == 'probation' ? 'selected' : '' }}>Probation</option>
-                            <option value="tetap" {{ old('employment_status', $employee->employment_status ?? '') == 'tetap' ? 'selected' : '' }}>Tetap</option>
-                            <option value="kontrak" {{ old('employment_status', $employee->employment_status ?? '') == 'kontrak' ? 'selected' : '' }}>Kontrak</option>
-                            <option value="freelance" {{ old('employment_status', $employee->employment_status ?? '') == 'freelance' ? 'selected' : '' }}>Freelance</option>
-                        </select>
-                        @error('employment_status')
+                        {{ Form::label('employment_status_id', 'Status Karyawan', ['class' => 'form-label']) }}
+                        <span class="text-danger">*</span>
+                        {{ Form::select('employment_status_id', $employmentStatuses, null, [
+                            'class' => 'form-select' . ($errors->has('employment_status_id') ? ' is-invalid' : ''),
+                            'id' => 'employment_status_id',
+                            'placeholder' => 'Pilih Status',
+                            'required' => true,
+                        ]) }}
+                        @error('employment_status_id')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
 
+                    {{-- Salary Structure --}}
+                    <div class="col-md-3 mb-3">
+                        {{ Form::label('salary_structure_id', 'Struktur Gaji', ['class' => 'form-label']) }}
+                        {{ Form::select('salary_structure_id', $salaryStructures, null, [
+                            'class' => 'form-select' . ($errors->has('salary_structure_id') ? ' is-invalid' : ''),
+                            'id' => 'salary_structure_id',
+                            'placeholder' => 'Pilih Struktur Gaji',
+                        ]) }}
+                        @error('salary_structure_id')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    {{-- is_active --}}
                     <div class="col-md-3 mb-3">
                         <div class="form-check form-switch mt-4">
-                            <input type="hidden" name="is_active" value="0">
-                            <input type="checkbox" class="form-check-input @error('is_active') is-invalid @enderror" 
-                                   id="is_active" name="is_active" value="1" 
-                                   {{ old('is_active', $employee->is_active ?? true) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="is_active">Aktif</label>
+                            {{ Form::hidden('is_active', 0) }}
+                            {{ Form::checkbox('is_active', 1, null, [
+                                'class' => 'form-check-input' . ($errors->has('is_active') ? ' is-invalid' : ''),
+                                'id' => 'is_active',
+                            ]) }}
+                            {{ Form::label('is_active', 'Aktif', ['class' => 'form-check-label']) }}
                             @error('is_active')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
                     </div>
 
-                    <!-- Data Bank & BPJS -->
+                    <!-- ================= Data Pajak & BPJS ================= -->
                     <div class="col-12 mt-2">
-                        <h6 class="border-bottom pb-2 mb-3">Data Bank & BPJS</h6>
+                        <h6 class="border-bottom pb-2 mb-3">Data Pajak & BPJS</h6>
                     </div>
 
-                    <div class="col-md-3 mb-3">
-                        <label for="bank_name" class="form-label">Nama Bank</label>
-                        <input type="text" class="form-control @error('bank_name') is-invalid @enderror" 
-                               id="bank_name" name="bank_name" 
-                               value="{{ old('bank_name', $employee->bank_name ?? '') }}">
-                        @error('bank_name')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="col-md-3 mb-3">
-                        <label for="bank_account_number" class="form-label">No. Rekening</label>
-                        <input type="text" class="form-control @error('bank_account_number') is-invalid @enderror" 
-                               id="bank_account_number" name="bank_account_number" 
-                               value="{{ old('bank_account_number', $employee->bank_account_number ?? '') }}">
-                        @error('bank_account_number')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="col-md-3 mb-3">
-                        <label for="bank_account_name" class="form-label">Nama Pemilik Rekening</label>
-                        <input type="text" class="form-control @error('bank_account_name') is-invalid @enderror" 
-                               id="bank_account_name" name="bank_account_name" 
-                               value="{{ old('bank_account_name', $employee->bank_account_name ?? '') }}">
-                        @error('bank_account_name')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="col-md-3 mb-3">
-                        <label for="npwp" class="form-label">NPWP</label>
-                        <input type="text" class="form-control @error('npwp') is-invalid @enderror" 
-                               id="npwp" name="npwp" 
-                               value="{{ old('npwp', $employee->npwp ?? '') }}">
+                    <div class="col-md-4 mb-3">
+                        {{ Form::label('npwp', 'NPWP', ['class' => 'form-label']) }}
+                        {{ Form::text('npwp', null, [
+                            'class' => 'form-control' . ($errors->has('npwp') ? ' is-invalid' : ''),
+                            'id' => 'npwp',
+                            'maxlength' => 50,
+                        ]) }}
                         @error('npwp')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
 
-                    <div class="col-md-3 mb-3">
-                        <label for="bpjs_ketenagakerjaan" class="form-label">BPJS Ketenagakerjaan</label>
-                        <input type="text" class="form-control @error('bpjs_ketenagakerjaan') is-invalid @enderror" 
-                               id="bpjs_ketenagakerjaan" name="bpjs_ketenagakerjaan" 
-                               value="{{ old('bpjs_ketenagakerjaan', $employee->bpjs_ketenagakerjaan ?? '') }}">
+                    <div class="col-md-4 mb-3">
+                        {{ Form::label('bpjs_ketenagakerjaan', 'BPJS Ketenagakerjaan', ['class' => 'form-label']) }}
+                        {{ Form::text('bpjs_ketenagakerjaan', null, [
+                            'class' => 'form-control' . ($errors->has('bpjs_ketenagakerjaan') ? ' is-invalid' : ''),
+                            'id' => 'bpjs_ketenagakerjaan',
+                            'maxlength' => 50,
+                        ]) }}
                         @error('bpjs_ketenagakerjaan')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
 
-                    <div class="col-md-3 mb-3">
-                        <label for="bpjs_kesehatan" class="form-label">BPJS Kesehatan</label>
-                        <input type="text" class="form-control @error('bpjs_kesehatan') is-invalid @enderror" 
-                               id="bpjs_kesehatan" name="bpjs_kesehatan" 
-                               value="{{ old('bpjs_kesehatan', $employee->bpjs_kesehatan ?? '') }}">
+                    <div class="col-md-4 mb-3">
+                        {{ Form::label('bpjs_kesehatan', 'BPJS Kesehatan', ['class' => 'form-label']) }}
+                        {{ Form::text('bpjs_kesehatan', null, [
+                            'class' => 'form-control' . ($errors->has('bpjs_kesehatan') ? ' is-invalid' : ''),
+                            'id' => 'bpjs_kesehatan',
+                            'maxlength' => 50,
+                        ]) }}
                         @error('bpjs_kesehatan')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
+                    </div>
+
+                    <!-- ================= Data Bank (Multiple) ================= -->
+                    <div class="col-12 mt-2">
+                        <h6 class="border-bottom pb-2 mb-3">Data Bank</h6>
+                    </div>
+
+                    <div class="col-12 mb-3" id="bank-accounts-container">
+                        @php
+                            $bankAccounts = old(
+                                'bank_accounts',
+                                isset($employee->bankAccounts) && $employee->bankAccounts->count()
+                                    ? $employee->bankAccounts
+                                        ->map(function ($b) {
+                                            return [
+                                                'id' => $b->id,
+                                                'bank_name' => $b->bank_name,
+                                                'account_number' => $b->account_number,
+                                                'account_name' => $b->account_name,
+                                                'is_primary' => $b->is_primary,
+                                            ];
+                                        })
+                                        ->toArray()
+                                    : [
+                                        [
+                                            'bank_name' => '',
+                                            'account_number' => '',
+                                            'account_name' => '',
+                                            'is_primary' => true,
+                                        ],
+                                    ],
+                            );
+                        @endphp
+
+                        @foreach ($bankAccounts as $i => $bank)
+                            <div class="row bank-account-row align-items-end mb-2" data-index="{{ $i }}">
+                                {{ Form::hidden("bank_accounts[{$i}][id]", $bank['id'] ?? '') }}
+
+                                <div class="col-md-3">
+                                    {{ Form::label("bank_accounts[{$i}][bank_name]", 'Nama Bank', ['class' => 'form-label']) }}
+                                    {{ Form::text("bank_accounts[{$i}][bank_name]", $bank['bank_name'] ?? '', [
+                                        'class' => 'form-control',
+                                        'maxlength' => 100,
+                                    ]) }}
+                                </div>
+                                <div class="col-md-3">
+                                    {{ Form::label("bank_accounts[{$i}][account_number]", 'No. Rekening', ['class' => 'form-label']) }}
+                                    {{ Form::text("bank_accounts[{$i}][account_number]", $bank['account_number'] ?? '', [
+                                        'class' => 'form-control',
+                                        'maxlength' => 255,
+                                    ]) }}
+                                </div>
+                                <div class="col-md-3">
+                                    {{ Form::label("bank_accounts[{$i}][account_name]", 'Nama Pemilik', ['class' => 'form-label']) }}
+                                    {{ Form::text("bank_accounts[{$i}][account_name]", $bank['account_name'] ?? '', [
+                                        'class' => 'form-control bank-account-name',
+                                        'maxlength' => 255,
+                                    ]) }}
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-check mt-4">
+                                        {{ Form::checkbox("bank_accounts[{$i}][is_primary]", 1, !empty($bank['is_primary']), [
+                                            'class' => 'form-check-input bank-primary-checkbox',
+                                        ]) }}
+                                        {{ Form::label("bank_accounts[{$i}][is_primary]", 'Utama', ['class' => 'form-check-label']) }}
+                                    </div>
+                                </div>
+                                <div class="col-md-1">
+                                    <button type="button" class="btn btn-sm btn-outline-danger remove-bank-row mb-1"
+                                        {{ count($bankAccounts) === 1 ? 'disabled' : '' }}>
+                                        &times;
+                                    </button>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+
+                    <div class="col-12 mb-3">
+                        <button type="button" class="btn btn-sm btn-outline-primary" id="add-bank-row">
+                            + Tambah Rekening
+                        </button>
                     </div>
                 </div>
 
@@ -297,31 +433,82 @@
                         {{ isset($employee->id) ? 'Update' : 'Simpan' }}
                     </button>
                 </div>
-            </form>
+                {{ Form::close() }}
+            </div>
         </div>
     </div>
-</div>
 @endsection
 
 @push('scripts')
-<script>
-    // Auto-fill bank account name with full name if empty
-    document.getElementById('name').addEventListener('change', function() {
-        var accountName = document.getElementById('bank_account_name');
-        if (!accountName.value) {
-            accountName.value = this.value;
-        }
-    });
+    <script>
+        // Auto-fill nama pemilik rekening dari nama karyawan jika kosong
+        document.getElementById('name').addEventListener('change', function() {
+            document.querySelectorAll('.bank-account-name').forEach(function(input) {
+                if (!input.value) input.value = this.value;
+            });
+        });
 
-    // Validate resign date >= join date
-    document.getElementById('resign_date').addEventListener('change', function() {
-        var joinDate = document.getElementById('join_date').value;
-        var resignDate = this.value;
-        
-        if (joinDate && resignDate && resignDate < joinDate) {
-            alert('Tanggal resign harus setelah tanggal bergabung!');
-            this.value = '';
-        }
-    });
-</script>
+        // Validasi resign >= join
+        document.getElementById('resign_date').addEventListener('change', function() {
+            var joinDate = document.getElementById('join_date').value;
+            var resignDate = this.value;
+            if (joinDate && resignDate && resignDate < joinDate) {
+                alert('Tanggal resign harus setelah tanggal bergabung!');
+                this.value = '';
+            }
+        });
+
+        // ============ Dynamic bank rows ============
+        let bankIndex = {{ count($bankAccounts) }};
+
+        document.getElementById('add-bank-row').addEventListener('click', function() {
+            const container = document.getElementById('bank-accounts-container');
+            const html = `
+                <div class="row bank-account-row align-items-end mb-2" data-index="${bankIndex}">
+                    <input type="hidden" name="bank_accounts[${bankIndex}][id]" value="">
+                    <div class="col-md-3">
+                        <label class="form-label">Nama Bank</label>
+                        <input type="text" name="bank_accounts[${bankIndex}][bank_name]" class="form-control" maxlength="100">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">No. Rekening</label>
+                        <input type="text" name="bank_accounts[${bankIndex}][account_number]" class="form-control" maxlength="255">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Nama Pemilik</label>
+                        <input type="text" name="bank_accounts[${bankIndex}][account_name]" class="form-control bank-account-name" maxlength="255">
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-check mt-4">
+                            <input type="checkbox" name="bank_accounts[${bankIndex}][is_primary]" class="form-check-input bank-primary-checkbox" value="1">
+                            <label class="form-check-label">Utama</label>
+                        </div>
+                    </div>
+                    <div class="col-md-1">
+                        <button type="button" class="btn btn-sm btn-outline-danger remove-bank-row mb-1">&times;</button>
+                    </div>
+                </div>`;
+            container.insertAdjacentHTML('beforeend', html);
+            bankIndex++;
+        });
+
+        // Hapus baris
+        document.getElementById('bank-accounts-container').addEventListener('click', function(e) {
+            if (e.target.classList.contains('remove-bank-row')) {
+                const rows = this.querySelectorAll('.bank-account-row');
+                if (rows.length > 1) {
+                    e.target.closest('.bank-account-row').remove();
+                }
+            }
+        });
+
+        // Hanya satu yang boleh primary
+        document.getElementById('bank-accounts-container').addEventListener('change', function(e) {
+            if (e.target.classList.contains('bank-primary-checkbox') && e.target.checked) {
+                this.querySelectorAll('.bank-primary-checkbox').forEach(function(cb) {
+                    if (cb !== e.target) cb.checked = false;
+                });
+            }
+        });
+    </script>
 @endpush

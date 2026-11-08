@@ -1,10 +1,11 @@
 @extends('layouts.app')
-@section('title', 'Kantin Management')
+@section('title', 'Alumni & Tracer Study')
 @push('styles')
     <link rel="stylesheet" href="{{ asset('assets/css/dashboard.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/alumni.css') }}">
 @endpush
 @section('content')
+<div class="alumni">
     <!-- ============ KPI BENTO ============ -->
     <section class="d-flex flex-column gap-3">
         <div class="d-flex align-items-center justify-content-between">
@@ -320,4 +321,5 @@
             <span class="text-label-sm mt-1">Profil</span>
         </a>
     </nav>
+</div>
 @endsection

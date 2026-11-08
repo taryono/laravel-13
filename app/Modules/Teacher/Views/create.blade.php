@@ -1,55 +1,114 @@
 {{ Form::open(['method' => 'POST', 'route' => ['teacher.store'], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
-    {{-- Organization --}}
-<div class="mb-4">
-    <label class="block text-sm font-medium text-gray-700 mb-1">Organisasi</label>
-    <select name="organization_id" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-        <option value="">Pilih Organisasi</option>
-        {{-- Contoh data: @foreach($organizations as $org) --}}
-        <option value="1">Sekolah Contoh</option>
-    </select>
-</div>
 
-{{-- User (opsional) --}}
-<div class="mb-4">
-    <label class="block text-sm font-medium text-gray-700 mb-1">Akun Pengguna</label>
-    <select name="user_id" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-        <option value="">Tidak Dihubungkan</option>
-        {{-- Contoh data: @foreach($users as $user) --}}
-        <option value="1">admin@example.com</option>
-    </select>
-</div>
+<div class="row">
+    {{-- Organisasi --}}
+    <div class="col-md-6 mb-3">
+        <label class="form-label">Organisasi <span class="text-danger">*</span></label>
+        {{ Form::select('organization_id', ['' => 'Pilih Organisasi'], null, [
+            'class' => 'form-select',
+            'id' => 'organization_id',
+            'required' => true,
+        ]) }}
+    </div>
 
-{{-- NIP --}}
-<div class="mb-4">
-    <label class="block text-sm font-medium text-gray-700 mb-1">NIP</label>
-    <input type="text" name="nip" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" maxlength="50" placeholder="Masukkan NIP">
-</div>
+    {{-- Sekolah --}}
+    <div class="col-md-6 mb-3">
+        <label class="form-label">Sekolah</label>
+        {{ Form::select('school_id', ['' => 'Pilih Sekolah'], null, [
+            'class' => 'form-select',
+            'id' => 'school_id',
+        ]) }}
+    </div>
 
-{{-- Nama Lengkap --}}
-<div class="mb-4">
-    <label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap <span class="text-red-500">*</span></label>
-    <input type="text" name="name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" maxlength="150" required placeholder="Nama lengkap guru">
-</div>
+    {{-- NIP --}}
+    <div class="col-md-6 mb-3">
+        <label class="form-label">NIP</label>
+        {{ Form::text('nip', null, [
+            'class' => 'form-control',
+            'id' => 'nip',
+            'maxlength' => 50,
+            'placeholder' => 'Masukkan NIP',
+        ]) }}
+    </div>
 
-{{-- Spesialisasi --}}
-<div class="mb-4">
-    <label class="block text-sm font-medium text-gray-700 mb-1">Spesialisasi / Bidang Keahlian</label>
-    <input type="text" name="specialization" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" maxlength="100" placeholder="Contoh: Matematika, Bahasa Indonesia">
-</div>
+    {{-- Nama --}}
+    <div class="col-md-6 mb-3">
+        <label class="form-label">Nama Lengkap <span class="text-danger">*</span></label>
+        {{ Form::text('name', null, [
+            'class' => 'form-control',
+            'id' => 'name',
+            'maxlength' => 150,
+            'required' => true,
+            'placeholder' => 'Nama lengkap guru',
+        ]) }}
+    </div>
 
-{{-- Tanggal Bergabung --}}
-<div class="mb-4">
-    <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Bergabung</label>
-    <input type="date" name="join_date" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-</div>
+    {{-- Akun Pengguna --}}
+    <div class="col-md-6 mb-3">
+        <label class="form-label">Akun Pengguna</label>
+        {{ Form::select('user_id', ['' => 'Tidak Dihubungkan'], null, [
+            'class' => 'form-select',
+            'id' => 'user_id',
+        ]) }}
+    </div>
 
-{{-- Status --}}
-<div class="mb-4">
-    <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-    <select name="status" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-        <option value="ACTIVE" selected>Aktif</option>
-        <option value="RESIGNED">Mengundurkan Diri</option>
-        <option value="RETIRED">Pensiun</option>
-    </select>
+    {{-- Spesialisasi --}}
+    <div class="col-md-6 mb-3">
+        <label class="form-label">Spesialisasi</label>
+        {{ Form::text('specialization', null, [
+            'class' => 'form-control',
+            'id' => 'specialization',
+            'maxlength' => 100,
+            'placeholder' => 'Contoh: Matematika',
+        ]) }}
+    </div>
+
+    {{-- Mata Pelajaran --}}
+    <div class="col-md-6 mb-3">
+        <label class="form-label">Mata Pelajaran</label>
+        {{ Form::text('subject', null, [
+            'class' => 'form-control',
+            'id' => 'subject',
+            'placeholder' => 'Contoh: Matematika, Fisika',
+        ]) }}
+    </div>
+
+    {{-- Tanggal Bergabung --}}
+    <div class="col-md-6 mb-3">
+        <label class="form-label">Tanggal Bergabung</label>
+        {{ Form::date('join_date', null, [
+            'class' => 'form-control',
+            'id' => 'join_date',
+        ]) }}
+    </div>
+
+    {{-- Status --}}
+    <div class="col-md-6 mb-3">
+        <label class="form-label">Status</label>
+        {{ Form::select(
+            'status',
+            [
+                'ACTIVE' => 'Aktif',
+                'RESIGNED' => 'Mengundurkan Diri',
+                'RETIRED' => 'Pensiun',
+            ],
+            'ACTIVE',
+            [
+                'class' => 'form-select',
+                'id' => 'status',
+            ],
+        ) }}
+    </div>
+
+    {{-- Aktif --}}
+    <div class="col-md-6 mb-3 align-self-center">
+        <div class="form-check form-switch">
+            {{ Form::checkbox('is_active', 1, true, [
+                'class' => 'form-check-input',
+                'id' => 'is_active',
+            ]) }}
+            <label class="form-check-label" for="is_active">Aktif</label>
+        </div>
+    </div>
 </div>
-{{ Form::close() }}  
+{{ Form::close() }}

@@ -1,10 +1,11 @@
 @extends('layouts.app')
-@section('title', 'Kantin Management')
+@section('title', 'Kantin & Cashless')
 @push('styles')
     <link rel="stylesheet" href="{{ asset('assets/css/dashboard.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/canteen.css') }}">
 @endpush
 @section('content')
+<div class="canteen">
     <!-- ===================== TOP APP BAR ===================== -->
     <header class="app-header d-flex justify-content-between align-items-center px-3">
         <div class="d-flex align-items-center gap-2">
@@ -379,4 +380,5 @@
             <span class="text-label-sm mt-1">Profil</span>
         </a>
     </nav>
+</div>
 @endsection

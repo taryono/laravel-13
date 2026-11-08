@@ -1,10 +1,11 @@
 @extends('layouts.app')
-@section('title', 'Kantin Management')
+@section('title', 'Penilaian & Rapor')
 @push('styles')
     <link rel="stylesheet" href="{{ asset('assets/css/dashboard.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/canteen.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/assessment.css') }}">
 @endpush
 @section('content')
+<div class="raport">
     <!-- ---------- MODULE HEADER ---------- -->
     <section class="rap-card p-4">
         <div class="d-flex align-items-start justify-content-between gap-2 mb-2">
@@ -328,4 +329,5 @@
             <span class="text-label-sm mt-1">Profil</span>
         </a>
     </nav>
+</div>
 @endsection

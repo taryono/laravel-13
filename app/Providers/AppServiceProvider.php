@@ -11,7 +11,8 @@ use Illuminate\Support\Facades\Schema;
 use App\Core\Menu\MenuService;
 use App\Core\Menu\MenuTreeBuilder;
 use Models\Organization;
-
+use Models\Employee;
+use App\Observers\EmployeeObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -57,6 +58,8 @@ class AppServiceProvider extends ServiceProvider
          View::composer('layouts.*', function ($view) {
             $view->with('organization', Organization::first());
         });
+        Employee::observe(EmployeeObserver::class);
+
     }
 
 }

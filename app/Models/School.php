@@ -36,4 +36,9 @@ class School extends BasedModel
     {
         return $this->hasMany(Admission::class, 'school_id', 'id');
     }
+
+    public function teachers()
+{
+    return $this->hasMany(Teacher::class);
+}
 }

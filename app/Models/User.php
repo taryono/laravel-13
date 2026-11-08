@@ -399,4 +399,9 @@ class User extends Authenticatable implements MustVerifyEmail
 
         return \Models\Organization::descendantsOf($orgId); // reuse logic yang sudah benar, sekali diperbaiki, berlaku di semua tempat
     }
+
+    public function teacherProfile()
+    {
+        return $this->hasOne(\Models\Teacher::class);
+    }
 }
