@@ -4,6 +4,7 @@ namespace App\Modules\AcademicSemester\Controllers;
 
 use App\DataTables\AcademicSemesterDataTable;
 use App\Http\Controllers\MainController;
+use App\Http\Requests\StoreAcademicSemesterRequest;
 use Models\AcademicSemester;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -66,9 +67,9 @@ class AcademicSemesterController extends MainController
     /**
      * Store a newly created resource.
      */
-    public function store(Request $request)
+    public function store(StoreAcademicSemesterRequest $request)
     {
-        $validated = $this->validated($request);
+        $validated = $request->validated();
 
         try {
             $model = DB::transaction(function () use ($validated) {
@@ -115,9 +116,9 @@ class AcademicSemesterController extends MainController
     /**
      * Update the specified resource.
      */
-    public function update(Request $request, $id)
+    public function update(StoreAcademicSemesterRequest $request, $id)
     {
-        $validated = $this->validated($request, $id);
+        $validated = $request->validated();
 
         try {
             $academicSemester = $this->model->findOrFail($id);
@@ -180,38 +181,5 @@ class AcademicSemesterController extends MainController
                 'Data Semester gagal dihapus.'
             );
         }
-    }
-
-    private function validated($request, $id = null)
-    {
-        $validated = $request->validate([
-            'school_id' => ['required', 'integer'],
-            'academic_year_id' => ['required', 'integer'],
-            'code' => [
-                'required',
-                'string',
-                'max:255',
-                Rule::unique('academic_semesters', 'code')
-                    ->where(function ($query) use ($request, $id) {
-                        $query->where('school_id', $request->school_id)
-                            ->where('academic_year_id', $request->academic_year_id);
-
-                        // Jika sedang update, abaikan record saat ini
-                        if ($id) {
-                            $query->where('id', '!=', $id);
-                        }
-
-                        return $query;
-                    })
-            ],
-            'name' => ['required', 'string', 'max:255'],
-            'type' => ['required', 'string', 'max:255'],
-            'start_date' => ['required', 'string', 'max:255'],
-            'end_date' => ['required', 'string', 'max:255'],
-            'krs_start_date' => ['required', 'string', 'max:255'],
-            'krs_end_date' => ['required', 'string', 'max:255'],
-        ]);
-
-        return $validated;
     }
 }

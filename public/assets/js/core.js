@@ -5,6 +5,42 @@
 const AppCore = (() => {
     'use strict';
 
+    const FieldErrors = {
+        clear: (form) => {
+            if (!form) return;
+            form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+            form.querySelectorAll('.js-field-error').forEach(el => el.remove());
+        },
+
+        show: (form, errors) => {
+            if (!form || !errors) return;
+            FieldErrors.clear(form);
+
+            let focused = false;
+            Object.entries(errors).forEach(([name, messages]) => {
+                const el = form.querySelector(`[name="${CSS.escape(name)}"]`);
+                if (!el) return;
+
+                el.classList.add('is-invalid');
+
+                const fb = document.createElement('div');
+                fb.className = 'invalid-feedback d-block js-field-error';
+                fb.textContent = messages[0];
+
+                // Select2: taruh pesan setelah container-nya
+                const anchor = el.nextElementSibling?.classList.contains('select2')
+                    ? el.nextElementSibling
+                    : el;
+                anchor.after(fb);
+
+                if (!focused && el.type !== 'hidden') {
+                    el.focus();
+                    focused = true;
+                }
+            });
+        }
+    };
+
     // ==============================================
     // 2. DEPENDENSI CHECK
     // ==============================================
@@ -39,26 +75,54 @@ const AppCore = (() => {
             return el?.content || null;
         },
 
+        escapeHtml: (str) => {
+            const div = document.createElement('div');
+            div.textContent = String(str ?? '');
+            return div.innerHTML;
+        },
+
         parseError: (error) => {
-            if (!error.response) return { status: null, message: 'Tidak dapat terhubung ke server. Periksa koneksi internet Anda.', isAuth: false };
+            if (!error.response) {
+                return {
+                    status: null,
+                    title: 'Terjadi Kesalahan',
+                    message: 'Tidak dapat terhubung ke server. Periksa koneksi internet Anda.',
+                    errors: null,
+                    isAuth: false
+                };
+            }
 
             const { status, data } = error.response;
-            const message = data?.message || 'Terjadi kesalahan tak dikenal.';
+
+            // Validasi Laravel: tampilkan semua error sebagai daftar
+            if (status === 422 && data?.errors) {
+                const items = Object.values(data.errors).flat()
+                    .map(err => `<li>${utils.escapeHtml(err)}</li>`)
+                    .join('');
+
+                return {
+                    status,
+                    title: 'Data belum lengkap',
+                    message: `<ul class="text-start mb-0 ps-3">${items}</ul>`,
+                    errors: data.errors,
+                    isAuth: false
+                };
+            }
 
             const errorMap = {
-                422: data?.errors
-                    ? Object.values(data.errors).flat().join('<br>')
-                    : 'Data yang dikirim tidak valid.',
                 401: 'Sesi Anda telah berakhir. Silakan login kembali.',
                 403: 'Anda tidak memiliki izin untuk aksi ini.',
                 404: 'Halaman atau data tidak ditemukan.',
-                419: 'Sesi keamanan habis. Silakan coba lagi.',
-                500: message
+                419: 'Sesi keamanan habis. Silakan muat ulang halaman.',
+                422: 'Data yang dikirim tidak valid.',
+                500: 'Terjadi kesalahan pada server.'
             };
 
             return {
                 status,
-                message: errorMap[status] || message,
+                title: 'Terjadi Kesalahan',
+                message: utils.escapeHtml(errorMap[status] || data?.message || 'Terjadi kesalahan tak dikenal.'),
+                errors: null,
                 isAuth: status === 401
             };
         }
@@ -138,16 +202,12 @@ const AppCore = (() => {
                 });
             },
             success: (message) => UI.notify.toast('success', message),
-            error: (message) => {
+            error: (message, title = 'Terjadi Kesalahan', icon = 'error') => {
                 if (typeof Swal === 'undefined') {
-                    alert(message);
+                    alert(message.replace(/<[^>]*>/g, '\n'));
                     return;
                 }
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Terjadi Kesalahan',
-                    text: message
-                });
+                Swal.fire({ icon, title, html: message });
             },
             warning: (message) => UI.notify.toast('warning', message),
             info: (message) => UI.notify.toast('info', message)
@@ -185,6 +245,7 @@ const AppCore = (() => {
                 url,
                 method = 'GET',
                 data = null,
+                form =null,
                 showLoading = true,
                 loadingMessage = 'Memproses...',
                 successMessage = null,
@@ -194,6 +255,7 @@ const AppCore = (() => {
             if (typeof axios === 'undefined') {
                 throw new Error('Axios belum dimuat.');
             }
+            FieldErrors.clear(form);
 
             if (showLoading) UI.loading.show(loadingMessage);
 
@@ -217,9 +279,10 @@ const AppCore = (() => {
                         if (confirmed) window.location.href = '/login';
                     });
                 } else {
+                    FieldErrors.show(form, errorInfo.errors);
                     UI.notify.error(errorInfo.message);
                 }
-
+                error.handledByCore = true;
                 throw error;
             }
         }
@@ -290,6 +353,7 @@ const AppCore = (() => {
                         url,
                         method,
                         data: formData,
+                        form,    
                         successMessage: 'Data berhasil disimpan!'
                     });
                 };

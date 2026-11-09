@@ -19,7 +19,7 @@ initFlyoutTitles();
 function bindNavParentClicks(container, respectSidebarCollapse) {
     if (!container) return;
     const topLevelNav = (respectSidebarCollapse && sidebar) ? sidebar.querySelector(':scope > nav') : null;
-    console.log('bindNavParentClicks topLevelNav ', topLevelNav);
+    //console.log('bindNavParentClicks topLevelNav ', topLevelNav);
     // Tangani SEMUA .bnsp-nav-parent, tidak hanya level atas
     container.querySelectorAll('.bnsp-nav-parent').forEach(link => {
         const item = link.closest('.bnsp-nav-item');

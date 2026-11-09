@@ -392,7 +392,12 @@
                 }
 
                 return error?.statusText || error?.message || 'Terjadi kesalahan';
-            }
+            },
+
+            notifyError: (error) => {
+                if (error?.handledByCore) return;   // sudah ditampilkan AppCore
+                UI.notify('error', utils.parseErrors(error));
+            },
         };
 
         // =============================================
@@ -520,6 +525,7 @@
                             url,
                             method,
                             data: formData,
+                            $form,
                             showLoading: false,
                             successMessage: null
                         });
