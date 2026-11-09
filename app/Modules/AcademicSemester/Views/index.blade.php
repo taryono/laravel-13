@@ -7,7 +7,7 @@
             <h5 class="mb-0">Daftar AcademicSemester</h5> 
             <button type="button" class="btn btn-primary btn-sm" data-toggle="ajax-modal" data-size="lg" data-method="GET"
                 data-title="Tambah Data AcademicSemester Baru" data-url="{{ route('academic_semester.create') }}"
-                data-submit='<button class="btn btn-primary" type="submit" form="formAcademicSemester">Simpan</button>'
+                data-submit='<button class="btn btn-primary modal-submit" type="submit" form="formAcademicSemester">Simpan</button>'
                 data-cancel='<button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Batal</button>'>
                 <i class="bi bi-plus-circle"></i> Tambah Baru
             </button>

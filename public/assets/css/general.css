@@ -400,3 +400,8 @@ body.dark-mode {
 .bnsp-flyout-title-item::after {
     content: none !important;
 }
+
+.control-label {
+    font-size: 14px !important;
+    margin-bottom: 5px;
+}

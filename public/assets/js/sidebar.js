@@ -325,10 +325,14 @@ function updateNotificationBadge(change) {
 }
 
 document.addEventListener('click', (e) => {
-    if (!e.target || typeof e.target.closest !== 'function') return;
+     const target = e.target;
+    if (!target || typeof target.closest !== 'function') return;
+
+     // ✅ Abaikan semua klik di dalam modal (termasuk tombol submit di footer)
+    if (target.closest('.modal')) return;
 
     // ✅ Skip kalau klik di dropdown topbar — biar Bootstrap handle
-    if (e.target.closest('.dropdown')) {
+    if (target.closest('.dropdown')) {
         // tetap boleh tutup nav-item
         document.querySelectorAll('.bnsp-nav-item.open').forEach(item => {
             item.classList.remove('open');
@@ -337,51 +341,32 @@ document.addEventListener('click', (e) => {
     }
 
     // JANGAN tutup kalau klik di dalam nav-item — biarkan toggle() berjalan dulu
-    if (!e.target.closest('.bnsp-nav-item')) {
+    if (!target.closest('.bnsp-nav-item')) {
         document.querySelectorAll('.bnsp-nav-item.open').forEach(item => {
             item.classList.remove('open');
         });
     }
+
+    const isNavLink = target.closest('.bnsp-nav-link');
+    const isParent  = target.closest('.bnsp-nav-parent');
+    
     // ✅ Tambahan: di mobile, klik submenu-link JANGAN tutup parent
     // Hanya tutup sidebar jika klik link BUKAN parent
     if (!isDesktop()) {
-        if (e.target.closest('.bnsp-nav-link') && !e.target.closest('.bnsp-nav-parent')) {
+        if (isNavLink && !isParent) {
             sidebar.classList.remove('mobile-open');
             backdrop.classList.remove('show');
         }
     }
+ 
     // Tutup flyout portal kalau klik sebuah link navigasi di dalamnya
     // (bukan link parent yang cuma toggle submenu lagi)
-    if (e.target.closest('.bnsp-nav-link') && !e.target.closest('.bnsp-nav-parent')) {
+    if (isNavLink && !isParent) {
         closeTopFlyout();
     } else {
         console.log("tidak ada");
     }
-});
-
-// ===== DETEKSI & ATUR POSISI SUBMENU =====
-// function adjustSubmenuPosition(menuItem) {
-//     const submenu = menuItem.querySelector(':scope > .bnsp-submenu');
-//     if (!submenu) return;
-
-//     const parentRect = menuItem.getBoundingClientRect();
-
-//     // Sembunyikan sesaat, ukur, lalu tampilkan lagi
-//     const wasVisible = submenu.classList.contains('bnsp-flyout-up');
-//     submenu.style.display = 'block';
-//     const submenuHeight = submenu.offsetHeight;
-//     if (!wasVisible) submenu.style.display = '';
-
-//     const spaceBelow = window.innerHeight - parentRect.bottom;
-//     const spaceAbove = parentRect.top;
-
-//     if (spaceBelow < submenuHeight && spaceAbove > submenuHeight) {
-//         submenu.classList.add('bnsp-flyout-up');
-//     } else {
-//         submenu.classList.remove('bnsp-flyout-up');
-//     }
-// }
-
+}); 
 // ===== SESUAIKAN POSISI SUBMENU JIKA MELEWATI BATAS LAYAR =====
 function adjustSubmenuPosition(menuItem) {
     const submenu = menuItem.querySelector(':scope > .bnsp-submenu');

@@ -11,7 +11,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
+use Models\School;
 use Throwable;
 
 class AcademicSemesterController extends MainController
@@ -52,14 +54,12 @@ class AcademicSemesterController extends MainController
      */
     public function create(): View
     {
-        $academicSemester = new AcademicSemester();
-        $result = $this->getForm($academicSemester);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
-
+        $academic_semester = new AcademicSemester();
+        $schools = School::active()->pluck('name', 'id')->prepend('-- Pilih Unit --', '')->toArray();
+        $academic_years = \Models\AcademicYear::pluck('name', 'id')->prepend('-- Pilih Tahun Akademik --', '')->toArray();
         return view(
             'AcademicSemester::create',
-            compact('academicSemester', 'forms', 'groupedForms')
+            compact('academic_semester', 'schools', 'academic_years')
         );
     }
 
@@ -68,22 +68,7 @@ class AcademicSemesterController extends MainController
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'organization_id' => ['required', 'integer'],
-            'school_id' => ['required', 'integer'],
-            'academic_year_id' => ['required', 'integer'],
-            'code' => ['required', 'string', 'max:255'],
-            'name' => ['required', 'string', 'max:255'],
-            'type' => ['required', 'string', 'max:255'],
-            'start_date' => ['required', 'string', 'max:255'],
-            'end_date' => ['required', 'string', 'max:255'],
-            'krs_start_date' => ['required', 'string', 'max:255'],
-            'krs_end_date' => ['required', 'string', 'max:255'],
-            'is_active' => ['required', 'string', 'max:255'],
-            'is_current' => ['required', 'string', 'max:255'],
-            'created_at' => ['required', 'string', 'max:255'],
-            'updated_at' => ['required', 'string', 'max:255'],
-        ]);
+        $validated = $this->validated($request);
 
         try {
             $model = DB::transaction(function () use ($validated) {
@@ -92,13 +77,13 @@ class AcademicSemesterController extends MainController
 
             return $this->successResponse(
                 $request,
-                'Data AcademicSemester berhasil ditambahkan.',
+                'Data Semester berhasil ditambahkan.',
                 $model
             );
         } catch (Throwable $e) {
 
             Log::error(
-                'Gagal menambahkan AcademicSemester.',
+                'Gagal menambahkan Semester .',
                 [
                     'exception' => $e,
                     'data' => $validated,
@@ -108,7 +93,7 @@ class AcademicSemesterController extends MainController
 
             return $this->errorResponse(
                 $request,
-                'Data AcademicSemester gagal ditambahkan.'
+                'Data Semester gagal ditambahkan.'
             );
         }
     }
@@ -119,9 +104,11 @@ class AcademicSemesterController extends MainController
     public function edit($id): View
     {
         $academic_semester = $this->model->findOrFail($id);
+        $schools = School::active()->pluck('name', 'id')->prepend('-- Pilih Unit --', '')->toArray();
+        $academic_years = \Models\AcademicYear::pluck('name', 'id')->prepend('-- Pilih Tahun Akademik --', '')->toArray();
         return view(
             'AcademicSemester::edit',
-            compact('academic_semester')
+            compact('academic_semester', 'schools', 'academic_years')
         );
     }
 
@@ -130,43 +117,25 @@ class AcademicSemesterController extends MainController
      */
     public function update(Request $request, $id)
     {
-        $validated = $request->validate([
-            'organization_id' => ['required', 'integer'],
-            'school_id' => ['required', 'integer'],
-            'academic_year_id' => ['required', 'integer'],
-            'code' => ['required', 'string', 'max:255'],
-            'name' => ['required', 'string', 'max:255'],
-            'type' => ['required', 'string', 'max:255'],
-            'start_date' => ['required', 'string', 'max:255'],
-            'end_date' => ['required', 'string', 'max:255'],
-            'krs_start_date' => ['required', 'string', 'max:255'],
-            'krs_end_date' => ['required', 'string', 'max:255'],
-            'is_active' => ['required', 'string', 'max:255'],
-            'is_current' => ['required', 'string', 'max:255'],
-            'created_at' => ['required', 'string', 'max:255'],
-            'updated_at' => ['required', 'string', 'max:255'],
-        ]);
+        $validated = $this->validated($request, $id);
 
         try {
             $academicSemester = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $academicSemester,
-                $validated
-            ) {
+            DB::transaction(function () use ($academicSemester, $validated) {
                 $academicSemester->update($validated);
             });
 
             return $this->successResponse(
                 $request,
-                'Data AcademicSemester berhasil diperbarui.',
+                'Data Semester berhasil diperbarui.',
                 $academicSemester
             );
         } catch (Throwable $e) {
             Log::error(
-                'Gagal memperbarui AcademicSemester.',
+                'Gagal memperbarui Semester .',
                 [
                     'exception' => $e,
-                    'AcademicSemester_id' => $id,
+                    'academic_emester_id' => $id,
                     'data' => $validated,
                     'user_id' => Auth::id(),
                 ]
@@ -174,7 +143,7 @@ class AcademicSemesterController extends MainController
 
             return $this->errorResponse(
                 $request,
-                'Data AcademicSemester gagal diperbarui.'
+                'Data Semester gagal diperbarui.'
             );
         }
     }
@@ -193,23 +162,56 @@ class AcademicSemesterController extends MainController
 
             return $this->successResponse(
                 $request,
-                'Data AcademicSemester berhasil dihapus.'
+                'Data Semester berhasil dihapus.'
             );
         } catch (Throwable $e) {
             // $academicSemester->getKey() yang bisa undefined.
             Log::error(
-                'Gagal menghapus AcademicSemester.',
+                'Gagal menghapus Semester .',
                 [
                     'exception' => $e,
-                    'AcademicSemester_id' => $id,
+                    'academic_emester_id' => $id,
                     'user_id' => Auth::id(),
                 ]
             );
 
             return $this->errorResponse(
                 $request,
-                'Data AcademicSemester gagal dihapus.'
+                'Data Semester gagal dihapus.'
             );
         }
+    }
+
+    private function validated($request, $id = null)
+    {
+        $validated = $request->validate([
+            'school_id' => ['required', 'integer'],
+            'academic_year_id' => ['required', 'integer'],
+            'code' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('academic_semesters', 'code')
+                    ->where(function ($query) use ($request, $id) {
+                        $query->where('school_id', $request->school_id)
+                            ->where('academic_year_id', $request->academic_year_id);
+
+                        // Jika sedang update, abaikan record saat ini
+                        if ($id) {
+                            $query->where('id', '!=', $id);
+                        }
+
+                        return $query;
+                    })
+            ],
+            'name' => ['required', 'string', 'max:255'],
+            'type' => ['required', 'string', 'max:255'],
+            'start_date' => ['required', 'string', 'max:255'],
+            'end_date' => ['required', 'string', 'max:255'],
+            'krs_start_date' => ['required', 'string', 'max:255'],
+            'krs_end_date' => ['required', 'string', 'max:255'],
+        ]);
+
+        return $validated;
     }
 }

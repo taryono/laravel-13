@@ -1,5 +1,5 @@
  {{-- Sembunyikan input jika diperlukan / otomatis dari konteks --}}
- @if (!isset($academicYear))
+ @if (!isset($academic_year))
      <div class="row mb-3">
          <label class="col-md-3 form-label">Organisasi <span class="text-danger">*</span></label>
          <div class="col-md-9">
@@ -18,14 +18,14 @@
  <div class="row mb-3">
      <label class="col-md-3 form-label">Nama Tahun Ajaran <span class="text-danger">*</span></label>
      <div class="col-md-9">
-         {{ Form::text('name', $academicYear->name ?? null, ['class' => 'form-control', 'required' => 'required', 'placeholder' => 'Contoh: Tahun Ajaran 2026/2027']) }}
+         {{ Form::text('name', $academic_year->name ?? null, ['class' => 'form-control', 'required' => 'required', 'placeholder' => 'Contoh: Tahun Ajaran 2026/2027']) }}
      </div>
  </div>
 
  <div class="row mb-3">
      <label class="col-md-3 form-label">Kode <span class="text-danger">*</span></label>
      <div class="col-md-9">
-         {{ Form::text('code', $academicYear->code ?? null, ['class' => 'form-control', 'required' => 'required', 'maxlength' => 20, 'placeholder' => 'Contoh: TA2026-27']) }}
+         {{ Form::text('code', $academic_year->code ?? null, ['class' => 'form-control', 'required' => 'required', 'maxlength' => 20, 'placeholder' => 'Contoh: TA2026-27']) }}
          <small class="text-muted">Unik per Organisasi</small>
      </div>
  </div>
@@ -33,14 +33,14 @@
  <div class="row mb-3">
      <label class="col-md-3 form-label">Tanggal Mulai <span class="text-danger">*</span></label>
      <div class="col-md-9">
-         {{ Form::date('start_date', $academicYear->start_date ?? null, ['class' => 'form-control', 'required' => 'required']) }}
+         {{ Form::date('start_date', $academic_year->start_date ?? null, ['class' => 'form-control', 'required' => 'required']) }}
      </div>
  </div>
 
  <div class="row mb-3">
      <label class="col-md-3 form-label">Tanggal Selesai <span class="text-danger">*</span></label>
      <div class="col-md-9">
-         {{ Form::date('end_date', $academicYear->end_date ?? null, ['class' => 'form-control', 'required' => 'required']) }}
+         {{ Form::date('end_date', $academic_year->end_date ?? null, ['class' => 'form-control', 'required' => 'required']) }}
      </div>
  </div>
 
@@ -50,14 +50,14 @@
  <div class="row mb-3">
      <label class="col-md-3 form-label">Tanggal Mulai Semester</label>
      <div class="col-md-9">
-         {{ Form::date('semester_start_date', $academicYear->semester_start_date ?? null, ['class' => 'form-control']) }}
+         {{ Form::date('semester_start_date', $academic_year->semester_start_date ?? null, ['class' => 'form-control']) }}
      </div>
  </div>
 
  <div class="row mb-3">
      <label class="col-md-3 form-label">Tanggal Selesai Semester</label>
      <div class="col-md-9">
-         {{ Form::date('semester_end_date', $academicYear->semester_end_date ?? null, ['class' => 'form-control']) }}
+         {{ Form::date('semester_end_date', $academic_year->semester_end_date ?? null, ['class' => 'form-control']) }}
      </div>
  </div>
 
@@ -68,7 +68,7 @@
      <label class="col-md-3 form-label">Buka Pendaftaran?</label>
      <div class="col-md-9 pt-2">
          <label class="form-check-label me-3">
-             {{ Form::checkbox('is_registration_open', 1, $academicYear->is_registration_open ?? false, ['class' => 'form-check-input']) }}
+             {{ Form::checkbox('is_registration_open', 1, $academic_year->is_registration_open ?? false, ['class' => 'form-check-input']) }}
              Ya, Buka
          </label>
      </div>
@@ -77,14 +77,14 @@
  <div class="row mb-3">
      <label class="col-md-3 form-label">Tanggal Mulai Daftar</label>
      <div class="col-md-9">
-         {{ Form::date('registration_start_date', $academicYear->registration_start_date ?? null, ['class' => 'form-control']) }}
+         {{ Form::date('registration_start_date', $academic_year->registration_start_date ?? null, ['class' => 'form-control']) }}
      </div>
  </div>
 
  <div class="row mb-3">
      <label class="col-md-3 form-label">Tanggal Tutup Daftar</label>
      <div class="col-md-9">
-         {{ Form::date('registration_end_date', $academicYear->registration_end_date ?? null, ['class' => 'form-control']) }}
+         {{ Form::date('registration_end_date', $academic_year->registration_end_date ?? null, ['class' => 'form-control']) }}
      </div>
  </div>
 
@@ -95,7 +95,7 @@
      <label class="col-md-3 form-label">Status Aktif</label>
      <div class="col-md-9 pt-2">
          <label class="form-check-label me-3">
-             {{ Form::checkbox('is_active', 1, $academicYear->is_active ?? true, ['class' => 'form-check-input']) }}
+             {{ Form::checkbox('is_active', 1, $academic_year->is_active ?? true, ['class' => 'form-check-input']) }}
              Aktif
          </label>
      </div>
@@ -105,7 +105,7 @@
      <label class="col-md-3 form-label">Tahun Ajaran Saat Ini</label>
      <div class="col-md-9 pt-2">
          <label class="form-check-label me-3">
-             {{ Form::checkbox('is_current', 1, $academicYear->is_current ?? false, ['class' => 'form-check-input']) }}
+             {{ Form::checkbox('is_current', 1, $academic_year->is_current ?? false, ['class' => 'form-check-input']) }}
              Jadikan Saat Ini
          </label>
          <small class="text-muted">Hanya boleh satu yang aktif</small>

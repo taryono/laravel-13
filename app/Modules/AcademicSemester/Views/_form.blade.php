@@ -1,6 +1,6 @@
 @php
-    $model = $academicSemester ?? null;
-    $selectedOrg = old('organization_id', $model->organization_id ?? null);
+    $model = $academic_semester ?? null;
+    $selectedOrg = old('school_id', $model->school_id ?? null);
     $selectedSchool = old('school_id', $model->school_id ?? null);
     $selectedYear = old('academic_year_id', $model->academic_year_id ?? null);
     $code = old('code', $model->code ?? null);
@@ -29,24 +29,10 @@
 <div class="row">
     <div class="col-md-6">
         <div class="form-group">
-            {{ Form::label('organization_id', 'Organisasi *', ['class' => 'control-label']) }}
-            {{ Form::select('organization_id', $organizations ?? [], $selectedOrg, [
-                'class' => 'form-control select2' . ($errors->has('organization_id') ? ' is-invalid' : ''),
-                'placeholder' => '-- Pilih Organisasi --',
-                'required' => true,
-            ]) }}
-            @error('organization_id')
-                <span class="invalid-feedback">{{ $message }}</span>
-            @enderror
-        </div>
-    </div>
-
-    <div class="col-md-6">
-        <div class="form-group">
-            {{ Form::label('school_id', 'Sekolah *', ['class' => 'control-label']) }}
+            {{ Form::label('school_id', 'Unit *', ['class' => 'control-label']) }}
             {{ Form::select('school_id', $schools ?? [], $selectedSchool, [
                 'class' => 'form-control select2' . ($errors->has('school_id') ? ' is-invalid' : ''),
-                'placeholder' => '-- Pilih Sekolah --',
+                'placeholder' => '-- Pilih Unit --',
                 'required' => true,
             ]) }}
             @error('school_id')
@@ -58,7 +44,7 @@
     <div class="col-md-6">
         <div class="form-group">
             {{ Form::label('academic_year_id', 'Tahun Ajaran *', ['class' => 'control-label']) }}
-            {{ Form::select('academic_year_id', $academicYears ?? [], $selectedYear, [
+            {{ Form::select('academic_year_id', $academic_years ?? [], $selectedYear, [
                 'class' => 'form-control select2' . ($errors->has('academic_year_id') ? ' is-invalid' : ''),
                 'placeholder' => '-- Pilih Tahun Ajaran --',
                 'required' => true,
@@ -99,27 +85,7 @@
         </div>
     </div>
 
-    <div class="col-md-6">
-        <div class="form-group">
-            {{ Form::label('type', 'Tipe *', ['class' => 'control-label']) }}
-            {{ Form::select(
-                'type',
-                [
-                    'ganjil' => 'Ganjil',
-                    'genap' => 'Genap',
-                    'pendek' => 'Pendek',
-                ],
-                $type,
-                [
-                    'class' => 'form-control' . ($errors->has('type') ? ' is-invalid' : ''),
-                    'required' => true,
-                ],
-            ) }}
-            @error('type')
-                <span class="invalid-feedback">{{ $message }}</span>
-            @enderror
-        </div>
-    </div>
+
 
     <div class="col-md-6">
         <div class="form-group">
@@ -171,6 +137,7 @@
         </div>
     </div>
 
+
     <div class="col-md-6">
         <div class="form-group">
             {{ Form::label('is_active', 'Status Aktif', ['class' => 'control-label d-block']) }}
@@ -196,7 +163,29 @@
                 ]) }}
                 {{ Form::label('is_current', 'Tandai sebagai semester berjalan', ['class' => 'custom-control-label']) }}
             </div>
-            <small class="text-muted">Hanya boleh 1 semester berjalan per sekolah.</small>
+            <small class="text-muted">Hanya boleh 1 semester berjalan per Unit.</small>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="form-group">
+            {{ Form::label('type', 'Tipe *', ['class' => 'control-label']) }}
+            {{ Form::select(
+                'type',
+                [
+                    'ganjil' => 'Ganjil',
+                    'genap' => 'Genap',
+                    'pendek' => 'Pendek',
+                ],
+                $type,
+                [
+                    'class' => 'form-control' . ($errors->has('type') ? ' is-invalid' : ''),
+                    'required' => true,
+                ],
+            ) }}
+            @error('type')
+                <span class="invalid-feedback">{{ $message }}</span>
+            @enderror
         </div>
     </div>
 </div>

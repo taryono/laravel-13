@@ -50,7 +50,18 @@
 
     function extractButtonOptions(triggerEl) {
         const buttons = [];
-        if (triggerEl.dataset.submit) buttons.push(triggerEl.dataset.submit);
+        if (triggerEl.dataset.submit) {
+            let submitBtn = triggerEl.dataset.submit;
+            // Pastikan memiliki class modal-submit agar dikenali oleh listener button.js
+            if (!submitBtn.includes('modal-submit')) {
+                if (/class=["']/.test(submitBtn)) {
+                    submitBtn = submitBtn.replace(/(class=["'][^"']*)/, '$1 modal-submit');
+                } else {
+                    submitBtn = submitBtn.replace('<button', '<button class="modal-submit"');
+                }
+            }
+            buttons.push(submitBtn);
+        }
         if (triggerEl.dataset.cancel) buttons.push(triggerEl.dataset.cancel);
         if (triggerEl.dataset.close) buttons.push(triggerEl.dataset.close);
         return buttons;

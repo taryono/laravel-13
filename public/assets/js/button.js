@@ -747,7 +747,7 @@
         const EventHandlers = {
             init: function() {
                 $(document)
-                    .on('click', '.modal-submit', this.handleModalSubmit)
+                    .on('click', '.modal-submit, #dynamicModal .modal-footer button[type="submit"], #dynamicModal .modal-footer button[form]', this.handleModalSubmit)
                     .on('click', '.submit-button', this.handleSubmitButton)
                     .on('submit', 'form.form-horizontal', this.handleFormSubmit)
                     .on('click', '.create-inline, .show-inline, .edit-inline, .anonimous-inline', this.handleInlineNavigation)
@@ -804,8 +804,18 @@
                 e.preventDefault();
 
                 const $button = $(this);
-                const $form = $button.closest('.modal-content').find('form');
-                const $closeButton = $button.closest('.modal').find('button.btn-close');
+                const formId = $button.attr('form');
+                let $form = formId ? $(`#${formId}`) : $();
+                if (!$form.length) {
+                    $form = $button.closest('.modal-content').find('form');
+                }
+                if (!$form.length && formId) {
+                    $form = $(`form[id="${formId}"]`);
+                }
+                if (!$form.length) {
+                    $form = $('#dynamicModal').find('form');
+                }
+                const $closeButton = $button.closest('.modal').find('button.btn-close, [data-bs-dismiss="modal"]');
 
                 // Ambil dari context atau attribute
                 let executeDraw = DataTableContext.getValue('executeDraw', true);
@@ -888,7 +898,7 @@
 
             handleFormSubmit: function(e) {
                 e.preventDefault();
-
+                console.log('handleFormSubmit',e)
                 const $form = $(this);
                 const ctx = $form.data('submitCtx') || {
                     targetElement: $form.data('target'),

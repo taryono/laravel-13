@@ -17,7 +17,7 @@ class AcademicSemesterDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['organization.name', 'school.name', 'academic_year.name', 'code', 'name', 'type', 'start_date', 'end_date', 'krs_start_date', 'krs_end_date', 'is_active', 'is_current'];
+    protected array $columns = ['organization.name', 'school.name', 'academic_year.name', 'code', 'name', 'type', 'start_date_formatted', 'end_date_formatted', 'krs_start_date_formatted', 'krs_end_date_formatted', 'is_active', 'is_current'];
 
     /**
      * Build DataTable response.
@@ -35,6 +35,10 @@ class AcademicSemesterDataTable extends DataTable
             ->editColumn('academic_year.name', function ($row) {
                 return $row->academic_year->name;
             })
+            ->addColumn('start_date_formatted', fn($row) => $row->start_date_formatted)
+            ->addColumn('end_date_formatted', fn($row) => $row->end_date_formatted)
+            ->addColumn('krs_start_date_formatted', fn($row) => $row->krs_start_date_formatted)
+            ->addColumn('krs_end_date_formatted', fn($row) => $row->krs_end_date_formatted)
             ->editColumn('type', function ($row) {
                 return $row->type;
             })

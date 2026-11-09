@@ -38,7 +38,13 @@ class School extends BasedModel
     }
 
     public function teachers()
-{
-    return $this->hasMany(Teacher::class);
-}
+    {
+        return $this->hasMany(Teacher::class);
+    }
+
+    // Scope
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
 }

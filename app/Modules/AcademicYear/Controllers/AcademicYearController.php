@@ -52,14 +52,11 @@ class AcademicYearController extends MainController
      */
     public function create(): View
     {
-        $academicYear = new AcademicYear();
-        $result = $this->getForm($academicYear);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
-
+        $academic_year = new AcademicYear();
+        $schools = \Models\School::with('organization')->pluck('name', 'id')->toArray();
         return view(
             'AcademicYear::create',
-            compact('academicYear', 'forms', 'groupedForms')
+            compact('academic_year', 'schools')
         );
     }
 
@@ -94,14 +91,14 @@ class AcademicYearController extends MainController
 
             return $this->successResponse(
                 $request,
-                'Data AcademicYear berhasil ditambahkan.',
+                'Data Tahun Ajaran berhasil ditambahkan.',
                 $model
             );
 
         } catch (Throwable $e) {
 
             Log::error(
-                'Gagal menambahkan AcademicYear.',
+                'Gagal menambahkan Tahun Ajaran.',
                 [
                     'exception' => $e,
                     'data' => $validated,
@@ -111,7 +108,7 @@ class AcademicYearController extends MainController
 
             return $this->errorResponse(
                 $request,
-                'Data AcademicYear gagal ditambahkan.'
+                'Data Tahun Ajaran gagal ditambahkan.'
             );
         }
     }
@@ -121,14 +118,14 @@ class AcademicYearController extends MainController
      */
     public function edit($id): View
     {
-        $academicYear = $this->model->findOrFail($id);
-        $result = $this->getForm($academicYear);
+        $academic_year = $this->model->findOrFail($id);
+        $result = $this->getForm($academic_year);
         $forms = $result['forms'];
         $groupedForms = $result['grouped'];
 
         return view(
             'AcademicYear::edit',
-            compact('academicYear', 'forms', 'groupedForms')
+            compact('academic_year', 'forms', 'groupedForms')
         );
     }
 
@@ -157,26 +154,26 @@ class AcademicYearController extends MainController
         ]);
 
         try {
-            $academicYear = $this->model->findOrFail($id);
+            $academic_year = $this->model->findOrFail($id);
             DB::transaction(function () use (
-                $academicYear,
+                $academic_year,
                 $validated
             ) {
-                $academicYear->update($validated);
+                $academic_year->update($validated);
             });
 
             return $this->successResponse(
                 $request,
-                'Data AcademicYear berhasil diperbarui.',
-                $academicYear
+                'Data Tahun Ajaran berhasil diperbarui.',
+                $academic_year
             );
 
         } catch (Throwable $e) { 
             Log::error(
-                'Gagal memperbarui AcademicYear.',
+                'Gagal memperbarui Tahun Ajaran.',
                 [
                     'exception' => $e,
-                    'AcademicYear_id' => $id,
+                    'academic_year_id' => $id,
                     'data' => $validated,
                     'user_id' => Auth::id(),
                 ]
@@ -184,7 +181,7 @@ class AcademicYearController extends MainController
 
             return $this->errorResponse(
                 $request,
-                'Data AcademicYear gagal diperbarui.'
+                'Data Tahun Ajaran gagal diperbarui.'
             );
         }
     }
@@ -195,31 +192,31 @@ class AcademicYearController extends MainController
     public function destroy(Request $request, $id): JsonResponse|RedirectResponse
     {
         try {
-            $academicYear = $this->model->findOrFail($id);
+            $academic_year = $this->model->findOrFail($id);
 
-            DB::transaction(function () use ($academicYear) {
-                $academicYear->delete();
+            DB::transaction(function () use ($academic_year) {
+                $academic_year->delete();
             });
 
             return $this->successResponse(
                 $request,
-                'Data AcademicYear berhasil dihapus.'
+                'Data Tahun Ajaran berhasil dihapus.'
             );
 
         } catch (Throwable $e) { 
-            // $academicYear->getKey() yang bisa undefined.
+            // $academic_year->getKey() yang bisa undefined.
             Log::error(
-                'Gagal menghapus AcademicYear.',
+                'Gagal menghapus Tahun Ajaran.',
                 [
                     'exception' => $e,
-                    'AcademicYear_id' => $id,
+                    'academic_year_id' => $id,
                     'user_id' => Auth::id(),
                 ]
             );
 
             return $this->errorResponse(
                 $request,
-                'Data AcademicYear gagal dihapus.'
+                'Data Tahun Ajaran gagal dihapus.'
             );
         }
     } 
@@ -227,20 +224,20 @@ class AcademicYearController extends MainController
     public function updateRegistrationOpen(Request $request, $academic_year, $is_registration_open): JsonResponse
     {
         try {
-            $academicYear = $this->model->where('academic_year', $academic_year)->first();
-            $academicYear->update(['is_registration_open' => $is_registration_open]);
+            $academic_year = $this->model->where('academic_year', $academic_year)->first();
+            $academic_year->update(['is_registration_open' => $is_registration_open]);
             
             return $this->successResponse(
                 $request,
-                'Data AcademicYear berhasil diperbarui.',
-                $academicYear
+                'Data Tahun Ajaran berhasil diperbarui.',
+                $academic_year
             );
         } catch (Throwable $e) {
             Log::error(
-                'Gagal memperbarui AcademicYear.',
+                'Gagal memperbarui Tahun Ajaran.',
                 [
                     'exception' => $e,
-                    'AcademicYear_id' => $academic_year,
+                    'academic_year_id' => $academic_year,
                     'data' => $request->all(),
                     'user_id' => Auth::id(),
                 ]
@@ -248,7 +245,7 @@ class AcademicYearController extends MainController
 
             return $this->errorResponse(
                 $request,
-                'Data AcademicYear gagal diperbarui.'
+                'Data Tahun Ajaran gagal diperbarui.'
             );
         }
     }
@@ -256,20 +253,20 @@ class AcademicYearController extends MainController
     public function updateActive(Request $request, $academic_year, $is_active): JsonResponse
     {
         try {
-            $academicYear = $this->model->where('academic_year', $academic_year)->first();
-            $academicYear->update(['is_active' => $is_active]);
+            $academic_year = $this->model->where('academic_year', $academic_year)->first();
+            $academic_year->update(['is_active' => $is_active]);
             
             return $this->successResponse(
                 $request,
-                'Data AcademicYear berhasil diperbarui.',
-                $academicYear
+                'Data Tahun Ajaran berhasil diperbarui.',
+                $academic_year
             );
         } catch (Throwable $e) {
             Log::error(
-                'Gagal memperbarui AcademicYear.',
+                'Gagal memperbarui Tahun Ajaran.',
                 [
                     'exception' => $e,
-                    'AcademicYear_id' => $academic_year,
+                    'academic_year_id' => $academic_year,
                     'data' => $request->all(),
                     'user_id' => Auth::id(),
                 ]
@@ -277,7 +274,7 @@ class AcademicYearController extends MainController
 
             return $this->errorResponse(
                 $request,
-                'Data AcademicYear gagal diperbarui.'
+                'Data Tahun Ajaran gagal diperbarui.'
             );
         }
     }
@@ -285,20 +282,20 @@ class AcademicYearController extends MainController
     public function updateCurrent(Request $request, $academic_year, $is_current): JsonResponse
     {
         try {
-            $academicYear = $this->model->where('academic_year', $academic_year)->first();
-            $academicYear->update(['is_current' => $is_current]);
+            $academic_year = $this->model->where('academic_year', $academic_year)->first();
+            $academic_year->update(['is_current' => $is_current]);
             
             return $this->successResponse(
                 $request,
-                'Data AcademicYear berhasil diperbarui.',
-                $academicYear
+                'Data Tahun Ajaran berhasil diperbarui.',
+                $academic_year
             );
         } catch (Throwable $e) {
             Log::error(
-                'Gagal memperbarui AcademicYear.',
+                'Gagal memperbarui Tahun Ajaran.',
                 [
                     'exception' => $e,
-                    'AcademicYear_id' => $academic_year,
+                    'academic_year_id' => $academic_year,
                     'data' => $request->all(),
                     'user_id' => Auth::id(),
                 ]
@@ -306,7 +303,7 @@ class AcademicYearController extends MainController
 
             return $this->errorResponse(
                 $request,
-                'Data AcademicYear gagal diperbarui.'
+                'Data Tahun Ajaran gagal diperbarui.'
             );
         }
     }

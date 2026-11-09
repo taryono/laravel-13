@@ -59,7 +59,7 @@ class AppServiceProvider extends ServiceProvider
             $view->with('organization', Organization::first());
         });
         Employee::observe(EmployeeObserver::class);
-
+        \Carbon\Carbon::setLocale('id');
     }
 
 }

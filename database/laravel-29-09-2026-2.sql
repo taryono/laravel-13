@@ -14526,6 +14526,7 @@ CREATE TABLE `schools`  (
   `address` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
   `status` enum('trial','active','suspended') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'trial',
   `trial_ends_at` timestamp NULL DEFAULT NULL,
+   `is_active` tinyint(1) NOT NULL DEFAULT 1,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
