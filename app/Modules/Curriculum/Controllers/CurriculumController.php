@@ -49,17 +49,14 @@ class CurriculumController extends MainController
     /**
      * Show the form for creating a new resource.
      */
-    public function create(): View
+    public function create()
     {
-        $curriculum = new Curriculum();
-        $result = $this->getForm($curriculum);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
-
-        return view(
-            'Curriculum::create',
-            compact('curriculum', 'forms', 'groupedForms')
-        );
+        return view('Curriculum::create', [
+            'organizations' => \Models\Organization::pluck('name', 'id')->toArray(),
+            'schools' => \Models\School::pluck('name', 'id')->toArray(),
+            'classLevels' => \Models\ClassLevel::pluck('name', 'id')->toArray(),
+            'academicYears' => \Models\AcademicYear::pluck('name', 'id')->toArray(),
+        ]);
     }
 
     /**
@@ -68,7 +65,7 @@ class CurriculumController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'code' => ['required', 'string', 'max:255'],
+            'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
         ]);
 
@@ -107,14 +104,15 @@ class CurriculumController extends MainController
     public function edit($id): View
     {
         $curriculum = $this->model->findOrFail($id);
-        $result = $this->getForm($curriculum);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
+        $curriculum->load('assignments');
 
-        return view(
-            'Curriculum::edit',
-            compact('curriculum', 'forms', 'groupedForms')
-        );
+        return view('Curriculum::edit', [
+            'curriculum' => $curriculum,
+            'organizations' => \Models\Organization::pluck('name', 'id')->toArray(),
+            'schools' => \Models\School::pluck('name', 'id')->toArray(),
+            'classLevels' => \Models\ClassLevel::pluck('name', 'id')->toArray(),
+            'academicYears' => \Models\AcademicYear::pluck('name', 'id')->toArray(),
+        ]);
     }
 
     /**
@@ -123,16 +121,13 @@ class CurriculumController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'code' => ['required', 'string', 'max:255'],
+            'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
         ]);
 
         try {
             $curriculum = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $curriculum,
-                $validated
-            ) {
+            DB::transaction(function () use ($curriculum, $validated) {
                 $curriculum->update($validated);
             });
 
@@ -142,7 +137,7 @@ class CurriculumController extends MainController
                 $curriculum
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui Curriculum.',
                 [
@@ -177,7 +172,7 @@ class CurriculumController extends MainController
                 'Data Curriculum berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $curriculum->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus Curriculum.',
@@ -193,5 +188,5 @@ class CurriculumController extends MainController
                 'Data Curriculum gagal dihapus.'
             );
         }
-    } 
+    }
 }

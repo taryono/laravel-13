@@ -15,6 +15,7 @@ use Throwable;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use App\Rules\StrongPassword;
+use Illuminate\Support\Arr;
 
 class UserController extends MainController
 {
@@ -58,12 +59,11 @@ class UserController extends MainController
     public function create(): View
     {
         $user = new User();
-        $result = $this->getForm($user);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
+        $organizations = \Models\Organization::pluck('name', 'id')->toArray();
+        $roles = \Models\Role::pluck('name', 'id')->toArray();
         return view(
             'User::create',
-            compact('user', 'forms', 'groupedForms')
+            compact('user', 'organizations', 'roles')
         );
     }
 
@@ -118,10 +118,9 @@ class UserController extends MainController
     public function edit($id): View
     {
         $user = $this->model->findOrFail($id);
-        $result = $this->getForm($user);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
-        return view('User::edit', compact('user', 'forms', 'groupedForms'));
+        $organizations = \Models\Organization::pluck('name', 'id')->toArray();
+        $roles = \Models\Role::pluck('name', 'id')->toArray();
+        return view('User::edit', compact('user', 'organizations', 'roles'));
     }
 
     /**

@@ -1,17 +1,109 @@
 {{ Form::open(['method' => 'POST', 'route' => ['user.store'], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
-    <div class="row">
-        <div class="col-md-6 mb-3">
-            @forelse ($forms as $key => $form)
-                <div class="form-group">
-                    <label for="{{ $key }}">{{ say($form['label']) }}</label>
-                    {!! $form['content'] !!}
-                </div>
-            @empty
-                <p>{{ say('Data Tidak Ditemukan') }}</p>
-            @endforelse
-        </div>
+
+  <div class="row g-3">
+
+    {{-- Name --}}
+    <div class="col-md-6">
+      {{ Form::label('name', 'Name', ['class' => 'form-label']) }}
+      {{ Form::text('name', old('name'), ['class' => 'form-control' . ($errors->has('name') ? ' is-invalid' : ''), 'placeholder' => 'Full name']) }}
+      @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
     </div>
-{{ Form::close() }}  
+
+    {{-- Email --}}
+    <div class="col-md-6">
+      {{ Form::label('email', 'Email', ['class' => 'form-label']) }}
+      {{ Form::email('email', old('email'), ['class' => 'form-control' . ($errors->has('email') ? ' is-invalid' : ''), 'placeholder' => 'email@example.com']) }}
+      @error('email') <div class="invalid-feedback">{{ $message }}</div> @enderror
+    </div>
+
+    {{-- Password --}}
+    <div class="col-md-6">
+      {{ Form::label('password', 'Password', ['class' => 'form-label']) }}
+      {{ Form::password('password', ['class' => 'form-control' . ($errors->has('password') ? ' is-invalid' : ''), 'placeholder' => 'Password', 'autocomplete' => 'new-password']) }}
+      @error('password') <div class="invalid-feedback">{{ $message }}</div> @enderror
+    </div>
+
+    {{-- Password Confirmation --}}
+    <div class="col-md-6">
+      {{ Form::label('password_confirmation', 'Confirm Password', ['class' => 'form-label']) }}
+      {{ Form::password('password_confirmation', ['class' => 'form-control', 'placeholder' => 'Confirm password', 'autocomplete' => 'new-password']) }}
+    </div>
+
+    {{-- Organization --}}
+    <div class="col-md-6">
+      {{ Form::label('current_organization_id', 'Organization', ['class' => 'form-label']) }}
+      {{ Form::select('current_organization_id', $organizations ?? [], old('current_organization_id'), ['class' => 'form-select' . ($errors->has('current_organization_id') ? ' is-invalid' : ''), 'placeholder' => '-- Select Organization --']) }}
+      @error('current_organization_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
+    </div>
+
+    {{-- Role --}}
+    <div class="col-md-6">
+      {{ Form::label('isCheckingRole', 'Role', ['class' => 'form-label']) }}
+      {{ Form::select('isCheckingRole', $roles ?? [], old('isCheckingRole'), ['class' => 'form-select' . ($errors->has('isCheckingRole') ? ' is-invalid' : ''), 'placeholder' => '-- Select Role --']) }}
+      @error('isCheckingRole') <div class="invalid-feedback">{{ $message }}</div> @enderror
+    </div>
+
+    {{-- Email Verified At --}}
+    <div class="col-md-6">
+      {{ Form::label('email_verified_at', 'Email Verified At', ['class' => 'form-label']) }}
+      {{ Form::input('datetime-local', 'email_verified_at', old('email_verified_at'), ['class' => 'form-control' . ($errors->has('email_verified_at') ? ' is-invalid' : '')]) }}
+      @error('email_verified_at') <div class="invalid-feedback">{{ $message }}</div> @enderror
+    </div>
+
+    {{-- Last Login At --}}
+    <div class="col-md-6">
+      {{ Form::label('last_login_at', 'Last Login At', ['class' => 'form-label']) }}
+      {{ Form::input('datetime-local', 'last_login_at', old('last_login_at'), ['class' => 'form-control' . ($errors->has('last_login_at') ? ' is-invalid' : '')]) }}
+      @error('last_login_at') <div class="invalid-feedback">{{ $message }}</div> @enderror
+    </div>
+
+    {{-- Last Login IP --}}
+    <div class="col-md-6">
+      {{ Form::label('last_login_ip', 'Last Login IP', ['class' => 'form-label']) }}
+      {{ Form::text('last_login_ip', old('last_login_ip'), ['class' => 'form-control' . ($errors->has('last_login_ip') ? ' is-invalid' : ''), 'placeholder' => '192.168.1.1']) }}
+      @error('last_login_ip') <div class="invalid-feedback">{{ $message }}</div> @enderror
+    </div>
+
+    {{-- Two Factor Confirmed At --}}
+    <div class="col-md-6">
+      {{ Form::label('two_factor_confirmed_at', 'Two Factor Confirmed At', ['class' => 'form-label']) }}
+      {{ Form::input('datetime-local', 'two_factor_confirmed_at', old('two_factor_confirmed_at'), ['class' => 'form-control' . ($errors->has('two_factor_confirmed_at') ? ' is-invalid' : '')]) }}
+      @error('two_factor_confirmed_at') <div class="invalid-feedback">{{ $message }}</div> @enderror
+    </div>
+
+    {{-- Two Factor Secret --}}
+    <div class="col-md-6">
+      {{ Form::label('two_factor_secret', 'Two Factor Secret', ['class' => 'form-label']) }}
+      {{ Form::text('two_factor_secret', old('two_factor_secret'), ['class' => 'form-control' . ($errors->has('two_factor_secret') ? ' is-invalid' : ''), 'placeholder' => 'Two factor secret']) }}
+      @error('two_factor_secret') <div class="invalid-feedback">{{ $message }}</div> @enderror
+    </div>
+
+    {{-- Two Factor Recovery Codes (full width) --}}
+    <div class="col-12">
+      {{ Form::label('two_factor_recovery_codes', 'Two Factor Recovery Codes', ['class' => 'form-label']) }}
+      {{ Form::textarea('two_factor_recovery_codes', old('two_factor_recovery_codes'), ['class' => 'form-control' . ($errors->has('two_factor_recovery_codes') ? ' is-invalid' : ''), 'rows' => 3, 'placeholder' => 'Recovery codes (JSON or comma separated)']) }}
+      @error('two_factor_recovery_codes') <div class="invalid-feedback">{{ $message }}</div> @enderror
+    </div>
+
+    {{-- Switches --}}
+    <div class="col-md-6">
+      <div class="form-check form-switch mt-2">
+        {{ Form::hidden('is_trial_user', 0) }}
+        {{ Form::checkbox('is_trial_user', 1, old('is_trial_user'), ['class' => 'form-check-input' . ($errors->has('is_trial_user') ? ' is-invalid' : ''), 'id' => 'is_trial_user']) }}
+        {{ Form::label('is_trial_user', 'Trial User', ['class' => 'form-check-label']) }}
+        @error('is_trial_user') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="form-check form-switch mt-2">
+        {{ Form::hidden('is_demo_admin', 0) }}
+        {{ Form::checkbox('is_demo_admin', 1, old('is_demo_admin'), ['class' => 'form-check-input' . ($errors->has('is_demo_admin') ? ' is-invalid' : ''), 'id' => 'is_demo_admin']) }}
+        {{ Form::label('is_demo_admin', 'Demo Admin', ['class' => 'form-check-label']) }}
+        @error('is_demo_admin') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
+      </div>
+    </div>
+{{ Form::close() }}
 <script>
 (function () {
     if (typeof $ === 'undefined' || typeof $.validator === 'undefined') return;

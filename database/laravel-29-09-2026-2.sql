@@ -17,6 +17,11 @@
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
+-- academic_years
+--   ├── academic_semesters
+--   │     └── academic_calendar_events (via academic_semester_id)
+--   └── academic_calendar_events (via academic_year_id, untuk event tahunan)
+
 -- ----------------------------
 -- Table structure for academic_calendar_events
 -- ----------------------------
@@ -4432,9 +4437,11 @@ CREATE TABLE `curriculum_phases`  (
   `code` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
   `age_range` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  'age_min' TINYINT UNSIGNED NULL,
+  'age_max' TINYINT UNSIGNED NULL,
   `class_levels` json NULL,
   `competencies` json NULL,
-  `order` int NOT NULL DEFAULT 0,
+  `sort_order` int NOT NULL DEFAULT 0,
   `is_active` tinyint(1) NOT NULL DEFAULT 1,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,

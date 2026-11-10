@@ -17,6 +17,11 @@
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
+
+-- academic_years
+--   ├── academic_semesters
+--   │     └── academic_calendar_events (via academic_semester_id)
+--   └── academic_calendar_events (via academic_year_id, untuk event tahunan)
 -- ----------------------------
 -- Table structure for academic_calendar_events
 -- ----------------------------
