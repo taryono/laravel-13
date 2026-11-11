@@ -2,37 +2,32 @@
 
 namespace App\Http\Middleware;
 
+use App\Support\PortalAuth;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Route;
+use Symfony\Component\HttpFoundation\Response;
 
 class ParentAuth
 {
-    public function handle(Request $request, Closure $next)
+    /**
+     * Authenticate parent portal users and superusers.
+     */
+    public function handle(Request $request, Closure $next): Response
     {
-        $loginRoute = Route::has('parent.login') ? 'parent.login' : 'login';
-
-        if (!Auth::guard('web')->check()) {
-            if ($request->expectsJson()) {
-                return response()->json(['error' => 'Silakan login sebagai orang tua.'], 401);
-            }
-            return redirect()->route($loginRoute)
-                ->with('error', 'Silakan login sebagai orang tua.');
+        if (! Auth::guard('web')->check()) {
+            return PortalAuth::unauthenticatedResponse($request, 'Silakan login sebagai orang tua.', 'parent.login');
         }
 
         $user = Auth::guard('web')->user();
 
         // SuperUser bypass (selaras dengan Gate::before di AuthServiceProvider)
-        if ($user->isSuperUser()) {
+        if (PortalAuth::isSuperUser($user)) {
             return $next($request);
         }
 
-        if (!$user->hasRole('parent')) {
-            if ($request->expectsJson()) {
-                return response()->json(['error' => 'Anda tidak memiliki akses ke portal orang tua.'], 403);
-            }
-            abort(403, 'Anda tidak memiliki akses ke portal orang tua.');
+        if (! $user || ! method_exists($user, 'hasAnyRole') || ! $user->hasAnyRole(PortalAuth::PARENT_PORTAL_ROLES)) {
+            return PortalAuth::forbiddenResponse($request, 'Anda tidak memiliki akses ke portal orang tua.');
         }
 
         return $next($request);

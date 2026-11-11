@@ -2,11 +2,14 @@
 if (!function_exists('isSuperUser')) {
     function isSuperUser($user = null)
     {
-        $user = $user ?? (auth()->check() ? auth()->user() : null);
-        if ($user && method_exists($user, 'isSuperUser') && $user->isSuperUser()) {
+        $resolvedUser = $user ?? (auth()->check() ? auth()->user() : null);
+        if ($resolvedUser && method_exists($resolvedUser, 'isSuperUser') && $resolvedUser->isSuperUser()) {
             return true;
         }
-        return session()->get('user_auth.login_as') === "super-admin";
+        if ($user !== null && auth()->check() && method_exists($user, 'getAuthIdentifier') && $user->getAuthIdentifier() !== auth()->id()) {
+            return false;
+        }
+        return request()->hasSession() && session()->get('user_auth.login_as') === "super-admin";
     }
 }
 

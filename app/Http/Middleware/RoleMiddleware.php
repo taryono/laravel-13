@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Support\PortalAuth;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,47 +17,28 @@ class RoleMiddleware
      * @param  string  ...$roles
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function handle(Request $request, Closure $next, ...$roles): Response
+    public function handle(Request $request, Closure $next, string ...$roles): Response
     {
         $user = $request->user();
 
         if (! $user) {
-            if ($request->expectsJson()) {
-                return response()->json(['error' => 'Silakan login terlebih dahulu.'], 401);
-            }
-            return redirect()->route('login');
+            return PortalAuth::unauthenticatedResponse($request);
         }
 
         // SuperUser bypass (selaras dengan Gate::before di AuthServiceProvider)
-        if ($user->isSuperUser()) {
+        if (PortalAuth::isSuperUser($user)) {
             return $next($request);
         }
 
-        if (empty($roles)) {
+        $parsedRoles = PortalAuth::parseList($roles);
+        if (empty($parsedRoles)) {
             return $next($request);
         }
 
-        // Mendukung argumen berupa array atau string dipisah koma (contoh: 'admin,teacher')
-        $parsedRoles = [];
-        foreach ($roles as $role) {
-            foreach (explode(',', (string)$role) as $r) {
-                $trimmed = trim($r);
-                if ($trimmed !== '') {
-                    $parsedRoles[] = $trimmed;
-                }
-            }
-        }
-
-        if ($user->hasAnyRole($parsedRoles)) {
+        if (method_exists($user, 'hasAnyRole') && $user->hasAnyRole($parsedRoles)) {
             return $next($request);
         }
 
-        if ($request->expectsJson()) {
-            return response()->json([
-                'error' => 'Anda tidak memiliki hak akses (peran) untuk halaman ini.',
-            ], 403);
-        }
-
-        abort(403, 'Anda tidak memiliki hak akses (peran) untuk halaman ini.');
+        return PortalAuth::forbiddenResponse($request, 'Anda tidak memiliki hak akses (peran) untuk halaman ini.');
     }
 }

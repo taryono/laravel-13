@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Support\PortalAuth;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -11,32 +12,28 @@ class Proctor
     /**
      * Daftar peran yang diizinkan mengakses dasbor pengawas.
      */
-    protected array $allowedRoles = ['proctor', 'pengawas', 'admin', 'supervisor'];
+    protected array $allowedRoles = PortalAuth::PROCTOR_ROLES;
 
+    /**
+     * Restrict proctoring routes to superusers or allowed proctor roles.
+     */
     public function handle(Request $request, Closure $next): Response
     {
         $user = $request->user();
 
         if (! $user) {
-            if ($request->expectsJson()) {
-                return response()->json(['error' => 'Silakan login terlebih dahulu.'], 401);
-            }
-            return redirect()->route('login');
+            return PortalAuth::unauthenticatedResponse($request);
         }
 
         // SuperUser bypass (selaras dengan Gate::before di AuthServiceProvider)
-        if ($user->isSuperUser()) {
+        if (PortalAuth::isSuperUser($user)) {
             return $next($request);
         }
 
-        if ($user->hasAnyRole($this->allowedRoles)) {
+        if (method_exists($user, 'hasAnyRole') && $user->hasAnyRole($this->allowedRoles)) {
             return $next($request);
         }
 
-        if ($request->expectsJson()) {
-            return response()->json(['error' => 'Akses hanya untuk Pengawas.'], 403);
-        }
-
-        abort(403, 'Akses hanya untuk Pengawas.');
+        return PortalAuth::forbiddenResponse($request, 'Akses hanya untuk Pengawas.');
     }
 }

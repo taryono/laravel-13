@@ -2,55 +2,71 @@
 
 namespace App\Http\Middleware;
 
+use App\Support\PortalAuth;
 use Closure;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Gate;
 use Models\AccessLog;
+use Symfony\Component\HttpFoundation\Response;
 
 class AccessCheck
 {
-    public function handle(Request $request, Closure $next, ...$roles): Response
+    /**
+     * Verify role or route/menu gate permissions and record an access audit log.
+     */
+    public function handle(Request $request, Closure $next, string ...$roles): Response
     {
-        $route  = $request->route();
+        $route        = $request->route();
         $rawRouteName = $route ? $route->getName() : null;
-        $access = $route ? ($route->getAction()['as'] ?? $rawRouteName) : '';
-        $accessSlug = str_replace('.', '-', (string)$access);
+        $access       = $route ? ($route->getAction()['as'] ?? $rawRouteName) : '';
+        $accessSlug   = str_replace('.', '-', (string) $access);
 
         $user = $request->user();
         if (is_null($user)) {
-            if ($request->expectsJson()) {
-                return response()->json(['error' => 'Silakan login terlebih dahulu.'], 401);
-            }
-            return redirect()->route('login');
+            return PortalAuth::unauthenticatedResponse($request);
         }
 
         // SuperUser bypass (selaras dengan Gate::before di AuthServiceProvider)
-        if ($user->isSuperUser()) {
+        if (PortalAuth::isSuperUser($user)) {
             $this->logAccess($user, $accessSlug ?: 'superuser', 'success', $request);
             return $next($request);
         }
 
-        $has_access = false;
+        $parsedRoles = PortalAuth::parseList($roles);
+        $hasAccess   = false;
 
-        if (count($roles) > 0) {
-            $has_access = $user->hasAnyRole($roles);
+        if (! empty($parsedRoles)) {
+            $hasAccess = method_exists($user, 'hasAnyRole') && $user->hasAnyRole($parsedRoles);
         } else {
-            // Cek Gate (terdaftar di AuthServiceProvider)
-            $has_access = $user->can($accessSlug)
-                || ($rawRouteName && $user->can($rawRouteName))
-                || ($access && $user->can($access));
+            $gate      = Gate::forUser($user);
+            $hasAccess = ($accessSlug !== '' && $gate->allows($accessSlug))
+                || ($rawRouteName && $gate->allows($rawRouteName))
+                || ($access && $gate->allows($access));
+
+            // Fallback ke Gate menu CRUD jika route mengikuti konvensi {resource}.{action}
+            if (! $hasAccess && $rawRouteName && str_contains($rawRouteName, '.')) {
+                $menuSlug   = PortalAuth::resolveMenuSlugFromRoute($rawRouteName);
+                $crudAction = PortalAuth::inferCrudActionFromRoute($rawRouteName);
+                $menuGate   = "{$menuSlug}.{$crudAction}";
+
+                $hasAccess = ($gate->has($menuGate) && $gate->allows($menuGate))
+                    || (method_exists($user, 'hasMenuPermission') && $user->hasMenuPermission($menuSlug, 'is_' . $crudAction));
+            }
         }
 
-        if (! $has_access) {
+        if (! $hasAccess) {
             $this->logAccess($user, $accessSlug ?: 'denied', 'denied', $request);
-            return $this->denyResponse($request);
+            return PortalAuth::forbiddenResponse($request, 'Anda tidak memiliki hak mengakses laman tersebut!', true);
         }
 
         $this->logAccess($user, $accessSlug ?: 'success', 'success', $request);
         return $next($request);
     }
 
-    protected function logAccess($user, $access, $status, $request): void
+    /**
+     * Persist an access audit entry without failing the request if logging errors.
+     */
+    protected function logAccess(mixed $user, string $access, string $status, Request $request): void
     {
         try {
             if (class_exists(AccessLog::class)) {
@@ -65,17 +81,5 @@ class AccessCheck
         } catch (\Throwable $e) {
             // Abaikan kesalahan log agar tidak menghambat aliran aplikasi
         }
-    }
-
-    protected function denyResponse($request): Response
-    {
-        if ($request->ajax() || $request->expectsJson()) {
-            return response()->json([
-                'status'  => 'error',
-                'message' => 'Anda tidak memiliki hak mengakses laman tersebut!'
-            ], 403);
-        }
-
-        abort(403, 'Anda tidak memiliki hak mengakses laman tersebut!');
     }
 }

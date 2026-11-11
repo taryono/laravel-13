@@ -152,8 +152,10 @@ class User extends Authenticatable implements MustVerifyEmail
     public function isSuperUser(): bool
     {
         return Cache::remember("user_{$this->id}_is_super", 3600, function () {
-            return $this->roles()->withoutGlobalScopes()
-                ->where('code', 'super-admin')
+            return $this->roles()
+                ->withoutGlobalScope('organization_id')
+                ->wherePivotNull('deleted_at')
+                ->whereIn('roles.code', ['super-admin', 'super_admin', 'SUPER-ADMIN', 'SUPER_ADMIN'])
                 ->exists();
         });
     }
@@ -163,12 +165,21 @@ class User extends Authenticatable implements MustVerifyEmail
         if ($this->isSuperUser()) return true;
 
         $orgId = $orgId ?? $this->active_organization_id;
-        $roles = (array)$role;
+        $roles = array_values(array_filter(array_map('trim', (array) $role), fn ($r) => $r !== ''));
+        if (empty($roles)) return false;
+
         $cacheKey = "user_{$this->id}_roles_" . md5(implode(',', $roles) . "_{$orgId}");
 
         return Cache::remember($cacheKey, 3600, function () use ($roles, $orgId) {
             return $this->roles()
-                ->when($orgId, fn($q) => $q->where('organization_id', $orgId))
+                ->withoutGlobalScope('organization_id')
+                ->wherePivotNull('deleted_at')
+                ->when($orgId, function ($q) use ($orgId) {
+                    $q->where(function ($sub) use ($orgId) {
+                        $sub->where('role_user.organization_id', $orgId)
+                            ->orWhereNull('role_user.organization_id');
+                    });
+                })
                 ->where(function ($q) use ($roles) {
                     $q->whereIn('roles.name', $roles)
                         ->orWhereIn('roles.code', $roles);
@@ -203,12 +214,17 @@ class User extends Authenticatable implements MustVerifyEmail
 
         $orgId = $orgId ?? $this->active_organization_id;
 
-        $menu = \Models\Menu::where('slug', $menuSlug)->first();
+        $menu = \Models\Menu::withoutGlobalScope('organization_id')
+            ->where('slug', $menuSlug)
+            ->when($orgId, fn ($q) => $q->where(fn ($sub) => $sub->where('organization_id', $orgId)->orWhereNull('organization_id')))
+            ->first()
+            ?? \Models\Menu::withoutGlobalScope('organization_id')->where('slug', $menuSlug)->first();
         if (!$menu) return false;
 
         // Ambil ID peran user di organisasi aktif
         $roleIds = $this->roleUsers()
-            ->where('organization_id', $orgId)
+            ->withoutGlobalScope('organization_id')
+            ->when($orgId, fn ($q) => $q->where(fn ($sub) => $sub->where('organization_id', $orgId)->orWhereNull('organization_id')))
             ->whereNull('deleted_at')
             ->pluck('role_id');
 
@@ -230,14 +246,16 @@ class User extends Authenticatable implements MustVerifyEmail
 
         $orgId = $orgId ?? $this->active_organization_id;
 
-        $action = \Models\Action::where('name', $actionName)
-            ->where('organization_id', $orgId)
+        $action = \Models\Action::withoutGlobalScope('organization_id')
+            ->where('name', $actionName)
+            ->when($orgId, fn ($q) => $q->where(fn ($sub) => $sub->where('organization_id', $orgId)->orWhereNull('organization_id')))
             ->first();
 
         if (!$action) return false;
 
         // Cek langsung ke user
-        $direct = \Models\ActionUser::where('action_id', $action->id)
+        $direct = \Models\ActionUser::withoutGlobalScope('organization_id')
+            ->where('action_id', $action->id)
             ->where('user_id', $this->id)
             ->exists();
 
@@ -245,12 +263,17 @@ class User extends Authenticatable implements MustVerifyEmail
 
         // Cek lewat peran
         $roleIds = $this->roleUsers()
-            ->where('organization_id', $orgId)
+            ->withoutGlobalScope('organization_id')
+            ->when($orgId, fn ($q) => $q->where(fn ($sub) => $sub->where('organization_id', $orgId)->orWhereNull('organization_id')))
             ->whereNull('deleted_at')
             ->pluck('role_id');
 
-        return \Models\ActionRole::where('action_id', $action->id)
+        if ($roleIds->isEmpty()) return false;
+
+        return \Models\ActionRole::withoutGlobalScope('organization_id')
+            ->where('action_id', $action->id)
             ->whereIn('role_id', $roleIds)
+            ->where('is_allowed', 1)
             ->exists();
     }
 
@@ -380,7 +403,7 @@ class User extends Authenticatable implements MustVerifyEmail
         // Peran biasa hanya bisa mengelola turunan langsungnya
         $myRoleIds = $this->roles()
             ->wherePivot('organization_id', $orgId)
-            ->pluck('id');
+            ->pluck('roles.id');
 
         $role = Role::find($roleId);
 

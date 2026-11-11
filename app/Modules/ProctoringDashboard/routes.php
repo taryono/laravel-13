@@ -11,6 +11,6 @@ use Illuminate\Support\Facades\Route;
 | and give it the controller to call when that URI is requested.
 |
  */
-Route::group(['prefix' => 'proctoring-dashboard', 'namespace' => 'App\Modules\ProctoringDashboard\Controllers', 'middleware' => ['auth', 'proctor']], function () {
+Route::group(['prefix' => 'proctoring-dashboard', 'namespace' => 'App\Modules\ProctoringDashboard\Controllers', 'middleware' => ['web', 'auth', 'proctor']], function () {
     Route::get('/', ['as' => 'proctoring_dashboard.index', 'uses' => 'ProctoringDashboardController@index']); 
 });

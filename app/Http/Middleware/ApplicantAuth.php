@@ -2,32 +2,32 @@
 
 namespace App\Http\Middleware;
 
+use App\Support\PortalAuth;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Route;
+use Symfony\Component\HttpFoundation\Response;
 
 class ApplicantAuth
 {
-    public function handle(Request $request, Closure $next)
+    /**
+     * Authenticate PPDB applicants using the dedicated applicant guard.
+     */
+    public function handle(Request $request, Closure $next): Response
     {
-        $loginRoute = Route::has('ppdb.login') ? 'ppdb.login' : 'login';
-
-        if (!Auth::guard('applicant')->check()) {
-            if ($request->expectsJson()) {
-                return response()->json(['error' => 'Silakan login terlebih dahulu.'], 401);
-            }
-            return redirect()->route($loginRoute)
-                ->with('error', 'Silakan login terlebih dahulu.');
+        if (! Auth::guard('applicant')->check()) {
+            return PortalAuth::unauthenticatedResponse($request, 'Silakan login terlebih dahulu.', 'ppdb.login');
         }
 
         $applicant = Auth::guard('applicant')->user();
-        if (!$applicant || !($applicant->is_active ?? true)) {
+        if (! $applicant || ! ($applicant->is_active ?? true)) {
             Auth::guard('applicant')->logout();
-            if ($request->expectsJson()) {
+
+            if (PortalAuth::wantsJson($request)) {
                 return response()->json(['error' => 'Akun Anda tidak aktif.'], 403);
             }
-            return redirect()->route($loginRoute)
+
+            return redirect()->to(PortalAuth::loginUrlFor($request, 'ppdb.login'))
                 ->with('error', 'Akun Anda tidak aktif.');
         }
 

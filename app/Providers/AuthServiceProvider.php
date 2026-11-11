@@ -68,6 +68,7 @@ class AuthServiceProvider extends ServiceProvider
                     return DB::table('action_role')
                         ->where('action_id', $actionId)
                         ->whereIn('role_id', $roleIds)
+                        ->where('is_allowed', 1)
                         ->whereNull('deleted_at')
                         ->exists();
                 });
@@ -132,7 +133,7 @@ class AuthServiceProvider extends ServiceProvider
         $orgId = session('active_organization_id') ?? $user->active_organization_id;
 
         // Ambil data menu
-        $menu = \Models\Menu::find($menuId);
+        $menu = \Models\Menu::withoutGlobalScope('organization_id')->find($menuId);
         if (!$menu) return false;
 
         // ✅ Menu PUNYA ROUTE → cek izin langsung
@@ -141,10 +142,11 @@ class AuthServiceProvider extends ServiceProvider
         }
 
         // ✅ Menu TANPA ROUTE (induk/kategori) → cek apakah ADA ANAK yang bisa diakses
-        $childMenuIds = \Models\Menu::where('parent_id', $menuId)
+        $childMenuIds = \Models\Menu::withoutGlobalScope('organization_id')
+            ->where('parent_id', $menuId)
             ->where('is_active', 1)
             ->whereNull('deleted_at')
-            ->where('organization_id', $orgId)
+            ->when($orgId, fn ($q) => $q->where(fn ($sub) => $sub->where('organization_id', $orgId)->orWhereNull('organization_id')))
             ->pluck('id');
 
         if ($childMenuIds->isEmpty()) {

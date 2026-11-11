@@ -2,38 +2,33 @@
 
 namespace App\Http\Middleware;
 
+use App\Support\PortalAuth;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Route;
+use Symfony\Component\HttpFoundation\Response;
 
 class StudentAuth
 {
-    public function handle(Request $request, Closure $next)
+    /**
+     * Authenticate students (or parents viewing student portal) and superusers.
+     */
+    public function handle(Request $request, Closure $next): Response
     {
-        $loginRoute = Route::has('student.login') ? 'student.login' : 'login';
-
-        if (!Auth::guard('web')->check()) {
-            if ($request->expectsJson()) {
-                return response()->json(['error' => 'Silakan login sebagai siswa.'], 401);
-            }
-            return redirect()->route($loginRoute)
-                ->with('error', 'Silakan login sebagai siswa.');
+        if (! Auth::guard('web')->check()) {
+            return PortalAuth::unauthenticatedResponse($request, 'Silakan login sebagai siswa.', 'student.login');
         }
 
         $user = Auth::guard('web')->user();
 
         // SuperUser bypass (selaras dengan Gate::before di AuthServiceProvider)
-        if ($user->isSuperUser()) {
+        if (PortalAuth::isSuperUser($user)) {
             return $next($request);
         }
 
-        // Cek role: student ATAU parent (ortu bisa lihat portal anak)
-        if (!$user->hasAnyRole(['student', 'parent'])) {
-            if ($request->expectsJson()) {
-                return response()->json(['error' => 'Anda tidak memiliki akses ke portal siswa.'], 403);
-            }
-            abort(403, 'Anda tidak memiliki akses ke portal siswa.');
+        // Cek role: student/siswa ATAU parent/orang-tua (ortu bisa lihat portal anak)
+        if (! $user || ! method_exists($user, 'hasAnyRole') || ! $user->hasAnyRole(PortalAuth::STUDENT_PORTAL_ROLES)) {
+            return PortalAuth::forbiddenResponse($request, 'Anda tidak memiliki akses ke portal siswa.');
         }
 
         return $next($request);
