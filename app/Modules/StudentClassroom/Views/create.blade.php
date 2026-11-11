@@ -1,4 +1,6 @@
- <div class="row">
+ @use('Kkxdev\HtmlCompat\Facades\Form')
+
+<div class="row">
      {{ Form::open(['method' => 'POST', 'route' => ['student_classroom.store'], 'class' => 'form-horizontal']) }}
 
      <div class="mb-6">

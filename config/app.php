@@ -125,6 +125,8 @@ return [
 
     'aliases' => Illuminate\Support\Facades\Facade::defaultAliases()->merge([
         'Str' => Illuminate\Support\Str::class,
+        'Form' => Kkxdev\HtmlCompat\Facades\Form::class,
+        'Html' => Kkxdev\HtmlCompat\Facades\Html::class,
     ])->toArray(),
 
 
