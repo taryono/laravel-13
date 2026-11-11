@@ -74,16 +74,22 @@ class DocumentController extends Controller
      */
     public function destroy(ApplicationDocument $document)
     {
-        if (Auth::check() && $document->applicant && $document->applicant->created_by && $document->applicant->created_by !== Auth::id()) {
-            if (!Auth::user()->isSuperUser() && !Auth::user()->hasAnyRole(['admin', 'admin-ppdb', 'super-admin'])) {
+        if (Auth::guard('web')->check() && $document->applicant && $document->applicant->created_by && $document->applicant->created_by !== Auth::guard('web')->id()) {
+            $webUser = Auth::guard('web')->user();
+            $isSuper = method_exists($webUser, 'isSuperUser') && $webUser->isSuperUser();
+            $isAdmin = method_exists($webUser, 'hasAnyRole') && $webUser->hasAnyRole(['admin', 'admin-ppdb', 'super-admin']);
+            if (!$isSuper && !$isAdmin) {
                 abort(403);
             }
         }
 
         if (!empty($document->document_url)) {
-            $relativePath = str_replace('/storage/', '', $document->document_url);
+            $urlPath = parse_url($document->document_url, PHP_URL_PATH) ?? $document->document_url;
+            $relativePath = ltrim(str_replace('/storage/', '', $urlPath), '/');
             Storage::disk('public')->delete($relativePath);
         }
+
+        AdmissionDocumentVerification::where('application_document_id', $document->id)->delete();
         $document->delete();
 
         return response()->json(['success' => true]);
@@ -94,14 +100,25 @@ class DocumentController extends Controller
      */
     public function preview(ApplicationDocument $document)
     {
-        $relativePath = str_replace('/storage/', '', $document->document_url);
+        $urlPath = parse_url($document->document_url ?? '', PHP_URL_PATH) ?? ($document->document_url ?? '');
+        $relativePath = ltrim(str_replace('/storage/', '', $urlPath), '/');
         $path = storage_path('app/public/' . $relativePath);
 
-        if (!file_exists($path)) {
-            $path = storage_path('app/public/' . $document->document_url);
+        if (!file_exists($path) && !empty($document->document_url)) {
+            $path = storage_path('app/public/' . ltrim($document->document_url, '/'));
         }
 
-        if (!file_exists($path)) {
+        if (!file_exists($path) || is_dir($path)) {
+            $verification = AdmissionDocumentVerification::where('application_document_id', $document->id)->first();
+            if ($verification && !empty($verification->file_path)) {
+                $altPath = storage_path('app/public/' . ltrim($verification->file_path, '/'));
+                if (file_exists($altPath)) {
+                    $path = $altPath;
+                }
+            }
+        }
+
+        if (!file_exists($path) || is_dir($path)) {
             abort(404, 'Dokumen tidak ditemukan.');
         }
 

@@ -44,6 +44,11 @@ class Applicant extends Authenticatable
         'agree_test',
     ];
 
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
     protected $casts = [
         'birth_date'        => 'date',
         'registered_at'     => 'datetime',

@@ -38,3 +38,19 @@ Route::prefix('ppdb')->name('ppdb.')->middleware(['web'])->group(function () {
     Route::get('/api/prodi/{school}', [RegistrationController::class, 'getPrograms'])->name('api.programs');
     Route::post('/api/geocode', [RegistrationController::class, 'geocode'])->name('api.geocode');
 });
+Route::prefix('ppdb')->name('ppdb.')->middleware(['web'])->group(function () {
+    // ---------- LOGIN PENDAFTAR ----------
+    Route::middleware('guest:applicant')->group(function () {
+        Route::get('/login', [ApplicantLoginController::class, 'showLogin'])->name('login');
+        Route::post('/login', [ApplicantLoginController::class, 'login'])->name('login.post');
+    });
+    Route::post('/logout', [ApplicantLoginController::class, 'logout'])->name('logout');
+    // ---------- AUTH: PENDAFTAR ----------
+    Route::middleware('applicant.auth')->group(function () {
+        Route::get('/dashboard', [ApplicantDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/profil', [ApplicantDashboardController::class, 'profile'])->name('profile');
+        Route::get('/dokumen', [ApplicantDashboardController::class, 'documents'])->name('documents');
+        Route::get('/pembayaran', [ApplicantDashboardController::class, 'payments'])->name('payments');
+        Route::get('/pengumuman', [ApplicantDashboardController::class, 'announcements'])->name('announcements');
+    });
+});

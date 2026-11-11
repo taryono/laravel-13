@@ -16,7 +16,7 @@
     <meta name="color-scheme" content="light dark">
 
     <title>@yield('title', config('app.name', 'Dashboard'))</title>
-    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+    {{-- @vite dinonaktifkan di layout utama karena Bootstrap 5.3, jQuery 3.7.1, dan DataTables 3.0.0 + Buttons 4.0.0 sudah dimuat langsung (mencegah bentrok versi & error Vite manifest) --}}
     {{-- ============================================= --}}
     {{-- 2. STYLESHEETS (Optimized) --}}
     {{-- ============================================= --}}

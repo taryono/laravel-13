@@ -15,7 +15,7 @@
     <meta name="env" content="{{ app()->environment() }}">
 
     <title>@yield('title', config('app.name', 'Dashboard'))</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    {{-- @vite dinonaktifkan karena Bootstrap 5.3, jQuery, dan DataTables CSS/JS sudah dimuat langsung di layout ini --}}
     {{-- ============================================= --}}
     {{-- 2. STYLESHEETS (Optimized) --}}
     {{-- ============================================= --}}

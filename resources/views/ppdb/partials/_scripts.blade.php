@@ -1,7 +1,7 @@
 {{-- resources/views/ppdb/partials/_scripts.blade.php --}}
 <script>
     const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]').content;
-    const APPLICANT_ID = {{ $applicant->id ?? 'null' }};
+    let APPLICANT_ID = {{ $applicant->id ?? 'null' }};
     const ADMISSION_ID = {{ $admission->id }};
 
     // ===== Jalur Chip =====
@@ -42,7 +42,8 @@
         }
 
         try {
-            const res = await fetch(`/ppdb/api/prodi/${schoolId}`, {
+            const url = `{{ route('ppdb.api.programs', ['school' => '__ID__']) }}`.replace('__ID__', schoolId);
+            const res = await fetch(url, {
                 headers: {
                     'Accept': 'application/json',
                     'X-CSRF-TOKEN': CSRF_TOKEN
@@ -83,7 +84,14 @@
 
     // ===== Upload Dokumen (AJAX) =====
     async function uploadDocument(input, type, applicantId) {
-        if (!applicantId) {
+        let targetId = applicantId || APPLICANT_ID;
+        if (!targetId) {
+            const draft = await saveDraft();
+            if (draft && draft.applicant_id) {
+                targetId = draft.applicant_id;
+            }
+        }
+        if (!targetId) {
             alert('Simpan data pendaftaran terlebih dahulu sebelum upload dokumen.');
             return;
         }
@@ -106,7 +114,8 @@
         filenameEl.textContent = 'Mengunggah...';
 
         try {
-            const res = await fetch(`/ppdb/dokumen/${applicantId}`, {
+            const uploadUrl = `{{ route('ppdb.document.upload', ['applicant' => '__ID__']) }}`.replace('__ID__', targetId);
+            const res = await fetch(uploadUrl, {
                 method: 'POST',
                 headers: {
                     'X-CSRF-TOKEN': CSRF_TOKEN,
@@ -134,15 +143,22 @@
     }
 
     // ===== Submit Final =====
-    function submitRegistration() {
+    async function submitRegistration() {
         const checkbox = document.getElementById('agree-integritas');
         if (!checkbox || !checkbox.checked) {
             alert('Silakan setujui Pakta Integritas terlebih dahulu.');
             return;
         }
 
-        const form = document.getElementById('ppdb-form');
-        const submitUrl = form.action.replace(/\/$/, '') + '/submit';
+        if (!APPLICANT_ID) {
+            const draft = await saveDraft();
+            if (!draft || !draft.applicant_id) {
+                alert('Silakan simpan data pendaftaran terlebih dahulu.');
+                return;
+            }
+        }
+
+        const submitUrl = `{{ route('ppdb.submit', ['applicant' => '__ID__']) }}`.replace('__ID__', APPLICANT_ID);
 
         // Buat form dinamis untuk submit
         const submitForm = document.createElement('form');
@@ -169,9 +185,11 @@
         const form = document.getElementById('ppdb-form');
         const formData = new FormData(form);
         formData.append('_is_draft', '1');
+        formData.append('admission_id', ADMISSION_ID);
 
         try {
-            await fetch(`/ppdb/draft/${APPLICANT_ID ?? ''}`, {
+            const draftUrl = `{{ route('ppdb.draft') }}` + (APPLICANT_ID ? `/${APPLICANT_ID}` : '');
+            const res = await fetch(draftUrl, {
                 method: 'POST',
                 headers: {
                     'X-CSRF-TOKEN': CSRF_TOKEN,
@@ -179,9 +197,15 @@
                 },
                 body: formData
             });
-            console.log('Draft tersimpan');
+            const data = await res.json();
+            if (data.success && data.applicant_id) {
+                APPLICANT_ID = data.applicant_id;
+            }
+            console.log('Draft tersimpan', data);
+            return data;
         } catch (e) {
             console.error('Gagal simpan draft', e);
+            return null;
         }
     }
 </script>

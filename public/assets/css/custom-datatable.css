@@ -373,15 +373,33 @@ body.dark-mode div.dt-processing,
 }
 
 /* Export Buttons & Toolbar */
-body.dark-mode .dt-buttons .btn-secondary,
-[data-bs-theme="dark"] .dt-buttons .btn-secondary {
+.dt-buttons .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dt-buttons .btn.btn-primary {
+    --bs-btn-color: #fff;
+    --bs-btn-bg: var(--bs-primary, #0d6efd);
+    --bs-btn-border-color: var(--bs-primary, #0d6efd);
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: #0b5ed7;
+    --bs-btn-hover-border-color: #0a58ca;
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: #0a58ca;
+    --bs-btn-active-border-color: #0a53be;
+}
+
+body.dark-mode .dt-buttons .btn-secondary:not(.btn-primary):not(.btn-success):not(.btn-danger):not(.btn-info):not(.btn-warning),
+[data-bs-theme="dark"] .dt-buttons .btn-secondary:not(.btn-primary):not(.btn-success):not(.btn-danger):not(.btn-info):not(.btn-warning) {
     background-color: #252b36;
     border-color: #3b4352;
     color: #e2e8f0;
 }
 
-body.dark-mode .dt-buttons .btn-secondary:hover,
-[data-bs-theme="dark"] .dt-buttons .btn-secondary:hover {
+body.dark-mode .dt-buttons .btn-secondary:not(.btn-primary):not(.btn-success):not(.btn-danger):not(.btn-info):not(.btn-warning):hover,
+[data-bs-theme="dark"] .dt-buttons .btn-secondary:not(.btn-primary):not(.btn-success):not(.btn-danger):not(.btn-info):not(.btn-warning):hover {
     background-color: #333a48;
     border-color: #475569;
     color: #ffffff;

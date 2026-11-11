@@ -65,8 +65,14 @@ class CurriculumController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'code' => ['required', 'string', 'max:255'],
-            'name' => ['required', 'string', 'max:255'],
+            'organization_id' => ['nullable', 'integer'],
+            'type'            => ['nullable', 'in:national,international,local,hybrid'],
+            'code'            => ['required', 'string', 'max:20'],
+            'name'            => ['required', 'string', 'max:100'],
+            'start_year'      => ['nullable', 'integer', 'min:1901', 'max:2155'],
+            'end_year'        => ['nullable', 'integer', 'min:1901', 'max:2155'],
+            'is_active'       => ['nullable', 'boolean'],
+            'description'     => ['nullable', 'string'],
         ]);
 
         try {
@@ -121,8 +127,14 @@ class CurriculumController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-            'code' => ['required', 'string', 'max:255'],
-            'name' => ['required', 'string', 'max:255'],
+            'organization_id' => ['nullable', 'integer'],
+            'type'            => ['nullable', 'in:national,international,local,hybrid'],
+            'code'            => ['required', 'string', 'max:20'],
+            'name'            => ['required', 'string', 'max:100'],
+            'start_year'      => ['nullable', 'integer', 'min:1901', 'max:2155'],
+            'end_year'        => ['nullable', 'integer', 'min:1901', 'max:2155'],
+            'is_active'       => ['nullable', 'boolean'],
+            'description'     => ['nullable', 'string'],
         ]);
 
         try {

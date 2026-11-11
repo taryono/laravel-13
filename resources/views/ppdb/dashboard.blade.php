@@ -278,21 +278,21 @@
                 <div class="d-none d-md-flex align-items-center gap-2 px-3 py-1 rounded-pill bg-light border">
                     <i class="bi bi-calendar2-check text-primary"></i>
                     <span style="font-size: 0.78rem; font-weight: 600;" class="text-secondary">
-                        {{ $applicant->admission->title ?? 'Tahun Ajaran 2025/2026' }}
+                        {{ $applicant?->admission?->name ?? 'Tahun Ajaran 2025/2026' }}
                     </span>
                 </div>
 
                 <div class="d-flex align-items-center gap-2 ps-2 border-start">
                     <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold"
                         style="width: 2.2rem; height: 2.2rem; font-size: 0.85rem;">
-                        {{ substr($applicant->name ?? 'Pendaftar', 0, 2) }}
+                        {{ substr($applicant?->name ?? 'Pendaftar', 0, 2) }}
                     </div>
                     <div class="d-none d-sm-block text-start me-2">
                         <div class="fw-bold" style="font-size: 0.82rem; line-height: 1.2;">
-                            {{ $applicant->name ?? 'Calon Siswa' }}
+                            {{ $applicant?->name ?? 'Calon Siswa' }}
                         </div>
                         <div class="text-muted" style="font-size: 0.7rem;">
-                            {{ $applicant->registration_number ?? '-' }}
+                            {{ $applicant?->registration_number ?? '-' }}
                         </div>
                     </div>
                     <form method="POST" action="{{ route('ppdb.logout') }}" class="m-0">
@@ -317,21 +317,21 @@
                 <div>
                     <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
                         <span class="badge bg-white text-primary fw-bold px-2 py-1" style="font-size: 0.72rem;">
-                            {{ $applicant->registration_number ?? 'REG-PPDB' }}
+                            {{ $applicant?->registration_number ?? 'REG-PPDB' }}
                         </span>
                         <span class="badge bg-white bg-opacity-25 text-white fw-bold px-2 py-1" style="font-size: 0.72rem;">
-                            Jalur: {{ $applicant->path->name ?? 'Zonasi Reguler' }}
+                            Jalur: {{ $applicant?->path?->name ?? 'Zonasi Reguler' }}
                         </span>
                     </div>
-                    <h3 class="fw-bold mb-1">Halo, {{ $applicant->name ?? 'Calon Siswa' }}! 👋</h3>
+                    <h3 class="fw-bold mb-1">Halo, {{ $applicant?->name ?? 'Calon Siswa' }}! 👋</h3>
                     <p class="mb-0 text-white-50" style="font-size: 0.85rem;">
-                        Pilihan Sekolah: <strong>{{ $applicant->school->name ?? 'SMAN 3 Bandung' }}</strong> • Asal Sekolah: <strong>{{ $applicant->previous_school ?? 'SMP/MTs' }}</strong>
+                        Pilihan Sekolah: <strong>{{ $applicant?->school?->name ?? 'SMAN 3 Bandung' }}</strong> • Asal Sekolah: <strong>{{ $applicant?->previous_school ?? 'SMP/MTs' }}</strong>
                     </p>
                 </div>
 
                 <div class="text-md-end">
                     @php
-                        $st = strtoupper($applicant->status ?? 'REGISTERED');
+                        $st = strtoupper($applicant?->status ?? 'REGISTERED');
                         $badgeClass = match($st) {
                             'VERIFIED' => 'status-verified',
                             'REVISION_REQUIRED' => 'status-revision',
@@ -359,9 +359,9 @@
                     <div class="step-circle"><i class="bi bi-check-lg"></i></div>
                     <span class="step-label">1. Formulir</span>
                 </div>
-                <div class="step-item {{ ($applicant->documents && $applicant->documents->count() > 0) ? 'completed' : 'active' }}">
+                <div class="step-item {{ ($applicant?->documents && $applicant->documents->count() > 0) ? 'completed' : 'active' }}">
                     <div class="step-circle">
-                        @if ($applicant->documents && $applicant->documents->count() > 0)
+                        @if ($applicant?->documents && $applicant->documents->count() > 0)
                             <i class="bi bi-check-lg"></i>
                         @else
                             2
@@ -411,7 +411,7 @@
             <li class="nav-item">
                 <a class="nav-link {{ ($tab ?? '') === 'documents' ? 'active' : '' }}" href="{{ route('ppdb.documents') }}">
                     <i class="bi bi-file-earmark-check-fill"></i> Berkas Persyaratan
-                    @if ($applicant->documents && $applicant->documents->count() > 0)
+                    @if ($applicant?->documents && $applicant->documents->count() > 0)
                         <span class="badge bg-primary-subtle text-primary rounded-pill px-2" style="font-size: 0.7rem;">{{ $applicant->documents->count() }}</span>
                     @endif
                 </a>
@@ -444,40 +444,40 @@
                         <div class="portal-card-body">
                             <div class="detail-row">
                                 <div class="detail-label">Nomor Registrasi</div>
-                                <div class="detail-value text-primary font-monospace">{{ $applicant->registration_number ?? '-' }}</div>
+                                <div class="detail-value text-primary font-monospace">{{ $applicant?->registration_number ?? '-' }}</div>
                             </div>
                             <div class="detail-row">
                                 <div class="detail-label">Nama Lengkap</div>
-                                <div class="detail-value">{{ $applicant->name ?? '-' }}</div>
+                                <div class="detail-value">{{ $applicant?->name ?? '-' }}</div>
                             </div>
                             <div class="detail-row">
                                 <div class="detail-label">NIK / NISN</div>
-                                <div class="detail-value">{{ $applicant->nik ?? '-' }} / {{ $applicant->nisn ?? '-' }}</div>
+                                <div class="detail-value">{{ $applicant?->nik ?? '-' }} / {{ $applicant?->nisn ?? '-' }}</div>
                             </div>
                             <div class="detail-row">
                                 <div class="detail-label">Sekolah Pilihan</div>
-                                <div class="detail-value">{{ $applicant->school->name ?? 'SMAN 3 Bandung' }}</div>
+                                <div class="detail-value">{{ $applicant?->school?->name ?? 'SMAN 3 Bandung' }}</div>
                             </div>
                             <div class="detail-row">
                                 <div class="detail-label">Jalur Pendaftaran</div>
                                 <div class="detail-value">
-                                    <span class="badge bg-primary text-white">{{ $applicant->path->name ?? 'Zonasi Reguler' }}</span>
+                                    <span class="badge bg-primary text-white">{{ $applicant?->path?->name ?? 'Zonasi Reguler' }}</span>
                                 </div>
                             </div>
                             <div class="detail-row">
                                 <div class="detail-label">Asal Sekolah</div>
-                                <div class="detail-value">{{ $applicant->previous_school ?? '-' }}</div>
+                                <div class="detail-value">{{ $applicant?->previous_school ?? '-' }}</div>
                             </div>
                             <div class="detail-row">
                                 <div class="detail-label">Jarak Geodesik ke Sekolah</div>
                                 <div class="detail-value">
-                                    {{ $applicant->domicile && $applicant->domicile->distance_to_school_m ? number_format($applicant->domicile->distance_to_school_m, 0, ',', '.') . ' Meter' : 'Dalam proses kalkulasi' }}
+                                    {{ $applicant?->domicile && $applicant->domicile->distance_to_school_m ? number_format($applicant->domicile->distance_to_school_m, 0, ',', '.') . ' Meter' : 'Dalam proses kalkulasi' }}
                                 </div>
                             </div>
                             <div class="detail-row">
                                 <div class="detail-label">Waktu Registrasi</div>
                                 <div class="detail-value">
-                                    {{ $applicant->registered_at ? \Carbon\Carbon::parse($applicant->registered_at)->translatedFormat('l, d F Y - H:i') . ' WIB' : '-' }}
+                                    {{ $applicant?->registered_at ? \Carbon\Carbon::parse($applicant->registered_at)->translatedFormat('l, d F Y - H:i') . ' WIB' : '-' }}
                                 </div>
                             </div>
                         </div>
@@ -530,7 +530,7 @@
                         </div>
                         <div class="portal-card-body p-0">
                             <ul class="list-group list-group-flush" style="font-size: 0.83rem;">
-                                @if ($applicant->admission && $applicant->admission->timelines && $applicant->admission->timelines->isNotEmpty())
+                                @if ($applicant?->admission && $applicant->admission->timelines && $applicant->admission->timelines->isNotEmpty())
                                     @foreach ($applicant->admission->timelines->sortBy('order_number') as $t)
                                         <li class="list-group-item d-flex justify-content-between align-items-center py-2 px-3">
                                             <div>
@@ -563,45 +563,45 @@
                         <div class="col-md-6">
                             <div class="detail-row">
                                 <div class="detail-label">Nama Lengkap</div>
-                                <div class="detail-value">{{ $applicant->name ?? '-' }}</div>
+                                <div class="detail-value">{{ $applicant?->name ?? '-' }}</div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="detail-row">
                                 <div class="detail-label">NIK</div>
-                                <div class="detail-value">{{ $applicant->nik ?? '-' }}</div>
+                                <div class="detail-value">{{ $applicant?->nik ?? '-' }}</div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="detail-row">
                                 <div class="detail-label">NISN</div>
-                                <div class="detail-value">{{ $applicant->nisn ?? '-' }}</div>
+                                <div class="detail-value">{{ $applicant?->nisn ?? '-' }}</div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="detail-row">
                                 <div class="detail-label">Tempat, Tanggal Lahir</div>
                                 <div class="detail-value">
-                                    {{ $applicant->birth_place ?? '-' }}, {{ $applicant->birth_date ? \Carbon\Carbon::parse($applicant->birth_date)->translatedFormat('d F Y') : '-' }}
+                                    {{ $applicant?->birth_place ?? '-' }}, {{ $applicant?->birth_date ? \Carbon\Carbon::parse($applicant->birth_date)->translatedFormat('d F Y') : '-' }}
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="detail-row">
                                 <div class="detail-label">Jenis Kelamin</div>
-                                <div class="detail-value">{{ ($applicant->gender == 'L' || $applicant->gender == 'male') ? 'Laki-laki' : 'Perempuan' }}</div>
+                                <div class="detail-value">{{ ($applicant?->gender == 'L' || $applicant?->gender == 'male') ? 'Laki-laki' : ($applicant?->gender ? 'Perempuan' : '-') }}</div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="detail-row">
                                 <div class="detail-label">No. Telepon / WhatsApp</div>
-                                <div class="detail-value">{{ $applicant->phone ?? '-' }}</div>
+                                <div class="detail-value">{{ $applicant?->phone ?? '-' }}</div>
                             </div>
                         </div>
                         <div class="col-12">
                             <div class="detail-row">
                                 <div class="detail-label" style="width: 17.5%;">Alamat Lengkap</div>
-                                <div class="detail-value" style="width: 82.5%;">{{ $applicant->address ?? '-' }}</div>
+                                <div class="detail-value" style="width: 82.5%;">{{ $applicant?->address ?? '-' }}</div>
                             </div>
                         </div>
                     </div>
@@ -611,25 +611,25 @@
                         <div class="col-md-6">
                             <div class="detail-row">
                                 <div class="detail-label">Nama Orang Tua / Wali</div>
-                                <div class="detail-value">{{ $applicant->parent_name ?? '-' }}</div>
+                                <div class="detail-value">{{ $applicant?->parent_name ?? '-' }}</div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="detail-row">
                                 <div class="detail-label">No. Telepon Orang Tua</div>
-                                <div class="detail-value">{{ $applicant->parent_phone ?? '-' }}</div>
+                                <div class="detail-value">{{ $applicant?->parent_phone ?? '-' }}</div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="detail-row">
                                 <div class="detail-label">Email Orang Tua</div>
-                                <div class="detail-value">{{ $applicant->parent_email ?? '-' }}</div>
+                                <div class="detail-value">{{ $applicant?->parent_email ?? '-' }}</div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="detail-row">
                                 <div class="detail-label">Asal Sekolah</div>
-                                <div class="detail-value">{{ $applicant->previous_school ?? '-' }}</div>
+                                <div class="detail-value">{{ $applicant?->previous_school ?? '-' }}</div>
                             </div>
                         </div>
                     </div>
@@ -662,13 +662,13 @@
                                         'akta_kelahiran' => 'Akta Kelahiran',
                                         'rapor' => 'Buku Rapor Semester 1 - 5',
                                         'surat_domisili' => 'Surat Keterangan Domisili / Bukti Tempat Tinggal',
-                                        'sertifikat_prestasi' => 'Sertifikat / Piagam Prestasi (Opsional)',
+                                        'sertifikat' => 'Sertifikat / Piagam Prestasi (Opsional)',
                                     ];
                                 @endphp
                                 @foreach ($requiredDocs as $key => $title)
                                     @php
-                                        $uploaded = $applicant->documents ? $applicant->documents->firstWhere('document_type', $key) : null;
-                                        $verif = $applicant->verifications ? $applicant->verifications->firstWhere('document_type', $key) : null;
+                                        $uploaded = $applicant?->documents ? $applicant->documents->firstWhere('document_type', $key) : null;
+                                        $verif = $applicant?->verifications ? $applicant->verifications->firstWhere('document_type', $key) : null;
                                         $vStatus = $verif ? $verif->verification_status : ($uploaded ? 'pending' : 'not_uploaded');
                                     @endphp
                                     <tr>
@@ -676,7 +676,7 @@
                                         <td>
                                             <div class="fw-bold">{{ $title }}</div>
                                             @if ($uploaded)
-                                                <span class="text-muted" style="font-size: 0.72rem;">File: {{ $uploaded->original_name ?? 'Dokumen.pdf' }}</span>
+                                                <span class="text-muted" style="font-size: 0.72rem;">File: {{ $uploaded->file_name ?? $uploaded->original_name ?? 'Dokumen.pdf' }}</span>
                                             @endif
                                         </td>
                                         <td>
@@ -716,31 +716,57 @@
 
         @elseif (($tab ?? '') === 'payments')
             <!-- ===== PAYMENTS TAB ===== -->
+            @php $latestInvoice = $applicant?->invoices?->sortByDesc('id')?->first(); @endphp
             <div class="portal-card">
                 <div class="portal-card-header">
                     <h6 class="mb-0 fw-bold"><i class="bi bi-receipt text-primary me-2"></i>Tagihan &amp; Pembayaran Pendaftaran</h6>
+                    @if ($latestInvoice && $applicant)
+                        <a href="{{ route('ppdb.invoice', $applicant->id) }}" class="btn btn-sm btn-primary rounded-pill px-3">
+                            <i class="bi bi-file-earmark-text me-1"></i> Lihat Invoice
+                        </a>
+                    @endif
                 </div>
                 <div class="portal-card-body">
-                    <div class="alert alert-success d-flex align-items-center gap-3 p-3 rounded-3 mb-4">
-                        <i class="bi bi-check-circle-fill fs-3 text-success"></i>
-                        <div>
-                            <h6 class="fw-bold mb-0">Biaya Formulir Pendaftaran PPDB: GRATIS / LUNAS</h6>
-                            <span style="font-size: 0.83rem;">Seluruh alur pendaftaran dan seleksi PPDB dibiayai oleh BOS dan Anggaran Daerah.</span>
+                    @if ($latestInvoice && ($latestInvoice->final_amount ?? $latestInvoice->total_amount ?? 0) > 0)
+                        <div class="detail-row">
+                            <div class="detail-label">Nomor Invoice</div>
+                            <div class="detail-value text-primary font-monospace">{{ $latestInvoice->invoice_number }}</div>
                         </div>
-                    </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Total Tagihan</div>
+                            <div class="detail-value fw-bold">Rp {{ number_format($latestInvoice->final_amount ?? $latestInvoice->total_amount ?? 0, 0, ',', '.') }}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Status Pembayaran</div>
+                            <div class="detail-value">
+                                @php $invStat = strtolower($latestInvoice->status ?? 'unpaid'); @endphp
+                                <span class="badge {{ $invStat === 'paid' ? 'bg-success' : ($invStat === 'pending' ? 'bg-warning text-dark' : 'bg-danger') }}">
+                                    {{ strtoupper($invStat) }}
+                                </span>
+                            </div>
+                        </div>
+                    @else
+                        <div class="alert alert-success d-flex align-items-center gap-3 p-3 rounded-3 mb-4">
+                            <i class="bi bi-check-circle-fill fs-3 text-success"></i>
+                            <div>
+                                <h6 class="fw-bold mb-0">Biaya Formulir Pendaftaran PPDB: GRATIS / LUNAS</h6>
+                                <span style="font-size: 0.83rem;">Seluruh alur pendaftaran dan seleksi PPDB dibiayai oleh BOS dan Anggaran Daerah.</span>
+                            </div>
+                        </div>
 
-                    <div class="detail-row">
-                        <div class="detail-label">Nomor Invoice</div>
-                        <div class="detail-value text-primary font-monospace">INV-PPDB-{{ $applicant->registration_number ?? '2025' }}</div>
-                    </div>
-                    <div class="detail-row">
-                        <div class="detail-label">Biaya Seleksi &amp; Ujian</div>
-                        <div class="detail-value">Rp 0 (Bebas Biaya)</div>
-                    </div>
-                    <div class="detail-row">
-                        <div class="detail-label">Status Pembayaran</div>
-                        <div class="detail-value"><span class="badge bg-success">LUNAS / BEBAS BIAYA</span></div>
-                    </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Nomor Invoice</div>
+                            <div class="detail-value text-primary font-monospace">INV-PPDB-{{ $applicant?->registration_number ?? '2025' }}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Biaya Seleksi &amp; Ujian</div>
+                            <div class="detail-value">Rp 0 (Bebas Biaya)</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Status Pembayaran</div>
+                            <div class="detail-value"><span class="badge bg-success">LUNAS / BEBAS BIAYA</span></div>
+                        </div>
+                    @endif
                 </div>
             </div>
 
@@ -752,7 +778,7 @@
                 </div>
                 <div class="portal-card-body text-center py-5">
                     @php
-                        $st = strtoupper($applicant->status ?? 'REGISTERED');
+                        $st = strtoupper($applicant?->status ?? 'REGISTERED');
                     @endphp
                     @if (in_array($st, ['ACCEPTED', 'LULUS']))
                         <div class="rounded-circle bg-success text-white d-inline-flex align-items-center justify-content-center mb-3" style="width: 4.5rem; height: 4.5rem;">
@@ -760,7 +786,7 @@
                         </div>
                         <h4 class="fw-bold text-success mb-2">SELAMAT! ANDA DINYATAKAN LULUS SELEKSI PPDB</h4>
                         <p class="text-muted mx-auto mb-4" style="max-width: 500px;">
-                            Berdasarkan hasil seleksi pemeringkatan geodesik dan verifikasi berkas, Anda diterima pada sekolah <strong>{{ $applicant->school->name ?? 'SMAN 3 Bandung' }}</strong>.
+                            Berdasarkan hasil seleksi pemeringkatan geodesik dan verifikasi berkas, Anda diterima pada sekolah <strong>{{ $applicant?->school?->name ?? 'SMAN 3 Bandung' }}</strong>.
                         </p>
                         <button onclick="window.print()" class="btn btn-primary px-4 py-2 rounded-pill fw-bold">
                             <i class="bi bi-file-earmark-pdf me-1"></i> Unduh Surat Keterangan Lulus (SKL)
@@ -771,11 +797,11 @@
                         </div>
                         <h5 class="fw-bold mb-2">Proses Seleksi Sedang Berjalan</h5>
                         <p class="text-muted mx-auto mb-3" style="max-width: 500px; font-size: 0.88rem;">
-                            Pemeringkatan hasil seleksi PPDB Jalur {{ $applicant->path->name ?? 'Zonasi' }} akan diumumkan secara resmi pada tanggal yang tertera pada linimasa gelombang.
+                            Pemeringkatan hasil seleksi PPDB Jalur {{ $applicant?->path?->name ?? 'Zonasi' }} akan diumumkan secara resmi pada tanggal yang tertera pada linimasa gelombang.
                         </p>
                         <div class="d-inline-flex align-items-center gap-2 px-3 py-2 rounded-2 bg-light border text-muted" style="font-size: 0.82rem;">
                             <i class="bi bi-geo-alt-fill text-danger"></i>
-                            Peringkat Sementara Anda: <strong>#{{ $applicant->ranking ?? '1' }}</strong> (Skor/Jarak: {{ $applicant->domicile && $applicant->domicile->distance_to_school_m ? number_format($applicant->domicile->distance_to_school_m, 0, ',', '.') . ' m' : 'Dalam kalkulasi' }})
+                            Peringkat Sementara Anda: <strong>#{{ $applicant?->ranking ?? '1' }}</strong> (Skor/Jarak: {{ $applicant?->domicile && $applicant->domicile->distance_to_school_m ? number_format($applicant->domicile->distance_to_school_m, 0, ',', '.') . ' m' : 'Dalam kalkulasi' }})
                         </div>
                     @endif
                 </div>

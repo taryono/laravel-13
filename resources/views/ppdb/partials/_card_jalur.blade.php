@@ -1,6 +1,9 @@
 {{-- resources/views/ppdb/partials/_card_jalur.blade.php --}}
 @php
-    $selectedPathId = old('admission_path_id', $applicant->admission_path_id ?? null);
+    $queryPathId = request()->filled('path')
+        ? $admission->paths->firstWhere('code', request('path'))?->id
+        : null;
+    $selectedPathId = old('admission_path_id', $applicant->admission_path_id ?? $queryPathId);
     $choices = old(
         'choices',
         $applicant?->choices->map(fn($c) => ['study_program_id' => $c->study_program_id])->toArray() ?? [],
@@ -68,7 +71,7 @@
                             <option value="">-- Pilih Sekolah --</option>
                             @foreach (\Models\School::whereHas('admissions', fn($q) => $q->where('id', $admission->id))->get() as $school)
                                 <option value="{{ $school->id }}"
-                                    {{ old("choices.$i.school_id", $applicant?->choices[$i]?->studyProgram?->school_id ?? '') == $school->id ? 'selected' : '' }}>
+                                    {{ old("choices.$i.school_id", $applicant?->choices->get($i)?->study_program?->school_id ?? '') == $school->id ? 'selected' : '' }}>
                                     {{ $school->name }}
                                 </option>
                             @endforeach

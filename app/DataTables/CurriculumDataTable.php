@@ -17,7 +17,7 @@ class CurriculumDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['code', 'school.name', 'name', 'type', 'description', 'start_year', 'end_year','is_active'];
+    protected array $columns = ['code', 'organization.name', 'name', 'type', 'description', 'start_year', 'end_year', 'is_active'];
 
     /**
      * Build DataTable response.
@@ -25,6 +25,9 @@ class CurriculumDataTable extends DataTable
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
+            ->editColumn('organization.name', fn($row) => $row->organization?->name ?? '-')
+            ->editColumn('description', fn($row) => $row->description ?? '-')
+            ->editColumn('is_active', fn($row) => $row->is_active ? 'Aktif' : 'Nonaktif')
             ->addColumn('action', function ($row) {
                 return $this->renderActionButtons($row);
             })
@@ -53,14 +56,14 @@ class CurriculumDataTable extends DataTable
         $context = htmlspecialchars(
             json_encode([
                 'executeDraw' => true,
-                'tableId'     => 'curriculum-table',
+                'tableId' => 'curriculum-table',
                 'reloadDelay' => 500,
             ]),
             ENT_QUOTES,
             'UTF-8'
         );
 
-        $editUrl   = e(route('curriculum.edit', $row));
+        $editUrl = e(route('curriculum.edit', $row));
         $deleteUrl = e(route('curriculum.destroy', $row));
 
         return <<<HTML
@@ -100,7 +103,7 @@ class CurriculumDataTable extends DataTable
      */
     public function query(Curriculum $model): QueryBuilder
     {
-        return $model->newQuery()->with('school');
+        return $model->newQuery()->with('organization');
     }
 
     /**
@@ -139,13 +142,13 @@ class CurriculumDataTable extends DataTable
                  */
                 'dom' =>
                     '<"row mb-3"' .
-                        '<"col-md-6 d-flex align-items-center"B>' .
-                        '<"col-md-6"f>' .
+                    '<"col-md-6 d-flex align-items-center"B>' .
+                    '<"col-md-6"f>' .
                     '>' .
                     'rt' .
                     '<"row mt-3"' .
-                        '<"col-md-6"i>' .
-                        '<"col-md-6 d-flex justify-content-md-end"p>' .
+                    '<"col-md-6"i>' .
+                    '<"col-md-6 d-flex justify-content-md-end"p>' .
                     '>',
 
                 /*
@@ -248,11 +251,11 @@ class CurriculumDataTable extends DataTable
 
                 Button::make([
                     'text' => '<span class="material-symbols-outlined align-middle">refresh</span>',
-                    'className' => 'btn btn-secondary',
+                    'className' => 'btn btn-secondary btn-sm',
                     'action' => 'function (e, dt, node, config) {
                         dt.ajax.reload(null, false);
                     }',
-                ])->className('btn btn-secondary'),
+                ])->className('btn btn-secondary btn-sm'),
             ]);
     }
 
@@ -264,12 +267,12 @@ class CurriculumDataTable extends DataTable
      * explode() dari string literal seperti versi lama, yang rapuh
      * terhadap karakter khusus pada nama kolom.
      */
-     
+
     protected function getColumns(): array
     {
         return collect($this->columns)
-            ->map(fn (string $kolom) => Column::make($kolom)
-                ->title(ucwords(str_replace(['_',"."], [' ',' '], $kolom))))
+            ->map(fn(string $kolom) => Column::make($kolom)
+                ->title(ucwords(str_replace(['_', "."], [' ', ' '], $kolom))))
             // 1. PREPEND: Masukkan kolom No di posisi PALING AWAL (indeks 0)
             ->prepend(
                 Column::make('DT_RowIndex')

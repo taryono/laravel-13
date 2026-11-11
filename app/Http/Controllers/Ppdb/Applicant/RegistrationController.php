@@ -64,8 +64,19 @@ class RegistrationController extends Controller
 
         // Get data applicant
         $applicant = null;
-        if (auth()->check()) {
-            $applicant = Applicant::with([
+        if (Auth::guard('applicant')->check()) {
+            $authApplicant = Auth::guard('applicant')->user();
+            if ($authApplicant && (int) $authApplicant->admission_id === (int) $admission->id) {
+                $applicant = $authApplicant;
+            }
+        } elseif (Auth::guard('web')->check()) {
+            $applicant = Applicant::where('user_id', Auth::guard('web')->id())
+                ->where('admission_id', $admission->id)
+                ->first();
+        }
+
+        if ($applicant) {
+            $applicant->load([
                 'domicile',
                 'parents',
                 'achievements',
@@ -74,9 +85,7 @@ class RegistrationController extends Controller
                 'documents',
                 'categories',
                 '_path'
-            ])->where('user_id', auth()->id())
-                ->where('admission_id', $admission->id)
-                ->first();
+            ]);
         }
 
         // Master data
@@ -116,6 +125,7 @@ class RegistrationController extends Controller
         try {
             // 1. Buat applicant
             $applicant = Applicant::create([
+                'user_id'             => Auth::guard('web')->id(),
                 'school_id'           => $admission->school_id,
                 'admission_id'        => $admission->id,
                 'admission_path_id'   => $validated['admission_path_id'] ?? null,
@@ -175,12 +185,13 @@ class RegistrationController extends Controller
             }
 
             // 4. Simpan pilihan sekolah (applicant_choices)
-            foreach ($validated['choices'] ?? [] as $order => $choice) {
+            $choiceOrder = 1;
+            foreach ($validated['choices'] ?? [] as $choice) {
                 if (!empty($choice['study_program_id'])) {
                     ApplicantChoice::create([
                         'applicant_id'     => $applicant->id,
                         'study_program_id' => $choice['study_program_id'],
-                        'choice_order'     => $order + 1,
+                        'choice_order'     => $choiceOrder++,
                     ]);
                 }
             }
@@ -226,6 +237,7 @@ class RegistrationController extends Controller
 
             if ($defaultStatus) {
                 $applicant->status = $defaultStatus->code;
+                $applicant->applicant_status_id = $defaultStatus->id;
                 $applicant->save();
 
                 ApplicantStatusHistory::create([
@@ -314,36 +326,38 @@ class RegistrationController extends Controller
 
         DB::beginTransaction();
         try {
+            $schoolId = $admission?->school_id ?? \Models\School::first()?->id ?? 1;
             $data = [
                 'name'                => $request->filled('name') ? strtoupper($request->input('name')) : ($applicantModel?->name ?? 'DRAFT PENDAFTAR'),
-                'nik'                 => $request->input('nik') ?? $applicantModel?->nik,
-                'nisn'                => $request->input('nisn') ?? $applicantModel?->nisn,
-                'birth_place'         => $request->input('birth_place') ?? $applicantModel?->birth_place,
-                'birth_date'          => $request->input('birth_date') ?? $applicantModel?->birth_date,
-                'gender'              => $request->input('gender') ?? $applicantModel?->gender,
-                'address'             => $request->input('address') ?? $applicantModel?->address,
-                'phone'               => $request->input('phone') ?? $applicantModel?->phone,
-                'email'               => $request->input('email') ?? $applicantModel?->email,
-                'parent_name'         => $request->input('parent_name') ?? $applicantModel?->parent_name,
-                'parent_phone'        => $request->input('parent_phone') ?? $applicantModel?->parent_phone,
-                'parent_email'        => $request->input('parent_email') ?? $applicantModel?->parent_email,
-                'previous_school'     => $request->input('previous_school') ?? $applicantModel?->previous_school,
-                'admission_path_id'   => $request->input('admission_path_id') ?? $applicantModel?->admission_path_id,
-                'extracurriculars'    => $request->input('extracurriculars') ?? $applicantModel?->extracurriculars,
-                'foreign_language'    => $request->input('foreign_language') ?? $applicantModel?->foreign_language,
-                'special_skill'       => $request->input('special_skill') ?? $applicantModel?->special_skill,
-                'agree_test'          => $request->boolean('agree_test'),
+                'nik'                 => $request->filled('nik') ? $request->input('nik') : $applicantModel?->nik,
+                'nisn'                => $request->filled('nisn') ? $request->input('nisn') : $applicantModel?->nisn,
+                'birth_place'         => $request->filled('birth_place') ? $request->input('birth_place') : $applicantModel?->birth_place,
+                'birth_date'          => $request->filled('birth_date') ? $request->input('birth_date') : $applicantModel?->birth_date,
+                'gender'              => $request->filled('gender') ? $request->input('gender') : $applicantModel?->gender,
+                'address'             => $request->filled('address') ? $request->input('address') : $applicantModel?->address,
+                'phone'               => $request->filled('phone') ? $request->input('phone') : $applicantModel?->phone,
+                'email'               => $request->filled('email') ? $request->input('email') : $applicantModel?->email,
+                'parent_name'         => $request->filled('parent_name') ? $request->input('parent_name') : $applicantModel?->parent_name,
+                'parent_phone'        => $request->filled('parent_phone') ? $request->input('parent_phone') : $applicantModel?->parent_phone,
+                'parent_email'        => $request->filled('parent_email') ? $request->input('parent_email') : $applicantModel?->parent_email,
+                'previous_school'     => $request->filled('previous_school') ? $request->input('previous_school') : $applicantModel?->previous_school,
+                'admission_path_id'   => $request->filled('admission_path_id') ? $request->input('admission_path_id') : $applicantModel?->admission_path_id,
+                'extracurriculars'    => $request->has('extracurriculars') ? $request->input('extracurriculars') : $applicantModel?->extracurriculars,
+                'foreign_language'    => $request->filled('foreign_language') ? $request->input('foreign_language') : $applicantModel?->foreign_language,
+                'special_skill'       => $request->filled('special_skill') ? $request->input('special_skill') : $applicantModel?->special_skill,
+                'agree_test'          => $request->has('agree_test') ? $request->boolean('agree_test') : ($applicantModel?->agree_test ?? true),
             ];
 
             if ($applicantModel) {
                 $applicantModel->update($data);
             } else {
-                $data['school_id'] = $admission ? $admission->school_id : 1;
+                $data['school_id'] = $schoolId;
                 $data['admission_id'] = $admission ? $admission->id : 1;
                 $data['registration_number'] = $this->generateRegistrationNumber($admission ?? Admission::first());
                 $data['status'] = 'DRAFT';
                 $data['registered_at'] = now();
-                $data['created_by'] = Auth::id();
+                $data['user_id'] = Auth::guard('web')->id();
+                $data['created_by'] = Auth::guard('web')->id();
                 $applicantModel = Applicant::create($data);
             }
 
@@ -352,10 +366,10 @@ class RegistrationController extends Controller
                 ApplicantDomicile::updateOrCreate(
                     ['applicant_id' => $applicantModel->id],
                     [
-                        'address'              => $request->input('address') ?? $applicantModel->address,
-                        'latitude'             => $request->input('latitude'),
-                        'longitude'            => $request->input('longitude'),
-                        'distance_to_school_m' => $request->input('distance'),
+                        'address'              => $request->filled('address') ? $request->input('address') : ($applicantModel->address ?: '-'),
+                        'latitude'             => $request->filled('latitude') ? $request->input('latitude') : $applicantModel->domicile?->latitude,
+                        'longitude'            => $request->filled('longitude') ? $request->input('longitude') : $applicantModel->domicile?->longitude,
+                        'distance_to_school_m' => $request->filled('distance') ? $request->input('distance') : $applicantModel->domicile?->distance_to_school_m,
                         'is_primary'           => 1,
                     ]
                 );
@@ -384,8 +398,11 @@ class RegistrationController extends Controller
     public function update(Request $request, Applicant $applicant)
     {
         // Cek otorisasi jika user sedang login
-        if (Auth::check() && $applicant->created_by && $applicant->created_by !== Auth::id()) {
-            if (!Auth::user()->isSuperUser() && !Auth::user()->hasAnyRole(['admin', 'admin-ppdb', 'super-admin'])) {
+        if (Auth::guard('web')->check() && $applicant->created_by && $applicant->created_by !== Auth::guard('web')->id()) {
+            $webUser = Auth::guard('web')->user();
+            $isSuper = method_exists($webUser, 'isSuperUser') && $webUser->isSuperUser();
+            $isAdmin = method_exists($webUser, 'hasAnyRole') && $webUser->hasAnyRole(['admin', 'admin-ppdb', 'super-admin']);
+            if (!$isSuper && !$isAdmin) {
                 abort(403);
             }
         }
@@ -435,12 +452,13 @@ class RegistrationController extends Controller
 
             // Sync choices
             $applicant->choices()->delete();
-            foreach ($validated['choices'] ?? [] as $order => $choice) {
+            $choiceOrder = 1;
+            foreach ($validated['choices'] ?? [] as $choice) {
                 if (!empty($choice['study_program_id'])) {
                     ApplicantChoice::create([
                         'applicant_id'     => $applicant->id,
                         'study_program_id' => $choice['study_program_id'],
-                        'choice_order'     => $order + 1,
+                        'choice_order'     => $choiceOrder++,
                     ]);
                 }
             }
@@ -483,16 +501,20 @@ class RegistrationController extends Controller
                 ->where(fn($q) => $q->whereNull('school_id')->orWhere('school_id', $applicant->school_id))
                 ->first();
 
-            if ($submittedStatus) {
-                $oldStatus = $applicant->status;
-                $applicant->update([
-                    'status'     => $submittedStatus->code,
-                    'updated_by' => Auth::id(),
-                ]);
+            $oldStatus = $applicant->status;
+            $oldStatusId = $applicant->applicant_status_id
+                ?? ($oldStatus ? optional(ApplicantStatus::where('code', $oldStatus)->first())->id : null);
 
+            $applicant->update([
+                'status'              => $submittedStatus?->code ?? 'SUBMITTED',
+                'applicant_status_id' => $submittedStatus?->id,
+                'updated_by'          => Auth::id(),
+            ]);
+
+            if ($submittedStatus) {
                 ApplicantStatusHistory::create([
                     'applicant_id'      => $applicant->id,
-                    'from_status_id'    => optional(ApplicantStatus::where('code', $oldStatus)->first())->id,
+                    'from_status_id'    => $oldStatusId,
                     'to_status_id'      => $submittedStatus->id,
                     'changed_by'        => Auth::id(),
                     'reason'            => 'Pendaftaran disubmit oleh pendaftar',
@@ -501,6 +523,7 @@ class RegistrationController extends Controller
             }
 
             // Generate invoice
+            $applicant->loadMissing('admission');
             $this->generateInvoice($applicant);
 
             DB::commit();
@@ -540,6 +563,7 @@ class RegistrationController extends Controller
     private function generateInvoice(Applicant $applicant): void
     {
         $invoiceNumber = 'INV-' . $applicant->registration_number;
+        $fee = $applicant->admission->registration_fee ?? 0;
 
         $invoice = \Models\ApplicantInvoice::updateOrCreate(
             ['applicant_id' => $applicant->id],
@@ -549,10 +573,9 @@ class RegistrationController extends Controller
                 'invoice_number'  => $invoiceNumber,
                 'invoice_type'    => 'registration',
                 'due_date'        => now()->addDays(3),
-                'total_amount'    => $applicant->admission->registration_fee ?? 0,
-                'final_amount'    => $applicant->admission->registration_fee ?? 0,
-                'balance_amount'  => $applicant->admission->registration_fee ?? 0,
-                'status'          => 'unpaid',
+                'total_amount'    => $fee,
+                'final_amount'    => $fee,
+                'status'          => $fee > 0 ? 'unpaid' : 'paid',
                 'created_by'      => Auth::id(),
             ]
         );
@@ -564,7 +587,7 @@ class RegistrationController extends Controller
                 'name'                 => 'Biaya Pendaftaran PPDB',
             ],
             [
-                'amount' => $applicant->admission->registration_fee ?? 0,
+                'amount' => $fee,
             ]
         );
     }
@@ -574,6 +597,8 @@ class RegistrationController extends Controller
      */
     private function validateRegistration(Request $request): array
     {
+        $hasPrograms = StudyProgram::where('is_active', 1)->exists();
+
         return $request->validate([
             // Data pribadi
             'nik'              => ['required', 'digits:16'],
@@ -602,8 +627,9 @@ class RegistrationController extends Controller
             'admission_path_id' => ['required', 'exists:admission_paths,id'],
             'category_ids'     => ['nullable', 'array'],
             'category_ids.*'   => ['exists:applicant_categories,id'],
-            'choices'          => ['required', 'array', 'min:1', 'max:2'],
-            'choices.*.study_program_id' => ['required', 'exists:study_programs,id'],
+            'choices'          => [$hasPrograms ? 'required' : 'nullable', 'array', 'max:2'],
+            'choices.0.study_program_id' => [$hasPrograms ? 'required' : 'nullable', 'exists:study_programs,id'],
+            'choices.*.study_program_id' => ['nullable', 'exists:study_programs,id'],
 
             // Minat bakat
             'extracurriculars' => ['nullable', 'array'],
@@ -636,21 +662,29 @@ class RegistrationController extends Controller
     }
 
     /**
-     * AJAX: Get schools by admission
+     * AJAX: Get schools by admission (mendukung parameter ID maupun code)
      */
-    public function getSchools(Admission $admission)
+    public function getSchools($admission)
     {
-        $schools = \Models\School::whereHas('admissions', fn($q) => $q->where('id', $admission->id))
+        $admissionModel = $admission instanceof Admission
+            ? $admission
+            : Admission::where('id', $admission)->orWhere('code', $admission)->firstOrFail();
+
+        $schools = \Models\School::whereHas('admissions', fn($q) => $q->where('id', $admissionModel->id))
             ->select('id', 'name', 'npsn')->get();
         return response()->json($schools);
     }
 
     /**
-     * AJAX: Get paths by admission
+     * AJAX: Get paths by admission (mendukung parameter ID maupun code)
      */
-    public function getPaths(Admission $admission)
+    public function getPaths($admission)
     {
-        $paths = $admission->paths()->where('is_active', 1)
+        $admissionModel = $admission instanceof Admission
+            ? $admission
+            : Admission::where('id', $admission)->orWhere('code', $admission)->firstOrFail();
+
+        $paths = $admissionModel->paths()->where('is_active', 1)
             ->select('id', 'code', 'name', 'quota', 'description')->get();
         return response()->json($paths);
     }
@@ -660,9 +694,12 @@ class RegistrationController extends Controller
      */
     public function getPrograms(\Models\School $school)
     {
-        $programs = StudyProgram::where('school_id', $school->id)
-            ->orWhereNull('school_id')
-            ->select('id', 'name', 'code', 'degree_level')->get();
+        $programs = StudyProgram::where(function ($q) use ($school) {
+                $q->where('school_id', $school->id)->orWhereNull('school_id');
+            })
+            ->where('is_active', 1)
+            ->select('id', 'name', 'code', 'degree_level')
+            ->get();
         return response()->json($programs);
     }
 

@@ -8,5 +8,6 @@ import Swal from 'sweetalert2';
 window.Swal = Swal;
 window.Alpine = Alpine;
 window.bootstrap = bootstrap; // supaya bisa dipanggil manual di modal.js (bootstrap.Modal.getOrCreateInstance)
+import 'laravel-datatables-vite';
 
 Alpine.start();

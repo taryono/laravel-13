@@ -15,7 +15,7 @@ class PaymentController extends Controller
 {
     public function invoice(Applicant $applicant)
     {
-        $invoice = $applicant->invoices()->with('items')->latest()->firstOrFail();
+        $invoice = $applicant->invoices()->with(['items', 'payments'])->latest()->firstOrFail();
         return view('ppdb.invoice', compact('applicant', 'invoice'));
     }
 
@@ -48,6 +48,10 @@ class PaymentController extends Controller
                 'status'             => 'pending',
                 'created_by'         => Auth::id(),
             ]);
+
+            if (strtolower($invoice->status ?? '') !== 'paid') {
+                $invoice->update(['status' => 'pending']);
+            }
 
             DB::commit();
 

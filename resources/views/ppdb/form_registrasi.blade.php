@@ -59,8 +59,13 @@
                 @method('PUT')
             @endif
 
+            @php
+                $queryPathId = request()->filled('path')
+                    ? $admission->paths->firstWhere('code', request('path'))?->id
+                    : null;
+            @endphp
             <input type="hidden" name="admission_path_id" id="admission_path_id"
-                value="{{ old('admission_path_id', $applicant->admission_path_id ?? '') }}">
+                value="{{ old('admission_path_id', $applicant->admission_path_id ?? ($queryPathId ?? '')) }}">
             <input type="hidden" name="latitude" id="latitude"
                 value="{{ old('latitude', $applicant->domicile->latitude ?? '') }}">
             <input type="hidden" name="longitude" id="longitude"

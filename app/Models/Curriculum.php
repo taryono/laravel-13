@@ -7,6 +7,7 @@ class Curriculum extends BasedModel
     protected $table = 'curriculums';
     // Relasi
     protected $fillable = [
+        'organization_id',
         'school_id',
         'report_card_id',
         'name',
@@ -20,6 +21,11 @@ class Curriculum extends BasedModel
     protected $casts = [
         'is_active' => 'boolean',
     ];
+    public function organization()
+    {
+        return $this->belongsTo(Organization::class, 'organization_id');
+    }
+
     public function school()
     {
         return $this->belongsTo(School::class);
