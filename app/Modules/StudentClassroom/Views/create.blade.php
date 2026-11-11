@@ -1,14 +1,58 @@
-{{ Form::open(['method' => 'POST', 'route' => ['student_classroom.store'], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
-    <div class="row">
-        <div class="col-md-6 mb-3">
-            @forelse ($forms as $key => $form)
-                <div class="form-group">
-                    <label for="name">{{ say($form['label']) }}</label>
-                    {!! $form['content'] !!}
-                </div>
-            @empty
-                <p>{{ say('Data Tidak Ditemukan') }}</p>
-            @endforelse
-        </div>
-    </div>
-{{ Form::close() }}  
+ <div class="row">
+     {{ Form::open(['method' => 'POST', 'route' => ['student_classroom.store'], 'class' => 'form-horizontal']) }}
+
+     <div class="mb-6">
+         {{ Form::label('student_id', 'Nama Siswa', ['class' => 'form-label']) }}
+         {{ Form::select('student_id', $students, null, [
+             'class' => 'form-select' . ($errors->has('student_id') ? ' is-invalid' : ''),
+             'required',
+         ]) }}
+         @error('student_id')
+             <div class="invalid-feedback d-block">{{ $message }}</div>
+         @enderror
+     </div>
+
+     <div class="mb-6">
+         {{ Form::label('classroom_id', 'Kelas', ['class' => 'form-label']) }}
+         {{ Form::select('classroom_id', $classrooms, null, [
+             'class' => 'form-select' . ($errors->has('classroom_id') ? ' is-invalid' : ''),
+             'required',
+         ]) }}
+         @error('classroom_id')
+             <div class="invalid-feedback d-block">{{ $message }}</div>
+         @enderror
+     </div>
+
+     <div class="mb-6">
+         {{ Form::label('academic_year_id', 'Tahun Akademik', ['class' => 'form-label']) }}
+         {{ Form::select('academic_year_id', $academicYears, null, [
+             'class' => 'form-select' . ($errors->has('academic_year_id') ? ' is-invalid' : ''),
+             'required',
+         ]) }}
+         @error('academic_year_id')
+             <div class="invalid-feedback d-block">{{ $message }}</div>
+         @enderror
+     </div>
+
+     <div class="mb-6">
+         {{ Form::label('enrollment_date', 'Tanggal Pendaftaran', ['class' => 'form-label']) }}
+         {{ Form::date('enrollment_date', null, [
+             'class' => 'form-control' . ($errors->has('enrollment_date') ? ' is-invalid' : ''),
+         ]) }}
+         @error('enrollment_date')
+             <div class="invalid-feedback d-block">{{ $message }}</div>
+         @enderror
+     </div>
+
+     <div class="mb-6">
+         {{ Form::label('status', 'Status', ['class' => 'form-label']) }}
+         {{ Form::select('status', $statuses, 'ACTIVE', [
+             'class' => 'form-select' . ($errors->has('status') ? ' is-invalid' : ''),
+         ]) }}
+         @error('status')
+             <div class="invalid-feedback d-block">{{ $message }}</div>
+         @enderror
+     </div>
+
+     {{ Form::close() }}
+ </div>

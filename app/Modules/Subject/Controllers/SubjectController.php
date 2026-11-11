@@ -54,13 +54,13 @@ class SubjectController extends MainController
     public function create(): View
     {
         $subject = new Subject();
-        $result = $this->getForm($subject);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
-
+        $parents = \Models\Subject::pluck('name', 'id')->prepend('Pilih Parent', '')->toArray();
+        $schools = \Models\School::pluck('name', 'id')->prepend('Pilih Sekolah', '')->toArray();
+        $organizations = \Models\Organization::pluck('name', 'id')->prepend('Pilih Yayasan', '')->toArray();
+        $categories = \Models\SubjectCategory::pluck('name', 'id')->prepend('Pilih Kategori', '')->toArray();
         return view(
             'Subject::create',
-            compact('subject', 'forms', 'groupedForms')
+            compact('subject', 'organizations', 'schools', 'categories', 'parents')
         );
     }
 
@@ -118,13 +118,13 @@ class SubjectController extends MainController
     public function edit($id): View
     {
         $subject = $this->model->findOrFail($id);
-        $result = $this->getForm($subject);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
-
+        $parents = \Models\Subject::pluck('name', 'id')->prepend('Pilih Parent', '')->toArray();
+        $schools = \Models\School::pluck('name', 'id')->prepend('Pilih Sekolah', '')->toArray();
+        $organizations = \Models\Organization::pluck('name', 'id')->prepend('Pilih Yayasan', '')->toArray();
+        $categories = \Models\SubjectCategory::pluck('name', 'id')->prepend('Pilih Kategori', '')->toArray();
         return view(
             'Subject::edit',
-            compact('subject', 'forms', 'groupedForms')
+            compact('subject', 'organizations', 'schools', 'categories', 'parents')
         );
     }
 
@@ -150,10 +150,7 @@ class SubjectController extends MainController
 
         try {
             $subject = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $subject,
-                $validated
-            ) {
+            DB::transaction(function () use ($subject, $validated) {
                 $subject->update($validated);
             });
 

@@ -87,10 +87,10 @@ class Subject extends BasedModel
             if ($subject->parent_id) {
                 $parent = static::find($subject->parent_id);
                 $subject->depth = $parent->depth + 1;
-                $subject->path  = $parent->path . '/' . $subject->id;
+                $subject->path = $parent->path . '/' . $subject->id;
             } else {
                 $subject->depth = 0;
-                $subject->path  = (string) $subject->id;
+                $subject->path = (string) $subject->id;
             }
         });
     }

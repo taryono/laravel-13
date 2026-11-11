@@ -1,18 +1,34 @@
 <?php
-
-namespace Models; 
+// app/Models/StudentClassroom.php
+namespace Models;
 
 class StudentClassroom extends BasedModel
-{ 
-    // Relasi
-    // public function user()
-    // {
-    //     return $this->belongsTo(User::class);
-    // }
+{
+    protected $table = "student_classrooms";
+    protected $fillable = [
+        'student_id',
+        'classroom_id',
+        'academic_year_id',
+        'enrollment_date',
+        'status',
+    ];
 
-    // Scope
-    public function scopeActive($query)
+    protected $casts = [
+        'enrollment_date' => 'date',
+    ];
+
+    public function student()
     {
-        return $query->where('is_active', true);
+        return $this->belongsTo(Student::class);
+    }
+
+    public function classroom()
+    {
+        return $this->belongsTo(Classroom::class);
+    }
+
+    public function academicYear()
+    {
+        return $this->belongsTo(AcademicYear::class);
     }
 }

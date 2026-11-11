@@ -51,15 +51,15 @@ class StudentClassroomController extends MainController
      */
     public function create(): View
     {
-        $studentClassroom = new StudentClassroom();
-        $result = $this->getForm($studentClassroom);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
+        $student_classroom = new StudentClassroom();
+        // Semua pakai pola yang sama
+        $students = \Models\Student::pluck('name', 'id')->prepend('-- Pilih Siswa --', '')->toArray();
+        $classrooms = \Models\Classroom::pluck('name', 'id')->prepend('-- Pilih Kelas --', '')->toArray();
+        $academicYears = \Models\AcademicYear::pluck('name', 'id')->prepend('-- Pilih Tahun Akademik --', '')->toArray();
 
-        return view(
-            'StudentClassroom::create',
-            compact('studentClassroom', 'forms', 'groupedForms')
-        );
+        $statuses = ['ACTIVE' => 'Active', 'TRANSFERRED' => 'Transferred', 'DROPPED' => 'Dropped', 'GRADUATED' => 'Graduated'];
+
+        return view('StudentClassroom::create', compact('students', 'classrooms', 'academicYears', 'statuses', 'student_classroom'));
     }
 
     /**
@@ -68,7 +68,7 @@ class StudentClassroomController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'student_id' => ['required', 'integer'],
+            'student_id' => ['required', 'integer'],
             'classroom_id' => ['required', 'integer'],
             'academic_year_id' => ['required', 'integer'],
             'enrollment_date' => ['required', 'string', 'max:255'],
@@ -114,14 +114,17 @@ class StudentClassroomController extends MainController
      */
     public function edit($id): View
     {
-        $studentClassroom = $this->model->findOrFail($id);
-        $result = $this->getForm($studentClassroom);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
+        $student_classroom = $this->model->findOrFail($id);
+        $students = \Models\Student::pluck('name', 'id')->prepend('-- Pilih Siswa --', '')->toArray();
+        $classrooms = \Models\Classroom::pluck('name', 'id')->prepend('-- Pilih Kelas --', '')->toArray();
+        $academicYears = \Models\AcademicYear::pluck('name', 'id')->prepend('-- Pilih Tahun Akademik --', '')->toArray();
+
+        $statuses = ['ACTIVE' => 'Active', 'TRANSFERRED' => 'Transferred', 'DROPPED' => 'Dropped', 'GRADUATED' => 'Graduated'];
+
 
         return view(
             'StudentClassroom::edit',
-            compact('studentClassroom', 'forms', 'groupedForms')
+            compact('student_classroom', 'students', 'classrooms', 'academicYears', 'statuses')
         );
     }
 
@@ -131,7 +134,7 @@ class StudentClassroomController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'student_id' => ['required', 'integer'],
+            'student_id' => ['required', 'integer'],
             'classroom_id' => ['required', 'integer'],
             'academic_year_id' => ['required', 'integer'],
             'enrollment_date' => ['required', 'string', 'max:255'],
@@ -145,10 +148,7 @@ class StudentClassroomController extends MainController
 
         try {
             $studentClassroom = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $studentClassroom,
-                $validated
-            ) {
+            DB::transaction(function () use ($studentClassroom, $validated) {
                 $studentClassroom->update($validated);
             });
 
@@ -158,7 +158,7 @@ class StudentClassroomController extends MainController
                 $studentClassroom
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui StudentClassroom.',
                 [
@@ -193,7 +193,7 @@ class StudentClassroomController extends MainController
                 'Data StudentClassroom berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $studentClassroom->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus StudentClassroom.',
@@ -209,5 +209,5 @@ class StudentClassroomController extends MainController
                 'Data StudentClassroom gagal dihapus.'
             );
         }
-    } 
+    }
 }
