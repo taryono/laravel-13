@@ -201,8 +201,10 @@ class MiddlewareConfigurationTest extends TestCase
             Route::get('/_test/student-portal', fn () => response()->json(['ok' => true]))->middleware('student.auth')->name('test.student');
             Route::get('/student/protected-check', fn () => response()->json(['ok' => true]))->middleware('auth')->name('test.student.guest_check');
             Route::get('/_test/parent-portal', fn () => response()->json(['ok' => true]))->middleware('parent.auth')->name('test.parent');
+            Route::get('/_test/ppdb-admin', fn () => response()->json(['ok' => true]))->middleware('ppdb-admin.auth')->name('test.ppdb_admin');
             Route::get('/_test/applicant-portal', fn () => response()->json(['ok' => true]))->middleware('applicant.auth')->name('test.applicant');
             Route::get('/_test/guest-applicant', fn () => response()->json(['guest' => true]))->middleware('guest:applicant')->name('test.guest.applicant');
+            Route::get('/ppdb/_test-guest', fn () => response()->json(['guest' => true]))->middleware('guest:applicant')->name('test.ppdb.guest');
 
             Route::get('/_test/canteen/{tenant}/cashier', fn (\Illuminate\Http\Request $request) => response()->json([
                 'tenant_role' => $request->attributes->get('tenant_role'),
@@ -419,6 +421,9 @@ class MiddlewareConfigurationTest extends TestCase
         $guru = $this->makeUser('guru1@example.com', [1], [['code' => 'guru', 'name' => 'Guru']]);
         $ppdbAdmin = $this->makeUser('ppdbadmin@example.com', [1], [['code' => 'admin-ppdb', 'name' => 'Panitia PPDB']]);
 
+        // AdminPpdbAuth redirects unauthenticated guests on /admin-ppdb root to ppdb-admin.login
+        $this->get('/admin-ppdb')->assertRedirect(route('ppdb-admin.login'));
+
         // StudentAuth allows siswa & orang-tua, rejects guru
         $this->actingAs($siswa)->getJson('/_test/student-portal')->assertOk();
         $this->actingAs($parent)->getJson('/_test/student-portal')->assertOk();
@@ -428,13 +433,12 @@ class MiddlewareConfigurationTest extends TestCase
         $this->actingAs($parent)->getJson('/_test/parent-portal')->assertOk();
         $this->actingAs($siswa)->getJson('/_test/parent-portal')->assertStatus(403);
 
-        // AdminPpdbAuth allows admin-ppdb, rejects guru, redirects unauthenticated to ppdb-admin.login even on /admin-ppdb root
-        $this->get('/admin-ppdb')->assertRedirect(route('ppdb-admin.login'));
-        $this->actingAs($guru)->get('/admin-ppdb')->assertStatus(403); // Dashboard itself must return 403, not redirect loop!
+        // AdminPpdbAuth allows admin-ppdb, rejects guru, prevents redirect loop on dashboard
+        $this->actingAs($guru)->get('/admin-ppdb')->assertStatus(403);
         $this->actingAs($guru)->get('/admin-ppdb/verifikasi')->assertRedirect(route('dashboard'));
-        $this->actingAs($ppdbAdmin)->getJson('/admin-ppdb/verifikasi')->assertOk();
+        $this->actingAs($ppdbAdmin)->getJson('/_test/ppdb-admin')->assertOk();
 
-        // ApplicantAuth with active and inactive applicant
+        // ApplicantAuth with active and inactive applicant (must not log out web guard)
         $activeApplicant = Applicant::create(['name' => 'Calon Aktif', 'is_active' => true]);
         $inactiveApplicant = Applicant::create(['name' => 'Calon Nonaktif', 'is_active' => false]);
 
@@ -446,6 +450,7 @@ class MiddlewareConfigurationTest extends TestCase
         Auth::guard('applicant')->login($inactiveApplicant);
         $this->getJson('/_test/applicant-portal')->assertStatus(403);
         $this->assertFalse(Auth::guard('applicant')->check());
+        $this->assertTrue(Auth::guard('web')->check());
     }
 
     public function test_guest_redirect_if_authenticated_uses_redirect_users_to_callback(): void
@@ -463,9 +468,13 @@ class MiddlewareConfigurationTest extends TestCase
         // Authenticated regular user visiting /login goes to dashboard
         $this->actingAs($regular)->get('/login')->assertRedirect(route('dashboard'));
 
-        // Authenticated applicant visiting guest:applicant route redirects via redirectUsersTo
+        // Authenticated applicant visiting ppdb/* guest:applicant route redirects via applicant branch even if web is also active
         $applicant = Applicant::create(['name' => 'Guest Applicant', 'is_active' => true]);
         Auth::guard('applicant')->login($applicant);
+        $this->get('/ppdb/_test-guest')->assertRedirect('/');
+
+        // When only applicant is logged in, generic guest:applicant route also redirects to applicant target
+        Auth::guard('web')->logout();
         $this->get('/_test/guest-applicant')->assertRedirect('/');
     }
 
