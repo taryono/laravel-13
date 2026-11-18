@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 use Throwable;
 use Models\Employee;
-use Models\PayrollPeriod; 
+use Models\PayrollPeriod;
 class BonusController extends MainController
 {
     public function __construct()
@@ -27,20 +27,15 @@ class BonusController extends MainController
             return $dataTable->ajax();
         }
 
-        return $dataTable->render('Payroll::bonus.index');
+        return $dataTable->render('Bonus::index');
     }
 
     public function create(): View
     {
         $bonus = new Bonus();
-        $employees = Employee::where('is_active', 1)->pluck('full_name', 'id');
-        $periods = PayrollPeriod::where('is_closed', 0)->pluck('code', 'id');
-
-        $result = $this->getForm($bonus);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
-
-        return view('Payroll::bonus.edit', compact('bonus', 'forms', 'groupedForms', 'employees', 'periods'));
+        $employees = Employee::where('is_active', 1)->pluck('full_name', 'id')->toArray();
+        $periods = PayrollPeriod::where('is_closed', 0)->pluck('period', 'id')->toArray();
+        return view('Bonus::create', compact('bonus', 'employees', 'periods'));
     }
 
     public function store(Request $request)
@@ -72,14 +67,9 @@ class BonusController extends MainController
     public function edit($id): View
     {
         $bonus = $this->model->findOrFail($id);
-        $employees = Employee::where('is_active', 1)->pluck('full_name', 'id');
-        $periods = PayrollPeriod::where('is_closed', 0)->pluck('code', 'id');
-
-        $result = $this->getForm($bonus);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
-
-        return view('Payroll::bonus.edit', compact('bonus', 'forms', 'groupedForms', 'employees', 'periods'));
+        $employees = Employee::where('is_active', 1)->pluck('full_name', 'id')->toArray();
+        $periods = PayrollPeriod::where('is_closed', 0)->pluck('period', 'id')->toArray();
+        return view('Bonus::edit', compact('bonus', 'employees', 'periods'));
     }
 
     public function update(Request $request, $id)

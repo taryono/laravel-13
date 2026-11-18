@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
 class PayrollPeriod extends BasedModel
-{ 
+{
     protected $fillable = [
         'organization_id',
         'code',
@@ -26,10 +26,10 @@ class PayrollPeriod extends BasedModel
 
     protected $casts = [
         'start_date' => 'date:Y-m-d',
-        'end_date'   => 'date:Y-m-d',
-        'is_closed'  => 'boolean',
-        'closed_at'  => 'datetime',
-        'is_active'  => 'boolean',
+        'end_date' => 'date:Y-m-d',
+        'is_closed' => 'boolean',
+        'closed_at' => 'datetime',
+        'is_active' => 'boolean',
     ];
 
     // Relasi
