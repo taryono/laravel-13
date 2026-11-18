@@ -2,10 +2,19 @@
 @section('title', 'Penilaian & Rapor')
 @push('styles')
     <link rel="stylesheet" href="{{ asset('assets/css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/ep-subnav.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/assessment.css') }}">
 @endpush
 @section('content')
 <div class="raport">
+    @include('Dashboard::partials.ep_subnav', [
+        'title' => 'Modul Rapor & Asesmen',
+        'badge' => 'Periode Penilaian Aktif',
+        'subtitle' => 'Kurikulum Merdeka & E-Rapor Semester Genap 2024/2025',
+        'metaIcon' => 'event',
+        'metaLabel' => 'Tenggat',
+        'metaValue' => '22 Juni 2025',
+    ])
     <!-- ---------- MODULE HEADER ---------- -->
     <section class="rap-card p-4">
         <div class="d-flex align-items-start justify-content-between gap-2 mb-2">

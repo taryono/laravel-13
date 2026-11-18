@@ -2,17 +2,26 @@
 @section('title', 'Budgeting & RAPBS')
 @push('styles')
     <link rel="stylesheet" href="{{ asset('assets/css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/ep-subnav.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/budgeting.css') }}">
 @endpush
 @section('content')
 
     <div class="bgt d-flex flex-column gap-4">
+        @include('Dashboard::partials.ep_subnav', [
+            'title' => 'Modul Budgeting & RAPBS',
+            'badge' => 'Realisasi 72.8%',
+            'subtitle' => 'Rencana Anggaran Pendapatan & Belanja Sekolah TA 2024/2025',
+            'metaIcon' => 'account_balance',
+            'metaLabel' => 'Tahun Anggaran',
+            'metaValue' => '2024/2025',
+        ])
         <!-- Page Header -->
         <section
             class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center gap-3 bg-lowest p-3 p-sm-4 r-2xl border-soft shadow-sm">
             <div class="d-flex flex-column gap-2">
                 <div class="d-flex align-items-center gap-2 flex-wrap">
-                    <a href="{{ url('/') }}" class="back-link text-body-sm pressable">
+                    <a href="{{ route('dashboard.back-to-home') }}" class="back-link back-to-home text-body-sm pressable">
                         <span class="material-symbols-outlined icon-16">arrow_back</span>
                         <span>Kembali ke Beranda</span>
                     </a>

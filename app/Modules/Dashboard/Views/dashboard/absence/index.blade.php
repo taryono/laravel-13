@@ -2,9 +2,18 @@
 @section('title', 'Presensi & Absensi')
 @push('styles')
     <link rel="stylesheet" href="{{ asset('assets/css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/ep-subnav.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/absence.css') }}">
 @endpush
 @section('content')
+    @include('Dashboard::partials.ep_subnav', [
+        'title' => 'Modul Presensi & Absensi',
+        'badge' => '96.8% Hadir Hari Ini',
+        'subtitle' => 'Pemantauan Kehadiran Siswa, Tap RFID/QR & Konfirmasi Izin',
+        'metaIcon' => 'how_to_reg',
+        'metaLabel' => 'Hadir',
+        'metaValue' => '1.180 / 1.216 Siswa',
+    ])
     <!-- KPI Bento -->
     <section>
         <div class="row g-3">

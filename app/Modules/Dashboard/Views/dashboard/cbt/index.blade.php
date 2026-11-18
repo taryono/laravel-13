@@ -1,10 +1,19 @@
 @extends('layouts.app')
-@section('title', 'Kantin & Cashless')
+@section('title', 'CBT & Ujian Online')
 @push('styles')
     <link rel="stylesheet" href="{{ asset('assets/css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/ep-subnav.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/cbt.css') }}">
 @endpush
 @section('content')
+    @include('Dashboard::partials.ep_subnav', [
+        'title' => 'Modul Ujian CBT',
+        'badge' => '2 Sesi Aktif',
+        'subtitle' => 'Manajemen Ujian Berbasis Komputer, Peserta & Status Server',
+        'metaIcon' => 'groups',
+        'metaLabel' => 'Peserta',
+        'metaValue' => '284 Siswa',
+    ])
     <!-- KPI Bento -->
     <section class="row g-2">
         <!-- Ujian Berlangsung -->

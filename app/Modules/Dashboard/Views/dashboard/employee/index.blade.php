@@ -908,6 +908,7 @@
             color: var(--on-secondary-container);
         }
     </style>
+    <link rel="stylesheet" href="{{ asset('assets/css/ep-subnav.css') }}" />
 </head>
 
 <body>
@@ -953,11 +954,20 @@
     <main class="container-fluid py-4 mx-auto" style="max-width:1280px;">
         <div class="d-flex flex-column gap-4 px-3 px-sm-4 px-lg-5">
 
+            @include('Dashboard::partials.ep_subnav', [
+                'title' => 'Modul Karyawan & SDM',
+                'badge' => 'Tahun Ajaran 2024/2025',
+                'subtitle' => 'Manajemen Guru, Pendidik & Tenaga Kependidikan Terpadu',
+                'metaIcon' => 'badge',
+                'metaLabel' => 'Unit',
+                'metaValue' => 'Tenaga Pendidik & Staf',
+            ])
+
             <!-- Header card -->
             <div class="card-soft p-4">
                 <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
                     <div>
-                        <a href="#" class="link-secondary-bold mb-2">
+                        <a href="{{ route('dashboard.back-to-home') }}" class="link-secondary-bold back-to-home mb-2">
                             <span class="material-symbols-outlined" style="font-size:16px;">arrow_back</span>
                             <span>Kembali ke Beranda</span>
                         </a>

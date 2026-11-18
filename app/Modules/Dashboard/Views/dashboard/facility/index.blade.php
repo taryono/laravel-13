@@ -2,9 +2,18 @@
 @section('title', 'Fasilitas & Sarpras')
 @push('styles')
     <link rel="stylesheet" href="{{ asset('assets/css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/ep-subnav.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/facility.css') }}">
 @endpush
 @section('content')
+    @include('Dashboard::partials.ep_subnav', [
+        'title' => 'Modul Fasilitas & Sarpras',
+        'badge' => '94.2% Kondisi Prima',
+        'subtitle' => 'Inventarisasi Aset, Ruangan & Pemeliharaan Sarana Prasarana',
+        'metaIcon' => 'inventory_2',
+        'metaLabel' => 'Total Aset',
+        'metaValue' => '3.420 Item',
+    ])
     <!-- KPI Section -->
     <section aria-labelledby="kpi-heading" class="mb-4">
         <div class="d-flex align-items-center justify-content-between mb-3">
