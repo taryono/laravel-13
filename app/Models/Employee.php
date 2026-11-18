@@ -9,13 +9,19 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 class Employee extends BasedModel
 {
     protected $fillable = [
+        'organization_id',
+        'employee_number',
         'employee_id',
         'user_id',
         'department_id',
         'position_id',
         'supervisor_id',
+        'salary_structure_id',
+        'employment_status_id',
+        'name',
         'full_name',
         'nick_name',
+        'nik',
         'gender',
         'birth_place',
         'birth_date',
@@ -31,6 +37,7 @@ class Employee extends BasedModel
         'npwp',
         'bpjs_ketenagakerjaan',
         'bpjs_kesehatan',
+        'photo_path',
         'is_active',
     ];
 

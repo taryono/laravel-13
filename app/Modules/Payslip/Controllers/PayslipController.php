@@ -4,12 +4,17 @@ namespace App\Modules\Payslip\Controllers;
 
 use App\DataTables\PayslipDataTable;
 use App\Http\Controllers\MainController;
+use Models\Employee;
+use Models\PayrollDetail;
+use Models\PayrollPeriod;
+use Models\PayrollRun;
 use Models\Payslip;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 use Throwable;
 
@@ -17,11 +22,11 @@ class PayslipController extends MainController
 {
     public function __construct()
     {
-        parent::__construct(new Payslip());
+        parent::__construct(new Payslip(), 'payslip');
     }
 
     /**
-     * Display a listing of accounts.
+     * Display a listing of payslips.
      */
     public function index(Request $request, PayslipDataTable $dataTable)
     {
@@ -38,18 +43,21 @@ class PayslipController extends MainController
     public function create(): View
     {
         $payslip = new Payslip();
-        $categories = PayslipCategory::where('is_active', 1)->pluck('name', 'id');
-        $parents = Payslip::where('is_active', 1)
-            ->where('account_type', 'header')
-            ->pluck('name', 'id');
+        $payslip->payslip_number = $payslip->generateUniqueCode();
+        $payslip->currency = 'IDR';
+        $payslip->status = 'draft';
+        $payslip->generated_at = now();
 
-        $result = $this->getForm($payslip);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
+        $employees = Employee::orderBy('name')->pluck('name', 'id')->toArray();
+        $payroll_periods = PayrollPeriod::orderBy('id', 'desc')->pluck('period', 'id')->toArray();
+        $payroll_details = PayrollDetail::with('employee')->orderBy('id', 'desc')->get()->mapWithKeys(function ($item) {
+            $empName = $item->employee_name_snapshot ?? $item->employee?->name ?? ('Karyawan #' . $item->employee_id);
+            return [$item->id => $empName . ' (Net: Rp ' . number_format((float) $item->net_salary, 0, ',', '.') . ')'];
+        })->toArray();
 
         return view(
-            'Payslip::edit',
-            compact('payslip', 'forms', 'groupedForms', 'categories', 'parents')
+            'Payslip::create',
+            compact('payslip', 'employees', 'payroll_periods', 'payroll_details')
         );
     }
 
@@ -58,42 +66,162 @@ class PayslipController extends MainController
      */
     public function store(Request $request)
     {
+        $orgId = $request->input('organization_id')
+            ?? session('active_organization_id')
+            ?? auth()->user()?->active_organization_id
+            ?? 1;
+
         $validated = $request->validate([
-            'code' => 'required|string|max:50|unique:accounts,code',
-            'name' => 'required|string|max:255',
-            'category_id' => 'required|exists:account_categories,id',
-            'parent_id' => 'nullable|exists:accounts,id',
-            'account_type' => 'required|in:header,detail',
-            'normal_balance' => 'required|in:debit,kredit',
-            'currency_code' => 'nullable|string|max:10',
-            'description' => 'nullable|string',
-            'opening_balance' => 'nullable|numeric|min:0',
-            'is_active' => 'boolean',
-            'is_system' => 'boolean',
+            'payroll_detail_id' => [
+                'nullable',
+                'integer',
+                'exists:payroll_details,id',
+                'unique:payslips,payroll_detail_id',
+            ],
+            'employee_id' => 'required|integer|exists:employees,id',
+            'payroll_period_id' => 'required|integer|exists:payroll_periods,id',
+            'organization_id' => 'nullable|integer|exists:organizations,id',
+            'payslip_number' => [
+                'nullable',
+                'string',
+                'max:255',
+                Rule::unique('payslips', 'payslip_number')->where(function ($query) use ($orgId) {
+                    return $query->where('organization_id', $orgId);
+                }),
+            ],
+            'total_allowance' => 'nullable|numeric|min:0',
+            'total_deduction' => 'nullable|numeric|min:0',
+            'gross_salary'    => 'nullable|numeric|min:0',
+            'net_salary'      => 'nullable|numeric|min:0',
+            'currency'        => 'nullable|string|max:3',
+            'status'          => 'required|in:draft,generated,sent,downloaded,void',
+            'generated_at'    => 'nullable|date',
+            'pdf_path'        => 'nullable|string|max:1000',
+            'html_content'    => 'nullable|string',
+            'is_sent'         => 'nullable|boolean',
+            'sent_at'         => 'nullable|date',
+            'is_downloaded'   => 'nullable|boolean',
+            'downloaded_at'   => 'nullable|date',
         ]);
 
         try {
-            $payslip = DB::transaction(function () use ($validated) {
+            $validated['organization_id'] = $orgId;
+
+            // Generate otomatis payslip_number jika kosong
+            if (empty($validated['payslip_number'])) {
+                $payslipModel = new Payslip();
+                $validated['payslip_number'] = $payslipModel->generateUniqueCode($orgId);
+            }
+
+            // Normalisasi nilai default
+            $validated['total_allowance'] = $validated['total_allowance'] ?? 0.00;
+            $validated['total_deduction'] = $validated['total_deduction'] ?? 0.00;
+            $validated['gross_salary']    = $validated['gross_salary'] ?? 0.00;
+            $validated['net_salary']      = $validated['net_salary'] ?? 0.00;
+            $validated['currency']        = $validated['currency'] ?? 'IDR';
+            $validated['status']          = $validated['status'] ?? 'draft';
+            $validated['is_sent']         = $request->boolean('is_sent');
+            $validated['is_downloaded']   = $request->boolean('is_downloaded');
+
+            if ($validated['is_sent'] && empty($validated['sent_at'])) {
+                $validated['sent_at'] = now();
+            }
+            if ($validated['is_downloaded'] && empty($validated['downloaded_at'])) {
+                $validated['downloaded_at'] = now();
+            }
+            if (empty($validated['generated_at'])) {
+                $validated['generated_at'] = now();
+            }
+
+            $payslip = DB::transaction(function () use ($validated, $orgId) {
+                // Auto-provision PayrollDetail jika belum disediakan
+                if (empty($validated['payroll_detail_id'])) {
+                    $existingDetail = PayrollDetail::where('employee_id', $validated['employee_id'])
+                        ->whereDoesntHave('payslip')
+                        ->first();
+
+                    if ($existingDetail) {
+                        $validated['payroll_detail_id'] = $existingDetail->id;
+                    } else {
+                        $payrollRun = PayrollRun::firstOrCreate(
+                            [
+                                'payroll_period_id' => $validated['payroll_period_id'],
+                                'organization_id'   => $orgId,
+                            ],
+                            [
+                                'run_number'  => 'PR/' . date('Ym') . '/001',
+                                'run_type'    => 'regular',
+                                'status'      => 'draft',
+                                'total_gross' => $validated['gross_salary'],
+                                'total_net'   => $validated['net_salary'],
+                            ]
+                        );
+
+                        $employee = Employee::find($validated['employee_id']);
+
+                        $newDetail = PayrollDetail::create([
+                            'payroll_run_id'           => $payrollRun->id,
+                            'employee_id'              => $validated['employee_id'],
+                            'employee_number_snapshot' => $employee?->employee_number ?? ('EMP-' . $validated['employee_id']),
+                            'employee_name_snapshot'   => $employee?->name ?? ('Employee #' . $validated['employee_id']),
+                            'gross_salary'             => $validated['gross_salary'],
+                            'total_deduction'          => $validated['total_deduction'],
+                            'net_salary'               => $validated['net_salary'],
+                            'status'                   => 'calculated',
+                        ]);
+
+                        $validated['payroll_detail_id'] = $newDetail->id;
+                    }
+                }
+
                 return Payslip::create($validated);
             });
 
             return $this->successResponse(
                 $request,
-                'Akun berhasil ditambahkan.',
+                'Payslip berhasil ditambahkan.',
                 $payslip
             );
         } catch (Throwable $e) {
-            Log::error('Gagal menambahkan akun.', [
+            Log::error('Gagal menambahkan payslip.', [
                 'exception' => $e,
-                'data' => $validated,
-                'user_id' => auth()->id(),
+                'data'      => $validated,
+                'user_id'   => auth()->id(),
             ]);
 
             return $this->errorResponse(
                 $request,
-                'Akun gagal ditambahkan.'
+                'Payslip gagal ditambahkan: ' . $e->getMessage()
             );
         }
+    }
+
+    /**
+     * Show detailed payslip view.
+     */
+    public function show($id): View
+    {
+        $payslip = $this->model->with(['employee', 'payrollPeriod', 'payrollDetail', 'organization'])->findOrFail($id);
+
+        return view('Payslip::show', compact('payslip'));
+    }
+
+    /**
+     * Preview payslip.
+     */
+    public function preview($id): View
+    {
+        return $this->show($id);
+    }
+
+    /**
+     * Print payslip.
+     */
+    public function print($id): View
+    {
+        $payslip = $this->model->with(['employee', 'payrollPeriod', 'payrollDetail', 'organization'])->findOrFail($id);
+
+        return view('Payslip::print', compact('payslip'));
     }
 
     /**
@@ -101,20 +229,18 @@ class PayslipController extends MainController
      */
     public function edit($id): View
     {
-        $payslip = $this->model->findOrFail($id);
-        $categories = PayslipCategory::where('is_active', 1)->pluck('name', 'id');
-        $parents = Payslip::where('is_active', 1)
-            ->where('account_type', 'header')
-            ->where('id', '!=', $id)
-            ->pluck('name', 'id');
+        $payslip = $this->model->with(['employee', 'payrollPeriod', 'payrollDetail'])->findOrFail($id);
 
-        $result = $this->getForm($payslip);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
+        $employees = Employee::orderBy('name')->pluck('name', 'id')->toArray();
+        $payroll_periods = PayrollPeriod::orderBy('id', 'desc')->pluck('period', 'id')->toArray();
+        $payroll_details = PayrollDetail::with('employee')->orderBy('id', 'desc')->get()->mapWithKeys(function ($item) {
+            $empName = $item->employee_name_snapshot ?? $item->employee?->name ?? ('Karyawan #' . $item->employee_id);
+            return [$item->id => $empName . ' (Net: Rp ' . number_format((float) $item->net_salary, 0, ',', '.') . ')'];
+        })->toArray();
 
         return view(
             'Payslip::edit',
-            compact('payslip', 'forms', 'groupedForms', 'categories', 'parents')
+            compact('payslip', 'employees', 'payroll_periods', 'payroll_details')
         );
     }
 
@@ -125,46 +251,75 @@ class PayslipController extends MainController
     {
         $payslip = $this->model->findOrFail($id);
 
-        if ($payslip->is_system) {
-            return $this->errorResponse(
-                $request,
-                'Akun sistem tidak dapat diubah.'
-            );
-        }
-
         $validated = $request->validate([
-            'code' => 'required|string|max:50|unique:accounts,code,' . $id,
-            'name' => 'required|string|max:255',
-            'category_id' => 'required|exists:account_categories,id',
-            'parent_id' => 'nullable|exists:accounts,id',
-            'account_type' => 'required|in:header,detail',
-            'normal_balance' => 'required|in:debit,kredit',
-            'currency_code' => 'nullable|string|max:10',
-            'description' => 'nullable|string',
-            'is_active' => 'boolean',
+            'payroll_detail_id' => [
+                'nullable',
+                'integer',
+                'exists:payroll_details,id',
+                Rule::unique('payslips', 'payroll_detail_id')->ignore($id),
+            ],
+            'employee_id' => 'required|integer|exists:employees,id',
+            'payroll_period_id' => 'required|integer|exists:payroll_periods,id',
+            'organization_id' => 'nullable|integer|exists:organizations,id',
+            'payslip_number' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('payslips', 'payslip_number')
+                    ->where(fn($q) => $q->where('organization_id', $payslip->organization_id))
+                    ->ignore($id),
+            ],
+            'total_allowance' => 'nullable|numeric|min:0',
+            'total_deduction' => 'nullable|numeric|min:0',
+            'gross_salary'    => 'nullable|numeric|min:0',
+            'net_salary'      => 'nullable|numeric|min:0',
+            'currency'        => 'nullable|string|max:3',
+            'status'          => 'required|in:draft,generated,sent,downloaded,void',
+            'generated_at'    => 'nullable|date',
+            'pdf_path'        => 'nullable|string|max:1000',
+            'html_content'    => 'nullable|string',
+            'is_sent'         => 'nullable|boolean',
+            'sent_at'         => 'nullable|date',
+            'is_downloaded'   => 'nullable|boolean',
+            'downloaded_at'   => 'nullable|date',
         ]);
 
         try {
+            $validated['total_allowance'] = $validated['total_allowance'] ?? 0.00;
+            $validated['total_deduction'] = $validated['total_deduction'] ?? 0.00;
+            $validated['gross_salary']    = $validated['gross_salary'] ?? 0.00;
+            $validated['net_salary']      = $validated['net_salary'] ?? 0.00;
+            $validated['currency']        = $validated['currency'] ?? 'IDR';
+            $validated['is_sent']         = $request->boolean('is_sent');
+            $validated['is_downloaded']   = $request->boolean('is_downloaded');
+
+            if ($validated['is_sent'] && empty($validated['sent_at'])) {
+                $validated['sent_at'] = now();
+            }
+            if ($validated['is_downloaded'] && empty($validated['downloaded_at'])) {
+                $validated['downloaded_at'] = now();
+            }
+
             DB::transaction(function () use ($payslip, $validated) {
                 $payslip->update($validated);
             });
 
             return $this->successResponse(
                 $request,
-                'Akun berhasil diperbarui.',
+                'Payslip berhasil diperbarui.',
                 $payslip
             );
         } catch (Throwable $e) {
-            Log::error('Gagal memperbarui akun.', [
-                'exception' => $e,
-                'chart_of_account_id' => $id,
-                'data' => $validated,
-                'user_id' => auth()->id(),
+            Log::error('Gagal memperbarui payslip.', [
+                'exception'  => $e,
+                'payslip_id' => $id,
+                'data'       => $validated,
+                'user_id'    => auth()->id(),
             ]);
 
             return $this->errorResponse(
                 $request,
-                'Akun gagal diperbarui.'
+                'Payslip gagal diperbarui: ' . $e->getMessage()
             );
         }
     }
@@ -177,72 +332,42 @@ class PayslipController extends MainController
         try {
             $payslip = $this->model->findOrFail($id);
 
-            if ($payslip->is_system) {
-                return $this->errorResponse(
-                    $request,
-                    'Akun sistem tidak dapat dihapus.'
-                );
-            }
-
-            // Check if payslip has transactions
-            if ($payslip->journalDetails()->exists()) {
-                return $this->errorResponse(
-                    $request,
-                    'Akun tidak dapat dihapus karena sudah memiliki transaksi.'
-                );
-            }
-
             DB::transaction(function () use ($payslip) {
                 $payslip->delete();
             });
 
             return $this->successResponse(
                 $request,
-                'Akun berhasil dihapus.'
+                'Payslip berhasil dihapus.'
             );
         } catch (Throwable $e) {
-            Log::error('Gagal menghapus akun.', [
-                'exception' => $e,
-                'chart_of_account_id' => $id,
-                'user_id' => auth()->id(),
+            Log::error('Gagal menghapus payslip.', [
+                'exception'  => $e,
+                'payslip_id' => $id,
+                'user_id'    => auth()->id(),
             ]);
 
             return $this->errorResponse(
                 $request,
-                'Akun gagal dihapus.'
+                'Payslip gagal dihapus: ' . $e->getMessage()
             );
         }
     }
 
     /**
-     * Get payslip balance.
+     * Search payslips for autocomplete / select2.
      */
-    public function getBalance(Request $request, $id): JsonResponse
+    public function search(Request $request): JsonResponse
     {
-        try {
-            $payslip = $this->model->findOrFail($id);
-            $balance = $payslip->getBalance();
+        $q = $request->input('q', '');
+        $items = Payslip::with(['employee', 'payrollPeriod'])
+            ->where('payslip_number', 'LIKE', "%{$q}%")
+            ->orWhereHas('employee', function ($query) use ($q) {
+                $query->where('name', 'LIKE', "%{$q}%");
+            })
+            ->limit(20)
+            ->get(['id', 'payslip_number', 'employee_id', 'payroll_period_id', 'net_salary', 'status']);
 
-            return response()->json([
-                'success' => true,
-                'data' => [
-                    'account_code' => $payslip->code,
-                    'account_name' => $payslip->name,
-                    'balance' => $balance,
-                    'normal_balance' => $payslip->normal_balance,
-                ]
-            ]);
-        } catch (Throwable $e) {
-            Log::error('Gagal mengambil saldo akun.', [
-                'exception' => $e,
-                'chart_of_account_id' => $id,
-                'user_id' => auth()->id(),
-            ]);
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Gagal mengambil saldo akun.'
-            ], 500);
-        }
+        return response()->json($items);
     }
 }

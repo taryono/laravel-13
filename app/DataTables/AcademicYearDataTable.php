@@ -17,7 +17,7 @@ class AcademicYearDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['school_name', 'name', 'code', 'start_date', 'end_date', 'semester_start_date', 'semester_end_date', 'is_registration_open', 'registration_start_date', 'registration_end_date', 'is_active', 'is_current'];
+    protected array $columns = ['school_name', 'name', 'code', 'start_date', 'end_date', 'start_date', 'end_date', 'is_registration_open', 'registration_start_date', 'registration_end_date', 'is_active', 'is_current'];
 
     /**
      * Build DataTable response.
@@ -62,17 +62,17 @@ class AcademicYearDataTable extends DataTable
         $context = htmlspecialchars(
             json_encode([
                 'executeDraw' => true,
-                'tableId'     => 'academic-year-table',
+                'tableId' => 'academic-year-table',
                 'reloadDelay' => 500,
             ]),
             ENT_QUOTES,
             'UTF-8'
         );
         if ($row->id) {
-            $editUrl   = e(route('academic_year.edit', $row));
+            $editUrl = e(route('academic_year.edit', $row));
             $deleteUrl = e(route('academic_year.destroy', $row));
         } else {
-            $editUrl   = "#";
+            $editUrl = "#";
             $deleteUrl = "#";
         }
 
@@ -157,7 +157,7 @@ class AcademicYearDataTable extends DataTable
                  * Custom Bootstrap 5 layout.
                  */
                 'dom' =>
-                '<"row mb-3"' .
+                    '<"row mb-3"' .
                     '<"col-md-6 d-flex align-items-center"B>' .
                     '<"col-md-6"f>' .
                     '>' .
@@ -327,7 +327,7 @@ class AcademicYearDataTable extends DataTable
         $context = htmlspecialchars(
             json_encode([
                 'executeDraw' => true,
-                'tableId'     => 'academic-year-table',
+                'tableId' => 'academic-year-table',
                 'reloadDelay' => 500,
             ]),
             ENT_QUOTES,
@@ -356,7 +356,7 @@ class AcademicYearDataTable extends DataTable
         $context = htmlspecialchars(
             json_encode([
                 'executeDraw' => true,
-                'tableId'     => 'academic-year-table',
+                'tableId' => 'academic-year-table',
                 'reloadDelay' => 500,
             ]),
             ENT_QUOTES,
@@ -385,7 +385,7 @@ class AcademicYearDataTable extends DataTable
         $context = htmlspecialchars(
             json_encode([
                 'executeDraw' => true,
-                'tableId'     => 'academic-year-table',
+                'tableId' => 'academic-year-table',
                 'reloadDelay' => 500,
             ]),
             ENT_QUOTES,
