@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
 class CurriculumCourse extends BasedModel
 {
     // Relasi
-        public function studyProgram()
+    public function study_program()
     {
         return $this->belongsTo(StudyProgram::class, 'study_program_id');
     }

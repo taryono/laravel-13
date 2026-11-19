@@ -216,7 +216,7 @@ class Employee extends BasedModel
             'probation' => 'Probation',
             'freelance' => 'Freelance',
         ];
-        return $labels[$this->employment_status] ?? $this->employment_status;
+        return $labels[$this->employment_status] ?? '-';
     }
 
     /**

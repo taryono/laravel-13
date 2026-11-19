@@ -17,7 +17,7 @@ class StudentDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['name'];
+    protected array $columns = ['name', 'school.name', 'nis', 'nisn', 'registration_number', 'birth_place', 'birth_date', 'gender', 'address', 'religion', 'parents_phone', 'emergency_contact'];
 
     /**
      * Build DataTable response.
@@ -53,14 +53,14 @@ class StudentDataTable extends DataTable
         $context = htmlspecialchars(
             json_encode([
                 'executeDraw' => true,
-                'tableId'     => 'student-table',
+                'tableId' => 'student-table',
                 'reloadDelay' => 500,
             ]),
             ENT_QUOTES,
             'UTF-8'
         );
 
-        $editUrl   = e(route('student.edit', $row));
+        $editUrl = e(route('student.edit', $row));
         $deleteUrl = e(route('student.destroy', $row));
 
         return <<<HTML
@@ -100,7 +100,7 @@ class StudentDataTable extends DataTable
      */
     public function query(Student $model): QueryBuilder
     {
-        return $model->newQuery();
+        return $model->newQuery()->with(['school']);
     }
 
     /**
@@ -139,13 +139,13 @@ class StudentDataTable extends DataTable
                  */
                 'dom' =>
                     '<"row mb-3"' .
-                        '<"col-md-6 d-flex align-items-center"B>' .
-                        '<"col-md-6"f>' .
+                    '<"col-md-6 d-flex align-items-center"B>' .
+                    '<"col-md-6"f>' .
                     '>' .
                     'rt' .
                     '<"row mt-3"' .
-                        '<"col-md-6"i>' .
-                        '<"col-md-6 d-flex justify-content-md-end"p>' .
+                    '<"col-md-6"i>' .
+                    '<"col-md-6 d-flex justify-content-md-end"p>' .
                     '>',
 
                 /*
@@ -267,8 +267,8 @@ class StudentDataTable extends DataTable
     protected function getColumns(): array
     {
         return collect($this->columns)
-            ->map(fn (string $kolom) => Column::make($kolom)
-                ->title(ucwords(str_replace(['_',"."], [' ',' '], $kolom))))
+            ->map(fn(string $kolom) => Column::make($kolom)
+                ->title(ucwords(str_replace(['_', "."], [' ', ' '], $kolom))))
             // 1. PREPEND: Masukkan kolom No di posisi PALING AWAL (indeks 0)
             ->prepend(
                 Column::make('DT_RowIndex')

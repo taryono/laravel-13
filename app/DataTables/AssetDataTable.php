@@ -99,15 +99,15 @@ class AssetDataTable extends DataTable
         $context = htmlspecialchars(
             json_encode([
                 'executeDraw' => true,
-                'tableId'     => 'academic-calendar-event-table',
+                'tableId' => 'academic-calendar-event-table',
                 'reloadDelay' => 500,
             ]),
             ENT_QUOTES,
             'UTF-8'
         );
 
-        $editUrl   = e(route('academic_calendar_event.edit', $row));
-        $deleteUrl = e(route('academic_calendar_event.destroy', $row));
+        $editUrl = e(route('asset.edit', $row));
+        $deleteUrl = e(route('asset.destroy', $row));
 
         return <<<HTML
             <div class="d-flex justify-content-center gap-1">
@@ -161,14 +161,14 @@ class AssetDataTable extends DataTable
              * Asesi -> asesi-table
              * Asesor -> asesor-table
              */
-            ->setTableId('academic-calendar-event-table')
+            ->setTableId('asset-table')
 
             ->columns($this->getColumns())
 
             /*
              * Server-side AJAX endpoint.
              */
-            ->minifiedAjax(route('academic_calendar_event.index'))
+            ->minifiedAjax(route('asset.index'))
 
             /*
              * Default sorting:
@@ -184,7 +184,7 @@ class AssetDataTable extends DataTable
                  * Custom Bootstrap 5 layout.
                  */
                 'dom' =>
-                '<"row mb-3"' .
+                    '<"row mb-3"' .
                     '<"col-md-6 d-flex align-items-center"B>' .
                     '<"col-md-6"f>' .
                     '>' .
