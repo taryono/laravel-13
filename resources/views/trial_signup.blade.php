@@ -17,6 +17,7 @@
         .input-group-password {
             position: relative;
         }
+
         .btn-toggle-password {
             position: absolute;
             right: 12px;
@@ -29,21 +30,28 @@
             z-index: 5;
             padding: 0;
         }
+
         .btn-toggle-password:hover {
             color: var(--brand-blue, #2f5ce0);
         }
+
         .step-node.done {
             cursor: pointer;
         }
-        @if(app()->environment('local', 'development', 'testing') || config('app.debug'))
-        .step-node {
-            cursor: pointer !important;
-        }
-        .dev-toolbar {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-        }
-        @endif
+    </style>
+    @if (app()->environment('local', 'development', 'testing') || config('app.debug'))
+        <style>
+            .step-node {
+                cursor: pointer !important;
+            }
+
+            .dev-toolbar {
+                background: #f8fafc;
+                border: 1px solid #e2e8f0;
+            }
+        </style>
+    @endif
+    <style>
         .notif-option {
             cursor: pointer;
             user-select: none;
@@ -58,13 +66,16 @@
             margin-bottom: 1rem;
             scrollbar-width: thin;
         }
+
         .module-category-nav::-webkit-scrollbar {
             height: 4px;
         }
+
         .module-category-nav::-webkit-scrollbar-thumb {
             background: #cbd5e1;
             border-radius: 4px;
         }
+
         .category-pill {
             white-space: nowrap;
             padding: 0.4rem 0.85rem;
@@ -77,11 +88,13 @@
             cursor: pointer;
             transition: all 0.2s ease;
         }
+
         .category-pill:hover {
             border-color: #2f5ce0;
             color: #2f5ce0;
             background: #eff6ff;
         }
+
         .category-pill.active {
             background: #2f5ce0;
             color: #fff;
@@ -96,9 +109,11 @@
             margin-bottom: 1.25rem;
             scrollbar-width: thin;
         }
+
         .module-scroll-container::-webkit-scrollbar {
             width: 6px;
         }
+
         .module-scroll-container::-webkit-scrollbar-thumb {
             background: #cbd5e1;
             border-radius: 6px;
@@ -118,16 +133,19 @@
             transition: all 0.2s ease;
             position: relative;
         }
+
         .module-option:hover {
             border-color: #93c5fd;
             transform: translateY(-2px);
             box-shadow: 0 6px 16px rgba(47, 92, 224, 0.08);
         }
+
         .module-option:has(input:checked) {
             border-color: #2f5ce0;
             background: #f0f7ff;
             box-shadow: 0 6px 18px rgba(47, 92, 224, 0.12);
         }
+
         .module-option .check-mark {
             position: absolute;
             top: 1rem;
@@ -144,7 +162,8 @@
             background: #ffffff;
             transition: all 0.2s ease;
         }
-        .module-option input:checked ~ .check-mark {
+
+        .module-option input:checked~.check-mark {
             background: #2f5ce0;
             border-color: #2f5ce0;
             color: #ffffff;
@@ -163,6 +182,7 @@
             color: #1e293b;
             transition: all 0.2s ease;
         }
+
         .module-option:has(input:checked) .mod-price-pill {
             background: #e0edff;
             border-color: #bfdbfe;
@@ -178,6 +198,7 @@
             box-shadow: 0 12px 30px rgba(15, 23, 42, 0.18);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
+
         .billing-summary-card .badge-trial {
             background: rgba(34, 197, 94, 0.18);
             color: #4ade80;
@@ -187,6 +208,7 @@
             padding: 0.25rem 0.6rem;
             border-radius: 50px;
         }
+
         .billing-summary-card .amount-display {
             font-size: 1.75rem;
             font-weight: 800;
@@ -202,6 +224,7 @@
             padding: 0.9rem 1rem;
             margin-bottom: 1.25rem;
         }
+
         .access-summary .access-summary-title {
             font-size: 0.75rem;
             font-weight: 700;
@@ -210,6 +233,7 @@
             color: #64748b;
             margin-bottom: 0.4rem;
         }
+
         .access-chip {
             display: inline-flex;
             align-items: center;
@@ -223,12 +247,14 @@
             font-weight: 600;
             color: #334155;
         }
+
         .access-card {
             border: 1.5px solid #e2e8f0;
             border-radius: 14px;
             background: #fff;
             overflow: hidden;
         }
+
         .access-card-head {
             display: flex;
             align-items: center;
@@ -237,7 +263,11 @@
             cursor: pointer;
             user-select: none;
         }
-        .access-card-head:hover { background: #f8fafc; }
+
+        .access-card-head:hover {
+            background: #f8fafc;
+        }
+
         .access-icon {
             width: 40px;
             height: 40px;
@@ -249,13 +279,24 @@
             background: #eff6ff;
             color: #2f5ce0;
         }
-        .access-title { font-weight: 700; font-size: 0.95rem; color: #1e293b; }
-        .access-count { font-size: 0.8rem; color: #64748b; }
+
+        .access-title {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #1e293b;
+        }
+
+        .access-count {
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+
         .access-card-body {
             padding: 0.25rem 1rem 1rem;
             border-top: 1px solid #f1f5f9;
             padding-top: 1rem;
         }
+
         .access-module {
             display: flex;
             align-items: center;
@@ -267,18 +308,40 @@
             height: 100%;
             transition: all 0.15s ease;
         }
-        .access-module:hover { border-color: #93c5fd; background: #f8fbff; }
-        .access-module:has(input:checked) { border-color: #2f5ce0; background: #f0f7ff; }
-        .access-module input { flex-shrink: 0; }
-        .access-module-name { font-size: 0.85rem; font-weight: 600; color: #1e293b; }
-        .access-module-cat { margin-left: auto; font-size: 0.68rem; color: #94a3b8; white-space: nowrap; }
+
+        .access-module:hover {
+            border-color: #93c5fd;
+            background: #f8fbff;
+        }
+
+        .access-module:has(input:checked) {
+            border-color: #2f5ce0;
+            background: #f0f7ff;
+        }
+
+        .access-module input {
+            flex-shrink: 0;
+        }
+
+        .access-module-name {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .access-module-cat {
+            margin-left: auto;
+            font-size: 0.68rem;
+            color: #94a3b8;
+            white-space: nowrap;
+        }
     </style>
 </head>
 
 <body>
 
     <!-- TOPBAR -->
-    <div class="topbar">
+    <div class="topbar sticky-top">
         <div class="container d-flex justify-content-between align-items-center">
             <a href="{{ url('/') }}" class="brand d-flex align-items-center">
                 <span class="brand-icon"><i class="fa-solid fa-graduation-cap"></i></span>EduPulse
@@ -327,23 +390,32 @@
                 $isDev = app()->environment('local', 'development', 'testing') || config('app.debug');
             @endphp
 
-            @if($isDev)
-                <div class="dev-toolbar py-2 px-3 mb-4 rounded-3 d-flex flex-wrap justify-content-between align-items-center gap-2 shadow-sm">
+            @if ($isDev)
+                <div
+                    class="dev-toolbar py-2 px-3 mb-4 rounded-3 d-flex flex-wrap justify-content-between align-items-center gap-2 shadow-sm">
                     <div class="d-flex align-items-center gap-2">
                         <span class="badge bg-primary text-white"><i class="fa-solid fa-flask me-1"></i>DEV MODE</span>
-                        <span class="small fw-semibold text-secondary">Semua form terisi otomatis untuk pengujian cepat.</span>
+                        <span class="small fw-semibold text-secondary">Semua form terisi otomatis untuk pengujian
+                            cepat.</span>
                     </div>
                     <div class="d-flex align-items-center gap-2 flex-wrap">
                         <span class="small text-muted fw-semibold">Lompat:</span>
                         <div class="btn-group btn-group-sm" role="group">
-                            <button type="button" class="btn btn-outline-primary" onclick="goToStep(1)">1. Info</button>
-                            <button type="button" class="btn btn-outline-primary" onclick="goToStep(2)">2. Modul</button>
-                            <button type="button" class="btn btn-outline-primary" onclick="goToStep(3)">3. Role</button>
-                            <button type="button" class="btn btn-outline-primary" onclick="goToStep(4)">4. Akses</button>
-                            <button type="button" class="btn btn-outline-primary" onclick="goToStep(5)">5. Notif</button>
-                            <button type="button" class="btn btn-outline-primary" onclick="goToStep(6)">6. Akun</button>
+                            <button type="button" class="btn btn-outline-primary" onclick="goToStep(1)">1.
+                                Info</button>
+                            <button type="button" class="btn btn-outline-primary" onclick="goToStep(2)">2.
+                                Modul</button>
+                            <button type="button" class="btn btn-outline-primary" onclick="goToStep(3)">3.
+                                Role</button>
+                            <button type="button" class="btn btn-outline-primary" onclick="goToStep(4)">4.
+                                Akses</button>
+                            <button type="button" class="btn btn-outline-primary" onclick="goToStep(5)">5.
+                                Notif</button>
+                            <button type="button" class="btn btn-outline-primary" onclick="goToStep(6)">6.
+                                Akun</button>
                         </div>
-                        <button type="button" class="btn btn-sm btn-dark" onclick="devResetForm()" title="Isi ulang data default form">
+                        <button type="button" class="btn btn-sm btn-dark" onclick="devResetForm()"
+                            title="Isi ulang data default form">
                             <i class="fa-solid fa-rotate-left me-1"></i>Reset Form
                         </button>
                     </div>
@@ -353,25 +425,52 @@
             <form id="trialForm" novalidate>
 
                 @php
-                    $savedLevels = isset($registration) && $registration->education_level->isNotEmpty()
-                        ? $registration->education_level->pluck('code')->map(fn($c) => strtoupper($c))->toArray()
-                        : ($isDev ? ['SMA'] : []);
-                    $savedModules = isset($registration) && $registration->modules->isNotEmpty()
-                        ? $registration->modules->pluck('code')->map(fn($c) => strtolower($c))->toArray()
-                        : ($isDev ? ['akademik', 'kesiswaan', 'keuangan', 'absensi', 'cbt'] : ['akademik']);
-                    $savedRoles = isset($registration) && $registration->roles->isNotEmpty()
-                        ? $registration->roles->pluck('code')->map(fn($c) => strtolower(str_replace('-', '_', $c)))->toArray()
-                        : ($isDev ? ['admin_sekolah', 'guru'] : ['admin_sekolah']);
-                    $selectedTotalStudent = old('total_student', $registration->total_student ?? ($isDev ? '300 - 600' : ''));
-                    $selectedPositionId = old('position_id', $registration->position_id ?? ($isDev ? 'kepala_sekolah' : ''));
-                    $devEmail = old('email', $registration->email ?? ($isDev ? ('trial.' . (isset($registration->id) ? $registration->id : date('dHis')) . '@edupulse.sch.id') : ''));
+                    $savedLevels =
+                        isset($registration) && $registration->education_level->isNotEmpty()
+                            ? $registration->education_level->pluck('code')->map(fn($c) => strtoupper($c))->toArray()
+                            : ($isDev
+                                ? ['SMA']
+                                : []);
+                    $savedModules =
+                        isset($registration) && $registration->modules->isNotEmpty()
+                            ? $registration->modules->pluck('code')->map(fn($c) => strtolower($c))->toArray()
+                            : ($isDev
+                                ? ['akademik', 'kesiswaan', 'keuangan', 'absensi', 'cbt']
+                                : ['akademik']);
+                    $savedRoles =
+                        isset($registration) && $registration->roles->isNotEmpty()
+                            ? $registration->roles
+                                ->pluck('code')
+                                ->map(fn($c) => strtolower(str_replace('-', '_', $c)))
+                                ->toArray()
+                            : ($isDev
+                                ? ['admin_sekolah', 'guru']
+                                : ['admin_sekolah']);
+                    $selectedTotalStudent = old(
+                        'total_student',
+                        $registration->total_student ?? ($isDev ? '300 - 600' : ''),
+                    );
+                    $selectedPositionId = old(
+                        'position_id',
+                        $registration->position_id ?? ($isDev ? 'kepala_sekolah' : ''),
+                    );
+                    $devEmail = old(
+                        'email',
+                        $registration->email ??
+                            ($isDev
+                                ? 'trial.' .
+                                    (isset($registration->id) ? $registration->id : date('dHis')) .
+                                    '@edupulse.sch.id'
+                                : ''),
+                    );
                 @endphp
 
                 <!-- STEP 1 -->
                 <div class="wizard-step fade-step" data-step="1">
                     <div class="step-eyebrow">Langkah 1 dari 6</div>
                     <h3 class="step-heading">Informasi Yayasan/Sekolah &amp; Jabatan Anda</h3>
-                    <p class="step-desc">Ceritakan sedikit tentang Yayasan/Sekolah Anda supaya kami bisa menyiapkan akun yang tepat.</p>
+                    <p class="step-desc">Ceritakan sedikit tentang Yayasan/Sekolah Anda supaya kami bisa menyiapkan akun
+                        yang tepat.</p>
 
                     <div class="row g-3">
                         <div class="col-md-8">
@@ -390,7 +489,8 @@
                             <hr class="my-2">
                         </div>
                         <div class="col-12">
-                            <label class="form-label">Jenjang Sekolah <span class="fw-normal text-muted">(bisa pilih lebih dari satu)</span> <span class="text-danger">*</span></label>
+                            <label class="form-label">Jenjang Sekolah <span class="fw-normal text-muted">(bisa pilih
+                                    lebih dari satu)</span> <span class="text-danger">*</span></label>
                             <div class="d-flex flex-wrap gap-2" id="educationLevelGroup">
                                 <label class="chip-option">
                                     <input type="checkbox" name="education_level_id[]" value="TK"
@@ -428,8 +528,9 @@
                         <div class="col-md-6">
                             <label class="form-label">Jumlah Siswa <span class="text-danger">*</span></label>
                             <select class="form-select" name="total_student" required>
-                                <option value="" {{ empty($selectedTotalStudent) ? 'selected' : '' }} disabled>Pilih rentang</option>
-                                @if(isset($student_ranges) && $student_ranges->count())
+                                <option value="" {{ empty($selectedTotalStudent) ? 'selected' : '' }} disabled>
+                                    Pilih rentang</option>
+                                @if (isset($student_ranges) && $student_ranges->count())
                                     @foreach ($student_ranges as $range)
                                         <option value="{{ $range->name }}"
                                             {{ $selectedTotalStudent == $range->name || $selectedTotalStudent == $range->id ? 'selected' : '' }}>
@@ -437,11 +538,19 @@
                                         </option>
                                     @endforeach
                                 @else
-                                    <option value="< 100" {{ $selectedTotalStudent == '< 100' ? 'selected' : '' }}>&lt; 100 Siswa</option>
-                                    <option value="100 - 300" {{ $selectedTotalStudent == '100 - 300' ? 'selected' : '' }}>100 - 300 Siswa</option>
-                                    <option value="300 - 600" {{ $selectedTotalStudent == '300 - 600' ? 'selected' : '' }}>300 - 600 Siswa</option>
-                                    <option value="600-1000" {{ $selectedTotalStudent == '600-1000' || $selectedTotalStudent == '600 - 1000' ? 'selected' : '' }}>600 - 1000 Siswa</option>
-                                    <option value="> 1000" {{ $selectedTotalStudent == '> 1000' ? 'selected' : '' }}>&gt; 1000 Siswa</option>
+                                    <option value="< 100" {{ $selectedTotalStudent == '< 100' ? 'selected' : '' }}>
+                                        &lt; 100 Siswa</option>
+                                    <option value="100 - 300"
+                                        {{ $selectedTotalStudent == '100 - 300' ? 'selected' : '' }}>100 - 300 Siswa
+                                    </option>
+                                    <option value="300 - 600"
+                                        {{ $selectedTotalStudent == '300 - 600' ? 'selected' : '' }}>300 - 600 Siswa
+                                    </option>
+                                    <option value="600-1000"
+                                        {{ $selectedTotalStudent == '600-1000' || $selectedTotalStudent == '600 - 1000' ? 'selected' : '' }}>
+                                        600 - 1000 Siswa</option>
+                                    <option value="> 1000" {{ $selectedTotalStudent == '> 1000' ? 'selected' : '' }}>
+                                        &gt; 1000 Siswa</option>
                                 @endif
                             </select>
                         </div>
@@ -464,8 +573,9 @@
                         <div class="col-md-6">
                             <label class="form-label">Jabatan di Sekolah <span class="text-danger">*</span></label>
                             <select class="form-select" name="position_id" required>
-                                <option value="" {{ empty($selectedPositionId) ? 'selected' : '' }} disabled>Pilih jabatan</option>
-                                @if(isset($positions) && $positions->count())
+                                <option value="" {{ empty($selectedPositionId) ? 'selected' : '' }} disabled>
+                                    Pilih jabatan</option>
+                                @if (isset($positions) && $positions->count())
                                     @foreach ($positions as $position)
                                         <option value="{{ $position->code ?? $position->id }}"
                                             {{ $selectedPositionId == ($position->code ?? $position->id) || $selectedPositionId == $position->id ? 'selected' : '' }}>
@@ -473,12 +583,22 @@
                                         </option>
                                     @endforeach
                                 @else
-                                    <option value="kepala_sekolah" {{ $selectedPositionId == 'kepala_sekolah' ? 'selected' : '' }}>Kepala Sekolah</option>
-                                    <option value="wakil_kepala_sekolah" {{ $selectedPositionId == 'wakil_kepala_sekolah' ? 'selected' : '' }}>Wakil Kepala Sekolah</option>
-                                    <option value="guru" {{ $selectedPositionId == 'guru' ? 'selected' : '' }}>Guru / Tenaga Pendidik</option>
-                                    <option value="tata_usaha" {{ $selectedPositionId == 'tata_usaha' ? 'selected' : '' }}>Tata Usaha / Administrasi / Keuangan</option>
-                                    <option value="admin_it" {{ $selectedPositionId == 'admin_it' ? 'selected' : '' }}>Admin IT / Operator</option>
-                                    <option value="lainnya" {{ $selectedPositionId == 'lainnya' ? 'selected' : '' }}>Lainnya</option>
+                                    <option value="kepala_sekolah"
+                                        {{ $selectedPositionId == 'kepala_sekolah' ? 'selected' : '' }}>Kepala Sekolah
+                                    </option>
+                                    <option value="wakil_kepala_sekolah"
+                                        {{ $selectedPositionId == 'wakil_kepala_sekolah' ? 'selected' : '' }}>Wakil
+                                        Kepala Sekolah</option>
+                                    <option value="guru" {{ $selectedPositionId == 'guru' ? 'selected' : '' }}>Guru
+                                        / Tenaga Pendidik</option>
+                                    <option value="tata_usaha"
+                                        {{ $selectedPositionId == 'tata_usaha' ? 'selected' : '' }}>Tata Usaha /
+                                        Administrasi / Keuangan</option>
+                                    <option value="admin_it"
+                                        {{ $selectedPositionId == 'admin_it' ? 'selected' : '' }}>Admin IT / Operator
+                                    </option>
+                                    <option value="lainnya" {{ $selectedPositionId == 'lainnya' ? 'selected' : '' }}>
+                                        Lainnya</option>
                                 @endif
                             </select>
                         </div>
@@ -490,26 +610,35 @@
                     <div class="step-eyebrow">Langkah 2 dari 6</div>
                     <div class="d-flex flex-wrap justify-content-between align-items-center mb-2 gap-2">
                         <h3 class="step-heading mb-0">Pilih Modul yang Anda Butuhkan</h3>
-                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 rounded-pill fw-semibold">
-                            <i class="fa-solid fa-cube me-1"></i> {{ isset($modules) ? $modules->count() : 0 }} Modul Siap Digunakan
+                        <span
+                            class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 rounded-pill fw-semibold">
+                            <i class="fa-solid fa-cube me-1"></i> {{ isset($modules) ? $modules->count() : 0 }} Modul
+                            Siap Digunakan
                         </span>
                     </div>
-                    <p class="step-desc mb-3">Centang modul yang ingin Anda aktifkan. Setiap modul memiliki harga lisensi bulanan yang otomatis dihitung di bawah sebagai acuan tagihan setelah masa trial gratis berakhir.</p>
+                    <p class="step-desc mb-3">Centang modul yang ingin Anda aktifkan. Setiap modul memiliki harga
+                        lisensi bulanan yang otomatis dihitung di bawah sebagai acuan tagihan setelah masa trial gratis
+                        berakhir.</p>
 
                     <!-- Toolbar: Pencarian & Aksi Cepat -->
                     <div class="row g-2 align-items-center mb-3">
                         <div class="col-md-7">
                             <div class="input-group">
-                                <span class="input-group-text bg-light border-end-0 text-muted"><i class="fa-solid fa-magnifying-glass"></i></span>
-                                <input type="text" id="moduleSearch" class="form-control border-start-0 ps-0" placeholder="Ketik nama modul, tabel, atau fitur (misal: Rapor, SPP, Presensi, CBT)...">
-                                <button type="button" class="btn btn-outline-secondary border" id="btnClearSearch" style="display:none;"><i class="fa-solid fa-xmark"></i></button>
+                                <span class="input-group-text bg-light border-end-0 text-muted"><i
+                                        class="fa-solid fa-magnifying-glass"></i></span>
+                                <input type="text" id="moduleSearch" class="form-control border-start-0 ps-0"
+                                    placeholder="Ketik nama modul, tabel, atau fitur (misal: Rapor, SPP, Presensi, CBT)...">
+                                <button type="button" class="btn btn-outline-secondary border" id="btnClearSearch"
+                                    style="display:none;"><i class="fa-solid fa-xmark"></i></button>
                             </div>
                         </div>
                         <div class="col-md-5 text-md-end">
-                            <button type="button" class="btn btn-sm btn-outline-primary me-1" id="btnSelectAllVisible">
+                            <button type="button" class="btn btn-sm btn-outline-primary me-1"
+                                id="btnSelectAllVisible">
                                 <i class="fa-solid fa-check-double me-1"></i>Pilih Semua di Kategori
                             </button>
-                            <button type="button" class="btn btn-sm btn-outline-secondary" id="btnUnselectAllVisible">
+                            <button type="button" class="btn btn-sm btn-outline-secondary"
+                                id="btnUnselectAllVisible">
                                 <i class="fa-solid fa-rotate-left me-1"></i>Reset
                             </button>
                         </div>
@@ -517,17 +646,33 @@
 
                     <!-- Category Filter Pills -->
                     @php
-                        $categories = isset($modules) ? $modules->pluck('category')->filter()->unique()->values() : collect();
-                        $featuredCodes = ['akademik', 'kesiswaan', 'keuangan', 'absensi', 'cbt', 'perpustakaan', 'pesantren', 'kepegawaian', 'parent_portal', 'analitik_ai', 'sarpras', 'layanan_kesehatan'];
+                        $categories = isset($modules)
+                            ? $modules->pluck('category')->filter()->unique()->values()
+                            : collect();
+                        $featuredCodes = [
+                            'akademik',
+                            'kesiswaan',
+                            'keuangan',
+                            'absensi',
+                            'cbt',
+                            'perpustakaan',
+                            'pesantren',
+                            'kepegawaian',
+                            'parent_portal',
+                            'analitik_ai',
+                            'sarpras',
+                            'layanan_kesehatan',
+                        ];
                     @endphp
                     <div class="module-category-nav" id="categoryNav">
                         <button type="button" class="category-pill active" data-category="featured">
                             <i class="fa-solid fa-star text-warning me-1"></i>Modul Unggulan (12)
                         </button>
                         <button type="button" class="category-pill" data-category="all">
-                            <i class="fa-solid fa-layer-group me-1"></i>Semua Modul ({{ isset($modules) ? $modules->count() : 0 }})
+                            <i class="fa-solid fa-layer-group me-1"></i>Semua Modul
+                            ({{ isset($modules) ? $modules->count() : 0 }})
                         </button>
-                        @foreach($categories as $cat)
+                        @foreach ($categories as $cat)
                             @php
                                 $catCount = $modules->where('category', $cat)->count();
                             @endphp
@@ -540,41 +685,45 @@
                     <!-- Scrollable Module Cards Container -->
                     <div class="module-scroll-container">
                         <div class="row g-3" id="moduleGrid">
-                            @if(isset($modules) && $modules->count())
+                            @if (isset($modules) && $modules->count())
                                 @foreach ($modules as $mod)
                                     @php
                                         $isFeatured = in_array(strtolower($mod->code), $featuredCodes);
-                                        $isChecked = in_array(strtolower($mod->code), $savedModules) || in_array((string)$mod->id, $savedModules);
+                                        $isChecked =
+                                            in_array(strtolower($mod->code), $savedModules) ||
+                                            in_array((string) $mod->id, $savedModules);
                                         $cat = $mod->category ?? 'Umum';
                                         $icon = $mod->icon ?: ($isFeatured ? 'fa-solid fa-star' : 'fa-solid fa-cube');
-                                        $price = (float)$mod->price;
+                                        $price = (float) $mod->price;
                                     @endphp
-                                    <div class="col-md-6 module-item"
-                                         data-category="{{ $cat }}"
-                                         data-featured="{{ $isFeatured ? '1' : '0' }}"
-                                         data-name="{{ strtolower($mod->name) }}"
-                                         data-desc="{{ strtolower($mod->description ?? '') }}"
-                                         data-code="{{ strtolower($mod->code) }}">
+                                    <div class="col-md-6 module-item" data-category="{{ $cat }}"
+                                        data-featured="{{ $isFeatured ? '1' : '0' }}"
+                                        data-name="{{ strtolower($mod->name) }}"
+                                        data-desc="{{ strtolower($mod->description ?? '') }}"
+                                        data-code="{{ strtolower($mod->code) }}">
                                         <label class="module-option">
                                             <input type="checkbox" name="modul[]" value="{{ $mod->code }}"
-                                                data-price="{{ $price }}"
-                                                data-name="{{ $mod->name }}"
-                                                data-code="{{ $mod->code }}"
-                                                {{ $isChecked ? 'checked' : '' }}>
+                                                data-price="{{ $price }}" data-name="{{ $mod->name }}"
+                                                data-code="{{ $mod->code }}" {{ $isChecked ? 'checked' : '' }}>
                                             <div>
-                                                <div class="d-flex justify-content-between align-items-start mb-2 pe-4">
+                                                <div
+                                                    class="d-flex justify-content-between align-items-start mb-2 pe-4">
                                                     <div class="mod-icon mb-0 me-2 flex-shrink-0">
                                                         <i class="{{ $icon }}"></i>
                                                     </div>
                                                     <div class="flex-grow-1">
                                                         <div class="mod-title">{{ $mod->name }}</div>
                                                         <div class="d-flex flex-wrap gap-1 mt-1">
-                                                            <span class="badge bg-light text-secondary border" style="font-size:0.7rem; font-weight:600;">
+                                                            <span class="badge bg-light text-secondary border"
+                                                                style="font-size:0.7rem; font-weight:600;">
                                                                 {{ $cat }}
                                                             </span>
-                                                            @if($isFeatured)
-                                                                <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle" style="font-size:0.7rem;">
-                                                                    <i class="fa-solid fa-star me-1 text-warning"></i>Populer
+                                                            @if ($isFeatured)
+                                                                <span
+                                                                    class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle"
+                                                                    style="font-size:0.7rem;">
+                                                                    <i
+                                                                        class="fa-solid fa-star me-1 text-warning"></i>Populer
                                                                 </span>
                                                             @endif
                                                         </div>
@@ -584,11 +733,13 @@
                                                     {{ $mod->description ?: 'Modul pengelolaan operasional sekolah terintegrasi.' }}
                                                 </div>
                                             </div>
-                                            <div class="d-flex justify-content-between align-items-center pt-2 border-top mt-auto">
+                                            <div
+                                                class="d-flex justify-content-between align-items-center pt-2 border-top mt-auto">
                                                 <span class="text-muted small">Biaya Lisensi:</span>
                                                 <div class="mod-price-pill">
                                                     <span>Rp {{ number_format($price, 0, ',', '.') }}</span>
-                                                    <span class="text-muted fw-normal" style="font-size:0.75rem;">/ bln</span>
+                                                    <span class="text-muted fw-normal" style="font-size:0.75rem;">/
+                                                        bln</span>
                                                 </div>
                                             </div>
                                             <div class="check-mark"><i class="fa-solid fa-check"></i></div>
@@ -605,7 +756,8 @@
                         <div id="noModuleMatch" class="text-center py-5 d-none">
                             <i class="fa-solid fa-box-open text-muted fs-1 mb-2"></i>
                             <h6 class="text-secondary fw-bold">Modul tidak ditemukan</h6>
-                            <p class="text-muted small mb-0">Coba ubah kata kunci pencarian atau pilih kategori modul lainnya.</p>
+                            <p class="text-muted small mb-0">Coba ubah kata kunci pencarian atau pilih kategori modul
+                                lainnya.</p>
                         </div>
                     </div>
 
@@ -614,12 +766,15 @@
                         <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
                             <div>
                                 <div class="d-flex align-items-center gap-2 mb-1">
-                                    <span class="badge-trial"><i class="fa-solid fa-gift me-1"></i>14 Hari Trial Gratis</span>
-                                    <span class="badge bg-white bg-opacity-25 text-white" id="selectedCountBadge">0 Modul Dipilih</span>
+                                    <span class="badge-trial"><i class="fa-solid fa-gift me-1"></i>14 Hari Trial
+                                        Gratis</span>
+                                    <span class="badge bg-white bg-opacity-25 text-white" id="selectedCountBadge">0
+                                        Modul Dipilih</span>
                                 </div>
                                 <h5 class="fw-bold mb-0 text-white">Estimasi Tagihan Bulanan</h5>
                                 <small class="text-white-50" style="font-size:0.8rem;">
-                                    *Nilai ini merupakan acuan tagihan rutin jika Anda melanjutkan langganan setelah masa uji coba berakhir.
+                                    *Nilai ini merupakan acuan tagihan rutin jika Anda melanjutkan langganan setelah
+                                    masa uji coba berakhir.
                                 </small>
                             </div>
                             <div class="text-md-end">
@@ -636,7 +791,8 @@
                     </div>
 
                     <div class="form-text mt-2 text-danger fw-semibold" id="moduleError" style="display:none;">
-                        <i class="fa-solid fa-triangle-exclamation me-1"></i>Pilih minimal satu modul untuk melanjutkan pendaftaran trial.
+                        <i class="fa-solid fa-triangle-exclamation me-1"></i>Pilih minimal satu modul untuk melanjutkan
+                        pendaftaran trial.
                     </div>
                 </div>
 
@@ -644,7 +800,8 @@
                 <div class="wizard-step d-none" data-step="3">
                     <div class="step-eyebrow">Langkah 3 dari 6</div>
                     <h3 class="step-heading">Pilih Role Pengguna</h3>
-                    <p class="step-desc">Role ini akan melekat pada akun pengguna pertama yang mengelola sistem. Bisa pilih lebih dari satu, dan Anda dapat menambah pengguna lain setelah aktif.</p>
+                    <p class="step-desc">Role ini akan melekat pada akun pengguna pertama yang mengelola sistem. Bisa
+                        pilih lebih dari satu, dan Anda dapat menambah pengguna lain setelah aktif.</p>
 
                     <div class="d-flex flex-column gap-3">
                         <label class="role-option">
@@ -706,7 +863,8 @@
                 <div class="wizard-step d-none" data-step="4">
                     <div class="step-eyebrow">Langkah 4 dari 6</div>
                     <h3 class="step-heading">Atur Akses Modul per Role</h3>
-                    <p class="step-desc">Tentukan modul apa saja yang dapat diakses oleh setiap role. Anda dapat mengubahnya kapan saja setelah akun aktif.</p>
+                    <p class="step-desc">Tentukan modul apa saja yang dapat diakses oleh setiap role. Anda dapat
+                        mengubahnya kapan saja setelah akun aktif.</p>
 
                     <div class="access-summary">
                         <div class="access-summary-title">Role yang Anda pilih</div>
@@ -723,7 +881,8 @@
                 <div class="wizard-step d-none" data-step="5">
                     <div class="step-eyebrow">Langkah 5 dari 6</div>
                     <h3 class="step-heading">Pilih Notifikasi yang Ingin Diaktifkan</h3>
-                    <p class="step-desc">Kami akan mengirimkan pengingat dan informasi penting lewat kanal yang Anda pilih.</p>
+                    <p class="step-desc">Kami akan mengirimkan pengingat dan informasi penting lewat kanal yang Anda
+                        pilih.</p>
 
                     @php
                         $notifWa = old('notif_whatsapp', $registration->notif_whatsapp ?? true);
@@ -732,35 +891,41 @@
                     @endphp
 
                     <div class="notif-option {{ $notifWa ? 'active' : '' }}" id="notifWhatsapp">
-                        <div class="notif-icon" style="background:#25D366;"><i class="fa-brands fa-whatsapp"></i></div>
+                        <div class="notif-icon" style="background:#25D366;"><i class="fa-brands fa-whatsapp"></i>
+                        </div>
                         <div>
                             <div class="notif-title">WhatsApp</div>
                             <div class="notif-desc">Notifikasi absensi, pembayaran, dan pengumuman.</div>
                         </div>
                         <div class="form-check form-switch ms-auto">
-                            <input class="form-check-input" type="checkbox" name="notif_whatsapp" value="1" {{ $notifWa ? 'checked' : '' }}>
+                            <input class="form-check-input" type="checkbox" name="notif_whatsapp" value="1"
+                                {{ $notifWa ? 'checked' : '' }}>
                         </div>
                     </div>
 
                     <div class="notif-option {{ $notifEmail ? 'active' : '' }}" id="notifEmail">
-                        <div class="notif-icon" style="background:#2f5ce0;"><i class="fa-solid fa-envelope"></i></div>
+                        <div class="notif-icon" style="background:#2f5ce0;"><i class="fa-solid fa-envelope"></i>
+                        </div>
                         <div>
                             <div class="notif-title">Email</div>
                             <div class="notif-desc">Ringkasan mingguan, invoice, dan laporan resmi.</div>
                         </div>
                         <div class="form-check form-switch ms-auto">
-                            <input class="form-check-input" type="checkbox" name="notif_email" value="1" {{ $notifEmail ? 'checked' : '' }}>
+                            <input class="form-check-input" type="checkbox" name="notif_email" value="1"
+                                {{ $notifEmail ? 'checked' : '' }}>
                         </div>
                     </div>
 
                     <div class="notif-option {{ $notifSms ? 'active' : '' }}" id="notifSms">
-                        <div class="notif-icon" style="background:#5b6478;"><i class="fa-solid fa-comment-sms"></i></div>
+                        <div class="notif-icon" style="background:#5b6478;"><i class="fa-solid fa-comment-sms"></i>
+                        </div>
                         <div>
                             <div class="notif-title">SMS</div>
                             <div class="notif-desc">Notifikasi darurat saat jaringan internet terbatas.</div>
                         </div>
                         <div class="form-check form-switch ms-auto">
-                            <input class="form-check-input" type="checkbox" name="notif_sms" value="1" {{ $notifSms ? 'checked' : '' }}>
+                            <input class="form-check-input" type="checkbox" name="notif_sms" value="1"
+                                {{ $notifSms ? 'checked' : '' }}>
                         </div>
                     </div>
                 </div>
@@ -769,17 +934,18 @@
                 <div class="wizard-step d-none" data-step="6">
                     <div class="step-eyebrow">Langkah 6 dari 6</div>
                     <h3 class="step-heading">Buat Akun Anda</h3>
-                    <p class="step-desc">Langkah terakhir. Data ini akan digunakan untuk masuk ke dashboard EduPulse Anda.</p>
+                    <p class="step-desc">Langkah terakhir. Data ini akan digunakan untuk masuk ke dashboard EduPulse
+                        Anda.</p>
 
                     <div class="row g-3">
                         <div class="col-12">
                             <label class="form-label">Email Login <span class="text-danger">*</span></label>
-                            <input type="email" class="form-control" name="email"
-                                value="{{ $devEmail }}"
+                            <input type="email" class="form-control" name="email" value="{{ $devEmail }}"
                                 placeholder="nama@sekolah.sch.id" required autocomplete="username">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">No. Handphone / WhatsApp <span class="text-danger">*</span></label>
+                            <label class="form-label">No. Handphone / WhatsApp <span
+                                    class="text-danger">*</span></label>
                             <input type="tel" class="form-control" name="no_hp"
                                 value="{{ old('no_hp', $registration->no_hp ?? ($isDev ? '081234567890' : '')) }}"
                                 placeholder="08xxxxxxxxxx" required autocomplete="tel">
@@ -789,9 +955,10 @@
                             <label class="form-label">Buat Password <span class="text-danger">*</span></label>
                             <div class="input-group-password">
                                 <input type="password" class="form-control pe-5" name="password" id="passwordInput"
-                                    value="{{ $isDev ? 'Password123!' : '' }}"
-                                    placeholder="Minimal 8 karakter" minlength="8" required autocomplete="new-password">
-                                <button type="button" class="btn-toggle-password" data-target="passwordInput" aria-label="Toggle password visibility">
+                                    value="{{ $isDev ? 'Password123!' : '' }}" placeholder="Minimal 8 karakter"
+                                    minlength="8" required autocomplete="new-password">
+                                <button type="button" class="btn-toggle-password" data-target="passwordInput"
+                                    aria-label="Toggle password visibility">
                                     <i class="fa-regular fa-eye"></i>
                                 </button>
                             </div>
@@ -799,10 +966,12 @@
                         <div class="col-md-6">
                             <label class="form-label">Konfirmasi Password <span class="text-danger">*</span></label>
                             <div class="input-group-password">
-                                <input type="password" class="form-control pe-5" name="password_confirmation" id="passwordConfirmInput"
-                                    value="{{ $isDev ? 'Password123!' : '' }}"
-                                    placeholder="Ulangi password" minlength="8" required autocomplete="new-password">
-                                <button type="button" class="btn-toggle-password" data-target="passwordConfirmInput" aria-label="Toggle password confirmation visibility">
+                                <input type="password" class="form-control pe-5" name="password_confirmation"
+                                    id="passwordConfirmInput" value="{{ $isDev ? 'Password123!' : '' }}"
+                                    placeholder="Ulangi password" minlength="8" required
+                                    autocomplete="new-password">
+                                <button type="button" class="btn-toggle-password" data-target="passwordConfirmInput"
+                                    aria-label="Toggle password confirmation visibility">
                                     <i class="fa-regular fa-eye"></i>
                                 </button>
                             </div>
@@ -812,9 +981,16 @@
                         </div>
                         <div class="col-12 mt-2">
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="agree_terms" id="agreeTerms" {{ $isDev ? 'checked' : '' }} required>
-                                <label class="form-check-label" for="agreeTerms" style="font-size:.87rem;color:var(--muted);">
-                                    Saya menyetujui <a href="javascript:void(0)" class="text-decoration-underline" onclick="alert('Syarat & Ketentuan berlaku untuk penggunaan masa uji coba EduPulse selama 14 hari.')">Syarat &amp; Ketentuan</a> dan <a href="javascript:void(0)" class="text-decoration-underline" onclick="alert('Privasi dan data sekolah Anda dijaga keamanannya sesuai standar enkripsi.')">Kebijakan Privasi</a> EduPulse.
+                                <input class="form-check-input" type="checkbox" name="agree_terms" id="agreeTerms"
+                                    {{ $isDev ? 'checked' : '' }} required>
+                                <label class="form-check-label" for="agreeTerms"
+                                    style="font-size:.87rem;color:var(--muted);">
+                                    Saya menyetujui <a href="javascript:void(0)" class="text-decoration-underline"
+                                        onclick="alert('Syarat & Ketentuan berlaku untuk penggunaan masa uji coba EduPulse selama 14 hari.')">Syarat
+                                        &amp; Ketentuan</a> dan <a href="javascript:void(0)"
+                                        class="text-decoration-underline"
+                                        onclick="alert('Privasi dan data sekolah Anda dijaga keamanannya sesuai standar enkripsi.')">Kebijakan
+                                        Privasi</a> EduPulse.
                                 </label>
                             </div>
                             <div class="text-danger small mt-1" id="termsError" style="display:none;">
@@ -844,7 +1020,8 @@
                 <div class="success-icon"><i class="fa-solid fa-check"></i></div>
                 <h3 class="step-heading">Akun Trial Anda Siap!</h3>
                 <p class="step-desc">Kami telah menyiapkan akun trial Anda. Sedang mengalihkan Anda ke Dashboard...</p>
-                <a href="{{ route('dashboard') }}" class="btn btn-brand">Masuk ke Dashboard<i class="fa-solid fa-arrow-right ms-2"></i></a>
+                <a href="{{ route('dashboard') }}" class="btn btn-brand">Masuk ke Dashboard<i
+                        class="fa-solid fa-arrow-right ms-2"></i></a>
             </div>
         </div>
     </div>
@@ -852,7 +1029,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         const totalSteps = 6;
-        let currentStep = {{ min(6, max(1, (int)($registration->current_step ?? 1))) }};
+        let currentStep = {{ min(6, max(1, (int) ($registration->current_step ?? 1))) }};
 
         const stepsWrap = document.querySelectorAll('.wizard-step');
         const stepNodes = document.querySelectorAll('.step-node');
@@ -869,7 +1046,7 @@
         const termsError = document.getElementById('termsError');
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
         const accessError = document.getElementById('accessError');
-        
+
         function renderStep() {
             stepsWrap.forEach(s => s.classList.toggle('d-none', parseInt(s.dataset.step) !== currentStep));
 
@@ -897,7 +1074,7 @@
         stepNodes.forEach(node => {
             node.addEventListener('click', () => {
                 const targetStep = parseInt(node.dataset.step);
-                @if($isDev)
+                @if ($isDev)
                     currentStep = targetStep;
                     renderStep();
                 @else
@@ -958,9 +1135,10 @@
                 const empty = roles.filter(r => !(accessState[r.key] && accessState[r.key].allowed.size));
                 if (!roles.length || empty.length) {
                     accessError.innerHTML = '<i class="fa-solid fa-triangle-exclamation me-1"></i>' +
-                        (empty.length
-                            ? 'Role berikut belum memiliki akses modul: ' + empty.map(r => escHtml(r.title)).join(', ') + '.'
-                            : 'Pilih minimal satu role dan satu modul pada langkah sebelumnya.');
+                        (empty.length ?
+                            'Role berikut belum memiliki akses modul: ' + empty.map(r => escHtml(r.title)).join(', ') +
+                            '.' :
+                            'Pilih minimal satu role dan satu modul pada langkah sebelumnya.');
                     accessError.style.display = 'block';
                     return false;
                 }
@@ -970,7 +1148,7 @@
 
             if (step === 5) {
                 return true; // Notifikasi opsional
-            } 
+            }
 
             if (step === 6) {
                 const required = document.querySelectorAll('.wizard-step[data-step="6"] [required]');
@@ -1011,7 +1189,8 @@
 
         function clearServerErrors(step) {
             document.querySelectorAll(`.wizard-step[data-step="${step}"] .server-error`).forEach(el => el.remove());
-            document.querySelectorAll(`.wizard-step[data-step="${step}"] .is-invalid`).forEach(el => el.classList.remove('is-invalid'));
+            document.querySelectorAll(`.wizard-step[data-step="${step}"] .is-invalid`).forEach(el => el.classList.remove(
+                'is-invalid'));
             if (step === 1 && jenjangError) jenjangError.style.display = 'none';
             if (step === 2 && moduleError) moduleError.style.display = 'none';
             if (step === 3 && roleError) roleError.style.display = 'none';
@@ -1051,7 +1230,8 @@
                     input.classList.add('is-invalid');
                     input.closest('.col-12, .col-md-6, .col-md-4, .col-md-8')?.appendChild(msg);
                 } else {
-                    document.querySelector(`.wizard-step[data-step="${step}"] .step-desc`)?.insertAdjacentElement('afterend', msg);
+                    document.querySelector(`.wizard-step[data-step="${step}"] .step-desc`)?.insertAdjacentElement(
+                        'afterend', msg);
                 }
             });
         }
@@ -1059,9 +1239,9 @@
         function setButtonLoading(btn, loading, loadingText) {
             btn.disabled = loading;
             btn.dataset.originalText = btn.dataset.originalText || btn.innerHTML;
-            btn.innerHTML = loading
-                ? `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>${loadingText}`
-                : btn.dataset.originalText;
+            btn.innerHTML = loading ?
+                `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>${loadingText}` :
+                btn.dataset.originalText;
         }
 
         async function saveStep(step) {
@@ -1173,7 +1353,7 @@
                 successState.classList.remove('d-none');
 
                 setTimeout(() => {
-                    window.location.href = data.redirect || '{{ url("/") }}';
+                    window.location.href = data.redirect || '{{ url('/') }}';
                 }, 1800);
             } catch (err) {
                 alert('Gagal terhubung ke server. Periksa koneksi internet Anda.');
@@ -1223,12 +1403,14 @@
         form.querySelectorAll('input, select, textarea').forEach(el => {
             el.addEventListener('input', () => {
                 el.classList.remove('is-invalid');
-                const err = el.closest('.col-12, .col-md-6, .col-md-4, .col-md-8')?.querySelector('.server-error');
+                const err = el.closest('.col-12, .col-md-6, .col-md-4, .col-md-8')?.querySelector(
+                    '.server-error');
                 if (err) err.remove();
             });
             el.addEventListener('change', () => {
                 el.classList.remove('is-invalid');
-                const err = el.closest('.col-12, .col-md-6, .col-md-4, .col-md-8')?.querySelector('.server-error');
+                const err = el.closest('.col-12, .col-md-6, .col-md-4, .col-md-8')?.querySelector(
+                    '.server-error');
                 if (err) err.remove();
             });
         });
@@ -1300,7 +1482,8 @@
                 // Search query match
                 let matchQuery = true;
                 if (query) {
-                    matchQuery = name.includes(query) || desc.includes(query) || code.includes(query) || cat.toLowerCase().includes(query);
+                    matchQuery = name.includes(query) || desc.includes(query) || code.includes(query) || cat
+                        .toLowerCase().includes(query);
                 }
 
                 if (matchCategory && matchQuery) {
@@ -1392,13 +1575,17 @@
         const accessRoleList = document.getElementById('accessRoleList');
         const accessModuleChips = document.getElementById('accessModuleChips');
         const accessRoleChips = document.getElementById('accessRoleChips');
-        const savedAccess = @json((object)($savedAccess ?? []));
+        const savedAccess = @json((object) ($savedAccess ?? []));
         const accessState = {}; // { roleKey: { known:Set, allowed:Set } }
 
         function escHtml(str) {
             return String(str).replace(/[&<>"']/g, c => ({
-                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-            }[c]));
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            } [c]));
         }
 
         function getSelectedRoles() {
@@ -1429,16 +1616,26 @@
             roles.forEach(r => {
                 let st = accessState[r.key];
                 if (!st) {
-                    st = savedAccess[r.key]
-                        ? { known: new Set(modKeys), allowed: new Set(savedAccess[r.key].filter(k => modKeys.has(k))) }
-                        : { known: new Set(), allowed: new Set() };
+                    st = savedAccess[r.key] ? {
+                        known: new Set(modKeys),
+                        allowed: new Set(savedAccess[r.key].filter(k => modKeys.has(k)))
+                    } : {
+                        known: new Set(),
+                        allowed: new Set()
+                    };
                     accessState[r.key] = st;
                 }
                 modKeys.forEach(k => {
-                    if (!st.known.has(k)) { st.known.add(k); st.allowed.add(k); }
+                    if (!st.known.has(k)) {
+                        st.known.add(k);
+                        st.allowed.add(k);
+                    }
                 });
                 [...st.known].forEach(k => {
-                    if (!modKeys.has(k)) { st.known.delete(k); st.allowed.delete(k); }
+                    if (!modKeys.has(k)) {
+                        st.known.delete(k);
+                        st.allowed.delete(k);
+                    }
                 });
             });
 
@@ -1555,61 +1752,61 @@
             }
         };
 
-        @if($isDev)
-        window.devResetForm = function() {
-            // Step 1
-            const namaSekolah = form.querySelector('[name="nama_sekolah"]');
-            if (namaSekolah) namaSekolah.value = 'SMA Nusantara Smart School';
-            const npsn = form.querySelector('[name="npsn"]');
-            if (npsn) npsn.value = '20123456';
-            const smaCb = form.querySelector('input[name="education_level_id[]"][value="SMA"]');
-            if (smaCb) smaCb.checked = true;
-            const totalStudent = form.querySelector('[name="total_student"]');
-            if (totalStudent) totalStudent.value = '300 - 600';
-            const address = form.querySelector('[name="address"]');
-            if (address) address.value = 'Jl. Pendidikan No. 45, Kebayoran Baru, Jakarta Selatan';
-            const namaUser = form.querySelector('[name="nama_user"]');
-            if (namaUser) namaUser.value = 'Budi Pratama, S.Pd., M.M.';
-            const pos = form.querySelector('[name="position_id"]');
-            if (pos) pos.value = 'kepala_sekolah';
+        @if ($isDev)
+            window.devResetForm = function() {
+                // Step 1
+                const namaSekolah = form.querySelector('[name="nama_sekolah"]');
+                if (namaSekolah) namaSekolah.value = 'SMA Nusantara Smart School';
+                const npsn = form.querySelector('[name="npsn"]');
+                if (npsn) npsn.value = '20123456';
+                const smaCb = form.querySelector('input[name="education_level_id[]"][value="SMA"]');
+                if (smaCb) smaCb.checked = true;
+                const totalStudent = form.querySelector('[name="total_student"]');
+                if (totalStudent) totalStudent.value = '300 - 600';
+                const address = form.querySelector('[name="address"]');
+                if (address) address.value = 'Jl. Pendidikan No. 45, Kebayoran Baru, Jakarta Selatan';
+                const namaUser = form.querySelector('[name="nama_user"]');
+                if (namaUser) namaUser.value = 'Budi Pratama, S.Pd., M.M.';
+                const pos = form.querySelector('[name="position_id"]');
+                if (pos) pos.value = 'kepala_sekolah';
 
-            // Step 2
-            const defaultMods = ['akademik', 'kesiswaan', 'keuangan', 'absensi', 'cbt'];
-            form.querySelectorAll('input[name="modul[]"]').forEach(cb => {
-                cb.checked = defaultMods.includes(cb.value.toLowerCase());
-            });
-            if (typeof updateModuleBillingSummary === 'function') updateModuleBillingSummary();
+                // Step 2
+                const defaultMods = ['akademik', 'kesiswaan', 'keuangan', 'absensi', 'cbt'];
+                form.querySelectorAll('input[name="modul[]"]').forEach(cb => {
+                    cb.checked = defaultMods.includes(cb.value.toLowerCase());
+                });
+                if (typeof updateModuleBillingSummary === 'function') updateModuleBillingSummary();
 
-            // Step 3
-            const defaultRoles = ['admin_sekolah', 'guru'];
-            form.querySelectorAll('input[name="role[]"]').forEach(cb => {
-                cb.checked = defaultRoles.includes(cb.value.toLowerCase().replace('-', '_'));
-            });
+                // Step 3
+                const defaultRoles = ['admin_sekolah', 'guru'];
+                form.querySelectorAll('input[name="role[]"]').forEach(cb => {
+                    cb.checked = defaultRoles.includes(cb.value.toLowerCase().replace('-', '_'));
+                });
 
-            // Step 5
-            ['notifWhatsapp', 'notifEmail', 'notifSms'].forEach(id => {
-                const wrap = document.getElementById(id);
-                const input = wrap?.querySelector('input[type="checkbox"]');
-                if (input) {
-                    input.checked = true;
-                    wrap.classList.add('active');
-                }
-            });
+                // Step 5
+                ['notifWhatsapp', 'notifEmail', 'notifSms'].forEach(id => {
+                    const wrap = document.getElementById(id);
+                    const input = wrap?.querySelector('input[type="checkbox"]');
+                    if (input) {
+                        input.checked = true;
+                        wrap.classList.add('active');
+                    }
+                });
 
-            // Step 6
-            const email = form.querySelector('[name="email"]');
-            if (email) email.value = 'trial.' + Math.floor(Date.now() / 1000) + '@edupulse.sch.id';
-            const noHp = form.querySelector('[name="no_hp"]');
-            if (noHp) noHp.value = '081234567890';
-            const pw = form.querySelector('[name="password"]');
-            if (pw) pw.value = 'Password123!';
-            const pwc = form.querySelector('[name="password_confirmation"]');
-            if (pwc) pwc.value = 'Password123!';
-            const agree = document.getElementById('agreeTerms');
-            if (agree) agree.checked = true;
+                // Step 6
+                const email = form.querySelector('[name="email"]');
+                if (email) email.value = 'trial.' + Math.floor(Date.now() / 1000) + '@edupulse.sch.id';
+                const noHp = form.querySelector('[name="no_hp"]');
+                if (noHp) noHp.value = '081234567890';
+                const pw = form.querySelector('[name="password"]');
+                if (pw) pw.value = 'Password123!';
+                const pwc = form.querySelector('[name="password_confirmation"]');
+                if (pwc) pwc.value = 'Password123!';
+                const agree = document.getElementById('agreeTerms');
+                if (agree) agree.checked = true;
 
-            renderStep();
-        };
+                renderStep();
+            };
         @endif
 
         renderStep();

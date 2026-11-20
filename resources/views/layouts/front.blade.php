@@ -56,6 +56,11 @@
         }
 
         /* Terapkan variabel ke elemen */
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 5.5rem;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--bg-body);
@@ -86,9 +91,25 @@
        NAVBAR
     ============================================ */
         .navbar-custom {
+            position: sticky;
+            top: 0;
+            z-index: 1030;
             border-bottom: 1px solid var(--border-color);
-            background: var(--navbar-bg);
-            transition: background 0.3s ease, border-color 0.3s ease;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 2px 10px 0 var(--card-shadow);
+            transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, padding 0.3s ease;
+        }
+
+        [data-bs-theme="dark"] .navbar-custom {
+            background: rgba(10, 14, 26, 0.92);
+        }
+
+        .navbar-custom.is-stuck {
+            box-shadow: 0 4px 20px -2px var(--card-shadow);
+            padding-top: 0.65rem !important;
+            padding-bottom: 0.65rem !important;
         }
 
         .navbar-custom .navbar-brand {
@@ -104,18 +125,6 @@
             font-size: .95rem;
             margin: 0 .6rem;
             transition: color 0.3s ease;
-        }
-
-        .navbar-custom .nav-link:hover {
-            color: var(--brand-blue);
-        }
-
-        .navbar-custom .navbar-brand {
-            color: var(--text-primary);
-        }
-
-        .navbar-custom .nav-link {
-            color: var(--text-primary);
         }
 
         .navbar-custom .nav-link:hover {
@@ -405,11 +414,11 @@
             box-sizing: border-box;
         }
 
-        /* 2. Batasi lebar maksimum body */
+        /* 2. Batasi lebar maksimum body tanpa memutus position: sticky */
         html,
         body {
             max-width: 100%;
-            overflow-x: hidden;
+            overflow-x: clip;
         }
 
         /* 3. Pastikan container tidak overflow */
@@ -421,7 +430,6 @@
         .container-xl,
         .container-xxl {
             max-width: 100%;
-            overflow-x: hidden;
         }
 
         /* 4. Untuk gambar dan elemen media */
@@ -592,6 +600,20 @@
         themeToggle.addEventListener('click', () => {
             applyTheme(htmlElement.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark');
         });
+
+        // Sticky Navbar state-aware elevation
+        const navbarCustom = document.querySelector('.navbar-custom');
+        if (navbarCustom) {
+            const handleScroll = () => {
+                if (window.scrollY > 10) {
+                    navbarCustom.classList.add('is-stuck');
+                } else {
+                    navbarCustom.classList.remove('is-stuck');
+                }
+            };
+            window.addEventListener('scroll', handleScroll, { passive: true });
+            handleScroll();
+        }
     </script>
 </body>
 
