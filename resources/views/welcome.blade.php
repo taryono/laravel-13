@@ -4,8 +4,8 @@
     <!-- HERO -->
     <style>
         /* ============================================
-                                                        VARIABEL DASAR (akan berubah sesuai tema)
-                                                    ============================================ */
+            VARIABEL DASAR (akan berubah sesuai tema)
+        ============================================ */
         :root {
             --brand-blue: #2f5ce0;
             --brand-blue-dark: #1d3fa8;
