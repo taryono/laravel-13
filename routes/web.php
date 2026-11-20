@@ -23,6 +23,9 @@ Route::get('/request_demo', [WelcomeController::class, 'requestDemo'])->name('re
 Route::post('/submit_request_demo', [WelcomeController::class, 'submitRequestDemo'])->name('submit_request_demo.form');
 Route::get('/submit_request_demo', fn() => redirect()->route('request_demo.form'));
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware(['auth', 'verified']);
+Route::get('/login-option', function(){
+    return view('login_option');
+})->name('login_option')->middleware(['guest']);
 
 Route::post('/organization/switch', [ProfileController::class, 'switch'])
     ->name('organization.switch');
