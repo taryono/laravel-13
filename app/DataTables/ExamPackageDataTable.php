@@ -17,7 +17,7 @@ class ExamPackageDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['school_id', 'subject_id', 'name', 'description', 'duration_minutes', 'total_questions', 'passing_score', 'is_randomized', 'shuffle_options', 'show_results', 'is_active', 'created_by', 'updated_by'];
+    protected array $columns = ['school.name', 'subject.name', 'name', 'description', 'duration_minutes', 'total_questions', 'passing_score', 'is_randomized', 'shuffle_options', 'show_results', 'is_active'];
 
     /**
      * Build DataTable response.
@@ -53,14 +53,14 @@ class ExamPackageDataTable extends DataTable
         $context = htmlspecialchars(
             json_encode([
                 'executeDraw' => true,
-                'tableId'     => 'exam-package-table',
+                'tableId' => 'exam-package-table',
                 'reloadDelay' => 500,
             ]),
             ENT_QUOTES,
             'UTF-8'
         );
 
-        $editUrl   = e(route('exam_package.edit', $row));
+        $editUrl = e(route('exam_package.edit', $row));
         $deleteUrl = e(route('exam_package.destroy', $row));
 
         return <<<HTML
@@ -100,7 +100,7 @@ class ExamPackageDataTable extends DataTable
      */
     public function query(ExamPackage $model): QueryBuilder
     {
-        return $model->newQuery();
+        return $model->newQuery()->with(['school', 'subject']);
     }
 
     /**
@@ -138,7 +138,7 @@ class ExamPackageDataTable extends DataTable
                  * Custom Bootstrap 5 layout.
                  */
                 'dom' =>
-                '<"row mb-3"' .
+                    '<"row mb-3"' .
                     '<"col-md-6 d-flex align-items-center"B>' .
                     '<"col-md-6"f>' .
                     '>' .

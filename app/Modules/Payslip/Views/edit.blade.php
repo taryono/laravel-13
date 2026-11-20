@@ -1,17 +1,11 @@
-{{ Form::model($payslip, ['method' => 'PUT', 'route' => ['payslip.update', $payslip->id], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
-    <div class="row">
-        <div class="col-md-6 mb-3">
-            @forelse ($forms as $key => $form)
-                <div class="row">
-                    <div class="col-md-12 mb-3">
-                        <label>{{ say($form['label']) }}</label>
-                        {!! $form['content'] !!}
-                    </div>
-                </div>
-            @empty
-                <p>{{ say('Data Tidak Ditemukan') }}</p>
-            @endforelse
-        </div> 
-    </div> 
-{{ Form::close() }}
-<!-- /.row -->
+<div class="card border-0">
+    <div class="card-header bg-transparent border-0 pb-0">
+        <h5 class="card-title mb-0 fw-bold text-primary">Edit Payslip: {{ $payslip->payslip_number }}</h5>
+        <small class="text-muted">Perbarui data slip gaji dan status pengiriman</small>
+    </div>
+    <div class="card-body">
+        {{ Form::model($payslip, ['method' => 'PUT', 'route' => ['payslip.update', $payslip->id], 'class' => 'form-horizontal form-validation', 'id' => 'formPayslip', 'enctype' => 'multipart/form-data', 'autocomplete' => 'off', 'data-validate' => 'true', 'novalidate' => true]) }}
+        @include('Payslip::_form')
+        {{ Form::close() }}
+    </div>
+</div>

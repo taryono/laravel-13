@@ -1,0 +1,238 @@
+/* ============================================================
+   Shared Module Sub Navigation (.ep-subnav)
+   Supports Light Mode, Dark Mode (system + manual toggle), and Forced Colors
+   ============================================================ */
+
+:root {
+    --ep-subnav-bg-light: #ffffff;
+    --ep-subnav-bg-dark: #141d2c;
+    --ep-subnav-chip-bg-light: #f0f3ff;
+    --ep-subnav-chip-bg-dark: #1e293b;
+    --ep-subnav-chip-hover-light: #e2e8ff;
+    --ep-subnav-chip-hover-dark: #2a3750;
+    --ep-subnav-border-light: #e7eeff;
+    --ep-subnav-border-dark: rgba(148, 163, 184, 0.22);
+    --ep-subnav-chip-border-light: rgba(198, 197, 211, 0.5);
+    --ep-subnav-chip-border-dark: rgba(148, 163, 184, 0.26);
+    --ep-subnav-primary-light: #021064;
+    --ep-subnav-primary-dark: #bcc3ff;
+    --ep-subnav-on-light: #111c2c;
+    --ep-subnav-on-dark: #e6eeff;
+    --ep-subnav-muted-light: #454651;
+    --ep-subnav-muted-dark: #b4c0d4;
+    --ep-subnav-sec-light: #006a61;
+    --ep-subnav-sec-dark: #6bd8cb;
+    --ep-subnav-sec-bg-light: rgba(0, 106, 97, 0.10);
+    --ep-subnav-sec-bg-dark: rgba(107, 216, 203, 0.14);
+    --ep-subnav-sec-border-light: rgba(0, 106, 97, 0.25);
+    --ep-subnav-sec-border-dark: rgba(107, 216, 203, 0.35);
+    --ep-subnav-shadow-light: 0 4px 16px -4px rgba(30, 42, 120, 0.08);
+    --ep-subnav-shadow-dark: 0 6px 20px -4px rgba(0, 0, 0, 0.45);
+
+    --ep-subnav-bg: var(--ep-subnav-bg-light);
+    --ep-subnav-chip-bg: var(--ep-subnav-chip-bg-light);
+    --ep-subnav-chip-hover: var(--ep-subnav-chip-hover-light);
+    --ep-subnav-border: var(--ep-subnav-border-light);
+    --ep-subnav-chip-border: var(--ep-subnav-chip-border-light);
+    --ep-subnav-primary: var(--ep-subnav-primary-light);
+    --ep-subnav-on: var(--ep-subnav-on-light);
+    --ep-subnav-muted: var(--ep-subnav-muted-light);
+    --ep-subnav-sec: var(--ep-subnav-sec-light);
+    --ep-subnav-sec-bg: var(--ep-subnav-sec-bg-light);
+    --ep-subnav-sec-border: var(--ep-subnav-sec-border-light);
+    --ep-subnav-shadow: var(--ep-subnav-shadow-light);
+
+    color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-bs-theme="light"]):not([data-theme="light"]):not(.light-mode) {
+        --ep-subnav-bg: var(--ep-subnav-bg-dark);
+        --ep-subnav-chip-bg: var(--ep-subnav-chip-bg-dark);
+        --ep-subnav-chip-hover: var(--ep-subnav-chip-hover-dark);
+        --ep-subnav-border: var(--ep-subnav-border-dark);
+        --ep-subnav-chip-border: var(--ep-subnav-chip-border-dark);
+        --ep-subnav-primary: var(--ep-subnav-primary-dark);
+        --ep-subnav-on: var(--ep-subnav-on-dark);
+        --ep-subnav-muted: var(--ep-subnav-muted-dark);
+        --ep-subnav-sec: var(--ep-subnav-sec-dark);
+        --ep-subnav-sec-bg: var(--ep-subnav-sec-bg-dark);
+        --ep-subnav-sec-border: var(--ep-subnav-sec-border-dark);
+        --ep-subnav-shadow: var(--ep-subnav-shadow-dark);
+    }
+}
+
+@supports (color: light-dark(white, black)) {
+    :root {
+        --ep-subnav-bg: light-dark(var(--ep-subnav-bg-light), var(--ep-subnav-bg-dark));
+        --ep-subnav-chip-bg: light-dark(var(--ep-subnav-chip-bg-light), var(--ep-subnav-chip-bg-dark));
+        --ep-subnav-chip-hover: light-dark(var(--ep-subnav-chip-hover-light), var(--ep-subnav-chip-hover-dark));
+        --ep-subnav-border: light-dark(var(--ep-subnav-border-light), var(--ep-subnav-border-dark));
+        --ep-subnav-chip-border: light-dark(var(--ep-subnav-chip-border-light), var(--ep-subnav-chip-border-dark));
+        --ep-subnav-primary: light-dark(var(--ep-subnav-primary-light), var(--ep-subnav-primary-dark));
+        --ep-subnav-on: light-dark(var(--ep-subnav-on-light), var(--ep-subnav-on-dark));
+        --ep-subnav-muted: light-dark(var(--ep-subnav-muted-light), var(--ep-subnav-muted-dark));
+        --ep-subnav-sec: light-dark(var(--ep-subnav-sec-light), var(--ep-subnav-sec-dark));
+        --ep-subnav-sec-bg: light-dark(var(--ep-subnav-sec-bg-light), var(--ep-subnav-sec-bg-dark));
+        --ep-subnav-sec-border: light-dark(var(--ep-subnav-sec-border-light), var(--ep-subnav-sec-border-dark));
+    }
+}
+
+:root[data-bs-theme="light"],
+:root[data-theme="light"],
+html.light-mode,
+body.light-mode {
+    color-scheme: light;
+    --ep-subnav-bg: var(--ep-subnav-bg-light);
+    --ep-subnav-chip-bg: var(--ep-subnav-chip-bg-light);
+    --ep-subnav-chip-hover: var(--ep-subnav-chip-hover-light);
+    --ep-subnav-border: var(--ep-subnav-border-light);
+    --ep-subnav-chip-border: var(--ep-subnav-chip-border-light);
+    --ep-subnav-primary: var(--ep-subnav-primary-light);
+    --ep-subnav-on: var(--ep-subnav-on-light);
+    --ep-subnav-muted: var(--ep-subnav-muted-light);
+    --ep-subnav-sec: var(--ep-subnav-sec-light);
+    --ep-subnav-sec-bg: var(--ep-subnav-sec-bg-light);
+    --ep-subnav-sec-border: var(--ep-subnav-sec-border-light);
+    --ep-subnav-shadow: var(--ep-subnav-shadow-light);
+}
+
+:root[data-bs-theme="dark"],
+:root[data-theme="dark"],
+html.dark,
+html.dark-mode,
+body.dark,
+body.dark-mode {
+    color-scheme: dark;
+    --ep-subnav-bg: var(--ep-subnav-bg-dark);
+    --ep-subnav-chip-bg: var(--ep-subnav-chip-bg-dark);
+    --ep-subnav-chip-hover: var(--ep-subnav-chip-hover-dark);
+    --ep-subnav-border: var(--ep-subnav-border-dark);
+    --ep-subnav-chip-border: var(--ep-subnav-chip-border-dark);
+    --ep-subnav-primary: var(--ep-subnav-primary-dark);
+    --ep-subnav-on: var(--ep-subnav-on-dark);
+    --ep-subnav-muted: var(--ep-subnav-muted-dark);
+    --ep-subnav-sec: var(--ep-subnav-sec-dark);
+    --ep-subnav-sec-bg: var(--ep-subnav-sec-bg-dark);
+    --ep-subnav-sec-border: var(--ep-subnav-sec-border-dark);
+    --ep-subnav-shadow: var(--ep-subnav-shadow-dark);
+}
+
+nav.ep-subnav {
+    top: var(--bnsp-topnav-h, 64px);
+    z-index: 1020;
+    width: 100%;
+    background: var(--ep-subnav-bg);
+    border: 1px solid var(--ep-subnav-border);
+    box-shadow: var(--ep-subnav-shadow);
+    color: var(--ep-subnav-on);
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+nav.ep-subnav .ep-subnav-wrap {
+    width: 100%;
+}
+
+nav.ep-subnav a.back-to-home {
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background: var(--ep-subnav-chip-bg);
+    color: var(--ep-subnav-primary);
+    border: 1px solid var(--ep-subnav-chip-border);
+    transition: background-color 0.15s ease, transform 0.15s ease, color 0.15s ease;
+}
+
+nav.ep-subnav a.back-to-home:hover,
+nav.ep-subnav a.back-to-home:focus-visible {
+    background: var(--ep-subnav-chip-hover);
+    color: var(--ep-subnav-primary);
+}
+
+nav.ep-subnav a.back-to-home:active {
+    transform: scale(0.95);
+}
+
+nav.ep-subnav .ep-subnav-title {
+    font-size: 1.125rem;
+    line-height: 1.4;
+    font-weight: 700;
+    color: var(--ep-subnav-primary);
+}
+
+nav.ep-subnav .ep-subnav-subtitle {
+    font-size: 0.75rem;
+    line-height: 1.35;
+    color: var(--ep-subnav-muted);
+}
+
+nav.ep-subnav .ep-subnav-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    border-radius: 50rem;
+    padding: 0.15rem 0.65rem;
+    font-size: 0.7rem;
+    line-height: 1.25;
+    font-weight: 700;
+    background: var(--ep-subnav-sec-bg);
+    color: var(--ep-subnav-sec);
+    border: 1px solid var(--ep-subnav-sec-border);
+}
+
+nav.ep-subnav .ep-subnav-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    background: var(--ep-subnav-sec);
+}
+
+nav.ep-subnav .ep-subnav-dot .placeholder {
+    background-color: var(--ep-subnav-sec);
+}
+
+nav.ep-subnav .ep-subnav-meta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8125rem;
+    line-height: 1.25;
+    font-weight: 600;
+    background: var(--ep-subnav-chip-bg);
+    color: var(--ep-subnav-muted);
+    border: 1px solid var(--ep-subnav-chip-border);
+}
+
+nav.ep-subnav .ep-subnav-meta strong {
+    color: var(--ep-subnav-on);
+}
+
+nav.ep-subnav .ep-subnav-meta-icon {
+    font-size: 16px;
+    line-height: 1;
+    color: var(--ep-subnav-sec);
+}
+
+nav.ep-subnav .ep-subnav-back-icon {
+    font-size: 20px;
+    line-height: 1;
+}
+
+@media (forced-colors: active) {
+    nav.ep-subnav,
+    nav.ep-subnav a.back-to-home,
+    nav.ep-subnav .ep-subnav-badge,
+    nav.ep-subnav .ep-subnav-meta {
+        border: 1px solid CanvasText;
+        box-shadow: none;
+    }
+
+    nav.ep-subnav .ep-subnav-dot {
+        background: CanvasText;
+    }
+}
+

@@ -2,10 +2,19 @@
 @section('title', 'Alumni & Tracer Study')
 @push('styles')
     <link rel="stylesheet" href="{{ asset('assets/css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/ep-subnav.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/alumni.css') }}">
 @endpush
 @section('content')
 <div class="alumni">
+    @include('Dashboard::partials.ep_subnav', [
+        'title' => 'Modul Alumni & Tracer Study',
+        'badge' => '4.850 Lulusan',
+        'subtitle' => 'Statistik Tracer Study, Sebaran Karir & Jaringan Alumni',
+        'metaIcon' => 'school',
+        'metaLabel' => 'Angkatan',
+        'metaValue' => '2005 - 2024',
+    ])
     <!-- ============ KPI BENTO ============ -->
     <section class="d-flex flex-column gap-3">
         <div class="d-flex align-items-center justify-content-between">

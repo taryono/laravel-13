@@ -17,7 +17,7 @@ class BonusDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['bonus_code', 'bonus_type', 'employee_id'];
+    protected array $columns = ['bonus_code', 'bonus_type', 'employee.name'];
 
     /**
      * Build DataTable response.
@@ -53,14 +53,14 @@ class BonusDataTable extends DataTable
         $context = htmlspecialchars(
             json_encode([
                 'executeDraw' => true,
-                'tableId'     => 'bonus-table',
+                'tableId' => 'bonus-table',
                 'reloadDelay' => 500,
             ]),
             ENT_QUOTES,
             'UTF-8'
         );
 
-        $editUrl   = e(route('bonus.edit', $row));
+        $editUrl = e(route('bonus.edit', $row));
         $deleteUrl = e(route('bonus.destroy', $row));
 
         return <<<HTML
@@ -100,7 +100,7 @@ class BonusDataTable extends DataTable
      */
     public function query(Bonus $model): QueryBuilder
     {
-        return $model->newQuery();
+        return $model->newQuery()->with('employee');
     }
 
     /**
@@ -139,13 +139,13 @@ class BonusDataTable extends DataTable
                  */
                 'dom' =>
                     '<"row mb-3"' .
-                        '<"col-md-6 d-flex align-items-center"B>' .
-                        '<"col-md-6"f>' .
+                    '<"col-md-6 d-flex align-items-center"B>' .
+                    '<"col-md-6"f>' .
                     '>' .
                     'rt' .
                     '<"row mt-3"' .
-                        '<"col-md-6"i>' .
-                        '<"col-md-6 d-flex justify-content-md-end"p>' .
+                    '<"col-md-6"i>' .
+                    '<"col-md-6 d-flex justify-content-md-end"p>' .
                     '>',
 
                 /*
@@ -267,8 +267,8 @@ class BonusDataTable extends DataTable
     protected function getColumns(): array
     {
         return collect($this->columns)
-            ->map(fn (string $kolom) => Column::make($kolom)
-                ->title(ucwords(str_replace(['_',"."], [' ',' '], $kolom))))
+            ->map(fn(string $kolom) => Column::make($kolom)
+                ->title(ucwords(str_replace(['_', "."], [' ', ' '], $kolom))))
             // 1. PREPEND: Masukkan kolom No di posisi PALING AWAL (indeks 0)
             ->prepend(
                 Column::make('DT_RowIndex')

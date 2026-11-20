@@ -17,7 +17,7 @@ class ScheduleDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['name'];
+    protected array $columns = ['name', 'classroom.name', 'academic_year.name', 'teacher.name', 'room.name', 'day_of_week', 'start_time', 'end_time'];
 
     /**
      * Build DataTable response.
@@ -53,14 +53,14 @@ class ScheduleDataTable extends DataTable
         $context = htmlspecialchars(
             json_encode([
                 'executeDraw' => true,
-                'tableId'     => 'schedule-table',
+                'tableId' => 'schedule-table',
                 'reloadDelay' => 500,
             ]),
             ENT_QUOTES,
             'UTF-8'
         );
 
-        $editUrl   = e(route('schedule.edit', $row));
+        $editUrl = e(route('schedule.edit', $row));
         $deleteUrl = e(route('schedule.destroy', $row));
 
         return <<<HTML
@@ -100,7 +100,7 @@ class ScheduleDataTable extends DataTable
      */
     public function query(Schedule $model): QueryBuilder
     {
-        return $model->newQuery();
+        return $model->newQuery()->with(['classroom', 'subject', 'teacher', 'room', 'academic_year']);
     }
 
     /**
@@ -139,13 +139,13 @@ class ScheduleDataTable extends DataTable
                  */
                 'dom' =>
                     '<"row mb-3"' .
-                        '<"col-md-6 d-flex align-items-center"B>' .
-                        '<"col-md-6"f>' .
+                    '<"col-md-6 d-flex align-items-center"B>' .
+                    '<"col-md-6"f>' .
                     '>' .
                     'rt' .
                     '<"row mt-3"' .
-                        '<"col-md-6"i>' .
-                        '<"col-md-6 d-flex justify-content-md-end"p>' .
+                    '<"col-md-6"i>' .
+                    '<"col-md-6 d-flex justify-content-md-end"p>' .
                     '>',
 
                 /*
@@ -267,8 +267,8 @@ class ScheduleDataTable extends DataTable
     protected function getColumns(): array
     {
         return collect($this->columns)
-            ->map(fn (string $kolom) => Column::make($kolom)
-                ->title(ucwords(str_replace(['_',"."], [' ',' '], $kolom))))
+            ->map(fn(string $kolom) => Column::make($kolom)
+                ->title(ucwords(str_replace(['_', "."], [' ', ' '], $kolom))))
             // 1. PREPEND: Masukkan kolom No di posisi PALING AWAL (indeks 0)
             ->prepend(
                 Column::make('DT_RowIndex')

@@ -17,7 +17,7 @@ class PayrollRunDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['name'];
+    protected array $columns = ['name', 'organization.name', 'payroll_period.name', 'run_number', 'run_type', 'status', 'total_gross', 'total_education'];
 
     /**
      * Build DataTable response.
@@ -53,15 +53,15 @@ class PayrollRunDataTable extends DataTable
         $context = htmlspecialchars(
             json_encode([
                 'executeDraw' => true,
-                'tableId'     => 'payroll-run-table',
+                'tableId' => 'payroll-run-table',
                 'reloadDelay' => 500,
             ]),
             ENT_QUOTES,
             'UTF-8'
         );
 
-        $editUrl   = e(route('payroll-run.edit', $row));
-        $deleteUrl = e(route('payroll-run.destroy', $row));
+        $editUrl = e(route('payroll_run.edit', $row));
+        $deleteUrl = e(route('payroll_run.destroy', $row));
 
         return <<<HTML
             <div class="d-flex justify-content-center gap-1">
@@ -75,7 +75,7 @@ class PayrollRunDataTable extends DataTable
                     data-title="{$title}"
                     data-url="{$editUrl}"
                     data-datatable-context='{$context}'
-                    data-submit='<button class="btn btn-primary modal-submit" type="button" data-is_execute_drawer="true" data-datatable-id="payroll-run-table">Simpan</button>'
+                    data-submit='<button class="btn btn-primary modal-submit" type="button" data-is_execute_drawer="true" data-datatable-id="payroll_run-table">Simpan</button>'
                     data-cancel='<button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Batal</button>'>
                     <span class="material-symbols-outlined">edit</span>
                 </button>
@@ -100,7 +100,7 @@ class PayrollRunDataTable extends DataTable
      */
     public function query(PayrollRun $model): QueryBuilder
     {
-        return $model->newQuery();
+        return $model->newQuery()->with(['organization', 'payroll_period']);
     }
 
     /**
@@ -115,14 +115,14 @@ class PayrollRunDataTable extends DataTable
              * Asesi -> asesi-table
              * Asesor -> asesor-table
              */
-            ->setTableId('payroll-run-table')
+            ->setTableId('payroll_run-table')
 
             ->columns($this->getColumns())
 
             /*
              * Server-side AJAX endpoint.
              */
-            ->minifiedAjax(route('payroll-run.index'))
+            ->minifiedAjax(route('payroll_run.index'))
 
             /*
              * Default sorting:
@@ -139,13 +139,13 @@ class PayrollRunDataTable extends DataTable
                  */
                 'dom' =>
                     '<"row mb-3"' .
-                        '<"col-md-6 d-flex align-items-center"B>' .
-                        '<"col-md-6"f>' .
+                    '<"col-md-6 d-flex align-items-center"B>' .
+                    '<"col-md-6"f>' .
                     '>' .
                     'rt' .
                     '<"row mt-3"' .
-                        '<"col-md-6"i>' .
-                        '<"col-md-6 d-flex justify-content-md-end"p>' .
+                    '<"col-md-6"i>' .
+                    '<"col-md-6 d-flex justify-content-md-end"p>' .
                     '>',
 
                 /*
@@ -267,8 +267,8 @@ class PayrollRunDataTable extends DataTable
     protected function getColumns(): array
     {
         return collect($this->columns)
-            ->map(fn (string $kolom) => Column::make($kolom)
-                ->title(ucwords(str_replace(['_',"."], [' ',' '], $kolom))))
+            ->map(fn(string $kolom) => Column::make($kolom)
+                ->title(ucwords(str_replace(['_', "."], [' ', ' '], $kolom))))
             // 1. PREPEND: Masukkan kolom No di posisi PALING AWAL (indeks 0)
             ->prepend(
                 Column::make('DT_RowIndex')

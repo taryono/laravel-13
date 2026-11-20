@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Modules\Payroll\Services;
+namespace App\Services;
 
 use Models\PayrollRun;
 use Models\PayrollDetail;
@@ -31,7 +31,7 @@ class PayrollCalculationService
 
             foreach ($employees as $employee) {
                 $payrollDetail = $this->calculateEmployeePayroll($employee, $payrollPeriod, $payrollRun);
-                
+
                 $totalGross += $payrollDetail->gross_salary;
                 $totalNet += $payrollDetail->net_salary;
                 $totalDeductions += $payrollDetail->total_deductions;
@@ -60,9 +60,9 @@ class PayrollCalculationService
             ->where('employee_id', $employee->id)
             ->where('is_active', 1)
             ->where('effective_date', '<=', $payrollPeriod->period_end_date)
-            ->where(function($query) use ($payrollPeriod) {
+            ->where(function ($query) use ($payrollPeriod) {
                 $query->whereNull('expiry_date')
-                      ->orWhere('expiry_date', '>=', $payrollPeriod->period_start_date);
+                    ->orWhere('expiry_date', '>=', $payrollPeriod->period_start_date);
             })
             ->get();
 
@@ -116,9 +116,9 @@ class PayrollCalculationService
 
         // Calculate other deductions
         $deductions = Deduction::where('employee_id', $employee->id)
-            ->where(function($query) use ($payrollPeriod) {
+            ->where(function ($query) use ($payrollPeriod) {
                 $query->whereNull('payroll_period_id')
-                      ->orWhere('payroll_period_id', $payrollPeriod->id);
+                    ->orWhere('payroll_period_id', $payrollPeriod->id);
             })
             ->where('is_paid', 0)
             ->get();

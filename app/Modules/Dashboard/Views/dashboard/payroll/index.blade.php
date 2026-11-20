@@ -2,10 +2,19 @@
 @section('title', 'Payroll & Penggajian')
 @push('styles')
     <link rel="stylesheet" href="{{ asset('assets/css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/ep-subnav.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/payroll.css') }}">
 @endpush
 @section('content')
     <div class="payroll">
+        @include('Dashboard::partials.ep_subnav', [
+            'title' => 'Modul Payroll & Gaji',
+            'badge' => '92% Tuntas Diproses',
+            'subtitle' => 'Penggajian Guru, Honorarium & Tunjangan Bulanan',
+            'metaIcon' => 'calendar_month',
+            'metaLabel' => 'Periode',
+            'metaValue' => 'Maret 2025',
+        ])
         <!-- ---------- HERO / TITLE ---------- -->
         <section class="hero-card mb-4">
             <div class="ps-2 d-flex flex-column gap-2">

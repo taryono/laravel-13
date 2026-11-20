@@ -926,6 +926,7 @@
             color: var(--primary);
         }
     </style>
+    <link rel="stylesheet" href="{{ asset('assets/css/ep-subnav.css') }}" />
 </head>
 
 <body>
@@ -975,6 +976,17 @@
             </div>
         </div>
     </header>
+
+    <div class="container-fluid pt-3 px-3" style="max-width:1280px;margin:0 auto;">
+        @include('Dashboard::partials.ep_subnav', [
+            'title' => 'Live Proctoring & Monitoring',
+            'badge' => 'Ujian Berlangsung - Sesi 1',
+            'subtitle' => 'Simulasi Matematika Peminatan XII MIPA • Lab Multimedia 1 & 2',
+            'metaIcon' => 'timer',
+            'metaLabel' => 'Sisa Waktu',
+            'metaValue' => '01:14:22',
+        ])
+    </div>
 
     <!-- Sub-header -->
     <div class="sub-header">

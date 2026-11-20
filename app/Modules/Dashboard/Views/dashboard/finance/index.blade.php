@@ -2,12 +2,21 @@
 @section('title', 'Keuangan & Kas')
 @push('styles')
     <link rel="stylesheet" href="{{ asset('assets/css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/ep-subnav.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/finance.css') }}">
 @endpush
 @section('content')
+    @include('Dashboard::partials.ep_subnav', [
+        'title' => 'Modul Keuangan & Kas',
+        'badge' => 'Realisasi SPP 92%',
+        'subtitle' => 'Tata Usaha, Penerimaan SPP & Ringkasan Arus Kas Sekolah',
+        'metaIcon' => 'calendar_month',
+        'metaLabel' => 'Periode',
+        'metaValue' => 'Maret 2025',
+    ])
     <!-- Breadcrumb -->
-    <section class="px-3 pt-3 pb-1">
-        <a href="#" class="d-inline-flex align-items-center gap-1 text-secondary text-label-md text-decoration-none">
+    <section class="px-3 pt-1 pb-1">
+        <a href="{{ route('dashboard.back-to-home') }}" class="back-to-home d-inline-flex align-items-center gap-1 text-secondary text-label-md text-decoration-none">
             <span class="material-symbols-outlined" style="font-size:14px;">home</span>
             <span>Kembali ke Beranda</span>
             <span class="material-symbols-outlined" style="font-size:14px;">chevron_right</span>

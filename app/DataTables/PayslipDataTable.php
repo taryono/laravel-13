@@ -14,10 +14,16 @@ class PayslipDataTable extends DataTable
 {
     /**
      * Kolom yang ditampilkan di tabel (selain DT_RowIndex & action).
-     * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
-     * opsi --columns.
      */
-    protected array $columns = ['name'];
+    protected array $columns = [
+        'payslip_number',
+        'employee.name',
+        'payroll_period.period',
+        'gross_salary',
+        'total_deduction',
+        'net_salary',
+        'status',
+    ];
 
     /**
      * Build DataTable response.
@@ -28,43 +34,61 @@ class PayslipDataTable extends DataTable
             ->addColumn('action', function ($row) {
                 return $this->renderActionButtons($row);
             })
+            ->editColumn('gross_salary', function ($row) {
+                return 'Rp ' . number_format((float) ($row->gross_salary ?? 0), 0, ',', '.');
+            })
+            ->editColumn('total_deduction', function ($row) {
+                return 'Rp ' . number_format((float) ($row->total_deduction ?? 0), 0, ',', '.');
+            })
+            ->editColumn('net_salary', function ($row) {
+                return '<span class="fw-bold text-success">Rp ' . number_format((float) ($row->net_salary ?? 0), 0, ',', '.') . '</span>';
+            })
+            ->editColumn('status', function ($row) {
+                return $row->status_label;
+            })
             ->addIndexColumn()
-            ->rawColumns(['action']) // ✅ Tetap wajib ada!
+            ->rawColumns(['action', 'net_salary', 'status'])
             ->setRowId('id');
     }
 
     /**
-     * Render tombol aksi (edit & delete) untuk satu baris.
-     *
-     * - $row->name di-escape dengan e() untuk mencegah XSS/attribute
-     *   breakout jika nilainya mengandung karakter " atau <script>.
-     * - Payload data-datatable-context dibangun via json_encode() lalu
-     *   di-escape dengan htmlspecialchars() supaya valid ditaruh di
-     *   dalam attribute HTML (bukan concat string manual yang rawan
-     *   attribute-nya terpotong).
-     * - Class tombol delete WAJIB "delete-button" (bukan "delete") supaya
-     *   cocok dengan selector di public/assets/js/button.js:
-     *   .on('click', '.delete-button', this.handleDeleteButton)
+     * Render tombol aksi (show, edit & delete) untuk satu baris.
      */
     protected function renderActionButtons($row): string
     {
-        $title = e('Detail Payslip ' . $row->name);
+        $num = e($row->payslip_number ?? ('#' . $row->id));
+        $title = e('Edit Payslip ' . $num);
+        $showTitle = e('Detail Payslip ' . $num);
 
         $context = htmlspecialchars(
             json_encode([
                 'executeDraw' => true,
-                'tableId'     => 'payslip-table',
+                'tableId' => 'payslip-table',
                 'reloadDelay' => 500,
             ]),
             ENT_QUOTES,
             'UTF-8'
         );
 
-        $editUrl   = e(route('payslip.edit', $row));
-        $deleteUrl = e(route('payslip.destroy', $row));
+        $showUrl = e(route('payslip.show', $row->id));
+        $editUrl = e(route('payslip.edit', $row->id));
+        $deleteUrl = e(route('payslip.destroy', $row->id));
 
         return <<<HTML
             <div class="d-flex justify-content-center gap-1">
+
+                <button
+                    type="button"
+                    class="btn btn-sm btn-info text-white"
+                    data-toggle="ajax-modal"
+                    data-size="lg"
+                    data-method="GET"
+                    data-title="{$showTitle}"
+                    data-url="{$showUrl}"
+                    data-cancel='<button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Tutup</button>'
+                    title="Lihat Detail">
+                    <span class="material-symbols-outlined">visibility</span>
+                </button>
 
                 <button
                     type="button"
@@ -75,8 +99,9 @@ class PayslipDataTable extends DataTable
                     data-title="{$title}"
                     data-url="{$editUrl}"
                     data-datatable-context='{$context}'
-                    data-submit='<button class="btn btn-primary modal-submit" type="button" data-is_execute_drawer="true" data-datatable-id="payslip-table">Simpan</button>'
-                    data-cancel='<button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Batal</button>'>
+                    data-submit='<button class="btn btn-primary modal-submit" type="submit" form="formPayslip" data-is_execute_drawer="true" data-datatable-id="payslip-table">Simpan</button>'
+                    data-cancel='<button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Batal</button>'
+                    title="Edit">
                     <span class="material-symbols-outlined">edit</span>
                 </button>
 
@@ -100,7 +125,7 @@ class PayslipDataTable extends DataTable
      */
     public function query(Payslip $model): QueryBuilder
     {
-        return $model->newQuery();
+        return $model->newQuery()->with(['employee', 'payrollPeriod', 'payrollDetail']);
     }
 
     /**
@@ -109,97 +134,40 @@ class PayslipDataTable extends DataTable
     public function html(): HtmlBuilder
     {
         return $this->builder()
-
-            /*
-             * Example:
-             * Asesi -> asesi-table
-             * Asesor -> asesor-table
-             */
             ->setTableId('payslip-table')
-
             ->columns($this->getColumns())
-
-            /*
-             * Server-side AJAX endpoint.
-             */
             ->minifiedAjax(route('payslip.index'))
-
-            /*
-             * Default sorting:
-             * column index 1 = name
-             */
             ->orderBy(1)
-
             ->selectStyleSingle()
-
             ->parameters([
-
-                /*
-                 * Custom Bootstrap 5 layout.
-                 */
                 'dom' =>
                     '<"row mb-3"' .
-                        '<"col-md-6 d-flex align-items-center"B>' .
-                        '<"col-md-6"f>' .
+                    '<"col-md-6 d-flex align-items-center"B>' .
+                    '<"col-md-6"f>' .
                     '>' .
                     'rt' .
                     '<"row mt-3"' .
-                        '<"col-md-6"i>' .
-                        '<"col-md-6 d-flex justify-content-md-end"p>' .
+                    '<"col-md-6"i>' .
+                    '<"col-md-6 d-flex justify-content-md-end"p>' .
                     '>',
-
-                /*
-                 * Let CSS / column configuration
-                 * control widths.
-                 */
                 'autoWidth' => false,
-
-                /*
-                 * Responsive DataTable.
-                 */
                 'responsive' => true,
-
-                /*
-                 * Processing indicator.
-                 */
                 'processing' => true,
-
-                /*
-                 * Server-side processing.
-                 */
                 'serverSide' => true,
-
-                /*
-                 * Save DataTable state.
-                 */
                 'stateSave' => false,
-
-                /*
-                 * Language.
-                 */
                 'language' => [
                     'processing' => '
                         <div class="d-flex align-items-center gap-2">
-                            <div
-                                class="spinner-border spinner-border-sm text-primary"
-                                role="status"
-                            ></div>
+                            <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
                             <span>Memuat data...</span>
                         </div>
                     ',
-
                     'search' => 'Cari:',
-
                     'lengthMenu' => 'Tampilkan _MENU_ data',
-
                     'info' => 'Menampilkan _START_ sampai _END_ dari _TOTAL_ data',
-
                     'infoEmpty' => 'Tidak ada data',
-
                     'zeroRecords' => 'Data tidak ditemukan',
-
                     'emptyTable' => 'Belum ada data',
-
                     'paginate' => [
                         'first' => 'Awal',
                         'last' => 'Akhir',
@@ -208,86 +176,64 @@ class PayslipDataTable extends DataTable
                     ],
                 ],
             ])
-
-            /*
-             * DataTable buttons.
-             */
             ->buttons([
-
                 Button::make('excel')
-                    ->text(
-                        '<span class="material-symbols-outlined align-middle me-1">
-                            download
-                        </span> Excel'
-                    )
+                    ->text('<span class="material-symbols-outlined align-middle me-1">download</span> Excel')
                     ->className('btn btn-success btn-sm'),
-
                 Button::make('csv')
-                    ->text(
-                        '<span class="material-symbols-outlined align-middle me-1">
-                            description
-                        </span> CSV'
-                    )
+                    ->text('<span class="material-symbols-outlined align-middle me-1">description</span> CSV')
                     ->className('btn btn-primary btn-sm'),
-
                 Button::make('pdf')
-                    ->text(
-                        '<span class="material-symbols-outlined align-middle me-1">
-                            picture_as_pdf
-                        </span> PDF'
-                    )
+                    ->text('<span class="material-symbols-outlined align-middle me-1">picture_as_pdf</span> PDF')
                     ->className('btn btn-danger btn-sm'),
-
                 Button::make('print')
-                    ->text(
-                        '<span class="material-symbols-outlined align-middle me-1">
-                            print
-                        </span> Print'
-                    )
+                    ->text('<span class="material-symbols-outlined align-middle me-1">print</span> Print')
                     ->className('btn btn-primary btn-sm'),
-
                 Button::make([
                     'text' => '<span class="material-symbols-outlined align-middle">refresh</span>',
                     'className' => 'btn btn-secondary',
-                    'action' => 'function (e, dt, node, config) {
-                        dt.ajax.reload(null, false);
-                    }',
+                    'action' => 'function (e, dt, node, config) { dt.ajax.reload(null, false); }',
                 ])->className('btn btn-secondary'),
             ]);
     }
 
     /**
      * Get DataTable columns.
-     *
-     * Dibangun langsung dari property $columns (array literal yang sudah
-     * digenerate di atas oleh make:crud-yajra) -- tidak lagi pakai
-     * explode() dari string literal seperti versi lama, yang rapuh
-     * terhadap karakter khusus pada nama kolom.
      */
     protected function getColumns(): array
     {
         return collect($this->columns)
-            ->map(fn (string $kolom) => Column::make($kolom)
-                ->title(ucwords(str_replace(['_',"."], [' ',' '], $kolom))))
-            // 1. PREPEND: Masukkan kolom No di posisi PALING AWAL (indeks 0)
+            ->map(function (string $kolom) {
+                $titles = [
+                    'payslip_number'        => 'No. Slip',
+                    'employee.name'         => 'Karyawan',
+                    'payroll_period.period' => 'Periode',
+                    'gross_salary'          => 'Gaji Kotor',
+                    'total_deduction'       => 'Potongan',
+                    'net_salary'            => 'Gaji Bersih',
+                    'status'                => 'Status',
+                ];
+
+                return Column::make($kolom)
+                    ->title($titles[$kolom] ?? ucwords(str_replace(['_', '.'], [' ', ' '], $kolom)));
+            })
             ->prepend(
                 Column::make('DT_RowIndex')
                     ->title('No')
                     ->orderable(false)
                     ->searchable(false)
-                    ->width(80)
+                    ->width(50)
                     ->addClass('text-center')
             )
-            // 2. PUSH: Masukkan kolom Aksi di posisi PALING AKHIR
             ->push(
                 Column::computed('action')
                     ->exportable(false)
                     ->printable(false)
-                    ->width(120)
+                    ->width(150)
                     ->addClass('text-center')
                     ->title('Aksi')
             )
-            ->all(); // Konversi collection kembali menjadi array di akhir
+            ->all();
     }
 
     /**

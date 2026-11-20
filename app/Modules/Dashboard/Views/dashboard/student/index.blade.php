@@ -2,10 +2,19 @@
 @section('title', 'Manajemen Siswa')
 @push('styles')
     <link rel="stylesheet" href="{{ asset('assets/css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/ep-subnav.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/student.css') }}">
 @endpush
 @section('content')
 <div class="students">
+    @include('Dashboard::partials.ep_subnav', [
+        'title' => 'Modul Manajemen Siswa',
+        'badge' => '1.180 Siswa Aktif',
+        'subtitle' => 'Buku Induk, Konseling BK & Poin Kedisiplinan Siswa',
+        'metaIcon' => 'school',
+        'metaLabel' => 'Periode',
+        'metaValue' => 'T.A. 2024/2025 Genap',
+    ])
     <!-- ---------- HERO MODULE HEADER ---------- -->
     <section class="hero-card">
         <div class="position-absolute bg-high rounded-circle"

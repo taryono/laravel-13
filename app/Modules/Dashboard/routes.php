@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Route;
  */
 Route::group(['prefix' => 'dashboard', 'namespace' => 'App\Modules\Dashboard\Controllers', 'middleware' => ['web']], function () {
     Route::get('/', ['as' => 'dashboard.index', 'uses' => 'DashboardController@index']);
+    Route::get('/back-to-home', ['as' => 'dashboard.back-to-home', 'uses' => 'DashboardController@backToHome']);
     Route::post('/dashboard/select-category/{id?}', ['as' => 'dashboard.select-category', 'uses' => 'DashboardController@selectCategory']);
     Route::get('/dashboard/select-category/{id?}', ['as' => 'dashboard.select-category.get', 'uses' => 'DashboardController@selectCategory']);
 });

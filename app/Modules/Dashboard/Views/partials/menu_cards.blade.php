@@ -2,16 +2,17 @@
     @php
         $isSelected = session('active_menu_category_id') == $menu->id;
     @endphp
-    <a href="{{ route('dashboard.select-category.get', ['id' => $menu->id, 'redirect' => $menu->url !== '#' ? $menu->url : null]) }}"
+    <a href="{{ route('dashboard.select-category.get', $menu->id) }}"
         class="menu-card d-flex flex-column align-items-center text-center p-3 rounded-4 shadow-sm position-relative {{ $isSelected ? 'active-category' : '' }}"
-        data-menu-category-id="{{ $menu->id }}"
-        data-target-url="{{ $menu->url }}">
+        data-menu-category-id="{{ $menu->id }}" data-target-url="{{ $menu->url }}">
         @if ($isSelected)
-            <span class="position-absolute top-0 end-0 m-2 badge rounded-pill bg-primary-edu text-white p-1" title="Kategori aktif pada sidebar">
+            <span class="position-absolute top-0 end-0 m-2 badge rounded-pill bg-primary-edu text-white p-1"
+                title="Kategori aktif pada sidebar">
                 <span class="material-symbols-outlined icon-14 d-block">check</span>
             </span>
         @endif
-        <div class="menu-icon tone-{{ $menu->tone }} rounded-3 d-flex align-items-center justify-content-center mb-2 {{ $isSelected ? 'ring-active' : '' }}">
+        <div
+            class="menu-icon tone-{{ $menu->tone }} rounded-3 d-flex align-items-center justify-content-center mb-2 {{ $isSelected ? 'ring-active' : '' }}">
             <span class="material-symbols-outlined icon-26">{{ $menu->icon }}</span>
         </div>
         <span class="t-label-md lh-sm">{{ $menu->title }}</span>

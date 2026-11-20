@@ -1,18 +1,37 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
 class Bonus extends BasedModel
-{ 
-    // Relasi
-    // public function user()
-    // {
-    //     return $this->belongsTo(User::class);
-    // }
+{
+    protected $fillable = [
+        'organization_id',
+        'employee_id',
+        'bonus_code',
+        'bonus_type',
+        'amount',
+        'payment_date',
+        'description',
+        'payroll_period_id',
+        'is_paid',
+        'paid_at',
+        'notes',
+    ];
 
-    // Scope
-    public function scopeActive($query)
+    protected $casts = [
+        'paid_at' => 'datetime',
+    ];
+    // Relasi
+    public function employee()
     {
-        return $query->where('is_active', true);
+        return $this->belongsTo(Employee::class);
+    }
+    public function organization()
+    {
+        return $this->belongsTo(Organization::class);
+    }
+    public function payroll_period()
+    {
+        return $this->belongsTo(PayrollPeriod::class);
     }
 }

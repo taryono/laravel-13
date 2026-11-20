@@ -1,0 +1,544 @@
+/* ============================================================
+   Modul Antar Jemput (Shuttle Service) — Bootstrap 5 + Dark Mode
+   ============================================================ */
+
+:root {
+    /* Raw light tokens */
+    --ep-bg-light: #f9f9ff;
+    --ep-lowest-light: #ffffff;
+    --ep-low-light: #f0f3ff;
+    --ep-cont-light: #e7eeff;
+    --ep-high-light: #dee9ff;
+    --ep-highest-light: #d8e3f9;
+    --ep-primary-light: #021064;
+    --ep-pc-light: #1e2a78;
+    --ep-pf-light: #dfe0ff;
+    --ep-pfd-light: #bcc3ff;
+    --ep-sec-light: #006a61;
+    --ep-on-sec-light: #ffffff;
+    --ep-sec10-light: rgba(0, 106, 97, 0.10);
+    --ep-sec15-light: rgba(0, 106, 97, 0.15);
+    --ep-sec-border-light: rgba(0, 106, 97, 0.25);
+    --ep-tf-light: #ffdea2;
+    --ep-tfd-light: #f7bd38;
+    --ep-tc-light: #443000;
+    --ep-otc-light: #a67800;
+    --ep-err-light: #ba1a1a;
+    --ep-errc-light: #ffdad6;
+    --ep-err-border-light: rgba(186, 26, 26, 0.45);
+    --ep-err-hover-bg-light: rgba(255, 218, 214, 0.28);
+    --ep-outline-light: #646572;
+    --ep-ov-light: #c6c5d3;
+    --ep-on-light: #111c2c;
+    --ep-onv-light: #454651;
+    --ep-border-light: rgba(198, 197, 211, 0.6);
+    --ep-border-soft-light: rgba(198, 197, 211, 0.35);
+    --ep-emergency-bg-light: rgba(222, 233, 255, 0.65);
+    --ep-shadow-light: 0 4px 20px -2px rgba(30, 42, 120, 0.05);
+    --ep-shadow-hover-light: 0 10px 25px -4px rgba(30, 42, 120, 0.10);
+
+    /* Raw dark tokens */
+    --ep-bg-dark: #0d1522;
+    --ep-lowest-dark: #141d2c;
+    --ep-low-dark: #1a2536;
+    --ep-cont-dark: #212d42;
+    --ep-high-dark: #2a3750;
+    --ep-highest-dark: #334361;
+    --ep-primary-dark: #bcc3ff;
+    --ep-pc-dark: #4c58a6;
+    --ep-pf-dark: #252f59;
+    --ep-pfd-dark: #8a95e9;
+    --ep-sec-dark: #6bd8cb;
+    --ep-on-sec-dark: #00201d;
+    --ep-sec10-dark: rgba(107, 216, 203, 0.14);
+    --ep-sec15-dark: rgba(107, 216, 203, 0.22);
+    --ep-sec-border-dark: rgba(107, 216, 203, 0.38);
+    --ep-tf-dark: #3d2e08;
+    --ep-tfd-dark: #f7bd38;
+    --ep-tc-dark: #ffdea2;
+    --ep-otc-dark: #f7bd38;
+    --ep-err-dark: #ffb4ab;
+    --ep-errc-dark: #5c161b;
+    --ep-err-border-dark: rgba(255, 180, 171, 0.45);
+    --ep-err-hover-bg-dark: rgba(147, 0, 10, 0.28);
+    --ep-outline-dark: #98a2b3;
+    --ep-ov-dark: #454f63;
+    --ep-on-dark: #e6eeff;
+    --ep-onv-dark: #b4c0d4;
+    --ep-border-dark: rgba(148, 163, 184, 0.24);
+    --ep-border-soft-dark: rgba(148, 163, 184, 0.16);
+    --ep-emergency-bg-dark: rgba(42, 55, 80, 0.72);
+    --ep-shadow-dark: 0 4px 20px -2px rgba(0, 0, 0, 0.42);
+    --ep-shadow-hover-dark: 0 10px 28px -4px rgba(0, 0, 0, 0.55);
+
+    /* Semantic defaults (light fallback) */
+    --ep-bg: var(--ep-bg-light);
+    --ep-lowest: var(--ep-lowest-light);
+    --ep-low: var(--ep-low-light);
+    --ep-cont: var(--ep-cont-light);
+    --ep-high: var(--ep-high-light);
+    --ep-highest: var(--ep-highest-light);
+    --ep-primary: var(--ep-primary-light);
+    --ep-pc: var(--ep-pc-light);
+    --ep-pf: var(--ep-pf-light);
+    --ep-pfd: var(--ep-pfd-light);
+    --ep-sec: var(--ep-sec-light);
+    --ep-on-sec: var(--ep-on-sec-light);
+    --ep-sec10: var(--ep-sec10-light);
+    --ep-sec15: var(--ep-sec15-light);
+    --ep-sec-border: var(--ep-sec-border-light);
+    --ep-tf: var(--ep-tf-light);
+    --ep-tfd: var(--ep-tfd-light);
+    --ep-tc: var(--ep-tc-light);
+    --ep-otc: var(--ep-otc-light);
+    --ep-err: var(--ep-err-light);
+    --ep-errc: var(--ep-errc-light);
+    --ep-err-border: var(--ep-err-border-light);
+    --ep-err-hover-bg: var(--ep-err-hover-bg-light);
+    --ep-outline: var(--ep-outline-light);
+    --ep-ov: var(--ep-ov-light);
+    --ep-on: var(--ep-on-light);
+    --ep-onv: var(--ep-onv-light);
+    --ep-border: var(--ep-border-light);
+    --ep-border-soft: var(--ep-border-soft-light);
+    --ep-emergency-bg: var(--ep-emergency-bg-light);
+    --ep-shadow: var(--ep-shadow-light);
+    --ep-shadow-hover: var(--ep-shadow-hover-light);
+
+    --bs-body-font-family: "Plus Jakarta Sans", sans-serif;
+    --bs-body-bg: var(--ep-bg);
+    --bs-body-color: var(--ep-on);
+    --bs-body-font-size: 14px;
+    --bs-body-line-height: 1.43;
+
+    color-scheme: light dark;
+}
+
+/* Fallback for browsers without light-dark() when following OS preference */
+@media (prefers-color-scheme: dark) {
+    :root:not([data-bs-theme="light"]):not([data-theme="light"]):not(.light-mode) {
+        --ep-bg: var(--ep-bg-dark);
+        --ep-lowest: var(--ep-lowest-dark);
+        --ep-low: var(--ep-low-dark);
+        --ep-cont: var(--ep-cont-dark);
+        --ep-high: var(--ep-high-dark);
+        --ep-highest: var(--ep-highest-dark);
+        --ep-primary: var(--ep-primary-dark);
+        --ep-pc: var(--ep-pc-dark);
+        --ep-pf: var(--ep-pf-dark);
+        --ep-pfd: var(--ep-pfd-dark);
+        --ep-sec: var(--ep-sec-dark);
+        --ep-on-sec: var(--ep-on-sec-dark);
+        --ep-sec10: var(--ep-sec10-dark);
+        --ep-sec15: var(--ep-sec15-dark);
+        --ep-sec-border: var(--ep-sec-border-dark);
+        --ep-tf: var(--ep-tf-dark);
+        --ep-tfd: var(--ep-tfd-dark);
+        --ep-tc: var(--ep-tc-dark);
+        --ep-otc: var(--ep-otc-dark);
+        --ep-err: var(--ep-err-dark);
+        --ep-errc: var(--ep-errc-dark);
+        --ep-err-border: var(--ep-err-border-dark);
+        --ep-err-hover-bg: var(--ep-err-hover-bg-dark);
+        --ep-outline: var(--ep-outline-dark);
+        --ep-ov: var(--ep-ov-dark);
+        --ep-on: var(--ep-on-dark);
+        --ep-onv: var(--ep-onv-dark);
+        --ep-border: var(--ep-border-dark);
+        --ep-border-soft: var(--ep-border-soft-dark);
+        --ep-emergency-bg: var(--ep-emergency-bg-dark);
+        --ep-shadow: var(--ep-shadow-dark);
+        --ep-shadow-hover: var(--ep-shadow-hover-dark);
+    }
+}
+
+/* Progressive enhancement with light-dark() */
+@supports (color: light-dark(white, black)) {
+    :root {
+        --ep-bg: light-dark(var(--ep-bg-light), var(--ep-bg-dark));
+        --ep-lowest: light-dark(var(--ep-lowest-light), var(--ep-lowest-dark));
+        --ep-low: light-dark(var(--ep-low-light), var(--ep-low-dark));
+        --ep-cont: light-dark(var(--ep-cont-light), var(--ep-cont-dark));
+        --ep-high: light-dark(var(--ep-high-light), var(--ep-high-dark));
+        --ep-highest: light-dark(var(--ep-highest-light), var(--ep-highest-dark));
+        --ep-primary: light-dark(var(--ep-primary-light), var(--ep-primary-dark));
+        --ep-pc: light-dark(var(--ep-pc-light), var(--ep-pc-dark));
+        --ep-pf: light-dark(var(--ep-pf-light), var(--ep-pf-dark));
+        --ep-pfd: light-dark(var(--ep-pfd-light), var(--ep-pfd-dark));
+        --ep-sec: light-dark(var(--ep-sec-light), var(--ep-sec-dark));
+        --ep-on-sec: light-dark(var(--ep-on-sec-light), var(--ep-on-sec-dark));
+        --ep-sec10: light-dark(var(--ep-sec10-light), var(--ep-sec10-dark));
+        --ep-sec15: light-dark(var(--ep-sec15-light), var(--ep-sec15-dark));
+        --ep-sec-border: light-dark(var(--ep-sec-border-light), var(--ep-sec-border-dark));
+        --ep-tf: light-dark(var(--ep-tf-light), var(--ep-tf-dark));
+        --ep-tfd: light-dark(var(--ep-tfd-light), var(--ep-tfd-dark));
+        --ep-tc: light-dark(var(--ep-tc-light), var(--ep-tc-dark));
+        --ep-otc: light-dark(var(--ep-otc-light), var(--ep-otc-dark));
+        --ep-err: light-dark(var(--ep-err-light), var(--ep-err-dark));
+        --ep-errc: light-dark(var(--ep-errc-light), var(--ep-errc-dark));
+        --ep-err-border: light-dark(var(--ep-err-border-light), var(--ep-err-border-dark));
+        --ep-err-hover-bg: light-dark(var(--ep-err-hover-bg-light), var(--ep-err-hover-bg-dark));
+        --ep-outline: light-dark(var(--ep-outline-light), var(--ep-outline-dark));
+        --ep-ov: light-dark(var(--ep-ov-light), var(--ep-ov-dark));
+        --ep-on: light-dark(var(--ep-on-light), var(--ep-on-dark));
+        --ep-onv: light-dark(var(--ep-onv-light), var(--ep-onv-dark));
+        --ep-border: light-dark(var(--ep-border-light), var(--ep-border-dark));
+        --ep-border-soft: light-dark(var(--ep-border-soft-light), var(--ep-border-soft-dark));
+        --ep-emergency-bg: light-dark(var(--ep-emergency-bg-light), var(--ep-emergency-bg-dark));
+    }
+}
+
+/* Explicit Light Mode Override (matches button.js toggle) */
+:root[data-bs-theme="light"],
+:root[data-theme="light"],
+html.light-mode,
+body.light-mode {
+    color-scheme: light;
+    --ep-bg: var(--ep-bg-light);
+    --ep-lowest: var(--ep-lowest-light);
+    --ep-low: var(--ep-low-light);
+    --ep-cont: var(--ep-cont-light);
+    --ep-high: var(--ep-high-light);
+    --ep-highest: var(--ep-highest-light);
+    --ep-primary: var(--ep-primary-light);
+    --ep-pc: var(--ep-pc-light);
+    --ep-pf: var(--ep-pf-light);
+    --ep-pfd: var(--ep-pfd-light);
+    --ep-sec: var(--ep-sec-light);
+    --ep-on-sec: var(--ep-on-sec-light);
+    --ep-sec10: var(--ep-sec10-light);
+    --ep-sec15: var(--ep-sec15-light);
+    --ep-sec-border: var(--ep-sec-border-light);
+    --ep-tf: var(--ep-tf-light);
+    --ep-tfd: var(--ep-tfd-light);
+    --ep-tc: var(--ep-tc-light);
+    --ep-otc: var(--ep-otc-light);
+    --ep-err: var(--ep-err-light);
+    --ep-errc: var(--ep-errc-light);
+    --ep-err-border: var(--ep-err-border-light);
+    --ep-err-hover-bg: var(--ep-err-hover-bg-light);
+    --ep-outline: var(--ep-outline-light);
+    --ep-ov: var(--ep-ov-light);
+    --ep-on: var(--ep-on-light);
+    --ep-onv: var(--ep-onv-light);
+    --ep-border: var(--ep-border-light);
+    --ep-border-soft: var(--ep-border-soft-light);
+    --ep-emergency-bg: var(--ep-emergency-bg-light);
+    --ep-shadow: var(--ep-shadow-light);
+    --ep-shadow-hover: var(--ep-shadow-hover-light);
+}
+
+/* Explicit Dark Mode Override (matches button.js toggle) */
+:root[data-bs-theme="dark"],
+:root[data-theme="dark"],
+html.dark,
+html.dark-mode,
+body.dark,
+body.dark-mode {
+    color-scheme: dark;
+    --ep-bg: var(--ep-bg-dark);
+    --ep-lowest: var(--ep-lowest-dark);
+    --ep-low: var(--ep-low-dark);
+    --ep-cont: var(--ep-cont-dark);
+    --ep-high: var(--ep-high-dark);
+    --ep-highest: var(--ep-highest-dark);
+    --ep-primary: var(--ep-primary-dark);
+    --ep-pc: var(--ep-pc-dark);
+    --ep-pf: var(--ep-pf-dark);
+    --ep-pfd: var(--ep-pfd-dark);
+    --ep-sec: var(--ep-sec-dark);
+    --ep-on-sec: var(--ep-on-sec-dark);
+    --ep-sec10: var(--ep-sec10-dark);
+    --ep-sec15: var(--ep-sec15-dark);
+    --ep-sec-border: var(--ep-sec-border-dark);
+    --ep-tf: var(--ep-tf-dark);
+    --ep-tfd: var(--ep-tfd-dark);
+    --ep-tc: var(--ep-tc-dark);
+    --ep-otc: var(--ep-otc-dark);
+    --ep-err: var(--ep-err-dark);
+    --ep-errc: var(--ep-errc-dark);
+    --ep-err-border: var(--ep-err-border-dark);
+    --ep-err-hover-bg: var(--ep-err-hover-bg-dark);
+    --ep-outline: var(--ep-outline-dark);
+    --ep-ov: var(--ep-ov-dark);
+    --ep-on: var(--ep-on-dark);
+    --ep-onv: var(--ep-onv-dark);
+    --ep-border: var(--ep-border-dark);
+    --ep-border-soft: var(--ep-border-soft-dark);
+    --ep-emergency-bg: var(--ep-emergency-bg-dark);
+    --ep-shadow: var(--ep-shadow-dark);
+    --ep-shadow-hover: var(--ep-shadow-hover-dark);
+}
+
+body {
+    min-height: max(884px, 100dvh);
+    padding-bottom: 6rem;
+    -webkit-font-smoothing: antialiased;
+    background-color: var(--ep-bg);
+    color: var(--ep-on);
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.shuttle-service {
+    color: var(--ep-on);
+}
+
+::selection {
+    background: #6bd8cb;
+    color: #00201d;
+}
+
+.material-symbols-outlined {
+    line-height: 1;
+    vertical-align: middle;
+}
+
+.ms-14 { font-size: 14px; }
+.ms-15 { font-size: 15px; }
+.ms-16 { font-size: 16px; }
+.ms-18 { font-size: 18px; }
+.ms-20 { font-size: 20px; }
+.ms-22 { font-size: 22px; }
+
+/* Warna */
+.bg-ep-lowest { background: var(--ep-lowest); }
+.bg-ep-low { background: var(--ep-low); }
+.bg-ep-cont { background: var(--ep-cont); }
+.bg-ep-highest { background: var(--ep-highest); }
+.bg-ep-pc { background: var(--ep-pc); }
+.bg-ep-sec { background: var(--ep-sec); color: var(--ep-on-sec); }
+.bg-ep-sec.text-white { color: var(--ep-on-sec) !important; }
+.bg-ep-sec10 { background: var(--ep-sec10); }
+.bg-ep-sec15 { background: var(--ep-sec15); }
+.bg-ep-pf { background: var(--ep-pf); }
+.bg-ep-pfd { background: var(--ep-pfd); }
+.bg-ep-tf { background: var(--ep-tf); }
+.bg-ep-errc { background: var(--ep-errc); }
+
+.text-ep-primary { color: var(--ep-primary); }
+.text-ep-sec { color: var(--ep-sec); }
+.text-ep-var { color: var(--ep-onv); }
+.text-ep-outline { color: var(--ep-outline); }
+.text-ep-on { color: var(--ep-on); }
+.text-ep-err { color: var(--ep-err); }
+.text-ep-tc { color: var(--ep-tc); }
+.text-ep-otc { color: var(--ep-otc); }
+
+/* Tipografi */
+.t-label-sm { font-size: 11px; line-height: 14px; font-weight: 700; }
+.t-label-md { font-size: 13px; line-height: 18px; font-weight: 600; }
+.t-body-sm { font-size: 12px; line-height: 16px; }
+.t-title-sm { font-size: 16px; line-height: 24px; font-weight: 700; }
+.t-hl-md { font-size: 20px; line-height: 28px; font-weight: 700; }
+.t-hl-lg { font-size: 28px; line-height: 36px; font-weight: 700; }
+
+/* Komponen */
+.ep-topbar {
+    height: 64px;
+    background: var(--ep-bg);
+    z-index: 1030;
+}
+
+.ep-wrap {
+    max-width: 80rem;
+    margin-inline: auto;
+}
+
+.ep-box {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.ep-b32 { width: 32px; height: 32px; }
+.ep-b36 { width: 36px; height: 36px; }
+.ep-b40 { width: 40px; height: 40px; }
+
+.ep-card {
+    background: var(--ep-lowest);
+    border: 1px solid var(--ep-border);
+    border-radius: 1rem;
+    padding: 1.25rem;
+    box-shadow: var(--ep-shadow);
+    transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.ep-accent {
+    border-left: 4px solid var(--accent, var(--ep-sec));
+}
+
+.ep-kpi:hover {
+    box-shadow: var(--ep-shadow-hover);
+}
+
+.ep-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    border-radius: 50rem;
+    padding: 0.125rem 0.625rem;
+}
+
+.ep-pill-sec {
+    border: 1px solid var(--ep-sec-border);
+}
+
+.ep-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.ep-press:active {
+    transform: scale(0.95);
+}
+
+.ep-iconbtn {
+    width: 40px;
+    height: 40px;
+    border: 0;
+    background: transparent;
+    color: var(--ep-onv);
+    border-radius: 50%;
+    transition: background 0.15s;
+}
+
+.ep-iconbtn:hover {
+    background: var(--ep-cont);
+}
+
+.ep-action {
+    width: 100%;
+    text-align: left;
+    background: var(--ep-lowest);
+    color: var(--ep-on);
+    border: 1px solid var(--ep-border);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.ep-action:hover {
+    border-color: var(--ep-sec-border);
+    background: var(--ep-low);
+}
+
+.ep-action.danger:hover {
+    border-color: var(--ep-err-border);
+    background: var(--ep-err-hover-bg);
+}
+
+.ep-action .ep-box {
+    transition: transform 0.15s;
+}
+
+.ep-action:hover .ep-box {
+    transform: scale(1.05);
+}
+
+.ep-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    border: 1px solid transparent;
+    border-radius: 0.75rem;
+    padding: 0.375rem 0.875rem;
+    transition: background-color 0.15s ease, opacity 0.15s ease;
+}
+
+.ep-btn-low {
+    background: var(--ep-low);
+    color: var(--ep-primary);
+    border-color: var(--ep-border-soft);
+}
+
+.ep-btn-low:hover {
+    background: var(--ep-cont);
+}
+
+.ep-btn-pc {
+    background: var(--ep-pc);
+    color: #ffffff;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+}
+
+.ep-btn-pc:hover {
+    opacity: 0.92;
+}
+
+.ep-route:hover {
+    border-color: var(--ep-sec-border);
+}
+
+.ep-route .head {
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--ep-cont);
+}
+
+.ep-progress {
+    height: 10px;
+    background: var(--ep-cont);
+    border-radius: 50rem;
+}
+
+.ep-progress .progress-bar {
+    background: var(--ep-sec);
+}
+
+.ep-check {
+    padding: 0.625rem;
+    border-radius: 0.75rem;
+    background: var(--ep-low);
+    border: 1px solid var(--ep-border-soft);
+}
+
+.ep-emergency-box {
+    background: var(--ep-emergency-bg);
+    border: 1px solid var(--ep-highest);
+}
+
+.ep-bottomnav {
+    background: var(--ep-bg);
+    z-index: 1040;
+    box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.ep-tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.375rem 0.75rem;
+    border-radius: 0.75rem;
+    color: var(--ep-onv);
+    text-decoration: none;
+    transition: all 0.15s;
+}
+
+.ep-tab:hover {
+    background: var(--ep-high);
+}
+
+.ep-tab.active {
+    background: var(--ep-pc);
+    color: #ffffff;
+}
+
+@media (max-width: 767.98px) {
+    .t-title-md-resp {
+        font-size: 22px;
+    }
+}
+
+@media (forced-colors: active) {
+    .ep-card,
+    .ep-action,
+    .ep-check,
+    .ep-pill,
+    .ep-btn,
+    .ep-emergency-box {
+        border: 1px solid CanvasText;
+        box-shadow: none;
+    }
+}

@@ -10,6 +10,11 @@ class ExamPackage extends BasedModel
         return $this->belongsTo(School::class);
     }
 
+    public function subject()
+    {
+        return $this->belongsTo(Subject::class);
+    }
+
     // Scope
     public function scopeActive($query)
     {

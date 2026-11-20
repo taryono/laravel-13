@@ -1,14 +1,11 @@
-{{ Form::open(['method' => 'POST', 'route' => ['payslip.store'], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
-    <div class="row">
-        <div class="col-md-6 mb-3">
-            @forelse ($forms as $key => $form)
-                <div class="form-group">
-                    <label for="name">{{ say($form['label']) }}</label>
-                    {!! $form['content'] !!}
-                </div>
-            @empty
-                <p>{{ say('Data Tidak Ditemukan') }}</p>
-            @endforelse
-        </div>
+<div class="card border-0">
+    <div class="card-header bg-transparent border-0 pb-0">
+        <h5 class="card-title mb-0 fw-bold text-primary">Tambah Data Payslip Baru</h5>
+        <small class="text-muted">Isi informasi slip gaji karyawan untuk periode terkait</small>
     </div>
-{{ Form::close() }}  
+    <div class="card-body">
+        {{ Form::open(['method' => 'POST', 'route' => ['payslip.store'], 'class' => 'form-horizontal form-validation', 'id' => 'formPayslip', 'enctype' => 'multipart/form-data', 'autocomplete' => 'off', 'data-validate' => 'true', 'novalidate' => true]) }}
+        @include('Payslip::_form')
+        {{ Form::close() }}
+    </div>
+</div>

@@ -7,16 +7,34 @@ class PayrollRun extends BasedModel
     protected $table = 'payroll_runs';
     
     protected $fillable = [
+        'organization_id',
         'payroll_period_id',
+        'run_number',
+        'run_type',
         'code',
         'total_employees',
+        'total_gross',
         'total_gross_salary',
+        'total_deduction',
         'total_deductions',
+        'total_company_contribution',
+        'total_tax',
+        'total_net',
         'total_net_salary',
         'status',
+        'calculated_at',
+        'approved_by',
+        'approved_at',
+        'posted_by',
+        'posted_at',
+        'locked_by',
+        'locked_at',
         'processed_by',
         'processed_at',
-        'notes'
+        'notes',
+        'created_by',
+        'updated_by',
+        'version',
     ];
 
     protected $casts = [
