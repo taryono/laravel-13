@@ -6,7 +6,6 @@
     <link rel="stylesheet" href="{{ asset('assets/css/budgeting.css') }}">
 @endpush
 @section('content')
-
     <div class="bgt d-flex flex-column gap-4">
         @include('Dashboard::partials.ep_subnav', [
             'title' => 'Modul Budgeting & RAPBS',
@@ -18,24 +17,7 @@
         ])
         <!-- Page Header -->
         <section
-            class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center gap-3 bg-lowest p-3 p-sm-4 r-2xl border-soft shadow-sm">
-            <div class="d-flex flex-column gap-2">
-                <div class="d-flex align-items-center gap-2 flex-wrap">
-                    <a href="{{ route('dashboard.back-to-home') }}" class="back-link back-to-home text-body-sm pressable">
-                        <span class="material-symbols-outlined icon-16">arrow_back</span>
-                        <span>Kembali ke Beranda</span>
-                    </a>
-                    <span class="bpill text-label-sm bg-secondary-container" style="color:var(--c-on-secondary-container)">
-                        <span class="material-symbols-outlined icon-14">verified</span>
-                        Realisasi 72.8%
-                    </span>
-                </div>
-                <div>
-                    <h1 class="text-display-sm page-title tc-primary mb-0">Modul Budgeting &amp; RAPBS</h1>
-                    <p class="tc-variant mb-0">Rencana Anggaran Pendapatan &amp; Belanja Sekolah TA 2024/2025</p>
-                </div>
-            </div>
-
+            class="d-flex flex-column flex-md-row justify-content-md-end align-items-md-center gap-3 bg-lowest p-3 p-sm-4 r-2xl border-soft shadow-sm">
             <div class="d-flex flex-wrap align-items-center gap-2">
                 <button type="button" class="btn-edu btn-edu-outline pressable">
                     <span class="material-symbols-outlined tc-secondary">file_download</span>

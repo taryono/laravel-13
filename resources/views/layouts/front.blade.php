@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EduPulse — Platform Sekolah All-in-One</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap"
@@ -490,7 +490,7 @@
                     </button>
                     <a href="{{ route('trial.form') }}" class="btn btn-brand">Get Started</a>
                     @if (!auth()->check())
-                        <a href="{{ url('/login-option') }}" class="btn btn-brand">Login</a>
+                        <a href="{{ url('/login-option') }}" class="btn btn-brand login-button">Login</a>
                     @else
                         <a href="{{ url('/dashboard') }}" class="btn btn-brand">Dashboard</a>
                     @endif
@@ -566,6 +566,9 @@
         </div>
     </footer>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/4.1.0/jquery.min.js"
+        integrity="sha512-LAwtVcZXPhBWVFQr9JK27ozsjKIZWJ6Y811gxInOV82L55pvK12upCcTye8dhlVJ5iIllnd4LO0zq9Ue80vxbQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     @stack('scripts')
     <script>
@@ -612,7 +615,9 @@
                     navbarCustom.classList.remove('is-stuck');
                 }
             };
-            window.addEventListener('scroll', handleScroll, { passive: true });
+            window.addEventListener('scroll', handleScroll, {
+                passive: true
+            });
             handleScroll();
         }
     </script>

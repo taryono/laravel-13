@@ -44,7 +44,7 @@
 
     <!-- KPI Bento -->
     <section>
-        <div class="row g-3">
+        <div class="row g-3 mt-3">
 
             <!-- Saldo Kas & Bank -->
             <div class="col-12 col-sm-6 col-lg-3">
@@ -196,13 +196,13 @@
     </section>
 
     <!-- Content Grid -->
-    <div class="row g-4">
+    <div class="row mt-3 g-4">
 
         <!-- LEFT: Journal Entries -->
         <section class="col-12 col-lg-8">
             <div class="card-soft p-4">
 
-                <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-2 pb-3 border-bottom"
+                <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-2 pb-3 border-bottom "
                     style="border-color:var(--surface-container)!important;">
                     <div>
                         <h2 class="text-headline-md text-primary mb-0">Entri Jurnal Keuangan Terbaru</h2>

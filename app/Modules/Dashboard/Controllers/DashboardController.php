@@ -308,4 +308,14 @@ class DashboardController extends MainController
     {
         return view('Dashboard::dashboard.shuttle-service.index');
     }
+
+    private function facilityView($request)
+    {
+        return view('Dashboard::dashboard.facility.index');
+    }
+
+    private function cmsView($request)
+    {
+        return view('Dashboard::dashboard.cms.index');
+    }
 }

@@ -4,8 +4,8 @@
     <!-- HERO -->
     <style>
         /* ============================================
-            VARIABEL DASAR (akan berubah sesuai tema)
-        ============================================ */
+                                                                                        VARIABEL DASAR (akan berubah sesuai tema)
+                                                                                    ============================================ */
         :root {
             --brand-blue: #2f5ce0;
             --brand-blue-dark: #1d3fa8;
@@ -34,8 +34,8 @@
         }
 
         /* ============================================
-                                                                           MODE GELAP
-                                                                        ============================================ */
+                                                                                                                                                       MODE GELAP
+                                                                                                                                                    ============================================ */
         [data-bs-theme="dark"] {
             --bg-body: #0a0e1a;
             --bg-soft: #151d2e;
@@ -59,8 +59,8 @@
         }
 
         /* ============================================
-                                                                           GLOBAL STYLES
-                                                                        ============================================ */
+                                                                                                                                                       GLOBAL STYLES
+                                                                                                                                                    ============================================ */
         h1,
         h2,
         h3,
@@ -100,8 +100,8 @@
         }
 
         /* ============================================
-                                                                           HERO
-                                                                        ============================================ */
+                                                                                                                                                       HERO
+                                                                                                                                                    ============================================ */
         .hero {
             background: linear-gradient(135deg, var(--hero-gradient-start) 0%, var(--hero-gradient-mid) 60%, var(--hero-gradient-end) 100%);
             position: relative;
@@ -151,8 +151,8 @@
         }
 
         /* ============================================
-                                                                           SECTIONS
-                                                                        ============================================ */
+                                                                                                                                                       SECTIONS
+                                                                                                                                                    ============================================ */
         .section-eyebrow-title {
             font-weight: 800;
             font-size: 2rem;
@@ -176,8 +176,8 @@
         }
 
         /* ============================================
-                                                                           FEATURE CARDS
-                                                                        ============================================ */
+                                                                                                                                                       FEATURE CARDS
+                                                                                                                                                    ============================================ */
         .feature-card {
             background: var(--bg-body);
             border: 1px solid var(--border-color);
@@ -225,8 +225,8 @@
         }
 
         /* ============================================
-                                                                           STEPS
-                                                                        ============================================ */
+                                                                                                                                                       STEPS
+                                                                                                                                                    ============================================ */
         .step-circle {
             width: 56px;
             height: 56px;
@@ -269,8 +269,8 @@
         }
 
         /* ============================================
-                                                                           STATS
-                                                                        ============================================ */
+                                                                                                                                                       STATS
+                                                                                                                                                    ============================================ */
         .stats-section {
             background: var(--brand-blue);
             color: #fff;
@@ -298,8 +298,8 @@
         }
 
         /* ============================================
-                                                                           PRICING
-                                                                        ============================================ */
+                                                                                                                                                       PRICING
+                                                                                                                                                    ============================================ */
         .price-card {
             background: var(--bg-body);
             border: 1.5px solid var(--border-color);
@@ -373,8 +373,8 @@
         }
 
         /* ============================================
-                                                                           TESTIMONIALS
-                                                                        ============================================ */
+                                                                                                                                                       TESTIMONIALS
+                                                                                                                                                    ============================================ */
         .testi-card {
             background: var(--bg-body);
             border: 1px solid var(--border-color);
@@ -405,8 +405,8 @@
         }
 
         /* ============================================
-                                                                           VIDEO CTA
-                                                                        ============================================ */
+                                                                                                                                                       VIDEO CTA
+                                                                                                                                                    ============================================ */
         .video-cta {
             position: relative;
             background: linear-gradient(180deg, var(--video-overlay), rgba(0, 0, 0, 0.85)),
@@ -441,8 +441,8 @@
         }
 
         /* ============================================
-                                                                           RESOURCES
-                                                                        ============================================ */
+                                                                                                                                                       RESOURCES
+                                                                                                                                                    ============================================ */
         .resource-item {
             display: flex;
             gap: 1rem;
@@ -483,8 +483,8 @@
         }
 
         /* ============================================
-                                                                           FOOTER
-                                                                        ============================================ */
+                                                                                                                                                       FOOTER
+                                                                                                                                                    ============================================ */
         footer {
             background: var(--footer-bg);
             color: var(--footer-text);
@@ -566,8 +566,8 @@
         }
 
         /* ============================================
-                                                                           NAVBAR TOGGLER
-                                                                        ============================================ */
+                                                                                                                                                       NAVBAR TOGGLER
+                                                                                                                                                    ============================================ */
         .navbar-toggler {
             border: 1.5px solid var(--border-color);
             border-radius: 8px;
@@ -587,8 +587,8 @@
         }
 
         /* ============================================
-                                                                           RESPONSIVE FIX
-                                                                        ============================================ */
+                                                                                                                                                       RESPONSIVE FIX
+                                                                                                                                                    ============================================ */
         @media (max-width: 768px) {
             .hero h1 {
                 font-size: 2rem;
@@ -656,15 +656,16 @@
                             @if ($slider->type === 'image' && $slider->image_url)
                                 {{-- === TIPE IMAGE === --}}
                                 @if ($slider->link_url)
-                                    <a href="{{ $slider->link_url }}" target="{{ $slider->link_target }}" class="d-block h-100">
+                                    <a href="{{ $slider->link_url }}" target="{{ $slider->link_target }}"
+                                        class="d-block h-100">
                                 @endif
-                                    <div class="hero-slide-image"
-                                        style="background-image:url('{{ $slider->image_url }}');
+                                <div class="hero-slide-image"
+                                    style="background-image:url('{{ $slider->image_url }}');
                                                                                                                                                             @if ($overlay) box-shadow: inset 0 0 0 9999px {{ $overlay }}; @endif">
-                                    </div>
-                                    @if ($slider->link_url)
-                                        </a>
-                                    @endif
+                                </div>
+                                @if ($slider->link_url)
+                                    </a>
+                                @endif
                             @elseif($slider->type === 'html')
                                 {{-- === TIPE HTML / BLADE === --}}
                                 <div class="hero-slide-html h-100">
@@ -706,7 +707,7 @@
                         <div class="feature-icon"><i class="fa-solid fa-book-open"></i></div>
                         <h5>Akademik</h5>
                         <p>Manajemen Kurikulum Merdeka, e-Learning, dan Rapor Digital otomatis.</p>
-                        <a href="#" class="detail-link">Lihat Detail →</a>
+                        <a href="/akademik" class="detail-link">Lihat Detail →</a>
                     </div>
                 </div>
                 <div class="col-md-6 col-lg-4">
@@ -714,7 +715,7 @@
                         <div class="feature-icon"><i class="fa-solid fa-user-group"></i></div>
                         <h5>Kesiswaan</h5>
                         <p>PPDB Online, profil lengkap siswa, hingga manajemen alumni dan prestasi.</p>
-                        <a href="#" class="detail-link">Lihat Detail →</a>
+                        <a href="/kesiswaan" class="detail-link">Lihat Detail →</a>
                     </div>
                 </div>
                 <div class="col-md-6 col-lg-4">
@@ -722,7 +723,7 @@
                         <div class="feature-icon"><i class="fa-solid fa-wallet"></i></div>
                         <h5>Keuangan</h5>
                         <p>Pembayaran SPP Online (QRIS/VA), laporan BOS, dan RKAS otomatis.</p>
-                        <a href="#" class="detail-link">Lihat Detail →</a>
+                        <a href="/keuangan" class="detail-link">Lihat Detail →</a>
                     </div>
                 </div>
                 <div class="col-md-6 col-lg-4">
@@ -730,7 +731,7 @@
                         <div class="feature-icon"><i class="fa-solid fa-calendar-check"></i></div>
                         <h5>Absensi</h5>
                         <p>QR Code, RFID, hingga Face Recognition dengan notifikasi WhatsApp ke orang tua.</p>
-                        <a href="#" class="detail-link">Lihat Detail →</a>
+                        <a href="/absensi" class="detail-link">Lihat Detail →</a>
                     </div>
                 </div>
                 <div class="col-md-6 col-lg-4">
@@ -738,7 +739,7 @@
                         <div class="feature-icon"><i class="fa-solid fa-people-roof"></i></div>
                         <h5>Parent Portal</h5>
                         <p>Dashboard khusus orang tua untuk pantau nilai, absensi, dan pembayaran real-time.</p>
-                        <a href="#" class="detail-link">Lihat Detail →</a>
+                        <a href="/parent-portal" class="detail-link">Lihat Detail →</a>
                     </div>
                 </div>
                 <div class="col-md-6 col-lg-4">
@@ -746,7 +747,7 @@
                         <div class="feature-icon"><i class="fa-solid fa-chart-line"></i></div>
                         <h5>Analitik AI</h5>
                         <p>Prediksi kelulusan dan analisis perkembangan akademik berbasis kecerdasan buatan.</p>
-                        <a href="#" class="detail-link">Lihat Detail →</a>
+                        <a href="/analitik" class="detail-link">Lihat Detail →</a>
                     </div>
                 </div>
             </div>
@@ -976,7 +977,7 @@
                         <div>
                             <h6>Dokumentasi</h6>
                             <p>Panduan lengkap demi langkah penggunaan setiap modul EduPulse.</p>
-                            <a href="#">Pelajari →</a>
+                            <a href="/dokumentasi?">Pelajari →</a>
                         </div>
                     </div>
                 </div>
@@ -986,7 +987,7 @@
                         <div>
                             <h6>Blog Edukasi</h6>
                             <p>Artikel tips implementasi teknologi di sekolah dan tren pendidikan terbaru.</p>
-                            <a href="#">Baca Artikel →</a>
+                            <a href="/blog">Baca Artikel →</a>
                         </div>
                     </div>
                 </div>
@@ -996,7 +997,7 @@
                         <div>
                             <h6>Kontak Sales</h6>
                             <p>Hubungi tim kami untuk trial kustom atau demo lanjutan khusus sekolah Anda.</p>
-                            <a href="#">Hubungi Kami →</a>
+                            <a href="/kontak">Hubungi Kami →</a>
                         </div>
                     </div>
                 </div>
@@ -1006,7 +1007,7 @@
                         <div>
                             <h6>Keamanan Data</h6>
                             <p>Informasi tentang bagaimana kami menjaga privasi dan keamanan data sekolah.</p>
-                            <a href="#">Selengkapnya →</a>
+                            <a href="/security">Selengkapnya →</a>
                         </div>
                     </div>
                 </div>
@@ -1016,7 +1017,7 @@
                         <div>
                             <h6>FAQ</h6>
                             <p>Jawaban atas pertanyaan yang paling sering diajukan oleh pengguna baru.</p>
-                            <a href="#">Lihat Pertanyaan →</a>
+                            <a href="/faq">Lihat Pertanyaan →</a>
                         </div>
                     </div>
                 </div>
@@ -1026,7 +1027,7 @@
                         <div>
                             <h6>Update Terbaru</h6>
                             <p>Catatan rilis fitur-fitur baru yang kami luncurkan setiap bulannya.</p>
-                            <a href="#">Cek Changelog →</a>
+                            <a href="/changelog?">Cek Changelog →</a>
                         </div>
                     </div>
                 </div>
