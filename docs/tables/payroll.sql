@@ -426,31 +426,33 @@ CREATE TABLE `payroll_payments` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
 -- ----------------------------
--- Table structure for `payroll_periods`
+-- Table structure for payroll_periods
 -- ----------------------------
 DROP TABLE IF EXISTS `payroll_periods`;
-CREATE TABLE `payroll_periods` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `organization_id` bigint unsigned NOT NULL,
+CREATE TABLE `payroll_periods`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `code` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `organization_id` bigint UNSIGNED NOT NULL,
   `period` varchar(7) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `start_date` date NOT NULL,
   `end_date` date NOT NULL,
-  `payment_date` date DEFAULT NULL,
+  `payment_date` date NULL DEFAULT NULL,
   `status` enum('open','processing','approved','paid','closed','cancelled') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'open',
-  `is_closed` tinyint(1) NOT NULL DEFAULT '0',
+  `is_closed` tinyint(1) NOT NULL DEFAULT 0,
   `closed_at` timestamp NULL DEFAULT NULL,
-  `closed_by` bigint unsigned DEFAULT NULL,
+  `closed_by` bigint UNSIGNED NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
-  `created_by` bigint unsigned DEFAULT NULL,
-  `updated_by` bigint unsigned DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE KEY `payroll_periods_org_period_unique` (`organization_id`,`period`) USING BTREE,
-  KEY `payroll_periods_status_index` (`status`) USING BTREE,
-  KEY `payroll_periods_deleted_at_index` (`deleted_at`) USING BTREE,
+  UNIQUE INDEX `payroll_periods_org_period_unique`(`organization_id` ASC, `period` ASC) USING BTREE,
+  INDEX `payroll_periods_status_index`(`status` ASC) USING BTREE,
+  INDEX `payroll_periods_deleted_at_index`(`deleted_at` ASC) USING BTREE,
   CONSTRAINT `payroll_periods_org_fk` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Table structure for `payroll_permissions`

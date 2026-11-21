@@ -5,7 +5,12 @@
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">Daftar Deduction</h5>
-                <a href="{{ route('deduction.create') }}" class="btn btn-primary btn-sm">Tambah Baru</a>
+                <button type="button" class="btn btn-primary btn-sm" data-toggle="ajax-modal" data-size="lg" data-method="GET"
+                    data-title="Tambah Data Potongan Baru" data-url="{{ route('deduction.create') }}"
+                    data-submit='<button class="btn btn-primary" type="submit" form="formDeduction">Simpan</button>'
+                    data-cancel='<button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Batal</button>'>
+                    <i class="bi bi-plus-circle"></i> Tambah Baru
+                </button>
             </div>
             <div class="card-body">
                 @if (session('success'))

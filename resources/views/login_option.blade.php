@@ -379,146 +379,189 @@
         }
 
         /* ============================
-                                                                                       BOTTOM SHEET & DESKTOP DIALOG (Offcanvas)
-                                                                                       ============================ */
-        .offcanvas-portal {
-            height: auto;
-            max-height: 90vh;
-            border-top-left-radius: 1.5rem;
-            border-top-right-radius: 1.5rem;
-            border-top: none;
-            box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+           BOTTOM SHEET & DESKTOP DIALOG (Offcanvas)
+           ============================ */
+        .offcanvas-portal.offcanvas-bottom {
+            height: auto !important;
+            max-height: 88vh !important;
+            width: 100% !important;
+            max-width: 480px !important;
+            margin: 0 auto !important;
+            border-top-left-radius: 1.5rem !important;
+            border-top-right-radius: 1.5rem !important;
+            border-bottom-left-radius: 0 !important;
+            border-bottom-right-radius: 0 !important;
+            border-top: 1px solid var(--bs-border-color) !important;
+            border-left: 1px solid var(--bs-border-color) !important;
+            border-right: 1px solid var(--bs-border-color) !important;
+            border-bottom: none !important;
+            box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.18);
+            overflow-y: auto;
         }
 
-        [data-bs-theme="dark"] .offcanvas-portal {
-            box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.6);
+        [data-bs-theme="dark"] .offcanvas-portal.offcanvas-bottom {
+            box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.65);
         }
 
-        /* Di layar Desktop (>=768px), ubah bottom-sheet menjadi centered dialog modal */
+        /* Di layar Desktop (>=768px), ubah bottom-sheet menjadi dialog modal proporsional */
         @media (min-width: 768px) {
             .offcanvas-portal.offcanvas-bottom {
-                position: fixed;
+                position: fixed !important;
                 top: 50% !important;
                 bottom: auto !important;
                 left: 50% !important;
                 right: auto !important;
-                transform: translate(-50%, -46%) scale(0.96) !important;
-                opacity: 0;
-                width: 100% !important;
-                max-width: 500px !important;
+                width: calc(100% - 2rem) !important;
+                max-width: 420px !important;
+                margin: 0 !important;
                 border-radius: 1.5rem !important;
                 border: 1px solid var(--bs-border-color) !important;
-                box-shadow: 0 24px 64px rgba(0, 0, 0, 0.3) !important;
+                box-shadow: 0 24px 64px rgba(0, 0, 0, 0.22) !important;
+                transform: translate(-50%, -46%) scale(0.96) !important;
+                opacity: 0;
                 visibility: hidden;
+                transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease, visibility 0.25s;
             }
 
+            [data-bs-theme="dark"] .offcanvas-portal.offcanvas-bottom {
+                box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6) !important;
+            }
+
+            .offcanvas-portal.offcanvas-bottom.showing,
             .offcanvas-portal.offcanvas-bottom.show {
                 transform: translate(-50%, -50%) scale(1) !important;
-                opacity: 1;
-                visibility: visible;
+                opacity: 1 !important;
+                visibility: visible !important;
             }
 
-            .sheet-handle {
-                display: none !important;
+            .offcanvas-portal.offcanvas-bottom.hiding {
+                transform: translate(-50%, -46%) scale(0.96) !important;
+                opacity: 0 !important;
             }
         }
 
-        .sheet-handle {
-            width: 48px;
-            height: 5px;
+        .sheet-drag-handle {
+            width: 42px;
+            height: 4px;
             background: var(--bs-secondary-bg);
             border-radius: 999px;
-            margin: 0 auto 0.75rem;
-            cursor: pointer;
+            margin: 0.75rem auto 0.25rem;
         }
 
         .sheet-close-btn {
-            width: 44px;
-            height: 44px;
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
-            border: none;
+            border: 1px solid var(--bs-border-color);
             background: var(--bs-tertiary-bg);
             color: var(--bs-secondary-color);
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            transition: background 0.2s, color 0.2s;
-            flex-shrink: 0;
+            transition: all 0.2s ease;
+            z-index: 5;
+            cursor: pointer;
         }
 
         .sheet-close-btn:hover {
             background: var(--bs-secondary-bg);
             color: var(--bs-body-color);
+            transform: rotate(90deg);
         }
 
         /* Modal icon badge */
         .modal-icon-badge {
-            width: 48px;
-            height: 48px;
-            border-radius: 1rem;
+            width: 56px;
+            height: 56px;
+            border-radius: 1.125rem;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
-            font-size: 1.35rem;
+            font-size: 1.5rem;
             border: 1px solid;
+            box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.08);
         }
 
         .modal-icon-badge.kantin {
             background: #FFF7ED;
             color: var(--kantin);
             border-color: #FFEDD5;
+            box-shadow: 0 8px 20px -4px rgba(234, 88, 12, 0.2);
         }
 
         .modal-icon-badge.siswa {
             background: #EFF6FF;
             color: var(--siswa);
             border-color: #DBEAFE;
+            box-shadow: 0 8px 20px -4px rgba(37, 99, 235, 0.2);
         }
 
         .modal-icon-badge.ppdb {
             background: #F0FDF4;
             color: var(--ppdb);
             border-color: #DCFCE7;
+            box-shadow: 0 8px 20px -4px rgba(22, 163, 74, 0.2);
         }
 
         .modal-icon-badge.guru {
             background: #EEF2FF;
             color: var(--guru);
             border-color: #E0E7FF;
+            box-shadow: 0 8px 20px -4px rgba(99, 102, 241, 0.2);
         }
 
         [data-bs-theme="dark"] .modal-icon-badge.kantin {
             background: rgba(234, 88, 12, 0.18);
             border-color: rgba(234, 88, 12, 0.35);
+            box-shadow: 0 8px 20px -4px rgba(234, 88, 12, 0.3);
         }
 
         [data-bs-theme="dark"] .modal-icon-badge.siswa {
             background: rgba(37, 99, 235, 0.18);
             border-color: rgba(37, 99, 235, 0.35);
+            box-shadow: 0 8px 20px -4px rgba(37, 99, 235, 0.3);
         }
 
         [data-bs-theme="dark"] .modal-icon-badge.ppdb {
             background: rgba(22, 163, 74, 0.18);
             border-color: rgba(22, 163, 74, 0.35);
+            box-shadow: 0 8px 20px -4px rgba(22, 163, 74, 0.3);
         }
 
         [data-bs-theme="dark"] .modal-icon-badge.guru {
             background: rgba(99, 102, 241, 0.18);
             border-color: rgba(99, 102, 241, 0.35);
+            box-shadow: 0 8px 20px -4px rgba(99, 102, 241, 0.3);
         }
 
         .portal-feature-pill {
             background: var(--bs-tertiary-bg);
             border: 1px solid var(--bs-border-color);
-            border-radius: 0.75rem;
-            padding: 0.65rem 0.85rem;
+            border-radius: 0.875rem;
+            padding: 0.65rem 0.875rem;
             font-size: 0.825rem;
             color: var(--bs-body-color);
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.65rem;
+            line-height: 1.4;
+        }
+
+        .sheet-btn-primary {
+            min-height: 48px;
+            font-weight: 600;
+            border-radius: 0.875rem;
+        }
+
+        .sheet-btn-secondary {
+            min-height: 42px;
+            border-radius: 0.875rem;
+            font-size: 0.875rem;
+            border: 1px solid var(--bs-border-color);
         }
     </style>
 
@@ -734,17 +777,20 @@
     </main>
 
     <!-- ==================== RESPONSIVE LOGIN OFFCANVAS / MODAL ==================== -->
-    <div class="offcanvas offcanvas-bottom offcanvas-portal" tabindex="-1" id="loginSheet"
+    <div class="offcanvas offcanvas-bottom offcanvas-portal position-relative" tabindex="-1" id="loginSheet"
         aria-labelledby="loginSheetLabel" data-bs-backdrop="true">
-        <div class="offcanvas-header pb-0 pt-3 px-4 d-flex align-items-center justify-content-between">
-            <div class="sheet-handle"></div>
-            <button type="button" class="sheet-close-btn ms-auto" data-bs-dismiss="offcanvas"
-                aria-label="Tutup dialog">
-                <i class="bi bi-x-lg fs-6"></i>
-            </button>
+        <!-- Drag Handle for Mobile Viewport -->
+        <div class="d-md-none text-center">
+            <div class="sheet-drag-handle"></div>
         </div>
 
-        <div class="offcanvas-body pt-2 pb-4 px-4">
+        <!-- Close Button (Pinned Top Right) -->
+        <button type="button" class="sheet-close-btn" data-bs-dismiss="offcanvas"
+            aria-label="Tutup dialog">
+            <i class="bi bi-x-lg fs-6"></i>
+        </button>
+
+        <div class="offcanvas-body pt-3 pb-4 px-4">
             <div class="text-center mb-4">
                 <div id="sheetIconBadge" class="modal-icon-badge guru mb-3">
                     <i id="sheetIcon" class="bi bi-person-badge"></i>
@@ -758,19 +804,23 @@
             <!-- Features Summary in Modal -->
             <div class="mb-4 d-flex flex-column gap-2" id="sheetFeatureList">
                 <div class="portal-feature-pill">
-                    <i class="bi bi-shield-check text-success fs-6"></i>
-                    <span id="sheetPillText">Akses aman dengan enkripsi kredensial</span>
+                    <i id="sheetPillIcon" class="bi bi-journal-bookmark-fill text-primary flex-shrink-0"></i>
+                    <span id="sheetPillText">Manajemen kurikulum, input nilai rapor, dan presensi</span>
+                </div>
+                <div class="portal-feature-pill">
+                    <i class="bi bi-shield-check text-success flex-shrink-0"></i>
+                    <span id="sheetSecurityText">Autentikasi aman terenkripsi &amp; sesi terlindungi</span>
                 </div>
             </div>
 
             <!-- Action Buttons -->
             <div class="d-grid gap-2">
                 <a id="sheetLoginButton" href="{{ route('login') }}"
-                    class="btn btn-role btn-guru w-100 d-flex align-items-center justify-content-center gap-2">
+                    class="btn btn-role btn-guru sheet-btn-primary w-100 d-flex align-items-center justify-content-center gap-2">
                     <span>Lanjutkan ke Halaman Login</span>
                     <i class="bi bi-arrow-right"></i>
                 </a>
-                <button type="button" class="btn btn-light py-2 text-secondary" data-bs-dismiss="offcanvas">
+                <button type="button" class="btn btn-light sheet-btn-secondary text-secondary" data-bs-dismiss="offcanvas">
                     Batal / Pilih Peran Lain
                 </button>
             </div>
@@ -789,37 +839,41 @@
                 title: 'Portal Kantin & Kasir',
                 desc: 'Akses khusus untuk kasir dan pengelola tenant kantin sekolah.',
                 icon: 'bi-shop',
+                pillIcon: 'bi-receipt-cutoff text-warning',
                 roleClass: 'kantin',
                 btnClass: 'btn-kantin',
                 url: '{{ route('login') }}',
-                pill: 'Pencatatan transaksi dan manajemen saldo digital siswa'
+                pill: 'Pencatatan kasir, menu kantin & transaksi non-tunai'
             },
             siswa: {
                 title: 'Portal Siswa & Wali Murid',
-                desc: 'Akses informasi akademik, status seleksi calon siswa, dan biodata.',
+                desc: 'Akses informasi akademik, status seleksi siswa, dan biodata.',
                 icon: 'bi-people',
+                pillIcon: 'bi-mortarboard-fill text-primary',
                 roleClass: 'siswa',
                 btnClass: 'btn-siswa',
                 url: '{{ route('ppdb.login') }}',
-                pill: 'Pantau kelulusan, jadwal belajar, dan kartu ujian siswa'
+                pill: 'Pantau kelulusan, jadwal belajar, dan kartu ujian'
             },
             ppdb: {
                 title: 'Portal Admin PPDB',
-                desc: 'Pintu masuk panitia pendaftaran untuk verifikasi berkas dan kuota jalur masuk.',
+                desc: 'Pintu masuk panitia pendaftaran untuk verifikasi berkas dan kuota.',
                 icon: 'bi-clipboard-check',
+                pillIcon: 'bi-file-earmark-check-fill text-success',
                 roleClass: 'ppdb',
                 btnClass: 'btn-ppdb',
                 url: '{{ route('ppdb-admin.login') }}',
-                pill: 'Manajemen berkas pendaftar baru dan rekapitulasi kuota'
+                pill: 'Verifikasi berkas pendaftar baru & rekap kuota'
             },
             guru: {
                 title: 'Portal Guru & Admin Sekolah',
                 desc: 'Akses terpadu untuk pendidik, staf tata usaha, dan admin sekolah.',
                 icon: 'bi-person-badge',
+                pillIcon: 'bi-journal-bookmark-fill text-indigo',
                 roleClass: 'guru',
                 btnClass: 'btn-guru',
                 url: '{{ route('login') }}',
-                pill: 'Manajemen kurikulum, input nilai rapor, dan presensi'
+                pill: 'Manajemen kurikulum, input nilai rapor & absensi'
             }
         };
 
@@ -832,6 +886,12 @@
             document.getElementById('sheetDescription').textContent = config.desc;
             document.getElementById('sheetPillText').textContent = config.pill;
 
+            // Update pill icon
+            const pillIcon = document.getElementById('sheetPillIcon');
+            if (pillIcon && config.pillIcon) {
+                pillIcon.className = 'bi ' + config.pillIcon + ' flex-shrink-0';
+            }
+
             // Update icon and badge
             const badge = document.getElementById('sheetIconBadge');
             badge.className = 'modal-icon-badge ' + config.roleClass + ' mb-3';
@@ -840,7 +900,7 @@
             // Update button
             const btn = document.getElementById('sheetLoginButton');
             btn.className = 'btn btn-role ' + config.btnClass +
-                ' w-100 d-flex align-items-center justify-content-center gap-2';
+                ' sheet-btn-primary w-100 d-flex align-items-center justify-content-center gap-2';
             btn.href = config.url;
 
             // Show offcanvas via Bootstrap 5 API

@@ -43,6 +43,11 @@ class PayrollPeriod extends BasedModel
         return $this->hasMany(Attendance::class);
     }
 
+    public function organization()
+    {
+        return $this->belongsTo(Organization::class);
+    }
+
     // Scope
     public function scopeActive($query)
     {

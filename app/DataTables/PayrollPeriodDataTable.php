@@ -17,7 +17,7 @@ class PayrollPeriodDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['name'];
+    protected array $columns = ['code', 'name', 'organization.name', 'period', 'start_date', 'end_date', 'payment_date', 'status', 'is_closed', 'closed_at', 'closed_by'];
 
     /**
      * Build DataTable response.
@@ -53,14 +53,14 @@ class PayrollPeriodDataTable extends DataTable
         $context = htmlspecialchars(
             json_encode([
                 'executeDraw' => true,
-                'tableId'     => 'payroll-period-table',
+                'tableId' => 'payroll-period-table',
                 'reloadDelay' => 500,
             ]),
             ENT_QUOTES,
             'UTF-8'
         );
 
-        $editUrl   = e(route('payroll_period.edit', $row));
+        $editUrl = e(route('payroll_period.edit', $row));
         $deleteUrl = e(route('payroll_period.destroy', $row));
 
         return <<<HTML
@@ -100,7 +100,7 @@ class PayrollPeriodDataTable extends DataTable
      */
     public function query(PayrollPeriod $model): QueryBuilder
     {
-        return $model->newQuery();
+        return $model->newQuery()->with(['organization']);
     }
 
     /**
@@ -139,13 +139,13 @@ class PayrollPeriodDataTable extends DataTable
                  */
                 'dom' =>
                     '<"row mb-3"' .
-                        '<"col-md-6 d-flex align-items-center"B>' .
-                        '<"col-md-6"f>' .
+                    '<"col-md-6 d-flex align-items-center"B>' .
+                    '<"col-md-6"f>' .
                     '>' .
                     'rt' .
                     '<"row mt-3"' .
-                        '<"col-md-6"i>' .
-                        '<"col-md-6 d-flex justify-content-md-end"p>' .
+                    '<"col-md-6"i>' .
+                    '<"col-md-6 d-flex justify-content-md-end"p>' .
                     '>',
 
                 /*
@@ -267,8 +267,8 @@ class PayrollPeriodDataTable extends DataTable
     protected function getColumns(): array
     {
         return collect($this->columns)
-            ->map(fn (string $kolom) => Column::make($kolom)
-                ->title(ucwords(str_replace(['_',"."], [' ',' '], $kolom))))
+            ->map(fn(string $kolom) => Column::make($kolom)
+                ->title(ucwords(str_replace(['_', "."], [' ', ' '], $kolom))))
             // 1. PREPEND: Masukkan kolom No di posisi PALING AWAL (indeks 0)
             ->prepend(
                 Column::make('DT_RowIndex')

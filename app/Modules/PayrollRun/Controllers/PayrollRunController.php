@@ -5,6 +5,7 @@ namespace App\Modules\PayrollRun\Controllers;
 use App\DataTables\PayrollRunDataTable;
 use App\Http\Controllers\MainController;
 use Models\PayrollRun;
+use Models\PayrollPeriod;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -13,6 +14,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 use Throwable;
 use App\Services\PayrollCalculationService;
+use Illuminate\Support\Facades\Auth;
 
 class PayrollRunController extends MainController
 {
@@ -41,18 +43,14 @@ class PayrollRunController extends MainController
      */
     public function create(): View
     {
-        $payrollRun = new PayrollRun();
+        $payroll_run = new PayrollRun();
         $periods = PayrollPeriod::where('is_closed', 0)
             ->where('status', 'completed')
             ->pluck('code', 'id');
-
-        $result = $this->getForm($payrollRun);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
-
+        $organizations = \Models\Organization::orderBy('name')->get();
         return view(
-            'PayrollRun::edit',
-            compact('payrollRun', 'forms', 'groupedForms', 'periods')
+            'PayrollRun::create',
+            compact('payroll_run', 'periods', 'organizations')
         );
     }
 
@@ -82,7 +80,7 @@ class PayrollRunController extends MainController
             Log::error('Gagal membuat Payroll Run.', [
                 'exception' => $e,
                 'data' => $validated,
-                'user_id' => auth()->id(),
+                'user_id' => Auth::id(),
             ]);
 
             return $this->errorResponse(
@@ -121,7 +119,7 @@ class PayrollRunController extends MainController
             Log::error('Gagal memproses Payroll.', [
                 'exception' => $e,
                 'payroll_run_id' => $id,
-                'user_id' => auth()->id(),
+                'user_id' => Auth::id(),
             ]);
 
             return $this->errorResponse(
@@ -136,12 +134,12 @@ class PayrollRunController extends MainController
      */
     public function show($id): View
     {
-        $payrollRun = $this->model->with([
+        $payroll_run = $this->model->with([
             'payrollDetails.employee',
             'payrollPeriod'
         ])->findOrFail($id);
 
-        return view('PayrollRun::show', compact('payrollRun'));
+        return view('PayrollRun::show', compact('payroll_run'));
     }
 
     /**
@@ -149,17 +147,13 @@ class PayrollRunController extends MainController
      */
     public function edit($id): View
     {
-        $payrollRun = $this->model->findOrFail($id);
+        $payroll_run = $this->model->findOrFail($id);
         $periods = PayrollPeriod::where('is_closed', 0)
             ->pluck('code', 'id');
-
-        $result = $this->getForm($payrollRun);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
-
+        $organizations = \Models\Organization::orderBy('name')->get();
         return view(
             'PayrollRun::edit',
-            compact('payrollRun', 'forms', 'groupedForms', 'periods')
+            compact('payroll_run', 'periods', 'organizations')
         );
     }
 
@@ -198,7 +192,7 @@ class PayrollRunController extends MainController
                 'exception' => $e,
                 'payroll_run_id' => $id,
                 'data' => $validated,
-                'user_id' => auth()->id(),
+                'user_id' => Auth::id(),
             ]);
 
             return $this->errorResponse(
@@ -237,7 +231,7 @@ class PayrollRunController extends MainController
             Log::error('Gagal menghapus Payroll Run.', [
                 'exception' => $e,
                 'payroll_run_id' => $id,
-                'user_id' => auth()->id(),
+                'user_id' => Auth::id(),
             ]);
 
             return $this->errorResponse(
@@ -268,7 +262,7 @@ class PayrollRunController extends MainController
             Log::error('Gagal ekspor payroll.', [
                 'exception' => $e,
                 'payroll_run_id' => $id,
-                'user_id' => auth()->id(),
+                'user_id' => Auth::id(),
             ]);
 
             return $this->errorResponse(

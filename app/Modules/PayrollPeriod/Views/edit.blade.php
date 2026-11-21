@@ -1,17 +1,3 @@
-{{ Form::model($payroll_period, ['method' => 'PUT', 'route' => ['payroll_period.update', $payroll_period->id], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
-    <div class="row">
-        <div class="col-md-6 mb-3">
-            @forelse ($forms as $key => $form)
-                <div class="row">
-                    <div class="col-md-12 mb-3">
-                        <label>{{ say($form['label']) }}</label>
-                        {!! $form['content'] !!}
-                    </div>
-                </div>
-            @empty
-                <p>{{ say('Data Tidak Ditemukan') }}</p>
-            @endforelse
-        </div> 
-    </div> 
+{{ Form::model($payroll_period, ['method' => 'PUT', 'route' => ['payroll_period.update', $payroll_run->id], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
+@include('PayrollPeriod::form', ['payrollPeriod' => new \Models\PayrollPeriod()])
 {{ Form::close() }}
-<!-- /.row -->

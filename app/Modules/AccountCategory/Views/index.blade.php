@@ -5,7 +5,12 @@
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">Daftar AccountCategory</h5>
-                <a href="{{ route('account_category.create') }}" class="btn btn-primary btn-sm">Tambah Baru</a>
+                <button type="button" class="btn btn-primary btn-sm" data-toggle="ajax-modal" data-size="lg" data-method="GET"
+                    data-title="Tambah Data Kategori COA Baru" data-url="{{ route('account_category.create') }}"
+                    data-submit='<button class="btn btn-primary" type="submit" form="formCoaCategory">Simpan</button>'
+                    data-cancel='<button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Batal</button>'>
+                    <i class="bi bi-plus-circle"></i> Tambah Baru
+                </button>
             </div>
             <div class="card-body">
                 @if (session('success'))

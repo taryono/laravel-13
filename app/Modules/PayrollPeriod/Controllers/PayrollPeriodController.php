@@ -32,11 +32,9 @@ class PayrollPeriodController extends MainController
     public function create(): View
     {
         $period = new PayrollPeriod();
-        $result = $this->getForm($period);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
+        $organizations = \Models\Organization::orderBy('name')->get();
 
-        return view('PayrollPeriod::create', compact('period', 'forms', 'groupedForms'));
+        return view('PayrollPeriod::create', compact('period', 'organizations'));
     }
 
     public function store(Request $request)
@@ -68,11 +66,9 @@ class PayrollPeriodController extends MainController
     public function edit($id): View
     {
         $period = $this->model->findOrFail($id);
-        $result = $this->getForm($period);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
+        $organizations = \Models\Organization::orderBy('name')->get();
 
-        return view('PayrollPeriod::edit', compact('period', 'forms', 'groupedForms'));
+        return view('PayrollPeriod::edit', compact('period', 'organizations'));
     }
 
     public function update(Request $request, $id)
