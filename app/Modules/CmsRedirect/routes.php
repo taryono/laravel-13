@@ -1,5 +1,6 @@
 <?php
 
+use App\Modules\CmsRedirect\Controllers\CmsRedirectController;
 use Illuminate\Support\Facades\Route;
 /*
 |--------------------------------------------------------------------------
@@ -23,5 +24,5 @@ Route::group(['prefix' => 'cms-redirect', 'namespace' => 'App\Modules\CmsRedirec
     Route::get('/edit/{id}', ['as' => 'cms_redirect.edit', 'uses' => 'CmsRedirectController@edit']);
     Route::put('/update/{id}', ['as' => 'cms_redirect.update', 'uses' => 'CmsRedirectController@update']);
     Route::delete('/delete/{id}', ['as' => 'cms_redirect.destroy', 'uses' => 'CmsRedirectController@destroy']);
-    
+    Route::patch('/{cmsRedirect}/toggle', ['as' => 'cms_redirect.toggle', 'uses' => 'CmsRedirectController@toggle']);
 });

@@ -112,7 +112,7 @@ CREATE TABLE `cms_categories` (
 DROP TABLE IF EXISTS `cms_comments`;
 CREATE TABLE `cms_comments` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `post_id` bigint unsigned NOT NULL,
+  `cms_post_id` bigint unsigned NOT NULL,
   `user_id` bigint unsigned DEFAULT NULL,
   `parent_id` bigint unsigned DEFAULT NULL,
   `name` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -127,7 +127,7 @@ CREATE TABLE `cms_comments` (
   PRIMARY KEY (`id`) USING BTREE,
   KEY `cms_comments_user_id_foreign` (`user_id`) USING BTREE,
   KEY `cms_comments_parent_id_foreign` (`parent_id`) USING BTREE,
-  KEY `cms_comments_post_id_status_index` (`post_id`,`status`) USING BTREE
+  KEY `cms_comments_post_id_status_index` (`cms_post_id`,`status`) USING BTREE
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
 -- ----------------------------
@@ -176,16 +176,16 @@ CREATE TABLE `cms_galleries` (
 DROP TABLE IF EXISTS `cms_gallery_items`;
 CREATE TABLE `cms_gallery_items` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `gallery_id` bigint unsigned NOT NULL,
-  `media_id` bigint unsigned DEFAULT NULL,
+  `cms_gallery_id` bigint unsigned NOT NULL,
+  `cms_media_id` bigint unsigned DEFAULT NULL,
   `image` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `caption` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sort_order` int unsigned NOT NULL DEFAULT '0',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
-  KEY `cms_gallery_items_gallery_id_foreign` (`gallery_id`) USING BTREE,
-  KEY `cms_gallery_items_media_id_foreign` (`media_id`) USING BTREE
+  KEY `cms_gallery_items_gallery_id_foreign` (`cms_gallery_id`) USING BTREE,
+  KEY `cms_gallery_items_media_id_foreign` (`cms_media_id`) USING BTREE
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
 -- ----------------------------
@@ -248,7 +248,7 @@ CREATE TABLE `cms_pages` (
 DROP TABLE IF EXISTS `cms_post_revisions`;
 CREATE TABLE `cms_post_revisions` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `post_id` bigint unsigned NOT NULL,
+  `cms_post_id` bigint unsigned NOT NULL,
   `user_id` bigint unsigned DEFAULT NULL,
   `title` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `excerpt` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
@@ -258,7 +258,7 @@ CREATE TABLE `cms_post_revisions` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   KEY `cms_post_revisions_user_id_foreign` (`user_id`) USING BTREE,
-  KEY `cms_post_revisions_post_id_revision_number_index` (`post_id`,`revision_number`) USING BTREE
+  KEY `cms_post_revisions_post_id_revision_number_index` (`cms_post_id`,`revision_number`) USING BTREE
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
 -- ----------------------------
@@ -266,10 +266,10 @@ CREATE TABLE `cms_post_revisions` (
 -- ----------------------------
 DROP TABLE IF EXISTS `cms_post_tag`;
 CREATE TABLE `cms_post_tag` (
-  `post_id` bigint unsigned NOT NULL,
-  `tag_id` bigint unsigned NOT NULL,
-  PRIMARY KEY (`post_id`,`tag_id`) USING BTREE,
-  KEY `cms_post_tag_tag_id_foreign` (`tag_id`) USING BTREE
+  `cms_post_id` bigint unsigned NOT NULL,
+  `cms_tag_id` bigint unsigned NOT NULL,
+  PRIMARY KEY (`cms_post_id`,`cms_tag_id`) USING BTREE,
+  KEY `cms_post_tag_tag_id_foreign` (`cms_tag_id`) USING BTREE
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=FIXED;
 
 -- ----------------------------
@@ -278,7 +278,7 @@ CREATE TABLE `cms_post_tag` (
 DROP TABLE IF EXISTS `cms_post_translations`;
 CREATE TABLE `cms_post_translations` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `post_id` bigint unsigned NOT NULL,
+  `cms_post_id` bigint unsigned NOT NULL,
   `locale` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `title` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `slug` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -289,42 +289,45 @@ CREATE TABLE `cms_post_translations` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE KEY `cms_post_translations_post_id_locale_unique` (`post_id`,`locale`) USING BTREE,
+  UNIQUE KEY `cms_post_translations_post_id_locale_unique` (`cms_post_id`,`locale`) USING BTREE,
   UNIQUE KEY `cms_post_translations_locale_slug_unique` (`locale`,`slug`) USING BTREE
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
 -- ----------------------------
 -- Table structure for `cms_posts`
 -- ----------------------------
+-- Contoh: cms_posts yang sudah diperbaiki
 DROP TABLE IF EXISTS `cms_posts`;
 CREATE TABLE `cms_posts` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `user_id` bigint unsigned NOT NULL,
   `cms_category_id` bigint unsigned DEFAULT NULL,
-  `title` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `slug` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `excerpt` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `featured_image` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `status` enum('draft','published','scheduled','archived') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'draft',
+  `title` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `slug` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `excerpt` text COLLATE utf8mb4_unicode_ci,
+  `content` longtext COLLATE utf8mb4_unicode_ci,
+  `featured_image` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `status` enum('draft','published','scheduled','archived') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'draft',
   `published_at` timestamp NULL DEFAULT NULL,
-  `is_featured` tinyint(1) NOT NULL DEFAULT '0',
-  `allow_comments` tinyint(1) NOT NULL DEFAULT '1',
+  `is_featured` tinyint NOT NULL DEFAULT '0',
+  `allow_comments` tinyint NOT NULL DEFAULT '1',
   `view_count` bigint unsigned NOT NULL DEFAULT '0',
-  `meta_title` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `meta_description` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `meta_keywords` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `meta_title` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `meta_description` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `meta_keywords` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE KEY `cms_posts_slug_unique` (`slug`) USING BTREE,
-  KEY `cms_posts_user_id_foreign` (`user_id`) USING BTREE,
-  KEY `cms_posts_category_id_foreign` (`cms_category_id`) USING BTREE,
-  KEY `cms_posts_status_index` (`status`) USING BTREE,
-  KEY `cms_posts_published_at_index` (`published_at`) USING BTREE,
-  KEY `cms_posts_status_published_at_index` (`status`,`published_at`) USING BTREE
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `cms_posts_slug_unique` (`slug`),
+  KEY `cms_posts_user_id_foreign` (`user_id`),
+  KEY `cms_posts_category_id_foreign` (`cms_category_id`),
+  KEY `cms_posts_status_index` (`status`),
+  KEY `cms_posts_published_at_index` (`published_at`),
+  KEY `cms_posts_status_published_at_index` (`status`,`published_at`),
+  CONSTRAINT `cms_posts_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `cms_posts_category_id_foreign` FOREIGN KEY (`cms_category_id`) REFERENCES `cms_categories` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ----------------------------
 -- Table structure for `cms_redirects`

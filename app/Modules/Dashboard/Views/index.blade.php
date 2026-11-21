@@ -335,14 +335,7 @@
                     })
                     .then(res => res.json())
                     .then(data => {
-                        // Jika URL adalah rute modul tujuan (bukan '#' dan bukan select-category), arahkan ke URL tersebut
-                        if (targetUrl && targetUrl !== '#' && !targetUrl.startsWith('javascript:') && !
-                            targetUrl.includes('select-category')) {
-                            window.location.href = targetUrl;
-                        } else {
-                            // Reload halaman agar sidebar langsung terupdate sesuai kategori menu yang dipilih
-                            window.location.reload();
-                        }
+                        window.location.reload();
                     })
                     .catch(err => {
                         console.error('Error saving menu category:', err);

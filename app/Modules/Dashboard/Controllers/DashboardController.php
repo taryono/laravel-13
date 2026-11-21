@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Str;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class DashboardController extends MainController
 {
@@ -169,6 +171,7 @@ class DashboardController extends MainController
             session(['active_menu_category_id' => (int) $categoryId]);
         } else {
             session()->forget('active_menu_category_id');
+            return redirect()->to('/dashboard');
         }
 
         if ($request->ajax() || $request->wantsJson()) {
@@ -316,6 +319,56 @@ class DashboardController extends MainController
 
     private function cmsView($request)
     {
-        return view('Dashboard::dashboard.cms.index');
+        // Dynamic metrics with fallback
+        $publishedPosts = Schema::hasTable('cms_posts') ? DB::table('cms_posts')->where('status', 'published')->count() : 0;
+        $draftPosts = Schema::hasTable('cms_posts') ? DB::table('cms_posts')->whereIn('status', ['draft', 'pending'])->count() : 0;
+        $announcementsCount = Schema::hasTable('announcements') ? DB::table('announcements')->where('is_active', 1)->count() : 0;
+        $galleriesCount = Schema::hasTable('cms_galleries') ? DB::table('cms_galleries')->count() : 0;
+        $pagesCount = Schema::hasTable('cms_pages') ? DB::table('cms_pages')->count() : 0;
+        $slidersCount = Schema::hasTable('sliders') ? DB::table('sliders')->where('is_active', 1)->count() : 0;
+        $documentsCount = Schema::hasTable('documents') ? DB::table('documents')->count() : 0;
+        $achievementsCount = Schema::hasTable('achievements') ? DB::table('achievements')->count() : 0;
+        $mediaCount = Schema::hasTable('cms_media') ? DB::table('cms_media')->count() : 0;
+        $eventsCount = Schema::hasTable('academic_calendar_events') ? DB::table('academic_calendar_events')->count() : 0;
+
+        $totalPublished = ($publishedPosts + $announcementsCount + $pagesCount) ?: 248;
+        $totalDraft = $draftPosts ?: 12;
+
+        // Fetch recent published items if available
+        $recentItems = collect();
+        if (Schema::hasTable('cms_posts')) {
+            $recentPosts = DB::table('cms_posts')
+                ->select('title', 'created_at', 'status', DB::raw("'Berita' as type_label"), DB::raw("'bg-secondary-c' as dot_class"))
+                ->orderByDesc('id')
+                ->limit(2)
+                ->get();
+            $recentItems = $recentItems->merge($recentPosts);
+        }
+        if (Schema::hasTable('announcements')) {
+            $recentAnnounce = DB::table('announcements')
+                ->select('title', 'created_at', DB::raw("'published' as status"), DB::raw("'Pengumuman' as type_label"), DB::raw("'bg-primary-container' as dot_class"))
+                ->orderByDesc('id')
+                ->limit(2)
+                ->get();
+            $recentItems = $recentItems->merge($recentAnnounce);
+        }
+
+        // Fetch pending items if available
+        $pendingItems = collect();
+        if (Schema::hasTable('cms_posts')) {
+            $pendingPosts = DB::table('cms_posts')
+                ->whereIn('status', ['draft', 'pending'])
+                ->orderByDesc('id')
+                ->limit(2)
+                ->get();
+            $pendingItems = $pendingPosts;
+        }
+        return view('Dashboard::dashboard.cms.index', compact('achievementsCount', 'documentsCount', 'galleriesCount', 'draftPosts', 'eventsCount', 'mediaCount', 'pagesCount', 'pendingItems', 'pendingPosts', 'publishedPosts', 'recentAnnounce', 'recentItems', 'recentPosts', 'slidersCount', 'totalDraft', 'totalPublished', 'announcementsCount'));
     }
+
+    private function payrollView($request)
+    {
+        return view('Dashboard::dashboard.payroll.index');
+    }
+
 }

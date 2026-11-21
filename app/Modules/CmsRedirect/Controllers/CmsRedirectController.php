@@ -10,6 +10,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Throwable;
 
@@ -51,14 +52,12 @@ class CmsRedirectController extends MainController
      */
     public function create(): View
     {
-        $cmsRedirect = new CmsRedirect();
-        $result = $this->getForm($cmsRedirect);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
+        $cms_redirect = new CmsRedirect();
+        $statusCodes = CmsRedirect::$statusCodes;
 
         return view(
             'CmsRedirect::create',
-            compact('cmsRedirect', 'forms', 'groupedForms')
+            compact('cms_redirect', 'statusCodes')
         );
     }
 
@@ -68,7 +67,7 @@ class CmsRedirectController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'from_url' => ['required', 'string', 'max:255'],
+            'from_url' => ['required', 'string', 'max:255'],
             'to_url' => ['required', 'string', 'max:255'],
             'status_code' => ['required', 'string', 'max:255'],
             'hits' => ['required', 'string', 'max:255'],
@@ -93,7 +92,7 @@ class CmsRedirectController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => Auth::id(),
                 ]
             );
 
@@ -109,14 +108,12 @@ class CmsRedirectController extends MainController
      */
     public function edit($id): View
     {
-        $cmsRedirect = $this->model->findOrFail($id);
-        $result = $this->getForm($cmsRedirect);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
+        $cms_redirect = $this->model->findOrFail($id);
+        $statusCodes = CmsRedirect::$statusCodes;
 
         return view(
             'CmsRedirect::edit',
-            compact('cmsRedirect', 'forms', 'groupedForms')
+            compact('cms_redirect', 'statusCodes')
         );
     }
 
@@ -126,7 +123,7 @@ class CmsRedirectController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'from_url' => ['required', 'string', 'max:255'],
+            'from_url' => ['required', 'string', 'max:255'],
             'to_url' => ['required', 'string', 'max:255'],
             'status_code' => ['required', 'string', 'max:255'],
             'hits' => ['required', 'string', 'max:255'],
@@ -135,10 +132,7 @@ class CmsRedirectController extends MainController
 
         try {
             $cmsRedirect = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $cmsRedirect,
-                $validated
-            ) {
+            DB::transaction(function () use ($cmsRedirect, $validated) {
                 $cmsRedirect->update($validated);
             });
 
@@ -148,14 +142,14 @@ class CmsRedirectController extends MainController
                 $cmsRedirect
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui CmsRedirect.',
                 [
                     'exception' => $e,
                     'CmsRedirect_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => Auth::id(),
                 ]
             );
 
@@ -183,14 +177,14 @@ class CmsRedirectController extends MainController
                 'Data CmsRedirect berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $cmsRedirect->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus CmsRedirect.',
                 [
                     'exception' => $e,
                     'CmsRedirect_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => Auth::id(),
                 ]
             );
 
@@ -199,5 +193,13 @@ class CmsRedirectController extends MainController
                 'Data CmsRedirect gagal dihapus.'
             );
         }
-    } 
+    }
+
+    // Toggle aktif/nonaktif
+    public function toggle(CmsRedirect $cmsRedirect)
+    {
+        $cmsRedirect->update(['is_active' => !$cmsRedirect->is_active]);
+
+        return back()->with('success', $cmsRedirect->is_active ? 'Redirect dinonaktifkan.' : 'Redirect diaktifkan.');
+    }
 }

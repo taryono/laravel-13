@@ -16,19 +16,10 @@
             'metaValue' => 'Cashless Aktif',
         ])
         <!-- ===================== TOP APP BAR ===================== -->
-        <header class="app-header d-flex justify-content-between align-items-center px-3">
+        <header class="app-header d-flex justify-content-end align-items-center px-3">
+
             <div class="d-flex align-items-center gap-2">
-                <button type="button" class="ibox-md bg-transparent tc-primary border-0 pressable"
-                    aria-label="Kembali ke Beranda">
-                    <span class="material-symbols-outlined">arrow_back</span>
-                </button>
-                <div class="d-flex flex-column">
-                    <span class="fs-20 fw-bold tc-primary leading-tight">EduPortal</span>
-                    <span class="fs-11 fw-bold tc-secondary" style="margin-top:-2px;">Kantin &amp; Cashless</span>
-                </div>
-            </div>
-            <div class="d-flex align-items-center gap-2">
-                <span class="bpill bg-secondary-fixed tc-on-secondary-fixed d-none d-sm-inline-flex">
+                <span class="bpill bg-secondary-fixed tc-on-secondary-fixed d-none d-sm-inline-flex p-3">
                     <span class="bg-secondary-c rounded-circle me-1" style="width:6px;height:6px;"></span>
                     12 Tenant Aktif Buka
                 </span>

@@ -8,15 +8,15 @@ use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
-use Yajra\DataTables\Services\DataTable; 
+use Yajra\DataTables\Services\DataTable;
 
 class EmployeeDataTable extends DataTable
 {
     protected array $columns = [
-        'employee_id',
+        'nik',
         'full_name',
-        'department_id',
-        'position_id',
+        'department.name',
+        'position.name',
         'employment_status',
         'join_date',
         'is_active'
@@ -30,8 +30,8 @@ class EmployeeDataTable extends DataTable
             })
             ->addIndexColumn()
             ->editColumn('full_name', function ($row) {
-                return '<strong>' . e($row->full_name) . '</strong>' . 
-                       ($row->nick_name ? ' (' . e($row->nick_name) . ')' : '');
+                return '<strong>' . e($row->full_name) . '</strong>' .
+                    ($row->nick_name ? ' (' . e($row->nick_name) . ')' : '');
             })
             ->editColumn('department_id', function ($row) {
                 return $row->department ? e($row->department->name) : '-';
@@ -73,14 +73,14 @@ class EmployeeDataTable extends DataTable
         $context = htmlspecialchars(
             json_encode([
                 'executeDraw' => true,
-                'tableId'     => 'employee-table',
+                'tableId' => 'employee-table',
                 'reloadDelay' => 500,
             ]),
             ENT_QUOTES,
             'UTF-8'
         );
 
-        $editUrl   = e(route('employee.edit', $row->id));
+        $editUrl = e(route('employee.edit', $row->id));
         $deleteUrl = e(route('employee.destroy', $row->id));
         $detailUrl = e(route('employee.show', $row->id));
 
@@ -154,16 +154,16 @@ class EmployeeDataTable extends DataTable
                 //     '>',
                 'dom' =>
                     '<"row mb-3"' .
-                        '<"col-md-5 d-flex align-items-center"B>' .
-                        '<"col-md-2"l>' .
-                        '<"col-md-5"f>' .
+                    '<"col-md-5 d-flex align-items-center"B>' .
+                    '<"col-md-2"l>' .
+                    '<"col-md-5"f>' .
                     '>' .
                     'rt' .
                     '<"row mt-3"' .
-                        '<"col-md-6"i>' .
-                        '<"col-md-6 d-flex justify-content-md-end"p>' .
+                    '<"col-md-6"i>' .
+                    '<"col-md-6 d-flex justify-content-md-end"p>' .
                     '>',
-                    
+
                 'autoWidth' => false,
                 'responsive' => true,
                 'processing' => true,
