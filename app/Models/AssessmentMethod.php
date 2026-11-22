@@ -2,7 +2,7 @@
 
 namespace Models;
 
-class AssessmentMethod extends BasedModel
+class AssessmentMethod extends SoftDeletableModel
 {
     // Relasi
     public function school()

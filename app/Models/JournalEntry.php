@@ -1,11 +1,11 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class JournalEntry extends BasedModel
-{ 
+class JournalEntry extends SoftDeletableModel
+{
     protected $table = 'journal_entries';
-    
+
     protected $fillable = [
         'journal_number',
         'journal_date',
@@ -37,7 +37,7 @@ class JournalEntry extends BasedModel
     public function generateUniqueCode(): string
     {
         $date = date('Ymd');
-        
+
         $last = $this->where('journal_number', 'LIKE', 'JRN-' . $date . '-%')
             ->orderBy('id', 'desc')
             ->first();

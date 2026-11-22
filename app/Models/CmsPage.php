@@ -1,17 +1,17 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class CmsPage extends BasedModel
+class CmsPage extends SoftDeletableModel
 {
     // Relasi
-        public function user()
+    public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
     }
 
     public function parent()
     {
-        return $this->belongsTo(Parent::class, 'parent_id');
+        return $this->belongsTo(parent::class, 'parent_id');
     }
 
 

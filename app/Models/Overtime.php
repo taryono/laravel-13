@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class Overtime extends BasedModel
-{ 
+class Overtime extends SoftDeletableModel
+{
     protected $fillable = [
         'employee_id',
         'attendance_daily_id', // ✅ penghubung

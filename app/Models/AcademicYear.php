@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class AcademicYear extends BasedModel
-{ 
+class AcademicYear extends SoftDeletableModel
+{
     protected $appends = ['start_year', 'end_year', 'formatted_name'];
 
     // Relasi

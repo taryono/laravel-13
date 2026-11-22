@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class StockTransferItem extends BasedModel
+class StockTransferItem extends SoftDeletableModel
 {
     // Relasi
-        public function stockTransfer()
+    public function stockTransfer()
     {
         return $this->belongsTo(StockTransfer::class, 'stock_transfer_id');
     }

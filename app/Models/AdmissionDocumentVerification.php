@@ -2,7 +2,7 @@
 
 namespace Models;
 
-class AdmissionDocumentVerification extends BasedModel
+class AdmissionDocumentVerification extends SoftDeletableModel
 {
     // Relasi
     public function applicant()

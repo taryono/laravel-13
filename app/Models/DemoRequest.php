@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class DemoRequest extends BasedModel
+class DemoRequest extends SoftDeletableModel
 {
     // Relasi
-    
+
 
 
     // Scope

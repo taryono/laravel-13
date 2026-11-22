@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class ApplicantRegistration extends BasedModel
+class ApplicantRegistration extends SoftDeletableModel
 {
     // Relasi
-        public function applicant()
+    public function applicant()
     {
         return $this->belongsTo(Applicant::class, 'applicant_id');
     }

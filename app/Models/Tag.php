@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class Tag extends BasedModel
+class Tag extends SoftDeletableModel
 {
     // Relasi
-        public function school()
+    public function school()
     {
         return $this->belongsTo(School::class, 'school_id');
     }

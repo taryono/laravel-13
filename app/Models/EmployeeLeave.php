@@ -2,7 +2,7 @@
 
 namespace Models;
 
-class EmployeeLeave extends BasedModel
+class EmployeeLeave extends SoftDeletableModel
 {
     // Relasi
     public function leave_type()

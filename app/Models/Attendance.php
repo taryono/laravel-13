@@ -1,14 +1,14 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class Attendance extends BasedModel
-{   
+class Attendance extends SoftDeletableModel
+{
     protected $fillable = [
         'employee_id',
         'attendance_daily_id',
         'payroll_period_id',
-        'attendance_date', 
+        'attendance_date',
         'overtime_hours',
         'status',
         'notes',
@@ -18,7 +18,7 @@ class Attendance extends BasedModel
 
     protected $casts = [
         'attendance_date' => 'date:Y-m-d',
-        'approved_at'     => 'datetime',
+        'approved_at' => 'datetime',
     ];
     // hadir,sakit,izin,alpha,cuti,dinas_luar,late,half_day
     // 'present', 'sick', 'excused', 'absent_unexcused', 'on_leave', 'business_trip', 'late', 'half_day'
@@ -50,10 +50,10 @@ class Attendance extends BasedModel
     public function employee()
     {
         return $this->belongsTo(Employee::class, 'employee_id');
-    } 
+    }
 
     public function attendanceDaily()
     {
         return $this->belongsTo(attendanceDaily::class, 'employee_id');
-    } 
+    }
 }

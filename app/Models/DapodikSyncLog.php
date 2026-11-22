@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class DapodikSyncLog extends BasedModel
+class DapodikSyncLog extends SoftDeletableModel
 {
     // Relasi
-        public function school()
+    public function school()
     {
         return $this->belongsTo(School::class, 'school_id');
     }

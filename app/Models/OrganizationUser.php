@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class OrganizationUser extends BasedModel
-{ 
+class OrganizationUser extends SoftDeletableModel
+{
     protected $table = 'organization_user';
     // Relasi
     public function user()

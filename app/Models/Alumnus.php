@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class Alumnus extends BasedModel
-{ 
+class Alumnus extends SoftDeletableModel
+{
     // Relasi
     // public function user()
     // {

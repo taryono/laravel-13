@@ -2,7 +2,7 @@
 
 namespace Models;
 
-class Curriculum extends BasedModel
+class Curriculum extends SoftDeletableModel
 {
     protected $table = 'curriculums';
     // Relasi
@@ -30,7 +30,7 @@ class Curriculum extends BasedModel
     {
         return $this->belongsTo(School::class);
     }
-    
+
     public function report_card()
     {
         return $this->hasMany(ReportCard::class);

@@ -1,13 +1,13 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class CmsCategory extends BasedModel
+class CmsCategory extends SoftDeletableModel
 {
     protected $table = 'cms_categories';
     protected $guarded = ['id'];
 
     protected $casts = [
-        'is_active'  => 'boolean',
+        'is_active' => 'boolean',
         'sort_order' => 'integer',
     ];
 

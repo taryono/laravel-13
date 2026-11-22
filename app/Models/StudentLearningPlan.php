@@ -1,9 +1,9 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class StudentLearningPlan extends BasedModel
+class StudentLearningPlan extends SoftDeletableModel
 {
-     protected $fillable = [
+    protected $fillable = [
         'school_id',
         'student_id',
         'curriculum_id',
@@ -13,10 +13,10 @@ class StudentLearningPlan extends BasedModel
         'start_date',
         'end_date',
         'is_active',
-     ];
+    ];
 
     protected $casts = [
-        'plan_data' => 'array', 
+        'plan_data' => 'array',
         'start_date' => 'datetime',
         'end_date' => 'datetime',
     ];

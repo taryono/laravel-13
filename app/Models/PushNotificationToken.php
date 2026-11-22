@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class PushNotificationToken extends BasedModel
+class PushNotificationToken extends SoftDeletableModel
 {
     // Relasi
-        public function user()
+    public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
     }

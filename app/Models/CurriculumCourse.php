@@ -1,7 +1,7 @@
 <?php
 namespace Models;
 
-class CurriculumCourse extends BasedModel
+class CurriculumCourse extends SoftDeletableModel
 {
     // Relasi
     public function study_program()

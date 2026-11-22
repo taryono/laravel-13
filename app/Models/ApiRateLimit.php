@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class ApiRateLimit extends BasedModel
-{ 
+class ApiRateLimit extends SoftDeletableModel
+{
     // Relasi
     // public function user()
     // {

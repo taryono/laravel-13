@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class WorkCalendarHoliday extends BasedModel
+class WorkCalendarHoliday extends SoftDeletableModel
 {
     // Relasi
-        public function workCalendar()
+    public function workCalendar()
     {
         return $this->belongsTo(WorkCalendar::class, 'work_calendar_id');
     }

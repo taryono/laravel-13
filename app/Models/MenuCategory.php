@@ -3,7 +3,7 @@ namespace Models;
 
 use Illuminate\Database\Eloquent\Builder;
 
-class MenuCategory extends BasedModel
+class MenuCategory extends SoftDeletableModel
 {
     protected $fillable = [
         'organization_id',
@@ -20,36 +20,36 @@ class MenuCategory extends BasedModel
         'created_by',
         'updated_by',
     ];
- 
+
     protected $casts = [
-        'is_system'     => 'boolean',
-        'is_active'     => 'boolean',
+        'is_system' => 'boolean',
+        'is_active' => 'boolean',
         'show_to_trial' => 'boolean',
-        'sort_order'    => 'integer',
+        'sort_order' => 'integer',
     ];
- 
+
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true);
     }
- 
+
     public function scopeForOrganization(Builder $query, int $organizationId): Builder
     {
         return $query->where('organization_id', $organizationId);
     }
 
-        public function organization()
+    public function organization()
     {
         return $this->belongsTo(Organization::class, 'organization_id');
     }
 
     public function parent()
     {
-        return $this->belongsTo(Parent::class, 'parent_id');
+        return $this->belongsTo(parent::class, 'parent_id');
     }
 
     public function menus()
     {
         return $this->hasMany(Menu::class, 'menu_category_id');
-    } 
+    }
 }

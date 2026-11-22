@@ -2,15 +2,15 @@
 
 namespace Models;
 
-class ParentModel extends BasedModel
+class ParentModel extends SoftDeletableModel
 {
     protected $table = 'parents'; // Tetap pakai nama tabel lama
     protected $guarded = ['id'];
 
     protected $casts = [
-        'created_at'  => 'datetime',
-        'updated_at'  => 'datetime',
-        'deleted_at'  => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'deleted_at' => 'datetime',
     ];
 
     public function organization()

@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class BosReportItem extends BasedModel
+class BosReportItem extends SoftDeletableModel
 {
     // Relasi
-        public function bosReport()
+    public function bosReport()
     {
         return $this->belongsTo(BosReport::class, 'bos_report_id');
     }

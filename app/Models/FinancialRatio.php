@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class FinancialRatio extends BasedModel
-{ 
+class FinancialRatio extends SoftDeletableModel
+{
     // Relasi
     // public function user()
     // {

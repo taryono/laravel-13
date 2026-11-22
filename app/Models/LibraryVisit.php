@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class LibraryVisit extends BasedModel
+class LibraryVisit extends SoftDeletableModel
 {
     // Relasi
-        public function libraryMembership()
+    public function libraryMembership()
     {
         return $this->belongsTo(LibraryMembership::class, 'library_membership_id');
     }

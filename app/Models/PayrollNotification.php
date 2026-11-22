@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class PayrollNotification extends BasedModel
-{ 
+class PayrollNotification extends SoftDeletableModel
+{
     // Relasi
     // public function user()
     // {

@@ -4,7 +4,7 @@ namespace Models;
 
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class P5Theme extends BasedModel
+class P5Theme extends SoftDeletableModel
 {
 
     protected $table = 'p5_themes';

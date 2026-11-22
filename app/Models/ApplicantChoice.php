@@ -2,7 +2,7 @@
 
 namespace Models;
 
-class ApplicantChoice extends BasedModel
+class ApplicantChoice extends SoftDeletableModel
 {
     // Relasi
     public function applicant()

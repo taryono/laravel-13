@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-class Employee extends BasedModel
+class Employee extends SoftDeletableModel
 {
     protected $fillable = [
         'organization_id',

@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class LibraryLoan extends BasedModel
+class LibraryLoan extends SoftDeletableModel
 {
     // Relasi
-        public function book()
+    public function book()
     {
         return $this->belongsTo(Book::class, 'book_id');
     }

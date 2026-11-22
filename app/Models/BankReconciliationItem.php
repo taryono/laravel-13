@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class BankReconciliationItem extends BasedModel
+class BankReconciliationItem extends SoftDeletableModel
 {
     // Relasi
-        public function bankReconciliation()
+    public function bankReconciliation()
     {
         return $this->belongsTo(BankReconciliation::class, 'bank_reconciliation_id');
     }

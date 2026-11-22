@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class SoroganEvaluation extends BasedModel
+class SoroganEvaluation extends SoftDeletableModel
 {
     // Relasi
-        public function soroganSession()
+    public function soroganSession()
     {
         return $this->belongsTo(SoroganSession::class, 'sorogan_session_id');
     }

@@ -1,21 +1,21 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class CostCenter extends BasedModel
-{ 
+class CostCenter extends SoftDeletableModel
+{
     // Relasi
     public function organization()
     {
         return $this->belongsTo(Organization::class);
     }
 
-     public function parent()
+    public function parent()
     {
         return $this->belongsTo(CostCenter::class);
     }
 
-      public function department()
+    public function department()
     {
         return $this->belongsTo(Department::class);
     }

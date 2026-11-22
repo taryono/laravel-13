@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class Package extends BasedModel
-{ 
+class Package extends SoftDeletableModel
+{
     protected $fillable = [
         'code',
         'name',

@@ -2,7 +2,7 @@
 
 namespace Models;
 
-class AccountMapping extends BasedModel
+class AccountMapping extends SoftDeletableModel
 {
     protected $table = 'account_mappings';
 
@@ -18,13 +18,13 @@ class AccountMapping extends BasedModel
 
     // ─── Source Type Constants ───
     public const SOURCE_PAYROLL_COMPONENT = 'payroll_component';
-    public const SOURCE_SALES             = 'sales';
-    public const SOURCE_PURCHASE          = 'purchase';
-    public const SOURCE_EXPENSE           = 'expense';
-    public const SOURCE_TAX               = 'tax';
-    public const SOURCE_LOAN              = 'loan';
-    public const SOURCE_BANK              = 'bank';
-    public const SOURCE_OTHER             = 'other';
+    public const SOURCE_SALES = 'sales';
+    public const SOURCE_PURCHASE = 'purchase';
+    public const SOURCE_EXPENSE = 'expense';
+    public const SOURCE_TAX = 'tax';
+    public const SOURCE_LOAN = 'loan';
+    public const SOURCE_BANK = 'bank';
+    public const SOURCE_OTHER = 'other';
 
     public const SOURCE_TYPES = [
         self::SOURCE_PAYROLL_COMPONENT,

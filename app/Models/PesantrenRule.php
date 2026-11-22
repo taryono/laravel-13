@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class PesantrenRule extends BasedModel
+class PesantrenRule extends SoftDeletableModel
 {
     // Relasi
-        public function organization()
+    public function organization()
     {
         return $this->belongsTo(Organization::class, 'organization_id');
     }
@@ -16,7 +16,7 @@ class PesantrenRule extends BasedModel
 
     public function parent()
     {
-        return $this->belongsTo(Parent::class, 'parent_id');
+        return $this->belongsTo(parent::class, 'parent_id');
     }
 
 

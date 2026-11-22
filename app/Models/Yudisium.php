@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class Yudisium extends BasedModel
+class Yudisium extends SoftDeletableModel
 {
     // Relasi
-        public function student()
+    public function student()
     {
         return $this->belongsTo(Student::class, 'student_id');
     }

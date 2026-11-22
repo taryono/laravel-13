@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class CmsBanner extends BasedModel
+class CmsBanner extends SoftDeletableModel
 {
     // Relasi
-    
+
 
 
     // Scope

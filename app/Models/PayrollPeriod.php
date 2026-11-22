@@ -2,7 +2,7 @@
 
 namespace Models;
 
-class PayrollPeriod extends BasedModel
+class PayrollPeriod extends SoftDeletableModel
 {
     protected $fillable = [
         'organization_id',

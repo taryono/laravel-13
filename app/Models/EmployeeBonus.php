@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class EmployeeBonus extends BasedModel
+class EmployeeBonus extends SoftDeletableModel
 {
     // Relasi
-        public function employee()
+    public function employee()
     {
         return $this->belongsTo(Employee::class, 'employee_id');
     }

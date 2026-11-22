@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class Submission extends BasedModel
+class Submission extends SoftDeletableModel
 {
     // Relasi
-        public function assignmentQuiz()
+    public function assignmentQuiz()
     {
         return $this->belongsTo(AssignmentQuiz::class, 'assignment_quiz_id');
     }

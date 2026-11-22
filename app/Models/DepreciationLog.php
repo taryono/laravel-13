@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class DepreciationLog extends BasedModel
-{ 
+class DepreciationLog extends SoftDeletableModel
+{
     // Relasi
     // public function user()
     // {

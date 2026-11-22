@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class Position extends BasedModel
-{    
+class Position extends SoftDeletableModel
+{
     protected $fillable = ['code', 'name', 'description', 'is_active'];
     // Scope
     public function scopeActive($query)

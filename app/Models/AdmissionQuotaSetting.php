@@ -2,7 +2,7 @@
 
 namespace Models;
 
-class AdmissionQuotaSetting extends BasedModel
+class AdmissionQuotaSetting extends SoftDeletableModel
 {
     protected $table = 'admission_quota_settings';
 

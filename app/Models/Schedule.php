@@ -2,7 +2,7 @@
 
 namespace Models;
 
-class Schedule extends BasedModel
+class Schedule extends SoftDeletableModel
 {
     // Relasi
     public function classroom()

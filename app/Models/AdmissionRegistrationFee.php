@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class AdmissionRegistrationFee extends BasedModel
+class AdmissionRegistrationFee extends SoftDeletableModel
 {
     // Relasi
-        public function admission()
+    public function admission()
     {
         return $this->belongsTo(Admission::class, 'admission_id');
     }

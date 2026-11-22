@@ -1,8 +1,8 @@
 <?php
 
 namespace Models;
- 
-class Dictionary extends BasedModel
+
+class Dictionary extends SoftDeletableModel
 {
     protected $fillable = [
         'key',
@@ -24,8 +24,8 @@ class Dictionary extends BasedModel
     public function translate(?string $locale = null): ?string
     {
         $locale = $locale ?? app()->getLocale();
-        
-        return match($locale) {
+
+        return match ($locale) {
             'in' => $this->in,
             'en' => $this->en,
             default => $this->en

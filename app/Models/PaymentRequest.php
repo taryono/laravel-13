@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class PaymentRequest extends BasedModel
-{ 
+class PaymentRequest extends SoftDeletableModel
+{
     // Relasi
     // public function user()
     // {

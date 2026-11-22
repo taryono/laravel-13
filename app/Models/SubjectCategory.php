@@ -2,7 +2,7 @@
 
 namespace Models;
 
-class SubjectCategory extends BasedModel
+class SubjectCategory extends SoftDeletableModel
 {
     protected $fillable = [
         'organization_id',

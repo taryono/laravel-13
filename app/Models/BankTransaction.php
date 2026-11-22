@@ -2,7 +2,7 @@
 
 namespace Models;
 
-class BankTransaction extends BasedModel
+class BankTransaction extends SoftDeletableModel
 {
     protected $fillable = [
         'bank_account_id',

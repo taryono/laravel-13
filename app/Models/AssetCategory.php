@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class AssetCategory extends BasedModel
+class AssetCategory extends SoftDeletableModel
 {
     // Relasi
-    
+
 
 
     // Scope

@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class TracerStudyQuestion extends BasedModel
+class TracerStudyQuestion extends SoftDeletableModel
 {
     // Relasi
-        public function tracerStudy()
+    public function tracerStudy()
     {
         return $this->belongsTo(TracerStudy::class, 'tracer_study_id');
     }

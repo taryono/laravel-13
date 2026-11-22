@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class ReportCardTemplate extends BasedModel
+class ReportCardTemplate extends SoftDeletableModel
 {
     // Relasi
-    
+
 
 
     // Scope

@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class RoomConstraint extends BasedModel
+class RoomConstraint extends SoftDeletableModel
 {
     // Relasi
-        public function room()
+    public function room()
     {
         return $this->belongsTo(Room::class, 'room_id');
     }

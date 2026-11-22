@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class QuestionBank extends BasedModel
-{ 
+class QuestionBank extends SoftDeletableModel
+{
     // Relasi
     // public function user()
     // {

@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class Achievement extends BasedModel
-{ 
+class Achievement extends SoftDeletableModel
+{
     // Relasi
     // public function user()
     // {

@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class EnrollmentConversion extends BasedModel
+class EnrollmentConversion extends SoftDeletableModel
 {
     // Relasi
-        public function applicant()
+    public function applicant()
     {
         return $this->belongsTo(Applicant::class, 'applicant_id');
     }

@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class PesantrenRuleViolation extends BasedModel
+class PesantrenRuleViolation extends SoftDeletableModel
 {
     // Relasi
-        public function pesantrenRule()
+    public function pesantrenRule()
     {
         return $this->belongsTo(PesantrenRule::class, 'pesantren_rule_id');
     }

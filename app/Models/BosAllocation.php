@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class BosAllocation extends BasedModel
+class BosAllocation extends SoftDeletableModel
 {
     // Relasi
-        public function bosPeriod()
+    public function bosPeriod()
     {
         return $this->belongsTo(BosPeriod::class, 'bos_period_id');
     }

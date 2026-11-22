@@ -5,7 +5,7 @@ namespace Models;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class CbtSession extends BasedModel
+class CbtSession extends SoftDeletableModel
 {
     protected $table = 'cbt_sessions';
     protected $fillable = [

@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class GoodsReceiptItem extends BasedModel
+class GoodsReceiptItem extends SoftDeletableModel
 {
     // Relasi
-        public function goodsReceipt()
+    public function goodsReceipt()
     {
         return $this->belongsTo(GoodsReceipt::class, 'goods_receipt_id');
     }

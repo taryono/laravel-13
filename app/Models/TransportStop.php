@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class TransportStop extends BasedModel
+class TransportStop extends SoftDeletableModel
 {
     // Relasi
-        public function transportRoute()
+    public function transportRoute()
     {
         return $this->belongsTo(TransportRoute::class, 'transport_route_id');
     }

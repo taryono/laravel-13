@@ -1,17 +1,17 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class Navigation extends BasedModel
+class Navigation extends SoftDeletableModel
 {
     // Relasi
-        public function organization()
+    public function organization()
     {
         return $this->belongsTo(Organization::class, 'organization_id');
     }
 
     public function parent()
     {
-        return $this->belongsTo(Parent::class, 'parent_id');
+        return $this->belongsTo(parent::class, 'parent_id');
     }
 
 

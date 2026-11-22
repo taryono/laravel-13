@@ -1,11 +1,11 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class Invoice extends BasedModel
-{ 
+class Invoice extends SoftDeletableModel
+{
     protected $table = 'invoices';
-    
+
     protected $fillable = [
         'invoice_number',
         'customer_name',
@@ -40,7 +40,7 @@ class Invoice extends BasedModel
     public function generateUniqueCode(): string
     {
         $year = date('Y');
-        
+
         $last = $this->where('invoice_number', 'LIKE', 'INV-' . $year . '-%')
             ->orderBy('id', 'desc')
             ->first();

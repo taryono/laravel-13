@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class AttitudeAssessment extends BasedModel
-{ 
+class AttitudeAssessment extends SoftDeletableModel
+{
     // Relasi
     // public function user()
     // {

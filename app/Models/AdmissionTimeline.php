@@ -2,7 +2,7 @@
 
 namespace Models;
 
-class AdmissionTimeline extends BasedModel
+class AdmissionTimeline extends SoftDeletableModel
 {
     protected $fillable = [
         'admission_id',
@@ -18,8 +18,8 @@ class AdmissionTimeline extends BasedModel
 
     protected $casts = [
         'start_date' => 'date',
-        'end_date'   => 'date',
-        'is_active'  => 'boolean',
+        'end_date' => 'date',
+        'is_active' => 'boolean',
     ];
 
     // Relasi

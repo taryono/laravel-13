@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class PtkpStatus extends BasedModel
-{ 
+class PtkpStatus extends SoftDeletableModel
+{
     // Relasi
     // public function user()
     // {

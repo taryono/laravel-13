@@ -2,7 +2,7 @@
 
 namespace Models;
 
-class AccountCategory extends BasedModel
+class AccountCategory extends SoftDeletableModel
 {
     protected $table = 'account_categories';
 

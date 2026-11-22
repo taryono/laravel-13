@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class LeaveType extends BasedModel
-{ 
+class LeaveType extends SoftDeletableModel
+{
     // Relasi
     // public function user()
     // {

@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class JournalEntryLine extends BasedModel
+class JournalEntryLine extends SoftDeletableModel
 {
     // Relasi
-        public function journalEntry()
+    public function journalEntry()
     {
         return $this->belongsTo(JournalEntry::class, 'journal_entry_id');
     }

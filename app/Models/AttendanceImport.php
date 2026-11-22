@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class AttendanceImport extends BasedModel
-{ 
+class AttendanceImport extends SoftDeletableModel
+{
     protected $table = 'attendance_import_batches';
     protected $fillable = [
         'batch_code',
@@ -22,13 +22,13 @@ class AttendanceImport extends BasedModel
     ];
 
     protected $casts = [
-        'file_size'        => 'integer',
-        'total_records'    => 'integer',
+        'file_size' => 'integer',
+        'total_records' => 'integer',
         'processed_records' => 'integer',
-        'failed_records'   => 'integer',
-        'errors'           => 'array', // Otomatis JSON ↔ Array
-        'started_at'       => 'datetime',
-        'completed_at'     => 'datetime',
+        'failed_records' => 'integer',
+        'errors' => 'array', // Otomatis JSON ↔ Array
+        'started_at' => 'datetime',
+        'completed_at' => 'datetime',
     ];
 
     // Relasi

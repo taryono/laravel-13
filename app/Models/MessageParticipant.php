@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class MessageParticipant extends BasedModel
+class MessageParticipant extends SoftDeletableModel
 {
     // Relasi
-        public function messageThread()
+    public function messageThread()
     {
         return $this->belongsTo(MessageThread::class, 'message_thread_id');
     }

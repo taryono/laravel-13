@@ -1,11 +1,11 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class PayrollRun extends BasedModel
-{    
+class PayrollRun extends SoftDeletableModel
+{
     protected $table = 'payroll_runs';
-    
+
     protected $fillable = [
         'organization_id',
         'payroll_period_id',
@@ -50,7 +50,7 @@ class PayrollRun extends BasedModel
         $period = PayrollPeriod::find($this->payroll_period_id);
         $year = $period ? $period->period_year : date('Y');
         $month = $period ? str_pad($period->period_month, 2, '0', STR_PAD_LEFT) : date('m');
-        
+
         $last = $this->where('code', 'LIKE', 'RUN-' . $year . '-' . $month . '-%')
             ->orderBy('id', 'desc')
             ->first();

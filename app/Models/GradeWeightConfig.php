@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class GradeWeightConfig extends BasedModel
-{ 
+class GradeWeightConfig extends SoftDeletableModel
+{
     // Relasi
     // public function user()
     // {

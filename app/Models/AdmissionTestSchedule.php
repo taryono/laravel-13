@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class AdmissionTestSchedule extends BasedModel
+class AdmissionTestSchedule extends SoftDeletableModel
 {
     // Relasi
-    
+
 
 
     // Scope

@@ -2,7 +2,7 @@
 
 namespace Models;
 
-class OrganizationType extends BasedModel
+class OrganizationType extends SoftDeletableModel
 {
     protected $fillable = [
         'code',

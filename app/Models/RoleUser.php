@@ -4,7 +4,7 @@ namespace Models;
 
 use Models\User;
 
-class RoleUser extends BasedModel
+class RoleUser extends SoftDeletableModel
 {
     public $table = 'role_user';
 

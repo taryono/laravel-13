@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class IdentityType extends BasedModel
+class IdentityType extends SoftDeletableModel
 {
     // Relasi
-    
+
 
 
     // Scope

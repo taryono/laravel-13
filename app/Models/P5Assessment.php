@@ -5,7 +5,7 @@ namespace Models;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class P5Assessment extends BasedModel
+class P5Assessment extends SoftDeletableModel
 {
     protected $table = 'p5_assessments';
 

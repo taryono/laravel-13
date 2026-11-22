@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class CmsSubscriber extends BasedModel
+class CmsSubscriber extends SoftDeletableModel
 {
     // Relasi
-    
+
 
 
     // Scope

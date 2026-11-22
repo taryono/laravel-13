@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class DigitalLibraryAccessLog extends BasedModel
+class DigitalLibraryAccessLog extends SoftDeletableModel
 {
     // Relasi
-        public function digitalLibraryItem()
+    public function digitalLibraryItem()
     {
         return $this->belongsTo(DigitalLibraryItem::class, 'digital_library_item_id');
     }

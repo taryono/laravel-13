@@ -1,14 +1,20 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class ShiftSwap extends BasedModel
-{ 
-   protected $fillable = [
+class ShiftSwap extends SoftDeletableModel
+{
+    protected $fillable = [
         'date',
-        'employee_id_a', 'original_shift_a', 'target_shift_a',
-        'employee_id_b', 'original_shift_b', 'target_shift_b',
-        'status', 'approved_by', 'notes'
+        'employee_id_a',
+        'original_shift_a',
+        'target_shift_a',
+        'employee_id_b',
+        'original_shift_b',
+        'target_shift_b',
+        'status',
+        'approved_by',
+        'notes'
     ];
 
     protected $casts = [
@@ -28,15 +34,36 @@ class ShiftSwap extends BasedModel
     }
 
     // Shift Asli & Tujuan
-    public function originalShiftA() { return $this->belongsTo(Shift::class, 'original_shift_a'); }
-    public function targetShiftA()   { return $this->belongsTo(Shift::class, 'target_shift_a'); }
-    public function originalShiftB() { return $this->belongsTo(Shift::class, 'original_shift_b'); }
-    public function targetShiftB()   { return $this->belongsTo(Shift::class, 'target_shift_b'); }
-    public function approver()       { return $this->belongsTo(Employee::class, 'approved_by'); }
+    public function originalShiftA()
+    {
+        return $this->belongsTo(Shift::class, 'original_shift_a');
+    }
+    public function targetShiftA()
+    {
+        return $this->belongsTo(Shift::class, 'target_shift_a');
+    }
+    public function originalShiftB()
+    {
+        return $this->belongsTo(Shift::class, 'original_shift_b');
+    }
+    public function targetShiftB()
+    {
+        return $this->belongsTo(Shift::class, 'target_shift_b');
+    }
+    public function approver()
+    {
+        return $this->belongsTo(Employee::class, 'approved_by');
+    }
 
     // Scope
-    public function scopeApproved($q) { return $q->where('status', 'approved'); }
-    public function scopeByDate($q, $date) { return $q->where('date', $date); }
+    public function scopeApproved($q)
+    {
+        return $q->where('status', 'approved');
+    }
+    public function scopeByDate($q, $date)
+    {
+        return $q->where('date', $date);
+    }
 
     // Scope
     public function scopeActive($query)

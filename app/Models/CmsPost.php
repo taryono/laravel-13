@@ -1,18 +1,18 @@
 <?php
-namespace Models; 
+namespace Models;
 
 use App\Models\User;
 
-class CmsPost extends BasedModel
+class CmsPost extends SoftDeletableModel
 {
     protected $table = 'cms_posts';
     protected $guarded = ['id'];
 
     protected $casts = [
-        'published_at'   => 'datetime',
-        'is_featured'    => 'boolean',
+        'published_at' => 'datetime',
+        'is_featured' => 'boolean',
         'allow_comments' => 'boolean',
-        'view_count'     => 'integer',
+        'view_count' => 'integer',
     ];
 
     // Relasi

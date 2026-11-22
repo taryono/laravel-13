@@ -4,7 +4,7 @@ namespace Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class PromotionCriteria extends BasedModel
+class PromotionCriteria extends SoftDeletableModel
 {
     protected $table = 'promotion_criteria';
 

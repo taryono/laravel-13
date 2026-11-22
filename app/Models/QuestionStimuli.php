@@ -2,7 +2,7 @@
 
 namespace Models;
 
-class QuestionStimuli extends BasedModel
+class QuestionStimuli extends SoftDeletableModel
 {
     protected $table = 'question_stimuli';
 

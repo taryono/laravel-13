@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class CbtFeature extends BasedModel
+class CbtFeature extends SoftDeletableModel
 {
     // Relasi
-    
+
 
 
     // Scope

@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class CurriculumAssignment extends BasedModel
+class CurriculumAssignment extends SoftDeletableModel
 {
     // Relasi
-        public function curriculum()
+    public function curriculum()
     {
         return $this->belongsTo(Curriculum::class, 'curriculum_id');
     }

@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class RkasSubActivity extends BasedModel
+class RkasSubActivity extends SoftDeletableModel
 {
     // Relasi
-        public function rkasActivity()
+    public function rkasActivity()
     {
         return $this->belongsTo(RkasActivity::class, 'rkas_activity_id');
     }

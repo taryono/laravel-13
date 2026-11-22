@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class FacilityCategory extends BasedModel
-{ 
+class FacilityCategory extends SoftDeletableModel
+{
     // Relasi
     // public function user()
     // {

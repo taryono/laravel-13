@@ -2,7 +2,7 @@
 
 namespace Models;
 
-class Document extends BasedModel
+class Document extends SoftDeletableModel
 {
     protected $fillable = [
         'organization_id',

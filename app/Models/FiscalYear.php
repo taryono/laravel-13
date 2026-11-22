@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class FiscalYear extends BasedModel
-{ 
+class FiscalYear extends SoftDeletableModel
+{
     // Relasi
     // public function user()
     // {

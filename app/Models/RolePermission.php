@@ -4,7 +4,7 @@ namespace Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class RolePermission extends BasedModel
+class RolePermission extends SoftDeletableModel
 {
     protected $table = 'role_permission';
 

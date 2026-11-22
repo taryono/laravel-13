@@ -2,7 +2,7 @@
 
 namespace Models;
 
-class Location extends BasedModel
+class Location extends SoftDeletableModel
 {
     protected $fillable = [
         'name',

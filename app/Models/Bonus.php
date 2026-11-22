@@ -2,7 +2,7 @@
 
 namespace Models;
 
-class Bonus extends BasedModel
+class Bonus extends SoftDeletableModel
 {
     protected $fillable = [
         'organization_id',

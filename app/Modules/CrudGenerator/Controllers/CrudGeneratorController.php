@@ -61,10 +61,12 @@ class CrudGeneratorController extends MainController
 
         $items = (new MenuRepository())->allForAdmin();
         $tree = (new MenuTreeBuilder())->build($items);
-        $organizations = Organization::all();
+        // Semua organisasi
+        $organizations = Organization::getTree();
         $parentOptions = $this->flattenForSelect($tree);
-
-        return view('CrudGenerator::index', compact('icons', 'tables', 'roles', 'filtered', 'parentOptions', 'organizations'));
+        //$menuCategories = \Models\MenuCategory::where('is_active', 1)->pluck('name', 'id')->toArray();
+        $menuCategories = \Models\MenuCategory::where('is_active', 1)->get();
+        return view('CrudGenerator::index', compact('icons', 'tables', 'roles', 'filtered', 'parentOptions', 'organizations', 'menuCategories'));
     }
 
     /**
@@ -138,20 +140,20 @@ class CrudGeneratorController extends MainController
     public function generateAsync(Request $request)
     {
         $request->validate([
-            'model_name'   => 'required|string|max:100|regex:/^[a-zA-Z]+$/',
-            'columns'      => 'required|string|max:1000',
-            'create_menu'  => 'boolean',
+            'model_name' => 'required|string|max:100|regex:/^[a-zA-Z]+$/',
+            'columns' => 'required|string|max:1000',
+            'create_menu' => 'boolean',
         ]);
 
-        $modelName   = Str::studly($request->model_name);
-        $columns     = $request->columns;
-        $createMenu  = $request->boolean('create_menu');
+        $modelName = Str::studly($request->model_name);
+        $columns = $request->columns;
+        $createMenu = $request->boolean('create_menu');
 
         Artisan::queue('make:crud-yajra', [
-            'name'       => $modelName,
-            '--model'    => "App\\Models\\{$modelName}",
-            '--columns'  => $columns,
-            '--no-menu'  => !$createMenu,
+            'name' => $modelName,
+            '--model' => "App\\Models\\{$modelName}",
+            '--columns' => $columns,
+            '--no-menu' => !$createMenu,
         ])->onQueue('default');
 
         return redirect()->route('crud_generator.index')
@@ -257,13 +259,14 @@ class CrudGeneratorController extends MainController
     public function menuGenerator(Request $request)
     {
         try {
-
+            $message = '';
             DB::beginTransaction();
 
             // 1. Validate request
             $validated = $request->validate([
                 'id' => 'nullable|exists:menus,id',
                 'organization_id' => 'nullable|exists:organizations,id',
+                'menu_category_id' => 'nullable|exists:menu_categories,id',
                 'title' => 'required|string|max:191',
                 'flyout_title' => 'nullable|string|max:255',
                 'id_text' => 'nullable|string|max:50',
@@ -290,6 +293,7 @@ class CrudGeneratorController extends MainController
             $menuData = [
                 'name' => $request->title,
                 'organization_id' => $request->organization_id,
+                'menu_category_id' => $request->menu_category_id,
                 'title' => $request->flyout_title ?? $request->title,
                 'flyout_title' => $request->flyout_title,
                 'id_text' => $request->id_text,
@@ -358,7 +362,7 @@ class CrudGeneratorController extends MainController
             $this->clearMenuCache();
             return $this->successResponse(
                 $request,
-                'Menu berhasil dibuat.',
+                $message,
                 $menu
             );
         } catch (\Exception $e) {

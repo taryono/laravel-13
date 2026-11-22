@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class InventoryStock extends BasedModel
+class InventoryStock extends SoftDeletableModel
 {
     // Relasi
-        public function warehouse()
+    public function warehouse()
     {
         return $this->belongsTo(Warehouse::class, 'warehouse_id');
     }

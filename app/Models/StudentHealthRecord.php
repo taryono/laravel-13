@@ -1,26 +1,26 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class StudentHealthRecord extends BasedModel
-{ 
+class StudentHealthRecord extends SoftDeletableModel
+{
     protected $fillable = [
-        'student_id', 
-        'school_id', 
-        'record_date', 
-        'complaint', 
-        'diagnosis', 
-        'treatment', 
-        'height_cm', 
-        'weight_kg', 
-        'blood_type', 
-        'blood_pressure', 
-        'allergies', 
-        'vaccination_notes', 
-        'handled_by', 
-        'referred_to', 
-        'is_active', 
-        'created_by', 
+        'student_id',
+        'school_id',
+        'record_date',
+        'complaint',
+        'diagnosis',
+        'treatment',
+        'height_cm',
+        'weight_kg',
+        'blood_type',
+        'blood_pressure',
+        'allergies',
+        'vaccination_notes',
+        'handled_by',
+        'referred_to',
+        'is_active',
+        'created_by',
         'updated_by'
     ];
     // Relasi

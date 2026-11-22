@@ -2,7 +2,7 @@
 
 namespace Models;
 
-class Currency extends BasedModel
+class Currency extends SoftDeletableModel
 {
     protected $fillable = [
         'code',

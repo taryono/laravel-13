@@ -4,7 +4,7 @@ namespace Models;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
 
-class AcademicSemester extends BasedModel
+class AcademicSemester extends SoftDeletableModel
 {
     protected $fillable = [
         'organization_id',
@@ -59,23 +59,23 @@ class AcademicSemester extends BasedModel
         return $query->where('is_active', true);
     }
 
-     protected function startDateFormatted(): Attribute
+    protected function startDateFormatted(): Attribute
     {
-        return Attribute::get(fn () => $this->start_date?->translatedFormat('d F Y'));
+        return Attribute::get(fn() => $this->start_date?->translatedFormat('d F Y'));
     }
 
     protected function endDateFormatted(): Attribute
     {
-        return Attribute::get(fn () => $this->end_date?->translatedFormat('d F Y'));
+        return Attribute::get(fn() => $this->end_date?->translatedFormat('d F Y'));
     }
 
-     protected function krsStartDateFormatted(): Attribute
+    protected function krsStartDateFormatted(): Attribute
     {
-        return Attribute::get(fn () => $this->krs_start_date?->translatedFormat('d F Y'));
+        return Attribute::get(fn() => $this->krs_start_date?->translatedFormat('d F Y'));
     }
 
     protected function krsEndDateFormatted(): Attribute
     {
-        return Attribute::get(fn () => $this->krs_end_date?->translatedFormat('d F Y'));
+        return Attribute::get(fn() => $this->krs_end_date?->translatedFormat('d F Y'));
     }
 }

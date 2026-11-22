@@ -2,7 +2,7 @@
 
 namespace Models;
 
-class InventoryCategory extends BasedModel
+class InventoryCategory extends SoftDeletableModel
 {
     // Relasi
     public function organization()
@@ -12,7 +12,7 @@ class InventoryCategory extends BasedModel
 
     public function parent()
     {
-        return $this->belongsTo(Parent::class, 'parent_id');
+        return $this->belongsTo(parent::class, 'parent_id');
     }
 
 

@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class PaymentWebhookLog extends BasedModel
+class PaymentWebhookLog extends SoftDeletableModel
 {
     // Relasi
-        public function paymentGateway()
+    public function paymentGateway()
     {
         return $this->belongsTo(PaymentGateway::class, 'payment_gateway_id');
     }

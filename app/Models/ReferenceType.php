@@ -1,11 +1,11 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class ReferenceType extends BasedModel
-{ 
+class ReferenceType extends SoftDeletableModel
+{
     // Relasi
-   protected $table = 'reference_types';
+    protected $table = 'reference_types';
 
     protected $fillable = [
         'code',

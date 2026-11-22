@@ -2,7 +2,7 @@
 
 namespace Models;
 
-class ReportTemplateVersion extends BasedModel
+class ReportTemplateVersion extends SoftDeletableModel
 {
     protected $table = 'report_template_versions';
 

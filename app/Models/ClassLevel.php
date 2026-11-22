@@ -2,7 +2,7 @@
 
 namespace Models;
 
-class ClassLevel extends BasedModel
+class ClassLevel extends SoftDeletableModel
 {
     public function organization()
     {

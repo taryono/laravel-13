@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class AssetDepreciation extends BasedModel
-{ 
+class AssetDepreciation extends SoftDeletableModel
+{
     protected $table = 'asset_depreciations';
 
     protected $fillable = [
@@ -16,9 +16,9 @@ class AssetDepreciation extends BasedModel
 
     protected $casts = [
         'depreciation_date' => 'date:Y-m-d',
-        'amount'            => 'decimal:2',
-        'created_at'        => 'datetime',
-        'updated_at'        => 'datetime',
+        'amount' => 'decimal:2',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
     // ─── Relationships ───

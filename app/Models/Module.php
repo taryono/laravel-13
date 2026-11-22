@@ -2,9 +2,9 @@
 
 namespace Models;
 
-class Module extends BasedModel
+class Module extends SoftDeletableModel
 {
-    protected $fillable = [ 
+    protected $fillable = [
         'code',
         'name',
         'category',

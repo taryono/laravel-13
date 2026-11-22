@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class DataImport extends BasedModel
-{ 
+class DataImport extends SoftDeletableModel
+{
     // Relasi
     // public function user()
     // {

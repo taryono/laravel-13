@@ -2,7 +2,7 @@
 
 namespace Models;
 
-class UserPermission extends BasedModel
+class UserPermission extends SoftDeletableModel
 {
     protected $table = 'user_permission';
 

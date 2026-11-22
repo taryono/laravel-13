@@ -2,7 +2,7 @@
 // app/Models/StudentClassroom.php
 namespace Models;
 
-class StudentClassroom extends BasedModel
+class StudentClassroom extends SoftDeletableModel
 {
     protected $table = "student_classrooms";
     protected $fillable = [

@@ -5,7 +5,7 @@ namespace Models;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Teacher extends BasedModel
+class Teacher extends SoftDeletableModel
 {
     protected $fillable = [
         'employee_id',

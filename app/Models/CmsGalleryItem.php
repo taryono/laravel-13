@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class CmsGalleryItem extends BasedModel
+class CmsGalleryItem extends SoftDeletableModel
 {
     // Relasi
-        public function gallery()
+    public function gallery()
     {
         return $this->belongsTo(Gallery::class, 'gallery_id');
     }

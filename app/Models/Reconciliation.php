@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class Reconciliation extends BasedModel
-{ 
+class Reconciliation extends SoftDeletableModel
+{
     // Relasi
     // public function user()
     // {

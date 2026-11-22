@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class DocumentType extends BasedModel
+class DocumentType extends SoftDeletableModel
 {
     // Relasi
-    
+
 
 
     // Scope

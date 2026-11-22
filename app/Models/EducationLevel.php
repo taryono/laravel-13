@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class EducationLevel extends BasedModel
-{  
+class EducationLevel extends SoftDeletableModel
+{
     // Scope
     public function scopeActive($query)
     {

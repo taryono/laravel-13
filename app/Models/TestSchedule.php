@@ -2,7 +2,7 @@
 
 namespace Models;
 
-class TestSchedule extends BasedModel
+class TestSchedule extends SoftDeletableModel
 {
     public function admission()
     {

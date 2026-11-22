@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class Message extends BasedModel
+class Message extends SoftDeletableModel
 {
     // Relasi
-        public function sender()
+    public function sender()
     {
         return $this->belongsTo(Sender::class, 'sender_id');
     }

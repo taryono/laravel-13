@@ -2,7 +2,7 @@
 
 namespace Models;
 
-class ReportCard extends BasedModel
+class ReportCard extends SoftDeletableModel
 {
     protected $fillable = [
         'school_id',
@@ -38,10 +38,10 @@ class ReportCard extends BasedModel
     ];
 
     protected $casts = [
-        'status'       => 'string',
+        'status' => 'string',
         'published_at' => 'datetime',
-        'locked_at'    => 'datetime',
-        'is_active'    => 'boolean',
+        'locked_at' => 'datetime',
+        'is_active' => 'boolean',
     ];
 
     public function school()

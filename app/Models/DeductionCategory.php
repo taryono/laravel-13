@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class DeductionCategory extends BasedModel
-{ 
+class DeductionCategory extends SoftDeletableModel
+{
     // Relasi
     public function deduction()
     {

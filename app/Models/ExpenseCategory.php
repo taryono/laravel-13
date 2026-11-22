@@ -1,10 +1,10 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class ExpenseCategory extends BasedModel
-{ 
-     protected $fillable = [
+class ExpenseCategory extends SoftDeletableModel
+{
+    protected $fillable = [
         'code',
         'name',
         'description',

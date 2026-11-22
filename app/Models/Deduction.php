@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class Deduction extends BasedModel
-{ 
+class Deduction extends SoftDeletableModel
+{
     // Relasi
     public function employee()
     {
@@ -15,7 +15,7 @@ class Deduction extends BasedModel
         return $this->belongsTo(DeductionCategory::class);
     }
 
-     public function payroll_period()
+    public function payroll_period()
     {
         return $this->belongsTo(PayrollPeriod::class);
     }

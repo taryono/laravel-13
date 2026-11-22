@@ -2,7 +2,7 @@
 
 namespace Models;
 
-class ReportTemplateSignatory extends BasedModel
+class ReportTemplateSignatory extends SoftDeletableModel
 {
     protected $table = 'report_template_signatories';
 

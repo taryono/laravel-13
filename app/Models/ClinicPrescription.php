@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class ClinicPrescription extends BasedModel
+class ClinicPrescription extends SoftDeletableModel
 {
     // Relasi
-        public function clinicVisit()
+    public function clinicVisit()
     {
         return $this->belongsTo(ClinicVisit::class, 'clinic_visit_id');
     }

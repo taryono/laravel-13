@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class JournalDetail extends BasedModel
-{ 
+class JournalDetail extends SoftDeletableModel
+{
     // Relasi
     // public function user()
     // {

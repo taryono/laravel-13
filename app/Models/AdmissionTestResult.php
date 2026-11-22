@@ -2,7 +2,7 @@
 
 namespace Models;
 
-class AdmissionTestResult extends BasedModel
+class AdmissionTestResult extends SoftDeletableModel
 {
     // Relasi
     public function admissionTestSchedule()

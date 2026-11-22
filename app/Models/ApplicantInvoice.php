@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class ApplicantInvoice extends BasedModel
-{ 
+class ApplicantInvoice extends SoftDeletableModel
+{
     protected $table = 'applicant_invoices';
     protected $guarded = ['id'];
 

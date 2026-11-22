@@ -17,11 +17,10 @@
                          <select name="organization_id" id="organization_id"
                              class="form-select @error('organization_id') is-invalid @enderror" required>
                              <option value="">-- Pilih Organisasi --</option>
-                             {{-- Ambil dari daftar organisasi --}}
                              @foreach ($organizations as $org)
                                  <option value="{{ $org->id }}"
                                      {{ old('organization_id') == $org->id ? 'selected' : '' }}>
-                                     {{ $org->name }}
+                                     {!! str_repeat('&nbsp;&nbsp;&nbsp;&nbsp;', $org->depth) !!}{{ $org->depth > 0 ? '└─ ' : '' }}{{ $org->name }}
                                  </option>
                              @endforeach
                          </select>
@@ -75,6 +74,15 @@
                              @endforeach
                          </select>
                      </div>
+                     <div class="col-md-6">
+                         <label class="form-label">Menu Categories</label>
+                         <select class="form-select" name="menu_categories" id="menu_category_id">
+                             <option value="">— Tidak ada (root) —</option>
+                             @foreach ($menuCategories ?? [] as $menu)
+                                 <option value="{{ $menu['id'] }}">{{ $menu['name'] }}</option>
+                             @endforeach
+                         </select>
+                     </div>
 
                      <!-- ===== ICON PICKER MENU ===== -->
                      <div class="col-md-12">
@@ -118,9 +126,11 @@
                                          @foreach ($news as $role)
                                              <div class="col-4">
                                                  <div class="form-check">
-                                                     <input class="form-check-input" type="checkbox" name="role_ids[]" id="role_{{ $role->id }}"
+                                                     <input class="form-check-input" type="checkbox"
+                                                         name="role_ids[]" id="role_{{ $role->id }}"
                                                          value="{{ $role->id }}">
-                                                     <label class="form-check-label small" for="role_{{ $role->id }}">
+                                                     <label class="form-check-label small"
+                                                         for="role_{{ $role->id }}">
                                                          {{ $role->display_name }}
                                                      </label>
                                                  </div>

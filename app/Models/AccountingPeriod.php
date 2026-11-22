@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class AccountingPeriod extends BasedModel
-{ 
+class AccountingPeriod extends SoftDeletableModel
+{
     protected $table = 'accounting_periods';
 
     protected $fillable = [
@@ -18,17 +18,17 @@ class AccountingPeriod extends BasedModel
     ];
 
     protected $casts = [
-        'start_date'   => 'date:Y-m-d',
-        'end_date'     => 'date:Y-m-d',
-        'closed_at'    => 'datetime',
-        'created_at'   => 'datetime',
-        'updated_at'   => 'datetime',
+        'start_date' => 'date:Y-m-d',
+        'end_date' => 'date:Y-m-d',
+        'closed_at' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
     // ─── Period Status Constants ───
-    public const STATUS_OPEN        = 'open';
+    public const STATUS_OPEN = 'open';
     public const STATUS_SOFT_CLOSED = 'soft_closed';
-    public const STATUS_CLOSED      = 'closed';
+    public const STATUS_CLOSED = 'closed';
 
     public const STATUSES = [
         self::STATUS_OPEN,

@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class AssetDepreciationLog extends BasedModel
+class AssetDepreciationLog extends SoftDeletableModel
 {
     // Relasi
-        public function asset()
+    public function asset()
     {
         return $this->belongsTo(\App\Models\Asset::class, 'asset_id');
     }

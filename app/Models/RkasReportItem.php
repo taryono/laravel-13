@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class RkasReportItem extends BasedModel
+class RkasReportItem extends SoftDeletableModel
 {
     // Relasi
-        public function rkasReport()
+    public function rkasReport()
     {
         return $this->belongsTo(RkasReport::class, 'rkas_report_id');
     }

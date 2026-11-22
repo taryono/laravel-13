@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class CmsPostRevision extends BasedModel
+class CmsPostRevision extends SoftDeletableModel
 {
     // Relasi
-        public function post()
+    public function post()
     {
         return $this->belongsTo(Post::class, 'post_id');
     }

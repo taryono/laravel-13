@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class P5Project extends BasedModel
+class P5Project extends SoftDeletableModel
 {
     protected $table = 'p5_projects';
 

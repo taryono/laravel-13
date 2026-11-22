@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class PurchaseOrderItem extends BasedModel
+class PurchaseOrderItem extends SoftDeletableModel
 {
     // Relasi
-        public function purchaseOrder()
+    public function purchaseOrder()
     {
         return $this->belongsTo(PurchaseOrder::class, 'purchase_order_id');
     }

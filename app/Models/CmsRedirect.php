@@ -1,7 +1,7 @@
 <?php
 namespace Models;
 
-class CmsRedirect extends BasedModel
+class CmsRedirect extends SoftDeletableModel
 {
     protected $fillable = [
         'from_url',

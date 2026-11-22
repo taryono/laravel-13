@@ -2,7 +2,7 @@
 
 namespace Models;
 
-class StudentExtracurricular extends BasedModel
+class StudentExtracurricular extends SoftDeletableModel
 {
     // Relasi
     public function student()

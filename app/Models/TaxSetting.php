@@ -1,10 +1,10 @@
 <?php
 
-namespace Models;  
-use Illuminate\Database\Eloquent\Relations\BelongsTo; 
+namespace Models;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class TaxSetting extends BasedModel
-{ 
+class TaxSetting extends SoftDeletableModel
+{
 
     protected $table = 'tax_settings';
 
@@ -25,12 +25,12 @@ class TaxSetting extends BasedModel
     ];
 
     protected $casts = [
-        'tax_rate'       => 'decimal:4',
-        'min_amount'     => 'decimal:2',
-        'max_amount'     => 'decimal:2',
+        'tax_rate' => 'decimal:4',
+        'min_amount' => 'decimal:2',
+        'max_amount' => 'decimal:2',
         'effective_date' => 'date',
-        'expiry_date'    => 'date',
-        'is_active'      => 'boolean',
+        'expiry_date' => 'date',
+        'is_active' => 'boolean',
     ];
 
     // Relasi ke organisasi
@@ -55,7 +55,7 @@ class TaxSetting extends BasedModel
             ->where('effective_date', '<=', $date)
             ->where(function ($q) use ($date) {
                 $q->whereNull('expiry_date')
-                  ->orWhere('expiry_date', '>=', $date);
+                    ->orWhere('expiry_date', '>=', $date);
             });
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Models;
 
-class StudentCurriculum extends BasedModel
+class StudentCurriculum extends SoftDeletableModel
 {
     protected $table = 'student_curriculums';
 

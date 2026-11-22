@@ -4,7 +4,7 @@ namespace Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class ExtracurricularAttendance extends BasedModel
+class ExtracurricularAttendance extends SoftDeletableModel
 {
     // Scope
     protected $fillable = [

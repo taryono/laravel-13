@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class AttendanceLog extends BasedModel
-{ 
+class AttendanceLog extends SoftDeletableModel
+{
     protected $fillable = [
         'employee_id',
         'attendance_date',
@@ -21,10 +21,10 @@ class AttendanceLog extends BasedModel
 
     protected $casts = [
         'attendance_date' => 'date:Y-m-d',
-        'scan_time'        => 'datetime',
-        'raw_data'         => 'array',
-        'is_processed'     => 'boolean',
-        'processed_at'     => 'datetime',
+        'scan_time' => 'datetime',
+        'raw_data' => 'array',
+        'is_processed' => 'boolean',
+        'processed_at' => 'datetime',
     ];
 
     // Relasi

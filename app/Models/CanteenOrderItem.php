@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class CanteenOrderItem extends BasedModel
+class CanteenOrderItem extends SoftDeletableModel
 {
     // Relasi
-        public function canteenOrder()
+    public function canteenOrder()
     {
         return $this->belongsTo(CanteenOrder::class, 'canteen_order_id');
     }

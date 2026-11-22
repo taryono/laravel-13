@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class DocumentVersion extends BasedModel
+class DocumentVersion extends SoftDeletableModel
 {
     // Relasi
-        public function document()
+    public function document()
     {
         return $this->belongsTo(Document::class, 'document_id');
     }

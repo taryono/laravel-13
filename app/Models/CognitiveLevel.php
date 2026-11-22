@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class CognitiveLevel extends BasedModel
-{ 
+class CognitiveLevel extends SoftDeletableModel
+{
     // Relasi
     // public function user()
     // {

@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class FiscalPeriod extends BasedModel
+class FiscalPeriod extends SoftDeletableModel
 {
     // Relasi
-        public function school()
+    public function school()
     {
         return $this->belongsTo(School::class, 'school_id');
     }

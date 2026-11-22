@@ -5,7 +5,7 @@ namespace Models;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Subject extends BasedModel
+class Subject extends SoftDeletableModel
 {
     protected $appends = ['level'];
     protected $fillable = [

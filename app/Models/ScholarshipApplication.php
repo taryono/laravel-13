@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class ScholarshipApplication extends BasedModel
+class ScholarshipApplication extends SoftDeletableModel
 {
     // Relasi
-        public function scholarship()
+    public function scholarship()
     {
         return $this->belongsTo(Scholarship::class, 'scholarship_id');
     }

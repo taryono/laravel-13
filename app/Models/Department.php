@@ -1,11 +1,11 @@
 <?php
- namespace Models; 
+namespace Models;
 // use App\Traits\HasUniqueCode;
 
-class Department extends BasedModel
-{ 
+class Department extends SoftDeletableModel
+{
     protected $table = 'departments';
-    
+
     protected $fillable = [
         'code',
         'name',
@@ -34,18 +34,18 @@ class Department extends BasedModel
         return $this->hasMany(Employee::class);
     }
 
-     // 🔥 Scope untuk menu dengan parent
+    // 🔥 Scope untuk menu dengan parent
     public function scopeHasParent($query)
     {
         return $query->whereNotNull('parent_id');
     }
-    
+
     // 🔥 Scope untuk menu root (tanpa parent)
     public function scopeIsRoot($query)
     {
         return $query->whereNull('parent_id');
     }
-    
+
     // 🔥 Scope untuk sorting hierarchical
     public function scopeOrderHierarchical($query, $direction = 'asc')
     {

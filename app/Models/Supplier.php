@@ -2,7 +2,7 @@
 
 namespace Models;
 
-class Supplier extends BasedModel
+class Supplier extends SoftDeletableModel
 {
     protected $fillable = [
         'name',

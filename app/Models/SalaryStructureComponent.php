@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class SalaryStructureComponent extends BasedModel
-{ 
+class SalaryStructureComponent extends SoftDeletableModel
+{
     protected $fillable = [
         'salary_structure_id',
         'salary_component_id',

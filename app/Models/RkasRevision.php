@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class RkasRevision extends BasedModel
+class RkasRevision extends SoftDeletableModel
 {
     // Relasi
-        public function rkasDocument()
+    public function rkasDocument()
     {
         return $this->belongsTo(RkasDocument::class, 'rkas_document_id');
     }

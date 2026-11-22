@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class Budget extends BasedModel
-{ 
+class Budget extends SoftDeletableModel
+{
     // Relasi
     // public function user()
     // {

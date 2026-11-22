@@ -1,16 +1,16 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class ApplicationDocument extends BasedModel
-{ 
+class ApplicationDocument extends SoftDeletableModel
+{
     protected $table = 'application_documents';
     protected $guarded = ['id'];
 
     protected $casts = [
         'uploaded_at' => 'datetime',
-        'is_active'   => 'boolean',
-        'verified'    => 'boolean',
+        'is_active' => 'boolean',
+        'verified' => 'boolean',
     ];
 
     public function applicant()

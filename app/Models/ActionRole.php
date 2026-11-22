@@ -2,7 +2,7 @@
 
 namespace Models;
 
-class ActionRole extends BasedModel
+class ActionRole extends SoftDeletableModel
 {
     protected $table = 'action_role';
 

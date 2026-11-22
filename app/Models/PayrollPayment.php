@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class PayrollPayment extends BasedModel
+class PayrollPayment extends SoftDeletableModel
 {
     // Relasi
-        public function payrollPaymentBatch()
+    public function payrollPaymentBatch()
     {
         return $this->belongsTo(PayrollPaymentBatch::class, 'payroll_payment_batch_id');
     }

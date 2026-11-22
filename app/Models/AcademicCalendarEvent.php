@@ -2,7 +2,7 @@
 
 namespace Models;
 
-class AcademicCalendarEvent extends BasedModel
+class AcademicCalendarEvent extends SoftDeletableModel
 {
     // Relasi
     public function organization()

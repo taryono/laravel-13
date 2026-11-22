@@ -2,7 +2,7 @@
 
 namespace Models;
 
-class AdmissionSelection extends BasedModel
+class AdmissionSelection extends SoftDeletableModel
 {
     // Relasi
     public function admission()

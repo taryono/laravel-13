@@ -2,7 +2,7 @@
 
 namespace Models;
 
-class Student extends BasedModel
+class Student extends SoftDeletableModel
 {
     protected $fillable = [
         'organization_id',
@@ -30,12 +30,12 @@ class Student extends BasedModel
     ];
 
     protected $casts = [
-        'birth_date'     => 'date',
-        'join_date'      => 'date',
+        'birth_date' => 'date',
+        'join_date' => 'date',
         'enrollment_year' => 'integer',
-        'created_at'     => 'datetime',
-        'updated_at'     => 'datetime',
-        'deleted_at'     => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'deleted_at' => 'datetime',
     ];
 
     public function organization()
@@ -62,7 +62,7 @@ class Student extends BasedModel
 
     public function parents()
     {
-        return $this->belongsToMany(Parent::class, 'student_parents')
+        return $this->belongsToMany(parent::class, 'student_parents')
             ->withPivot('relationship', 'is_primary', 'deleted_at')
             ->withTimestamps();
     }

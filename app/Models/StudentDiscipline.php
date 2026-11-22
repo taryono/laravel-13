@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class StudentDiscipline extends BasedModel
-{ 
+class StudentDiscipline extends SoftDeletableModel
+{
     // Relasi
     // public function user()
     // {

@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class PayrollDetailComponent extends BasedModel
+class PayrollDetailComponent extends SoftDeletableModel
 {
     // Relasi
-        public function payrollDetail()
+    public function payrollDetail()
     {
         return $this->belongsTo(PayrollDetail::class, 'payroll_detail_id');
     }

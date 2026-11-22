@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class Expense extends BasedModel
-{ 
+class Expense extends SoftDeletableModel
+{
     protected $fillable = [
         'expense_number',
         'expense_date',

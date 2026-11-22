@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class PromotionApproval extends BasedModel
+class PromotionApproval extends SoftDeletableModel
 {
     // Relasi
-        public function promotion()
+    public function promotion()
     {
         return $this->belongsTo(Promotion::class, 'promotion_id');
     }

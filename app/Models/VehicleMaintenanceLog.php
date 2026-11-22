@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class VehicleMaintenanceLog extends BasedModel
+class VehicleMaintenanceLog extends SoftDeletableModel
 {
     // Relasi
-        public function vehicle()
+    public function vehicle()
     {
         return $this->belongsTo(Vehicle::class, 'vehicle_id');
     }

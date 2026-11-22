@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class DiscussionReply extends BasedModel
+class DiscussionReply extends SoftDeletableModel
 {
     // Relasi
-        public function discussion()
+    public function discussion()
     {
         return $this->belongsTo(Discussion::class, 'discussion_id');
     }

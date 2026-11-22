@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class ApplicantPayment extends BasedModel
-{ 
+class ApplicantPayment extends SoftDeletableModel
+{
     protected $table = 'applicant_payments';
     protected $guarded = ['id'];
 

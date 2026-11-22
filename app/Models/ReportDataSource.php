@@ -2,7 +2,7 @@
 
 namespace Models;
 
-class ReportDataSource extends BasedModel
+class ReportDataSource extends SoftDeletableModel
 {
     protected $table = 'report_data_sources';
 
@@ -24,11 +24,11 @@ class ReportDataSource extends BasedModel
     protected function casts(): array
     {
         return [
-            'fields'      => 'array',
+            'fields' => 'array',
             'sample_data' => 'array',
-            'is_system'   => 'boolean',
-            'is_active'   => 'boolean',
-            'order'       => 'integer',
+            'is_system' => 'boolean',
+            'is_active' => 'boolean',
+            'order' => 'integer',
         ];
     }
 
@@ -52,12 +52,12 @@ class ReportDataSource extends BasedModel
     public function getCategoryLabelAttribute(): string
     {
         return match ($this->category) {
-            'academic'    => 'Akademik',
-            'pesantren'   => 'Kepesantrenan',
-            'tahfidz'     => 'Tahfidz Al-Qur\'an',
-            'attendance'  => 'Kehadiran',
-            'character'   => 'Karakter & Adab',
-            default       => ucfirst($this->category ?? 'Kustom'),
+            'academic' => 'Akademik',
+            'pesantren' => 'Kepesantrenan',
+            'tahfidz' => 'Tahfidz Al-Qur\'an',
+            'attendance' => 'Kehadiran',
+            'character' => 'Karakter & Adab',
+            default => ucfirst($this->category ?? 'Kustom'),
         };
     }
 }

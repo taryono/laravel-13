@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class QuestionOption extends BasedModel
+class QuestionOption extends SoftDeletableModel
 {
     // Relasi
-        public function questionBank()
+    public function questionBank()
     {
         return $this->belongsTo(QuestionBank::class, 'question_bank_id');
     }

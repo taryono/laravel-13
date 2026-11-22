@@ -4,7 +4,7 @@ namespace Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ActionUser extends BasedModel
+class ActionUser extends SoftDeletableModel
 {
     protected $table = 'action_user';
     protected $fillable = [

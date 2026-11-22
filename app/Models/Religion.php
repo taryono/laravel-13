@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class Religion extends BasedModel
-{ 
+class Religion extends SoftDeletableModel
+{
     // Relasi
     // public function user()
     // {

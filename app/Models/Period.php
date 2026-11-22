@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class Period extends BasedModel
-{ 
+class Period extends SoftDeletableModel
+{
 
     // ─── Assessment Type Constants ───
     public const SEMESTER = 'Semester';
@@ -18,11 +18,11 @@ class Period extends BasedModel
 
     // ─── Assessment Type Constants ───
     public const SUMATIF = 'Sumatif';
-    public const FORMATIF = 'Formatif'; 
+    public const FORMATIF = 'Formatif';
 
     public const ASSESSMENT_TYPES = [
         self::SUMATIF,
-        self::FORMATIF, 
+        self::FORMATIF,
     ];
 
     // ─── Assessment Type Constants ───

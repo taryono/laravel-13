@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class PayrollAuditLog extends BasedModel
-{ 
+class PayrollAuditLog extends SoftDeletableModel
+{
     // Relasi
     // public function user()
     // {

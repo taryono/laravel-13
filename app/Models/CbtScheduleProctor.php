@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class CbtScheduleProctor extends BasedModel
+class CbtScheduleProctor extends SoftDeletableModel
 {
     // Relasi
-        public function schedule()
+    public function schedule()
     {
         return $this->belongsTo(Schedule::class, 'schedule_id');
     }

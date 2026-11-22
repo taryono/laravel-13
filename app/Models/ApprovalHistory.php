@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class ApprovalHistory extends BasedModel
+class ApprovalHistory extends SoftDeletableModel
 {
     // Relasi
-        public function approvalRequest()
+    public function approvalRequest()
     {
         return $this->belongsTo(ApprovalRequest::class, 'approval_request_id');
     }
@@ -13,7 +13,7 @@ class ApprovalHistory extends BasedModel
     {
         return $this->belongsTo(WorkflowStep::class, 'workflow_step_id');
     }
-    
+
     // Scope
     public function scopeActive($query)
     {

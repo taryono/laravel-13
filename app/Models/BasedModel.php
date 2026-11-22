@@ -4,7 +4,6 @@ namespace Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 // use App\Traits\HasUniqueCode;
@@ -18,7 +17,7 @@ use Illuminate\Support\Facades\Schema;
 
 class BasedModel extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
     protected static array $relationsCache = [];
     // use HasUniqueCode;
 
@@ -26,7 +25,6 @@ class BasedModel extends Model
     protected $casts = [
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
-        'deleted_at' => 'datetime',
     ];
     public $timestamps = true;
     protected $hidden = [];
@@ -39,9 +37,11 @@ class BasedModel extends Model
         parent::boot();
 
         static::addGlobalScope('organization_id', function (Builder $builder) {
-            if (!Auth::check()) return;
+            if (!Auth::check())
+                return;
             $user = Auth::user();
-            if (!$user || !$user instanceof \App\Models\User) return;
+            if (!$user || !$user instanceof \App\Models\User)
+                return;
             if (!$user || $user->isCheckingRole ?? false) {
                 return;
             }
@@ -51,7 +51,8 @@ class BasedModel extends Model
 
             try {
                 $table = $builder->getModel()->getTable();
-                if (!Schema::hasColumn($table, 'organization_id')) return;
+                if (!Schema::hasColumn($table, 'organization_id'))
+                    return;
 
                 // 🔑 Sistem Super Admin = LIHAT SEMUA, tanpa filter
                 if ($user->isSystemSuperAdmin()) {

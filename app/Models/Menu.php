@@ -5,7 +5,7 @@ namespace Models;
 use Models\Role;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-class Menu extends BasedModel
+class Menu extends SoftDeletableModel
 {
     protected $fillable = [
         'organization_id',
@@ -57,7 +57,8 @@ class Menu extends BasedModel
 
     public function getRoleByName()
     {
-        if (empty($this->role)) return null;
+        if (empty($this->role))
+            return null;
         return Role::where('name', $this->role)->first();
     }
 

@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class AcademicRegistrationFee extends BasedModel
+class AcademicRegistrationFee extends SoftDeletableModel
 {
     // Relasi
-    
+
 
 
     // Scope

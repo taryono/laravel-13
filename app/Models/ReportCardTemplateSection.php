@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class ReportCardTemplateSection extends BasedModel
+class ReportCardTemplateSection extends SoftDeletableModel
 {
     // Relasi
-        public function reportCardTemplate()
+    public function reportCardTemplate()
     {
         return $this->belongsTo(ReportCardTemplate::class, 'report_card_template_id');
     }

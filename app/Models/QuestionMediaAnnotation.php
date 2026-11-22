@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class QuestionMediaAnnotation extends BasedModel
+class QuestionMediaAnnotation extends SoftDeletableModel
 {
     // Relasi
-        public function questionMedia()
+    public function questionMedia()
     {
         return $this->belongsTo(QuestionMedia::class, 'question_media_id');
     }

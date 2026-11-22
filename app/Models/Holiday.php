@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class Holiday extends BasedModel
-{ 
+class Holiday extends SoftDeletableModel
+{
     // Relasi
     // public function user()
     // {

@@ -2,7 +2,7 @@
 
 namespace Models;
 
-class ExamPackage extends BasedModel
+class ExamPackage extends SoftDeletableModel
 {
     // Relasi
     public function school()

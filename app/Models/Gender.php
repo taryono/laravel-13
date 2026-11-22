@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class Gender extends BasedModel
+class Gender extends SoftDeletableModel
 {
     // Relasi
-    
+
 
 
     // Scope

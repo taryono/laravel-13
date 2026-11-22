@@ -1,10 +1,10 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class ReferenceValue extends BasedModel
-{ 
-     protected $fillable = [
+class ReferenceValue extends SoftDeletableModel
+{
+    protected $fillable = [
         'reference_type_id',
         'code',
         'name',
@@ -20,8 +20,8 @@ class ReferenceValue extends BasedModel
     ];
 
     protected $casts = [
-        'is_system'  => 'boolean',
-        'is_active'  => 'boolean',
+        'is_system' => 'boolean',
+        'is_active' => 'boolean',
         'sort_order' => 'integer',
     ];
 

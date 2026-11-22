@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class Lesson extends BasedModel
+class Lesson extends SoftDeletableModel
 {
     // Relasi
-        public function course()
+    public function course()
     {
         return $this->belongsTo(Course::class, 'course_id');
     }

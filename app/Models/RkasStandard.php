@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class RkasStandard extends BasedModel
+class RkasStandard extends SoftDeletableModel
 {
     // Relasi
-    
+
 
 
     // Scope

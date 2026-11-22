@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class CmsMedia extends BasedModel
+class CmsMedia extends SoftDeletableModel
 {
     // Relasi
-        public function user()
+    public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
     }

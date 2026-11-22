@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class InvoiceItem extends BasedModel
+class InvoiceItem extends SoftDeletableModel
 {
     // Relasi
-        public function invoice()
+    public function invoice()
     {
         return $this->belongsTo(Invoice::class, 'invoice_id');
     }

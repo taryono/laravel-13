@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class DifficultyLevel extends BasedModel
-{ 
+class DifficultyLevel extends SoftDeletableModel
+{
     // Relasi
     // public function user()
     // {

@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class PositionUser extends BasedModel
-{ 
+class PositionUser extends SoftDeletableModel
+{
     // Relasi
     // public function user()
     // {

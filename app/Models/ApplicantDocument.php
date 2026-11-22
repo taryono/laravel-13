@@ -2,7 +2,7 @@
 
 namespace Models;
 
-class ApplicantDocument extends BasedModel
+class ApplicantDocument extends SoftDeletableModel
 {
     protected $fillable = [
         'id',

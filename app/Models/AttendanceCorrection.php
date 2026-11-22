@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class AttendanceCorrection extends BasedModel
+class AttendanceCorrection extends SoftDeletableModel
 {
     // Relasi
-        public function employeeAttendance()
+    public function employeeAttendance()
     {
         return $this->belongsTo(EmployeeAttendance::class, 'employee_attendance_id');
     }

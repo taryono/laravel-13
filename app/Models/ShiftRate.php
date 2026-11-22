@@ -1,19 +1,24 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class ShiftRate extends BasedModel
-{ 
+class ShiftRate extends SoftDeletableModel
+{
     protected $fillable = [
-        'shift_id', 'day_type',
-        'base_rate_per_shift', 'overtime_multiplier', 'overtime_rate_per_hour',
-        'night_allowance_per_shift', 'meal_allowance_per_shift',
-        'transport_allowance_per_shift', 'is_active',
+        'shift_id',
+        'day_type',
+        'base_rate_per_shift',
+        'overtime_multiplier',
+        'overtime_rate_per_hour',
+        'night_allowance_per_shift',
+        'meal_allowance_per_shift',
+        'transport_allowance_per_shift',
+        'is_active',
     ];
 
     protected $casts = [
-        'day_type'   => 'string',
-        'is_active'  => 'boolean',
+        'day_type' => 'string',
+        'is_active' => 'boolean',
     ];
 
     // Scope

@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class BloodType extends BasedModel
-{ 
+class BloodType extends SoftDeletableModel
+{
     // Relasi
     // public function user()
     // {

@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class WorkflowApprover extends BasedModel
+class WorkflowApprover extends SoftDeletableModel
 {
     // Relasi
-        public function workflowStep()
+    public function workflowStep()
     {
         return $this->belongsTo(WorkflowStep::class, 'workflow_step_id');
     }

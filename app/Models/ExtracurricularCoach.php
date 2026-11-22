@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class ExtracurricularCoach extends BasedModel
+class ExtracurricularCoach extends SoftDeletableModel
 {
     // Relasi
-        public function extracurricular()
+    public function extracurricular()
     {
         return $this->belongsTo(Extracurricular::class, 'extracurricular_id');
     }

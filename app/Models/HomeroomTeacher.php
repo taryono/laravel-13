@@ -2,7 +2,7 @@
 
 namespace Models;
 
-class HomeroomTeacher extends BasedModel
+class HomeroomTeacher extends SoftDeletableModel
 {
     // Relasi
     protected $fillable = [

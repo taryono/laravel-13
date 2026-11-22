@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class Dashboard extends BasedModel
-{ 
+class Dashboard extends SoftDeletableModel
+{
     // Relasi
     // public function user()
     // {

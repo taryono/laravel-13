@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class Account extends BasedModel
+class Account extends SoftDeletableModel
 {
     // Relasi
-    
+
 
 
     // Scope

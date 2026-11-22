@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class ExchangeRate extends BasedModel
+class ExchangeRate extends SoftDeletableModel
 {
     // Relasi
-        public function currency()
+    public function currency()
     {
         return $this->belongsTo(Currency::class, 'currency_id');
     }

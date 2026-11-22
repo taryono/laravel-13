@@ -4,7 +4,7 @@ namespace Models;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
 
-class ExtracurricularDay extends BasedModel
+class ExtracurricularDay extends SoftDeletableModel
 {
     protected $fillable = [
         'extracurricular_id',

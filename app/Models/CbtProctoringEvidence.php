@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class CbtProctoringEvidence extends BasedModel
+class CbtProctoringEvidence extends SoftDeletableModel
 {
     // Relasi
-        public function session()
+    public function session()
     {
         return $this->belongsTo(Session::class, 'session_id');
     }

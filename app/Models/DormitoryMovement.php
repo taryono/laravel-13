@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class DormitoryMovement extends BasedModel
+class DormitoryMovement extends SoftDeletableModel
 {
     // Relasi
-        public function dormitoryAssignment()
+    public function dormitoryAssignment()
     {
         return $this->belongsTo(DormitoryAssignment::class, 'dormitory_assignment_id');
     }

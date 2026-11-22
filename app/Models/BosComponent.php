@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class BosComponent extends BasedModel
+class BosComponent extends SoftDeletableModel
 {
     // Relasi
-    
+
 
 
     // Scope

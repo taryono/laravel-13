@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Validation\ValidationException;
 
 
-class Role extends BasedModel
+class Role extends SoftDeletableModel
 {
     protected $fillable = [
         'organization_id',
@@ -253,6 +253,7 @@ class Role extends BasedModel
 
     public function actions()
     {
-        return $this->hasMany(Action::class, 'action_role')->withTimestamps();;
+        return $this->hasMany(Action::class, 'action_role')->withTimestamps();
+        ;
     }
 }

@@ -1,16 +1,27 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class CbtProctoring extends BasedModel
-{ 
+class CbtProctoring extends SoftDeletableModel
+{
     protected $table = 'cbt_proctoring';
     protected $fillable = [
-        'session_id', 'proctor_id', 'start_proctoring', 'end_proctoring',
-        'notes', 'status', 'flag_reason'
+        'session_id',
+        'proctor_id',
+        'start_proctoring',
+        'end_proctoring',
+        'notes',
+        'status',
+        'flag_reason'
     ];
     protected $casts = ['start_proctoring' => 'datetime', 'end_proctoring' => 'datetime'];
 
-    public function session(): BelongsTo { return $this->belongsTo(CbtSession::class, 'session_id'); }
-    public function proctor(): BelongsTo { return $this->belongsTo(User::class, 'proctor_id'); }
+    public function session(): BelongsTo
+    {
+        return $this->belongsTo(CbtSession::class, 'session_id');
+    }
+    public function proctor(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'proctor_id');
+    }
 }

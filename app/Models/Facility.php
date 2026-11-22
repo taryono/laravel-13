@@ -1,10 +1,10 @@
 <?php
 
 namespace Models;
- 
-class Facility extends BasedModel
-{ 
-    protected $table = 'facilities'; 
+
+class Facility extends SoftDeletableModel
+{
+    protected $table = 'facilities';
     // Relasi
     // public function user()
     // {

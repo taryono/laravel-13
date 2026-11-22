@@ -1,10 +1,10 @@
 <?php
 
-namespace Models; 
+namespace Models;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class TaxType extends BasedModel
+class TaxType extends SoftDeletableModel
 {
     protected $fillable = [
         'organization_id',

@@ -4,7 +4,7 @@ namespace Models;
 
 use Illuminate\Support\Facades\Storage;
 
-class TemplateAsset extends BasedModel
+class TemplateAsset extends SoftDeletableModel
 {
     protected $table = 'template_assets';
 

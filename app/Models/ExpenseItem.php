@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class ExpenseItem extends BasedModel
+class ExpenseItem extends SoftDeletableModel
 {
     // Relasi
-        public function expense()
+    public function expense()
     {
         return $this->belongsTo(Expense::class, 'expense_id');
     }

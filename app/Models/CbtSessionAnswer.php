@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class CbtSessionAnswer extends BasedModel
-{ 
+class CbtSessionAnswer extends SoftDeletableModel
+{
     // Relasi
     // public function user()
     // {

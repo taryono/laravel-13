@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class FeeStructure extends BasedModel
+class FeeStructure extends SoftDeletableModel
 {
     // Relasi
-        public function feeMaster()
+    public function feeMaster()
     {
         return $this->belongsTo(FeeMaster::class, 'fee_master_id');
     }

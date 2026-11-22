@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class ScheduledReport extends BasedModel
-{ 
+class ScheduledReport extends SoftDeletableModel
+{
     // Relasi
     // public function user()
     // {

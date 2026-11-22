@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class StudentRange extends BasedModel
+class StudentRange extends SoftDeletableModel
 {
     // Relasi
-    
+
 
 
     // Scope

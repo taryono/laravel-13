@@ -2,7 +2,7 @@
 
 namespace Models;
 
-class ReportBuilderComponent extends BasedModel
+class ReportBuilderComponent extends SoftDeletableModel
 {
     protected $table = 'report_builder_components';
 

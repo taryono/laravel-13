@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class MployeeSalaryComponent extends BasedModel
-{ 
+class MployeeSalaryComponent extends SoftDeletableModel
+{
     // Relasi
     // public function user()
     // {

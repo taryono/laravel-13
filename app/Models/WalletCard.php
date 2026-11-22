@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class WalletCard extends BasedModel
+class WalletCard extends SoftDeletableModel
 {
     // Relasi
-        public function digitalWallet()
+    public function digitalWallet()
     {
         return $this->belongsTo(DigitalWallet::class, 'digital_wallet_id');
     }

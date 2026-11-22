@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class MasteryTracking extends BasedModel
+class MasteryTracking extends SoftDeletableModel
 {
     // Relasi
-        public function school()
+    public function school()
     {
         return $this->belongsTo(School::class, 'school_id');
     }

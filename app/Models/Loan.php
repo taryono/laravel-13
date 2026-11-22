@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class Loan extends BasedModel
-{ 
+class Loan extends SoftDeletableModel
+{
     // Relasi
     // public function user()
     // {

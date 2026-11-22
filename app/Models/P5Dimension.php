@@ -5,7 +5,7 @@ namespace Models;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class P5Dimension extends BasedModel
+class P5Dimension extends SoftDeletableModel
 {
 
     protected $table = 'p5_dimensions';

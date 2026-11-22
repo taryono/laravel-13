@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class PaymentChannel extends BasedModel
+class PaymentChannel extends SoftDeletableModel
 {
     // Relasi
-        public function paymentGateway()
+    public function paymentGateway()
     {
         return $this->belongsTo(PaymentGateway::class, 'payment_gateway_id');
     }

@@ -2,7 +2,7 @@
 
 namespace Models;
 
-class ChartOfAccount extends BasedModel
+class ChartOfAccount extends SoftDeletableModel
 {
     protected $fillable = [
         'code',
@@ -36,7 +36,7 @@ class ChartOfAccount extends BasedModel
     ];
 
     // ─── Normal Balance Constants ───
-    public const BALANCE_DEBIT  = 'debit';
+    public const BALANCE_DEBIT = 'debit';
     public const BALANCE_CREDIT = 'credit';
 
     public const NORMAL_BALANCES = [

@@ -4,7 +4,7 @@ namespace Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class StudentPromotion extends BasedModel
+class StudentPromotion extends SoftDeletableModel
 {
     protected $fillable = [
         'student_id',

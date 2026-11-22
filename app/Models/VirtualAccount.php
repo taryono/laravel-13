@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class VirtualAccount extends BasedModel
+class VirtualAccount extends SoftDeletableModel
 {
     // Relasi
-        public function school()
+    public function school()
     {
         return $this->belongsTo(School::class, 'school_id');
     }

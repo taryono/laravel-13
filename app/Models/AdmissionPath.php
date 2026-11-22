@@ -2,7 +2,7 @@
 
 namespace Models;
 
-class AdmissionPath extends BasedModel
+class AdmissionPath extends SoftDeletableModel
 {
     protected $table = 'admission_paths';
 
@@ -26,11 +26,11 @@ class AdmissionPath extends BasedModel
 
     protected $casts = [
         'requirements' => 'array',
-        'open_date'    => 'date',
-        'close_date'   => 'date',
-        'is_active'    => 'boolean',
-        'min_score'    => 'float',
-        'max_score'    => 'float',
+        'open_date' => 'date',
+        'close_date' => 'date',
+        'is_active' => 'boolean',
+        'min_score' => 'float',
+        'max_score' => 'float',
     ];
 
     public function admission()

@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class EmploymentStatus extends BasedModel
+class EmploymentStatus extends SoftDeletableModel
 {
     // Relasi
-    
+
 
 
     // Scope

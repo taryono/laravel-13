@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class CmsComment extends BasedModel
+class CmsComment extends SoftDeletableModel
 {
     // Relasi
-        public function post()
+    public function post()
     {
         return $this->belongsTo(Post::class, 'post_id');
     }
@@ -16,7 +16,7 @@ class CmsComment extends BasedModel
 
     public function parent()
     {
-        return $this->belongsTo(Parent::class, 'parent_id');
+        return $this->belongsTo(parent::class, 'parent_id');
     }
 
 

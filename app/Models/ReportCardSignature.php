@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class ReportCardSignature extends BasedModel
+class ReportCardSignature extends SoftDeletableModel
 {
     // Relasi
-        public function reportCard()
+    public function reportCard()
     {
         return $this->belongsTo(ReportCard::class, 'report_card_id');
     }

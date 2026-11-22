@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class ThesisSupervision extends BasedModel
+class ThesisSupervision extends SoftDeletableModel
 {
     // Relasi
-        public function student()
+    public function student()
     {
         return $this->belongsTo(Student::class, 'student_id');
     }

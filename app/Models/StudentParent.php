@@ -2,7 +2,7 @@
 
 namespace Models;
 
-class StudentParent extends BasedModel
+class StudentParent extends SoftDeletableModel
 {
     protected $fillable = [];
     // Relasi

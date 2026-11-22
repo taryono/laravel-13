@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class CmsActivityLog extends BasedModel
+class CmsActivityLog extends SoftDeletableModel
 {
     // Relasi
-        public function user()
+    public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
     }

@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class ExamPackageQuestion extends BasedModel
+class ExamPackageQuestion extends SoftDeletableModel
 {
     // Relasi
-        public function examPackage()
+    public function examPackage()
     {
         return $this->belongsTo(ExamPackage::class, 'exam_package_id');
     }

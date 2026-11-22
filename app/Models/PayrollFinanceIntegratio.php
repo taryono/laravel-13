@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class PayrollFinanceIntegratio extends BasedModel
-{ 
+class PayrollFinanceIntegratio extends SoftDeletableModel
+{
     // Relasi
     // public function user()
     // {

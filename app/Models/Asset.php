@@ -2,7 +2,7 @@
 
 namespace Models;
 
-class Asset extends BasedModel
+class Asset extends SoftDeletableModel
 {
     // Tambahkan baris ini agar 'book_value' & 'monthly_depreciation' otomatis masuk di response JSON/Array
     protected $appends = [
@@ -129,7 +129,7 @@ class Asset extends BasedModel
         // Untuk perhitungan akurat semua metode, pakai AssetDepreciationService.
         return match ($this->depreciation_method) {
             'straight_line' => $depreciableAmount / $this->useful_life_months,
-            default         => $depreciableAmount / $this->useful_life_months, // fallback kasar
+            default => $depreciableAmount / $this->useful_life_months, // fallback kasar
         };
     }
 

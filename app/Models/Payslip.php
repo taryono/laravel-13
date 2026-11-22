@@ -4,7 +4,7 @@ namespace Models;
 
 use App\Services\DocumentNumberGenerator;
 
-class Payslip extends BasedModel
+class Payslip extends SoftDeletableModel
 {
     protected $table = 'payslips';
 
@@ -34,13 +34,13 @@ class Payslip extends BasedModel
     protected $casts = [
         'total_allowance' => 'decimal:2',
         'total_deduction' => 'decimal:2',
-        'gross_salary'    => 'decimal:2',
-        'net_salary'      => 'decimal:2',
-        'generated_at'    => 'datetime',
-        'sent_at'         => 'datetime',
-        'downloaded_at'   => 'datetime',
-        'is_sent'         => 'boolean',
-        'is_downloaded'   => 'boolean',
+        'gross_salary' => 'decimal:2',
+        'net_salary' => 'decimal:2',
+        'generated_at' => 'datetime',
+        'sent_at' => 'datetime',
+        'downloaded_at' => 'datetime',
+        'is_sent' => 'boolean',
+        'is_downloaded' => 'boolean',
     ];
 
     /**
@@ -112,11 +112,11 @@ class Payslip extends BasedModel
     public function getStatusLabelAttribute(): string
     {
         $statusColors = [
-            'draft'      => 'secondary',
-            'generated'  => 'info',
-            'sent'       => 'primary',
+            'draft' => 'secondary',
+            'generated' => 'info',
+            'sent' => 'primary',
             'downloaded' => 'success',
-            'void'       => 'danger',
+            'void' => 'danger',
         ];
         $color = $statusColors[$this->status] ?? 'secondary';
         $label = ucfirst($this->status ?? 'draft');

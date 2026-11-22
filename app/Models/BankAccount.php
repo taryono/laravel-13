@@ -2,7 +2,7 @@
 
 namespace Models;
 
-class BankAccount extends BasedModel
+class BankAccount extends SoftDeletableModel
 {
     protected $fillable = [
         'chart_of_account_id',
@@ -19,8 +19,8 @@ class BankAccount extends BasedModel
 
     protected $casts = [
         'current_balance' => 'decimal:2',
-        'is_active'       => 'boolean',
-        'is_default'      => 'boolean',
+        'is_active' => 'boolean',
+        'is_default' => 'boolean',
     ];
 
     // Relasi ke Chart of Accounts

@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class LoanInstallment extends BasedModel
-{ 
+class LoanInstallment extends SoftDeletableModel
+{
     // Relasi
     // public function user()
     // {

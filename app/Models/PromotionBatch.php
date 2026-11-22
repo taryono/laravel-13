@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 
-class PromotionBatch extends BasedModel
+class PromotionBatch extends SoftDeletableModel
 {
     protected $fillable = [
         'code',

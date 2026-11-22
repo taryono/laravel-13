@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class FileUpload extends BasedModel
+class FileUpload extends SoftDeletableModel
 {
     // Relasi
-        public function organization()
+    public function organization()
     {
         return $this->belongsTo(Organization::class, 'organization_id');
     }

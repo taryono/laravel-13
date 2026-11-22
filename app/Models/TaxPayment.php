@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class TaxPayment extends BasedModel
-{ 
+class TaxPayment extends SoftDeletableModel
+{
     // Relasi
     // public function user()
     // {

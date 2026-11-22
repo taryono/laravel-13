@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class PromotionCriterion extends BasedModel
+class PromotionCriterion extends SoftDeletableModel
 {
     // Relasi
-        public function academicYear()
+    public function academicYear()
     {
         return $this->belongsTo(AcademicYear::class, 'academic_year_id');
     }

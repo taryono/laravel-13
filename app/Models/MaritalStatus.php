@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class MaritalStatus extends BasedModel
-{ 
+class MaritalStatus extends SoftDeletableModel
+{
     // Relasi
     // public function user()
     // {

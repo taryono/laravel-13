@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class EmployeeMutation extends BasedModel
-{ 
+class EmployeeMutation extends SoftDeletableModel
+{
     // Relasi
     // public function user()
     // {

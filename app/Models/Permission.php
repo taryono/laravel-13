@@ -2,7 +2,7 @@
 
 namespace Models;
 
-class Permission extends BasedModel
+class Permission extends SoftDeletableModel
 {
     protected $table = 'permissions';
     protected $fillable = [

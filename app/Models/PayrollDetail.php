@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class PayrollDetail extends BasedModel
-{ 
+class PayrollDetail extends SoftDeletableModel
+{
     protected $fillable = [
         'payroll_run_id',
         'employee_id',

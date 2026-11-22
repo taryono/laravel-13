@@ -4,7 +4,7 @@ namespace Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class P5ProjectDimension extends BasedModel
+class P5ProjectDimension extends SoftDeletableModel
 {
 
     protected $table = 'p5_project_dimensions';

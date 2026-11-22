@@ -2,7 +2,7 @@
 
 namespace Models;
 
-class AdmissionAnnouncement extends BasedModel
+class AdmissionAnnouncement extends SoftDeletableModel
 {
     // Relasi
     public function organization()

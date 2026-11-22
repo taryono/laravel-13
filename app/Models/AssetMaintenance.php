@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class AssetMaintenance extends BasedModel
+class AssetMaintenance extends SoftDeletableModel
 {
     // Relasi
-        public function fixedAsset()
+    public function fixedAsset()
     {
         return $this->belongsTo(FixedAsset::class, 'fixed_asset_id');
     }

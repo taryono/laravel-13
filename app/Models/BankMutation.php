@@ -1,10 +1,10 @@
 <?php
-namespace Models; 
+namespace Models;
 
-class BankMutation extends BasedModel
+class BankMutation extends SoftDeletableModel
 {
     // Relasi
-        public function school()
+    public function school()
     {
         return $this->belongsTo(School::class, 'school_id');
     }
@@ -13,11 +13,11 @@ class BankMutation extends BasedModel
     {
         return $this->belongsTo(BankAccount::class, 'bank_account_id');
     }
- 
+
     public function currency()
     {
         return $this->belongsTo(Currency::class, 'currency_id');
-    } 
+    }
     // Scope
     public function scopeActive($query)
     {

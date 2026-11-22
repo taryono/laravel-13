@@ -1,24 +1,33 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class Shift extends BasedModel
-{ 
-   protected $table = 'shifts';
+class Shift extends SoftDeletableModel
+{
+    protected $table = 'shifts';
 
     protected $fillable = [
-        'code', 'name', 'start_time', 'end_time', 'crosses_midnight',
-        'grace_period_start', 'grace_period_end',
-        'break_start', 'break_end', 'break_duration',
-        'overtime_min_threshold', 'night_shift_start', 'is_active',
+        'code',
+        'name',
+        'start_time',
+        'end_time',
+        'crosses_midnight',
+        'grace_period_start',
+        'grace_period_end',
+        'break_start',
+        'break_end',
+        'break_duration',
+        'overtime_min_threshold',
+        'night_shift_start',
+        'is_active',
     ];
 
     protected $casts = [
         'crosses_midnight' => 'boolean',
-        'is_active'        => 'boolean',
+        'is_active' => 'boolean',
     ];
 
-   public function shift_rates()
+    public function shift_rates()
     {
         return $this->hasMany(ShiftRate::class);
     }
@@ -40,11 +49,11 @@ class Shift extends BasedModel
     {
         $start = \Carbon\Carbon::parse($this->start_time);
         $end = \Carbon\Carbon::parse($this->end_time);
-        
+
         if ($end->lt($start)) {
             $end->addDay();
         }
-        
+
         return $end->diffInHours($start) + ($end->diffInMinutes($start) % 60) / 60;
     }
 
@@ -84,12 +93,12 @@ class Shift extends BasedModel
     {
         $start = strtotime($this->start_time);
         $end = strtotime($this->end_time);
-        
+
         // Jika melewati tengah malam, tambahkan 24 jam (86400 detik) ke waktu selesai
         if ($end < $start) {
-            $end += 86400; 
+            $end += 86400;
         }
-        
+
         $totalSeconds = $end - $start;
         return (int) ($totalSeconds / 60); // Kembalikan dalam menit
     }

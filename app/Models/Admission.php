@@ -2,7 +2,7 @@
 
 namespace Models;
 
-class Admission extends BasedModel
+class Admission extends SoftDeletableModel
 {
     protected $table = 'admissions';
     protected $fillable = [
@@ -96,27 +96,27 @@ class Admission extends BasedModel
     {
         return [
             [
-                'phase_name'  => 'Pendaftaran Online',
-                'start_date'  => $this->start_date,
-                'end_date'    => $this->end_date,
+                'phase_name' => 'Pendaftaran Online',
+                'start_date' => $this->start_date,
+                'end_date' => $this->end_date,
                 'description' => 'Layanan 24 Jam (Ditutup pkl 23:59 WIB)',
             ],
             [
-                'phase_name'  => 'Verifikasi Berkas & Dokumen',
-                'start_date'  => $this->end_date->copy()->addDay(),
-                'end_date'    => $this->end_date->copy()->addDays(3),
+                'phase_name' => 'Verifikasi Berkas & Dokumen',
+                'start_date' => $this->end_date->copy()->addDay(),
+                'end_date' => $this->end_date->copy()->addDays(3),
                 'description' => 'Jam Kerja Tim Panitia: 08:00 - 15:30 WIB',
             ],
             [
-                'phase_name'  => 'Pengumuman Kelulusan',
-                'start_date'  => $this->end_date->copy()->addDays(4),
-                'end_date'    => $this->end_date->copy()->addDays(4),
+                'phase_name' => 'Pengumuman Kelulusan',
+                'start_date' => $this->end_date->copy()->addDays(4),
+                'end_date' => $this->end_date->copy()->addDays(4),
                 'description' => 'Diumumkan serentak pukul 10:00 WIB',
             ],
             [
-                'phase_name'  => 'Daftar Ulang Fisik di Sekolah',
-                'start_date'  => $this->end_date->copy()->addDays(5),
-                'end_date'    => $this->end_date->copy()->addDays(8),
+                'phase_name' => 'Daftar Ulang Fisik di Sekolah',
+                'start_date' => $this->end_date->copy()->addDays(5),
+                'end_date' => $this->end_date->copy()->addDays(8),
                 'description' => 'Membawa berkas fisik asli ke sekolah tujuan',
             ],
         ];

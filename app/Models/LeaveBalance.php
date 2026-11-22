@@ -1,9 +1,9 @@
 <?php
 
-namespace Models; 
+namespace Models;
 
-class LeaveBalance extends BasedModel
-{ 
+class LeaveBalance extends SoftDeletableModel
+{
     // Relasi
     // public function user()
     // {

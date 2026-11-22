@@ -2,7 +2,7 @@
 
 namespace Models;
 
-class TestType extends BasedModel
+class TestType extends SoftDeletableModel
 {
     // Relasi
     public function test_schedule()
