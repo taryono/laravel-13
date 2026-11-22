@@ -1,7 +1,7 @@
 <?php
 namespace Models;
 
-class EmailLog extends SoftDeletableModel
+class EmailLog extends BasedModel
 {
     // Relasi
     public function organization()

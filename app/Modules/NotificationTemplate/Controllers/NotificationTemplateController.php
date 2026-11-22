@@ -51,14 +51,11 @@ class NotificationTemplateController extends MainController
      */
     public function create(): View
     {
-        $notificationTemplate = new NotificationTemplate();
-        $result = $this->getForm($notificationTemplate);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
+        $notification_template = new NotificationTemplate();
 
         return view(
             'NotificationTemplate::create',
-            compact('notificationTemplate', 'forms', 'groupedForms')
+            compact('notification_template')
         );
     }
 
@@ -68,7 +65,7 @@ class NotificationTemplateController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'category' => ['required', 'string', 'max:255'],
@@ -125,14 +122,11 @@ class NotificationTemplateController extends MainController
      */
     public function edit($id): View
     {
-        $notificationTemplate = $this->model->findOrFail($id);
-        $result = $this->getForm($notificationTemplate);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
+        $notification_template = $this->model->findOrFail($id);
 
         return view(
             'NotificationTemplate::edit',
-            compact('notificationTemplate', 'forms', 'groupedForms')
+            compact('notification_template')
         );
     }
 
@@ -142,7 +136,7 @@ class NotificationTemplateController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'category' => ['required', 'string', 'max:255'],
@@ -167,10 +161,7 @@ class NotificationTemplateController extends MainController
 
         try {
             $notificationTemplate = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $notificationTemplate,
-                $validated
-            ) {
+            DB::transaction(function () use ($notificationTemplate, $validated) {
                 $notificationTemplate->update($validated);
             });
 
@@ -180,7 +171,7 @@ class NotificationTemplateController extends MainController
                 $notificationTemplate
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui NotificationTemplate.',
                 [
@@ -215,7 +206,7 @@ class NotificationTemplateController extends MainController
                 'Data NotificationTemplate berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $notificationTemplate->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus NotificationTemplate.',
@@ -231,5 +222,5 @@ class NotificationTemplateController extends MainController
                 'Data NotificationTemplate gagal dihapus.'
             );
         }
-    } 
+    }
 }

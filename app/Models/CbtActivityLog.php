@@ -2,7 +2,9 @@
 
 namespace Models;
 
-class CbtActivityLog extends SoftDeletableModel
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class CbtActivityLog extends BasedModel
 {
     protected $table = 'cbt_activity_logs';
     protected $fillable = [

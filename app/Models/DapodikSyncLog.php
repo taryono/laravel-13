@@ -1,7 +1,7 @@
 <?php
 namespace Models;
 
-class DapodikSyncLog extends SoftDeletableModel
+class DapodikSyncLog extends BasedModel
 {
     // Relasi
     public function school()

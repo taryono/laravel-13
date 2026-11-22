@@ -1,7 +1,7 @@
 <?php
 namespace Models;
 
-class WhatsappLog extends SoftDeletableModel
+class WhatsappLog extends BasedModel
 {
     // Relasi
     public function organization()

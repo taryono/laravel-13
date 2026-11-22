@@ -2,7 +2,7 @@
 
 namespace Models;
 
-class DepreciationLog extends SoftDeletableModel
+class DepreciationLog extends BasedModel
 {
     // Relasi
     // public function user()

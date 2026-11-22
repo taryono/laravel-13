@@ -1,7 +1,7 @@
 <?php
 namespace Models;
 
-class SmsLog extends SoftDeletableModel
+class SmsLog extends BasedModel
 {
     // Relasi
     public function organization()
@@ -14,19 +14,25 @@ class SmsLog extends SoftDeletableModel
         return $this->belongsTo(NotificationTemplate::class, 'notification_template_id');
     }
 
-    public function recipientUser()
-    {
-        return $this->belongsTo(RecipientUser::class, 'recipient_user_id');
-    }
+    // public function recipientUser()
+    // {
+    //     return $this->belongsTo(RecipientUser::class, 'recipient_user_id');
+    // }
 
-    public function recipientStudent()
-    {
-        return $this->belongsTo(RecipientStudent::class, 'recipient_student_id');
-    }
+    // public function recipientStudent()
+    // {
+    //     return $this->belongsTo(RecipientStudent::class, 'recipient_student_id');
+    // }
 
-    public function recipientEmployee()
+    // public function recipientEmployee()
+    // {
+    //     return $this->belongsTo(RecipientEmployee::class, 'recipient_employee_id');
+    // }
+
+    // Pengganti 3 relasi recipient*
+    public function recipient()
     {
-        return $this->belongsTo(RecipientEmployee::class, 'recipient_employee_id');
+        return $this->morphTo(); // recipient_type + recipient_id
     }
 
     public function providerMessage()

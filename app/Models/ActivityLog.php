@@ -1,12 +1,12 @@
 <?php
 namespace Models;
 
-class ActivityLog extends SoftDeletableModel
+class ActivityLog extends BasedModel
 {
     // Relasi
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(\App\Models\User::class, 'user_id');
     }
 
     public function record()

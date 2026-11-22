@@ -13,6 +13,7 @@ use App\Core\Menu\MenuTreeBuilder;
 use Models\Organization;
 use Models\Employee;
 use App\Observers\EmployeeObserver;
+use Illuminate\Database\Eloquent\Relations\Relation;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -29,7 +30,7 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Bootstrap any application services.
      */
-   public function boot(): void
+    public function boot(): void
     {
         Schema::defaultStringLength(191);
         $modulesPath = app_path('Modules');
@@ -44,7 +45,7 @@ class AppServiceProvider extends ServiceProvider
                 // FIX: Menggunakan Route::group() untuk meload file routes.php secara aman
                 if (File::exists("{$module}/routes.php")) {
                     Route::group([], "{$module}/routes.php");
-                } 
+                }
                 if (File::exists("{$module}/Views")) {
                     View::addNamespace($moduleName, "{$module}/Views");
                 }
@@ -55,11 +56,17 @@ class AppServiceProvider extends ServiceProvider
             $view->with('assetVersion', config('app.asset_version', time()));
         });
 
-         View::composer('layouts.*', function ($view) {
+        View::composer('layouts.*', function ($view) {
             $view->with('organization', Organization::first());
         });
         Employee::observe(EmployeeObserver::class);
         \Carbon\Carbon::setLocale('id');
+        // Agar recipient_type berisi 'student' dan bukan nama kelas lengkap, daftarkan morph map di AppServiceProvider::boot():
+        Relation::enforceMorphMap([
+            'user' => \App\Models\User::class,
+            'student' => \Models\Student::class,
+            'employee' => Employee::class,
+        ]);
     }
 
 }
