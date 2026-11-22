@@ -11,7 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 // use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
-
+use Illuminate\Database\Eloquent\Model;
 class MainController extends Controller implements HasMiddleware
 {
     protected $model;
@@ -75,25 +75,24 @@ class MainController extends Controller implements HasMiddleware
     protected function successResponse(
         Request $request,
         string $message,
-        $data = null
+        $data = null,
+        ?string $redirectTo = null
     ): JsonResponse|RedirectResponse {
 
         if ($this->isAjaxRequest($request)) {
-
-            $response = [
-                'success' => true,
-                'message' => $message,
-            ];
+            $response = ['success' => true, 'message' => $message];
 
             if ($data !== null) {
                 $response['data'] = $data;
+            }
+            if ($redirectTo) {
+                $response['redirectTo'] = $redirectTo;
             }
 
             return response()->json($response);
         }
 
-        return redirect()
-            ->route($this->controller . '.index')
+        return redirect($redirectTo ?? route($this->controller . '.index'))
             ->with('success', $message);
     }
 

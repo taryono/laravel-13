@@ -2,8 +2,13 @@
 namespace App\Traits;
 
 use Exception;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
+use Throwable;
+
 
 trait ProcessHandler
 {
@@ -20,123 +25,99 @@ trait ProcessHandler
 
     protected function handleProcess(callable $callback, array $options = [])
     {
-        $defaultOptions = [
-            'successMessage' => 'Proses Berhasil',
-            'errorMessage'   => 'Proses Gagal',
-            'redirectTo'     => null,
-            'redirectRoute'  => null,
+        $options = array_merge([
+            'successMessage' => 'Proses berhasil.',
+            'errorMessage' => 'Proses gagal.',
+            'redirectTo' => null,
+            'redirectRoute' => null,
             'redirectParams' => [],
-            'view'           => null,
-            'viewParams'     => [],
-            'save'           => false,
-        ];
+            'view' => null,
+            'viewParams' => [],
+            'save' => false,   // bungkus DB::transaction
+            'audit' => false,   // tulis ke tabel Log
+            'logContext' => [],      // tambahan konteks log error
+        ], $options);
 
-        $options      = array_merge($defaultOptions, $options);
-        $errorMessage = $options['errorMessage'];
-         
+        $request = request();
+
         try {
+            $result = $options['save']
+                ? DB::transaction(function () use ($callback, $options, $request) {
+                    $result = $callback();
 
-            if ($options['save']) {
-                DB::beginTransaction();
+                    if ($options['audit']) {
 
-                $result = $callback();
+                    }
 
-                \Models\Log::create([
-                    'user_id' => auth()->user()->id,
-                    'data'     => json_encode(request()->all()),
-                    'type'  => 1 
-                ]);
-                
-                DB::commit();
-            } else {
-                $result = $callback();
-            }
+                    return $result;
+                })
+                : $callback();
 
             $successMessage = $options['successMessage'];
-
-            if ($result) {
-                // Perbaikan: Cek apakah $result adalah array
-                if (is_array($result)) {
-                    if (array_key_exists('errorMessage', $result)) {
-                        $errorMessage = $result['errorMessage'];
-                    }
-                    if (array_key_exists('successMessage', $result)) {
-                        $successMessage = $result['successMessage'];
-                    }
-                }
+            $errorMessage = $options['errorMessage'];
+            if ($options['activity']) {
+                $this->logProcessActivity($options['activity'], 'success');
             }
 
-            // Handle view response
+            // Override pesan dari callback
+            if (is_array($result)) {
+                $successMessage = $result['successMessage'] ?? $successMessage;
+            }
+
+            // Response view
             if ($options['view']) {
-                $viewParams = is_array($result) ? $result : $options['viewParams'];
-                return view($options['view'], $viewParams);
+                return view(
+                    $options['view'],
+                    is_array($result) ? $result : $options['viewParams']
+                );
             }
 
-            // Determine redirect URL if provided
-            $redirectUrl = $options['redirectTo'] ??
-                ($options['redirectRoute'] ? route($options['redirectRoute'], $options['redirectParams']) : null);
+            $redirectUrl = $options['redirectTo']
+                ?? ($options['redirectRoute']
+                    ? route($options['redirectRoute'], $options['redirectParams'])
+                    : null);
 
-            if (request()->ajax()) {
-                return response()->json([
-                    'status'     => 'success',
-                    'message'    => say($successMessage),
-                    'data'       => $result ?? null,
-                    'redirectTo' => $redirectUrl,
-                ], 200);
+            return $this->successResponse(
+                $request,
+                say($successMessage),
+                $result,
+                $redirectUrl
+            );
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return $this->errorResponse(
+                $request,
+                say('Data tidak ditemukan.'),
+                404
+            );
+        } catch (ValidationException $e) {
+            throw $e; // biarkan Laravel menangani validasi (422 + error bag)
+
+        } catch (Throwable $e) {
+            if ($options['activity']) {
+                $this->logProcessActivity($options['activity'], 'failed', $e->getMessage());
+            }
+            Log::error($options['errorMessage'], array_merge([
+                'exception' => $e,
+                'user_id' => Auth::id(),
+                'input' => $request->except(['password', 'password_confirmation', '_token']),
+            ], $options['logContext']));
+
+            // Kasus khusus MySQL 3988
+            if (
+                $e instanceof \Illuminate\Database\QueryException
+                && ($e->errorInfo[1] ?? null) == 3988
+            ) {
+                return $this->errorResponse(
+                    $request,
+                    say('Maaf, teks yang Anda input mengandung karakter yang belum didukung oleh sistem kami.'),
+                    422
+                );
             }
 
-            
-
-
-            return $redirectUrl ? redirect($redirectUrl) : back()->with('success', say($successMessage));
-
-        }catch (Exception $e) {
-            $user = auth()->user();
-
-            Log::error($e->getMessage(), [
-                'user_id'   => $user?->id,
-                'user_name' => $user?->name,
-            ]);
-
-            if ($options['save']) {
-                DB::rollBack();
-            }
-
-            // ✅ Deteksi error collation MySQL 3988
-            if ($e instanceof \Illuminate\Database\QueryException) {
-                $errorCode = $e->errorInfo[1] ?? null;
-
-                if ($errorCode == 3988) {
-                    $charsetMessage = 'Maaf, teks yang Anda input mengandung karakter yang belum didukung oleh sistem kami.';
-
-                    if (request()->ajax()) {
-                        return response()->json([
-                            'status'  => 'error',
-                            'message' => say($charsetMessage),
-                        ], 422);
-                    }
-
-                    return back()
-                        ->withErrors(['answer' => $charsetMessage])
-                        ->withInput();
-                }
-            }
-
-            // ✅ Hilangkan 'line' dari response — jangan pernah expose ke client
-            if (request()->ajax()) {
-                return response()->json([
-                    'status'  => 'error',
-                    'message' => config('app.debug')
-                        ? $e->getMessage() . ' (Line: ' . $e->getLine() . ')'
-                        : say($errorMessage),
-                ], 400);
-            }
-
-            return back()
-                ->with('error', config('app.debug')
-                    ? $e->getMessage()
-                    : say($errorMessage))
-                ->withInput();
+            return $this->errorResponse(
+                $request,
+                config('app.debug') ? $e->getMessage() : say($options['errorMessage'])
+            );
         }
     }
 
@@ -157,83 +138,83 @@ trait ProcessHandler
 
             if (request()->input('id_file')) {
                 $document = \Models\Document::where('id_file', request()->input('id_file'))
-                    ->where('user_id', auth()->user()->id)
+                    ->where('user_id', Auth::id())
                     ->first();
                 if ($document) {
                     $document->deleteFile();
                 }
                 $document = \Models\Document::updateOrCreate([
-                    'user_id'                  => auth()->user()->id,
+                    'user_id' => Auth::id(),
                     'certification_request_id' => $certification_request?->id,
-                    'id_file'                  => request()->input('id_file'),
+                    'id_file' => request()->input('id_file'),
                 ], [
-                    'filename'             => $new_filename, // new filename
-                    'form_type_id'         => $certification_request?->step?->form_type_id,
-                    'original_path'        => $path,
-                    'object'               => $object,
-                    'object_id'            => $object_id,
-                    'size'                 => $properties->size,
-                    'mime_type'            => $properties->mime,
-                    'ext'                  => $ext,
-                    'original_extension'   => $properties->ext,
-                    'code'                 => $code,
-                    'name'                 => $properties->filename, // original file name
+                    'filename' => $new_filename, // new filename
+                    'form_type_id' => $certification_request?->step?->form_type_id,
+                    'original_path' => $path,
+                    'object' => $object,
+                    'object_id' => $object_id,
+                    'size' => $properties->size,
+                    'mime_type' => $properties->mime,
+                    'ext' => $ext,
+                    'original_extension' => $properties->ext,
+                    'code' => $code,
+                    'name' => $properties->filename, // original file name
                     'document_category_id' => request()->input('document_category_id'),
                 ]);
             } else {
 
-                if (! empty($code)) {
+                if (!empty($code)) {
                     if ($code == "facilities") {
                         $document = \Models\Document::updateOrCreate([
-                            'user_id'                  => auth()->user()->id,
+                            'user_id' => Auth::id(),
                             'certification_request_id' => $certification_request?->id,
-                            'code'                     => $code, // new filename
-                            'object'                   => $object,
-                            'object_id'                => $object_id,
+                            'code' => $code, // new filename
+                            'object' => $object,
+                            'object_id' => $object_id,
                         ], [
-                            'form_type_id'         => $certification_request?->step?->form_type_id,
-                            'original_path'        => $path,
-                            'size'                 => $properties->size,
-                            'mime_type'            => $properties->mime,
-                            'ext'                  => $ext,
-                            'original_extension'   => $properties->ext,
-                            'name'                 => $properties->filename, // original file name
+                            'form_type_id' => $certification_request?->step?->form_type_id,
+                            'original_path' => $path,
+                            'size' => $properties->size,
+                            'mime_type' => $properties->mime,
+                            'ext' => $ext,
+                            'original_extension' => $properties->ext,
+                            'name' => $properties->filename, // original file name
                             'document_category_id' => request()->input('document_category_id'),
                         ]);
                     } else {
                         $document = \Models\Document::updateOrCreate([
-                            'user_id'                  => auth()->user()->id,
+                            'user_id' => Auth::id(),
                             'certification_request_id' => $certification_request?->id,
-                            'code'                     => $code, // new filename
+                            'code' => $code, // new filename
                         ], [
-                            'form_type_id'         => $certification_request?->step?->form_type_id,
-                            'original_path'        => $path,
-                            'object'               => $object,
-                            'object_id'            => $object_id,
-                            'size'                 => $properties->size,
-                            'mime_type'            => $properties->mime,
-                            'ext'                  => $ext,
-                            'original_extension'   => $properties->ext,
-                            'name'                 => $properties->filename, // original file name
+                            'form_type_id' => $certification_request?->step?->form_type_id,
+                            'original_path' => $path,
+                            'object' => $object,
+                            'object_id' => $object_id,
+                            'size' => $properties->size,
+                            'mime_type' => $properties->mime,
+                            'ext' => $ext,
+                            'original_extension' => $properties->ext,
+                            'name' => $properties->filename, // original file name
                             'document_category_id' => request()->input('document_category_id'),
                         ]);
                     }
                 } else {
                     $document = \Models\Document::updateOrCreate([
-                        'user_id'                  => auth()->user()->id,
+                        'user_id' => Auth::id(),
                         'certification_request_id' => $certification_request?->id,
-                        'filename'                 => $new_filename, // new filename
+                        'filename' => $new_filename, // new filename
                     ], [
-                        'form_type_id'         => $certification_request?->step?->form_type_id,
-                        'original_path'        => $path,
-                        'object'               => $object,
-                        'object_id'            => $object_id,
-                        'size'                 => $properties->size,
-                        'mime_type'            => $properties->mime,
-                        'ext'                  => $ext,
-                        'original_extension'   => $properties->ext,
-                        'code'                 => $code,
-                        'name'                 => $properties->filename, // original file name
+                        'form_type_id' => $certification_request?->step?->form_type_id,
+                        'original_path' => $path,
+                        'object' => $object,
+                        'object_id' => $object_id,
+                        'size' => $properties->size,
+                        'mime_type' => $properties->mime,
+                        'ext' => $ext,
+                        'original_extension' => $properties->ext,
+                        'code' => $code,
+                        'name' => $properties->filename, // original file name
                         'document_category_id' => request()->input('document_category_id'),
                     ]);
                 }
@@ -262,74 +243,84 @@ trait ProcessHandler
     {
         try {
             $area_ids = request()->input('area_ids');
-            $areas    = request()->input('area');
-            if (! is_null($area_ids) && ! is_null($areas)) {
+            $areas = request()->input('area');
+            if (!is_null($area_ids) && !is_null($areas)) {
 
                 if ($area_ids['country_id'] == null) {
-                    $country = \Models\Country::updateOrCreate([
-                        'name' => $areas['country_id'],
-                    ], [
-                        'name' => $areas['country_id'],
-                    ]
+                    $country = \Models\Country::updateOrCreate(
+                        [
+                            'name' => $areas['country_id'],
+                        ],
+                        [
+                            'name' => $areas['country_id'],
+                        ]
                     );
                 } else {
                     $country = \Models\Country::find($area_ids['country_id']);
                 }
 
                 if ($area_ids['region_id'] == null) {
-                    $region = \Models\Region::updateOrCreate([
-                        'name'       => $areas['region_id'],
-                        'country_id' => $country->id,
-                    ], [
-                        'name' => $areas['region_id'],
+                    $region = \Models\Region::updateOrCreate(
+                        [
+                            'name' => $areas['region_id'],
+                            'country_id' => $country->id,
+                        ],
+                        [
+                            'name' => $areas['region_id'],
 
-                    ]
+                        ]
                     );
                 } else {
                     $region = \Models\Region::find($area_ids['region_id']);
                 }
 
                 if ($area_ids['city_id'] == null) {
-                    $city = \Models\City::updateOrCreate([
-                        'name'      => $areas['city_id'],
-                        'region_id' => $region->id,
-                    ], [
-                        'name' => $areas['city_id'],
-                    ]
+                    $city = \Models\City::updateOrCreate(
+                        [
+                            'name' => $areas['city_id'],
+                            'region_id' => $region->id,
+                        ],
+                        [
+                            'name' => $areas['city_id'],
+                        ]
                     );
                 } else {
                     $city = \Models\City::find($area_ids['city_id']);
                 }
 
                 if ($area_ids['district_id'] == null) {
-                    $district = \Models\District::updateOrCreate([
-                        'name'    => $areas['district_id'],
-                        'city_id' => $city->id,
-                    ], [
-                        'name' => $areas['district_id'],
-                    ]
+                    $district = \Models\District::updateOrCreate(
+                        [
+                            'name' => $areas['district_id'],
+                            'city_id' => $city->id,
+                        ],
+                        [
+                            'name' => $areas['district_id'],
+                        ]
                     );
                 } else {
                     $district = \Models\District::find($area_ids['district_id']);
                 }
 
                 if ($area_ids['subdistrict_id'] == null) {
-                    $subdistrict = \Models\Subdistrict::updateOrCreate([
-                        'name'        => $areas['subdistrict_id'],
-                        'district_id' => $district->id,
-                    ], [
-                        'name' => $areas['subdistrict_id'],
-                    ]
+                    $subdistrict = \Models\Subdistrict::updateOrCreate(
+                        [
+                            'name' => $areas['subdistrict_id'],
+                            'district_id' => $district->id,
+                        ],
+                        [
+                            'name' => $areas['subdistrict_id'],
+                        ]
                     );
                 } else {
                     $subdistrict = \Models\Subdistrict::find($area_ids['subdistrict_id']);
                 }
 
                 return [
-                    'country_id'     => $country?->id,
-                    'region_id'      => $region?->id,
-                    'city_id'        => $city?->id,
-                    'district_id'    => $district?->id,
+                    'country_id' => $country?->id,
+                    'region_id' => $region?->id,
+                    'city_id' => $city?->id,
+                    'district_id' => $district?->id,
                     'subdistrict_id' => $subdistrict?->id,
                 ];
             }
@@ -339,6 +330,29 @@ trait ProcessHandler
             throw $th;
         }
         return [];
+    }
+
+    protected function logProcessActivity(string $action, string $status, ?string $error = null): void
+    {
+        try {
+            $request = request();
+            $user = auth()->user();
+
+            \Models\ActivityLog::create([
+                'user_id' => $user?->getAuthIdentifier(),
+                'user_role' => $user?->role,
+                'action' => $action,
+                'module' => class_basename($this),   // nama controller
+                'status' => $status,
+                'new_values' => $error ? ['error' => $error] : null,
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+                'url' => $request->fullUrl(),
+                'method' => $request->method(),
+            ]);
+        } catch (Throwable $e) {
+            Log::warning('Gagal menulis ActivityLog proses.', ['exception' => $e->getMessage()]);
+        }
     }
 }
 
@@ -401,3 +415,13 @@ trait ProcessHandler
 //         ]
 //     );
 // }
+
+// Pemakaian di controller:
+
+// return $this->handleProcess(
+//     callback: fn () => $this->importNilai($request),
+//     options: [
+//         'save'     => true,
+//         'activity' => 'import_nilai', // ini akan diubah menjadi 'Import Nilai' di activity log berdasarkan nama method menandakan bahwa proses ini disimpan di logs
+//     ]
+// );

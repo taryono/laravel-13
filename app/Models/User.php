@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\LogsActivity;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -14,7 +15,7 @@ use Models\Role;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
+    use HasApiTokens, HasFactory, Notifiable, SoftDeletes, LogsActivity;
 
     protected $guarded = ['id'];
     public $timestamps = true;
@@ -55,10 +56,15 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return [
             'email_verified_at' => 'datetime',
-            'password'          => 'hashed',
-            'deleted_at'         => 'datetime',
-            'is_trial_user'     => 'boolean',
+            'password' => 'hashed',
+            'deleted_at' => 'datetime',
+            'is_trial_user' => 'boolean',
         ];
+    }
+
+    public function activityLogHidden(): array
+    {
+        return array_merge(parent::activityLogHidden(), ['email_verified_at']);
     }
 
     public function isTrialUser(): bool
@@ -162,11 +168,13 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function hasRole($role, $orgId = null): bool
     {
-        if ($this->isSuperUser()) return true;
+        if ($this->isSuperUser())
+            return true;
 
         $orgId = $orgId ?? $this->active_organization_id;
-        $roles = array_values(array_filter(array_map('trim', (array) $role), fn ($r) => $r !== ''));
-        if (empty($roles)) return false;
+        $roles = array_values(array_filter(array_map('trim', (array) $role), fn($r) => $r !== ''));
+        if (empty($roles))
+            return false;
 
         $cacheKey = "user_{$this->id}_roles_" . md5(implode(',', $roles) . "_{$orgId}");
 
@@ -195,7 +203,8 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function authorizeRoles($roles, $orgId = null): bool
     {
-        if ($this->isSuperUser()) return true;
+        if ($this->isSuperUser())
+            return true;
 
         if (!$this->hasAnyRole($roles, $orgId)) {
             abort(403, 'Anda tidak memiliki akses ke halaman ini.');
@@ -210,25 +219,28 @@ class User extends Authenticatable implements MustVerifyEmail
     public function hasMenuPermission($menuSlug, $action = 'is_view', $orgId = null): bool
     {
         // Super Admin = semua izin
-        if ($this->isSuperUser()) return true;
+        if ($this->isSuperUser())
+            return true;
 
         $orgId = $orgId ?? $this->active_organization_id;
 
         $menu = \Models\Menu::withoutGlobalScope('organization_id')
             ->where('slug', $menuSlug)
-            ->when($orgId, fn ($q) => $q->where(fn ($sub) => $sub->where('organization_id', $orgId)->orWhereNull('organization_id')))
+            ->when($orgId, fn($q) => $q->where(fn($sub) => $sub->where('organization_id', $orgId)->orWhereNull('organization_id')))
             ->first()
             ?? \Models\Menu::withoutGlobalScope('organization_id')->where('slug', $menuSlug)->first();
-        if (!$menu) return false;
+        if (!$menu)
+            return false;
 
         // Ambil ID peran user di organisasi aktif
         $roleIds = $this->roleUsers()
             ->withoutGlobalScope('organization_id')
-            ->when($orgId, fn ($q) => $q->where(fn ($sub) => $sub->where('organization_id', $orgId)->orWhereNull('organization_id')))
+            ->when($orgId, fn($q) => $q->where(fn($sub) => $sub->where('organization_id', $orgId)->orWhereNull('organization_id')))
             ->whereNull('deleted_at')
             ->pluck('role_id');
 
-        if ($roleIds->isEmpty()) return false;
+        if ($roleIds->isEmpty())
+            return false;
 
         return \Models\MenuRole::where('menu_id', $menu->id)
             ->whereIn('role_id', $roleIds)
@@ -242,16 +254,18 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function hasActionPermission($actionName, $orgId = null): bool
     {
-        if ($this->isSuperUser()) return true;
+        if ($this->isSuperUser())
+            return true;
 
         $orgId = $orgId ?? $this->active_organization_id;
 
         $action = \Models\Action::withoutGlobalScope('organization_id')
             ->where('name', $actionName)
-            ->when($orgId, fn ($q) => $q->where(fn ($sub) => $sub->where('organization_id', $orgId)->orWhereNull('organization_id')))
+            ->when($orgId, fn($q) => $q->where(fn($sub) => $sub->where('organization_id', $orgId)->orWhereNull('organization_id')))
             ->first();
 
-        if (!$action) return false;
+        if (!$action)
+            return false;
 
         // Cek langsung ke user
         $direct = \Models\ActionUser::withoutGlobalScope('organization_id')
@@ -259,16 +273,18 @@ class User extends Authenticatable implements MustVerifyEmail
             ->where('user_id', $this->id)
             ->exists();
 
-        if ($direct) return true;
+        if ($direct)
+            return true;
 
         // Cek lewat peran
         $roleIds = $this->roleUsers()
             ->withoutGlobalScope('organization_id')
-            ->when($orgId, fn ($q) => $q->where(fn ($sub) => $sub->where('organization_id', $orgId)->orWhereNull('organization_id')))
+            ->when($orgId, fn($q) => $q->where(fn($sub) => $sub->where('organization_id', $orgId)->orWhereNull('organization_id')))
             ->whereNull('deleted_at')
             ->pluck('role_id');
 
-        if ($roleIds->isEmpty()) return false;
+        if ($roleIds->isEmpty())
+            return false;
 
         return \Models\ActionRole::withoutGlobalScope('organization_id')
             ->where('action_id', $action->id)
@@ -284,13 +300,13 @@ class User extends Authenticatable implements MustVerifyEmail
     public function setAuthSession($role, $roles)
     {
         session()->put('user_auth', [
-            'login_as'        => $role->code,
-            'active_role_id'  => $role->id,
-            'auth_role_ids'   => $roles->pluck('id'),
-            'auth_roles'      => $roles->pluck('name'),
-            'auth_role'       => $role,
-            'layout'          => $role->layout ?? null,
-            'origin_role'     => $role,
+            'login_as' => $role->code,
+            'active_role_id' => $role->id,
+            'auth_role_ids' => $roles->pluck('id'),
+            'auth_roles' => $roles->pluck('name'),
+            'auth_role' => $role,
+            'layout' => $role->layout ?? null,
+            'origin_role' => $role,
         ]);
         session()->put('role_ids', $roles->pluck('id'));
     }
@@ -377,7 +393,8 @@ class User extends Authenticatable implements MustVerifyEmail
     // Cek apakah ini ADMIN ORGANISASI
     public function isOrganizationAdmin($orgId = null): bool
     {
-        if ($this->isSystemSuperAdmin()) return true; // Sistem super admin = otomatis bisa semua
+        if ($this->isSystemSuperAdmin())
+            return true; // Sistem super admin = otomatis bisa semua
 
         $orgId = $orgId ?? $this->active_organization_id;
 
@@ -393,12 +410,14 @@ class User extends Authenticatable implements MustVerifyEmail
     // Cek apakah bisa mengelola peran di bawahnya
     public function canManageRole($roleId, $orgId = null): bool
     {
-        if ($this->isSystemSuperAdmin()) return true;
+        if ($this->isSystemSuperAdmin())
+            return true;
 
         $orgId = $orgId ?? $this->active_organization_id;
 
         // Admin organisasi bisa mengelola semua peran di organisasinya
-        if ($this->isOrganizationAdmin($orgId)) return true;
+        if ($this->isOrganizationAdmin($orgId))
+            return true;
 
         // Peran biasa hanya bisa mengelola turunan langsungnya
         $myRoleIds = $this->roles()

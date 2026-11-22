@@ -49,3 +49,45 @@ php artisan make:crud-yajra Product --columns=id,name,price --no-menu
 #### Kalau migration lain bermasalah, jalankan spesifik file ini:
 
 $ php artisan migrate --path=database/migrations/2026_09_19_154734_create_sliders_table.php
+
+---
+
+### Scaffolding Modul Area (docs/tables/area.sql)
+
+```bash
+# 1. Country (Table: countries)
+php artisan make:crud-yajra Country --columns=id,iso,name,printable_name,iso3,numcode --namespace=App\\Models
+
+# 2. Region (Table: regions)
+php artisan make:crud-yajra Region --columns=id,code,name,country_id,postal_code,is_free_text,verified_at,is_user_input,type --namespace=App\\Models
+
+# 3. City (Table: cities)
+php artisan make:crud-yajra City --columns=id,code,name,region_id,postal_code,type,is_free_text,verified_at,is_user_input --namespace=App\\Models
+
+# 4. District (Table: districts)
+php artisan make:crud-yajra District --columns=id,code,name,city_id,last_id,is_free_text,verified_at,is_user_input --namespace=App\\Models
+
+# 5. Subdistrict (Table: subdistricts)
+php artisan make:crud-yajra Subdistrict --columns=id,code,name,district_id,zip,latitude,longitude,elevation,timezone,ordering,last_id,is_free_text,verified_at,is_user_input --namespace=App\\Models
+```
+
+---
+
+### Scaffolding Modul Area (docs/tables/area.sql)
+
+```bash
+# 1. Country (Table: countries)
+php artisan make:crud-yajra Country --columns=id,iso,name,printable_name,iso3,numcode --namespace=App\\Models
+
+# 2. Region (Table: regions)
+php artisan make:crud-yajra Region --columns=id,code,name,country_id,postal_code,is_free_text,verified_at,is_user_input,type --namespace=App\\Models
+
+# 3. City (Table: cities)
+php artisan make:crud-yajra City --columns=id,code,name,region_id,postal_code,type,is_free_text,verified_at,is_user_input --namespace=App\\Models
+
+# 4. District (Table: districts)
+php artisan make:crud-yajra District --columns=id,code,name,city_id,last_id,is_free_text,verified_at,is_user_input --namespace=App\\Models
+
+# 5. Subdistrict (Table: subdistricts)
+php artisan make:crud-yajra Subdistrict --columns=id,code,name,district_id,zip,latitude,longitude,elevation,timezone,ordering,last_id,is_free_text,verified_at,is_user_input --namespace=App\\Models
+```

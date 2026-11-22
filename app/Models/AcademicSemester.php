@@ -3,9 +3,11 @@
 namespace Models;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use App\Traits\LogsActivity;
 
 class AcademicSemester extends SoftDeletableModel
 {
+    use LogsActivity;
     protected $fillable = [
         'organization_id',
         'school_id',

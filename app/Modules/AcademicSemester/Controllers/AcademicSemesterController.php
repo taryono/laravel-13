@@ -16,9 +16,10 @@ use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 use Models\School;
 use Throwable;
-
+use App\Traits\ProcessHandler;
 class AcademicSemesterController extends MainController
 {
+    use ProcessHandler;
     public function __construct()
     {
         parent::__construct(new AcademicSemester());
@@ -69,34 +70,14 @@ class AcademicSemesterController extends MainController
      */
     public function store(StoreAcademicSemesterRequest $request)
     {
-        $validated = $request->validated();
-
-        try {
-            $model = DB::transaction(function () use ($validated) {
-                return AcademicSemester::create($validated);
-            });
-
-            return $this->successResponse(
-                $request,
-                'Data Semester berhasil ditambahkan.',
-                $model
-            );
-        } catch (Throwable $e) {
-
-            Log::error(
-                'Gagal menambahkan Semester .',
-                [
-                    'exception' => $e,
-                    'data' => $validated,
-                    'user_id' => Auth::id(),
-                ]
-            );
-
-            return $this->errorResponse(
-                $request,
-                'Data Semester gagal ditambahkan.'
-            );
-        }
+        return $this->handleProcess(
+            callback: fn() => AcademicSemester::create($request->validated()),
+            options: [
+                'save' => true,
+                'successMessage' => 'Data Semester berhasil ditambahkan.',
+                'errorMessage' => 'Data Semester gagal ditambahkan.',
+            ]
+        );
     }
 
     /**
