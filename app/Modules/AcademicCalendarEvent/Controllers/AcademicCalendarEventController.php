@@ -105,7 +105,7 @@ class AcademicCalendarEventController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -176,7 +176,7 @@ class AcademicCalendarEventController extends MainController
                     'exception' => $e,
                     'AcademicCalendarEvent_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -211,7 +211,7 @@ class AcademicCalendarEventController extends MainController
                 [
                     'exception' => $e,
                     'AcademicCalendarEvent_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 

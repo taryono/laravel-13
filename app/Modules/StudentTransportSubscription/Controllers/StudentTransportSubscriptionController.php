@@ -68,7 +68,7 @@ class StudentTransportSubscriptionController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'student_id' => ['required', 'integer'],
+            'student_id' => ['required', 'integer'],
             'transport_route_id' => ['required', 'integer'],
             'transport_stop_id' => ['required', 'integer'],
             'academic_year_id' => ['required', 'integer'],
@@ -97,7 +97,7 @@ class StudentTransportSubscriptionController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -130,7 +130,7 @@ class StudentTransportSubscriptionController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'student_id' => ['required', 'integer'],
+            'student_id' => ['required', 'integer'],
             'transport_route_id' => ['required', 'integer'],
             'transport_stop_id' => ['required', 'integer'],
             'academic_year_id' => ['required', 'integer'],
@@ -143,10 +143,7 @@ class StudentTransportSubscriptionController extends MainController
 
         try {
             $studentTransportSubscription = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $studentTransportSubscription,
-                $validated
-            ) {
+            DB::transaction(function () use ($studentTransportSubscription, $validated) {
                 $studentTransportSubscription->update($validated);
             });
 
@@ -156,14 +153,14 @@ class StudentTransportSubscriptionController extends MainController
                 $studentTransportSubscription
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui StudentTransportSubscription.',
                 [
                     'exception' => $e,
                     'StudentTransportSubscription_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -191,14 +188,14 @@ class StudentTransportSubscriptionController extends MainController
                 'Data StudentTransportSubscription berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $studentTransportSubscription->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus StudentTransportSubscription.',
                 [
                     'exception' => $e,
                     'StudentTransportSubscription_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -207,5 +204,5 @@ class StudentTransportSubscriptionController extends MainController
                 'Data StudentTransportSubscription gagal dihapus.'
             );
         }
-    } 
+    }
 }

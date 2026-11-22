@@ -68,7 +68,7 @@ class PaymentGatewayController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'provider' => ['required', 'string', 'max:255'],
             'environment' => ['required', 'string', 'max:255'],
             'merchant_id' => ['required', 'integer'],
@@ -102,7 +102,7 @@ class PaymentGatewayController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -135,7 +135,7 @@ class PaymentGatewayController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'provider' => ['required', 'string', 'max:255'],
             'environment' => ['required', 'string', 'max:255'],
             'merchant_id' => ['required', 'integer'],
@@ -153,10 +153,7 @@ class PaymentGatewayController extends MainController
 
         try {
             $paymentGateway = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $paymentGateway,
-                $validated
-            ) {
+            DB::transaction(function () use ($paymentGateway, $validated) {
                 $paymentGateway->update($validated);
             });
 
@@ -166,14 +163,14 @@ class PaymentGatewayController extends MainController
                 $paymentGateway
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui PaymentGateway.',
                 [
                     'exception' => $e,
                     'PaymentGateway_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -201,14 +198,14 @@ class PaymentGatewayController extends MainController
                 'Data PaymentGateway berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $paymentGateway->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus PaymentGateway.',
                 [
                     'exception' => $e,
                     'PaymentGateway_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -217,5 +214,5 @@ class PaymentGatewayController extends MainController
                 'Data PaymentGateway gagal dihapus.'
             );
         }
-    } 
+    }
 }

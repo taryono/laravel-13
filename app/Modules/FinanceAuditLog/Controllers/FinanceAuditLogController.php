@@ -68,7 +68,7 @@ class FinanceAuditLogController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'user_id' => ['required', 'integer'],
             'action' => ['required', 'string', 'max:255'],
             'table_name' => ['required', 'string', 'max:255'],
@@ -97,7 +97,7 @@ class FinanceAuditLogController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -130,7 +130,7 @@ class FinanceAuditLogController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'user_id' => ['required', 'integer'],
             'action' => ['required', 'string', 'max:255'],
             'table_name' => ['required', 'string', 'max:255'],
@@ -143,10 +143,7 @@ class FinanceAuditLogController extends MainController
 
         try {
             $financeAuditLog = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $financeAuditLog,
-                $validated
-            ) {
+            DB::transaction(function () use ($financeAuditLog, $validated) {
                 $financeAuditLog->update($validated);
             });
 
@@ -156,14 +153,14 @@ class FinanceAuditLogController extends MainController
                 $financeAuditLog
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui FinanceAuditLog.',
                 [
                     'exception' => $e,
                     'FinanceAuditLog_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -191,14 +188,14 @@ class FinanceAuditLogController extends MainController
                 'Data FinanceAuditLog berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $financeAuditLog->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus FinanceAuditLog.',
                 [
                     'exception' => $e,
                     'FinanceAuditLog_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -207,5 +204,5 @@ class FinanceAuditLogController extends MainController
                 'Data FinanceAuditLog gagal dihapus.'
             );
         }
-    } 
+    }
 }

@@ -68,7 +68,7 @@ class CurriculumPhaseController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'curriculum_id' => ['required', 'integer'],
             'name' => ['required', 'string', 'max:255'],
             'code' => ['required', 'string', 'max:255'],
@@ -100,7 +100,7 @@ class CurriculumPhaseController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -133,7 +133,7 @@ class CurriculumPhaseController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'curriculum_id' => ['required', 'integer'],
             'name' => ['required', 'string', 'max:255'],
             'code' => ['required', 'string', 'max:255'],
@@ -149,10 +149,7 @@ class CurriculumPhaseController extends MainController
 
         try {
             $curriculumPhase = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $curriculumPhase,
-                $validated
-            ) {
+            DB::transaction(function () use ($curriculumPhase, $validated) {
                 $curriculumPhase->update($validated);
             });
 
@@ -162,14 +159,14 @@ class CurriculumPhaseController extends MainController
                 $curriculumPhase
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui CurriculumPhase.',
                 [
                     'exception' => $e,
                     'CurriculumPhase_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -197,14 +194,14 @@ class CurriculumPhaseController extends MainController
                 'Data CurriculumPhase berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $curriculumPhase->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus CurriculumPhase.',
                 [
                     'exception' => $e,
                     'CurriculumPhase_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -213,5 +210,5 @@ class CurriculumPhaseController extends MainController
                 'Data CurriculumPhase gagal dihapus.'
             );
         }
-    } 
+    }
 }

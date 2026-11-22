@@ -68,7 +68,7 @@ class RoomConstraintController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'room_id' => ['required', 'integer'],
+            'room_id' => ['required', 'integer'],
             'day_of_week' => ['required', 'string', 'max:255'],
             'time_slot_start' => ['required', 'string', 'max:255'],
             'time_slot_end' => ['required', 'string', 'max:255'],
@@ -97,7 +97,7 @@ class RoomConstraintController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -130,7 +130,7 @@ class RoomConstraintController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'room_id' => ['required', 'integer'],
+            'room_id' => ['required', 'integer'],
             'day_of_week' => ['required', 'string', 'max:255'],
             'time_slot_start' => ['required', 'string', 'max:255'],
             'time_slot_end' => ['required', 'string', 'max:255'],
@@ -143,10 +143,7 @@ class RoomConstraintController extends MainController
 
         try {
             $roomConstraint = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $roomConstraint,
-                $validated
-            ) {
+            DB::transaction(function () use ($roomConstraint, $validated) {
                 $roomConstraint->update($validated);
             });
 
@@ -156,14 +153,14 @@ class RoomConstraintController extends MainController
                 $roomConstraint
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui RoomConstraint.',
                 [
                     'exception' => $e,
                     'RoomConstraint_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -191,14 +188,14 @@ class RoomConstraintController extends MainController
                 'Data RoomConstraint berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $roomConstraint->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus RoomConstraint.',
                 [
                     'exception' => $e,
                     'RoomConstraint_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -207,5 +204,5 @@ class RoomConstraintController extends MainController
                 'Data RoomConstraint gagal dihapus.'
             );
         }
-    } 
+    }
 }

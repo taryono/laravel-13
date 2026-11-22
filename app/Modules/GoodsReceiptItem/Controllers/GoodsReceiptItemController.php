@@ -68,7 +68,7 @@ class GoodsReceiptItemController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'goods_receipt_id' => ['required', 'integer'],
+            'goods_receipt_id' => ['required', 'integer'],
             'purchase_order_item_id' => ['required', 'integer'],
             'account_id' => ['required', 'integer'],
             'name' => ['required', 'string', 'max:255'],
@@ -104,7 +104,7 @@ class GoodsReceiptItemController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -137,7 +137,7 @@ class GoodsReceiptItemController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'goods_receipt_id' => ['required', 'integer'],
+            'goods_receipt_id' => ['required', 'integer'],
             'purchase_order_item_id' => ['required', 'integer'],
             'account_id' => ['required', 'integer'],
             'name' => ['required', 'string', 'max:255'],
@@ -157,10 +157,7 @@ class GoodsReceiptItemController extends MainController
 
         try {
             $goodsReceiptItem = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $goodsReceiptItem,
-                $validated
-            ) {
+            DB::transaction(function () use ($goodsReceiptItem, $validated) {
                 $goodsReceiptItem->update($validated);
             });
 
@@ -170,14 +167,14 @@ class GoodsReceiptItemController extends MainController
                 $goodsReceiptItem
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui GoodsReceiptItem.',
                 [
                     'exception' => $e,
                     'GoodsReceiptItem_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -205,14 +202,14 @@ class GoodsReceiptItemController extends MainController
                 'Data GoodsReceiptItem berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $goodsReceiptItem->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus GoodsReceiptItem.',
                 [
                     'exception' => $e,
                     'GoodsReceiptItem_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -221,5 +218,5 @@ class GoodsReceiptItemController extends MainController
                 'Data GoodsReceiptItem gagal dihapus.'
             );
         }
-    } 
+    }
 }

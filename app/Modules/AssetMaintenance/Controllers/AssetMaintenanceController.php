@@ -68,7 +68,7 @@ class AssetMaintenanceController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'fixed_asset_id' => ['required', 'integer'],
+            'fixed_asset_id' => ['required', 'integer'],
             'vendor_id' => ['required', 'integer'],
             'maintenance_type' => ['required', 'string', 'max:255'],
             'title' => ['required', 'string', 'max:255'],
@@ -102,7 +102,7 @@ class AssetMaintenanceController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -135,7 +135,7 @@ class AssetMaintenanceController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'fixed_asset_id' => ['required', 'integer'],
+            'fixed_asset_id' => ['required', 'integer'],
             'vendor_id' => ['required', 'integer'],
             'maintenance_type' => ['required', 'string', 'max:255'],
             'title' => ['required', 'string', 'max:255'],
@@ -153,10 +153,7 @@ class AssetMaintenanceController extends MainController
 
         try {
             $assetMaintenance = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $assetMaintenance,
-                $validated
-            ) {
+            DB::transaction(function () use ($assetMaintenance, $validated) {
                 $assetMaintenance->update($validated);
             });
 
@@ -166,14 +163,14 @@ class AssetMaintenanceController extends MainController
                 $assetMaintenance
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui AssetMaintenance.',
                 [
                     'exception' => $e,
                     'AssetMaintenance_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -201,14 +198,14 @@ class AssetMaintenanceController extends MainController
                 'Data AssetMaintenance berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $assetMaintenance->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus AssetMaintenance.',
                 [
                     'exception' => $e,
                     'AssetMaintenance_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -217,5 +214,5 @@ class AssetMaintenanceController extends MainController
                 'Data AssetMaintenance gagal dihapus.'
             );
         }
-    } 
+    }
 }

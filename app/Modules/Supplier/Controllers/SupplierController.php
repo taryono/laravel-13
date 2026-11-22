@@ -68,7 +68,7 @@ class SupplierController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
             'address' => ['required', 'string', 'max:255'],
             'phone' => ['required', 'string', 'max:255'],
         ]);
@@ -91,7 +91,7 @@ class SupplierController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -124,17 +124,14 @@ class SupplierController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
             'address' => ['required', 'string', 'max:255'],
             'phone' => ['required', 'string', 'max:255'],
         ]);
 
         try {
             $supplier = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $supplier,
-                $validated
-            ) {
+            DB::transaction(function () use ($supplier, $validated) {
                 $supplier->update($validated);
             });
 
@@ -144,14 +141,14 @@ class SupplierController extends MainController
                 $supplier
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui Supplier.',
                 [
                     'exception' => $e,
                     'Supplier_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -179,14 +176,14 @@ class SupplierController extends MainController
                 'Data Supplier berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $supplier->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus Supplier.',
                 [
                     'exception' => $e,
                     'Supplier_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -195,5 +192,5 @@ class SupplierController extends MainController
                 'Data Supplier gagal dihapus.'
             );
         }
-    } 
+    }
 }

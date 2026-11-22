@@ -68,7 +68,7 @@ class ApprovalHistoryController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'approval_request_id' => ['required', 'integer'],
+            'approval_request_id' => ['required', 'integer'],
             'workflow_step_id' => ['required', 'integer'],
             'approver_id' => ['required', 'integer'],
             'action' => ['required', 'string', 'max:255'],
@@ -95,7 +95,7 @@ class ApprovalHistoryController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -128,7 +128,7 @@ class ApprovalHistoryController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'approval_request_id' => ['required', 'integer'],
+            'approval_request_id' => ['required', 'integer'],
             'workflow_step_id' => ['required', 'integer'],
             'approver_id' => ['required', 'integer'],
             'action' => ['required', 'string', 'max:255'],
@@ -139,10 +139,7 @@ class ApprovalHistoryController extends MainController
 
         try {
             $approvalHistory = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $approvalHistory,
-                $validated
-            ) {
+            DB::transaction(function () use ($approvalHistory, $validated) {
                 $approvalHistory->update($validated);
             });
 
@@ -152,14 +149,14 @@ class ApprovalHistoryController extends MainController
                 $approvalHistory
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui ApprovalHistory.',
                 [
                     'exception' => $e,
                     'ApprovalHistory_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -187,14 +184,14 @@ class ApprovalHistoryController extends MainController
                 'Data ApprovalHistory berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $approvalHistory->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus ApprovalHistory.',
                 [
                     'exception' => $e,
                     'ApprovalHistory_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -203,5 +200,5 @@ class ApprovalHistoryController extends MainController
                 'Data ApprovalHistory gagal dihapus.'
             );
         }
-    } 
+    }
 }

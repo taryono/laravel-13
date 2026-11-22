@@ -68,7 +68,7 @@ class ReportCardComponentController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'report_card_template_section_id' => ['required', 'integer'],
+            'report_card_template_section_id' => ['required', 'integer'],
             'component_type' => ['required', 'string', 'max:255'],
             'field_key' => ['required', 'string', 'max:255'],
             'label' => ['required', 'string', 'max:255'],
@@ -97,7 +97,7 @@ class ReportCardComponentController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -130,7 +130,7 @@ class ReportCardComponentController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'report_card_template_section_id' => ['required', 'integer'],
+            'report_card_template_section_id' => ['required', 'integer'],
             'component_type' => ['required', 'string', 'max:255'],
             'field_key' => ['required', 'string', 'max:255'],
             'label' => ['required', 'string', 'max:255'],
@@ -143,10 +143,7 @@ class ReportCardComponentController extends MainController
 
         try {
             $reportCardComponent = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $reportCardComponent,
-                $validated
-            ) {
+            DB::transaction(function () use ($reportCardComponent, $validated) {
                 $reportCardComponent->update($validated);
             });
 
@@ -156,14 +153,14 @@ class ReportCardComponentController extends MainController
                 $reportCardComponent
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui ReportCardComponent.',
                 [
                     'exception' => $e,
                     'ReportCardComponent_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -191,14 +188,14 @@ class ReportCardComponentController extends MainController
                 'Data ReportCardComponent berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $reportCardComponent->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus ReportCardComponent.',
                 [
                     'exception' => $e,
                     'ReportCardComponent_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -207,5 +204,5 @@ class ReportCardComponentController extends MainController
                 'Data ReportCardComponent gagal dihapus.'
             );
         }
-    } 
+    }
 }

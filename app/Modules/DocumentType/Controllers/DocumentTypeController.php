@@ -68,7 +68,7 @@ class DocumentTypeController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
         ]);
 
         try {
@@ -89,7 +89,7 @@ class DocumentTypeController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -122,15 +122,12 @@ class DocumentTypeController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
         ]);
 
         try {
             $documentType = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $documentType,
-                $validated
-            ) {
+            DB::transaction(function () use ($documentType, $validated) {
                 $documentType->update($validated);
             });
 
@@ -140,14 +137,14 @@ class DocumentTypeController extends MainController
                 $documentType
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui DocumentType.',
                 [
                     'exception' => $e,
                     'DocumentType_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -175,14 +172,14 @@ class DocumentTypeController extends MainController
                 'Data DocumentType berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $documentType->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus DocumentType.',
                 [
                     'exception' => $e,
                     'DocumentType_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -191,5 +188,5 @@ class DocumentTypeController extends MainController
                 'Data DocumentType gagal dihapus.'
             );
         }
-    } 
+    }
 }

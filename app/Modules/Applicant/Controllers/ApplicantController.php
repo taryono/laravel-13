@@ -68,7 +68,7 @@ class ApplicantController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'admission_id' => ['required', 'integer'],
             'full_name' => ['required', 'string', 'max:255'],
             'nik' => ['required', 'string', 'max:255'],
@@ -116,7 +116,7 @@ class ApplicantController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -149,7 +149,7 @@ class ApplicantController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'admission_id' => ['required', 'integer'],
             'full_name' => ['required', 'string', 'max:255'],
             'nik' => ['required', 'string', 'max:255'],
@@ -181,10 +181,7 @@ class ApplicantController extends MainController
 
         try {
             $applicant = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $applicant,
-                $validated
-            ) {
+            DB::transaction(function () use ($applicant, $validated) {
                 $applicant->update($validated);
             });
 
@@ -194,14 +191,14 @@ class ApplicantController extends MainController
                 $applicant
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui Applicant.',
                 [
                     'exception' => $e,
                     'Applicant_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -229,14 +226,14 @@ class ApplicantController extends MainController
                 'Data Applicant berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $applicant->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus Applicant.',
                 [
                     'exception' => $e,
                     'Applicant_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -245,5 +242,5 @@ class ApplicantController extends MainController
                 'Data Applicant gagal dihapus.'
             );
         }
-    } 
+    }
 }

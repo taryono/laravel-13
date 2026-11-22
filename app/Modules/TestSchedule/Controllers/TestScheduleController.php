@@ -68,7 +68,7 @@ class TestScheduleController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'admission_id' => ['required', 'integer'],
+            'admission_id' => ['required', 'integer'],
             'admission_selection_id' => ['required', 'integer'],
             'academic_year_id' => ['required', 'integer'],
             'school_id' => ['required', 'integer'],
@@ -134,7 +134,7 @@ class TestScheduleController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -167,7 +167,7 @@ class TestScheduleController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'admission_id' => ['required', 'integer'],
+            'admission_id' => ['required', 'integer'],
             'admission_selection_id' => ['required', 'integer'],
             'academic_year_id' => ['required', 'integer'],
             'school_id' => ['required', 'integer'],
@@ -217,10 +217,7 @@ class TestScheduleController extends MainController
 
         try {
             $testSchedule = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $testSchedule,
-                $validated
-            ) {
+            DB::transaction(function () use ($testSchedule, $validated) {
                 $testSchedule->update($validated);
             });
 
@@ -230,14 +227,14 @@ class TestScheduleController extends MainController
                 $testSchedule
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui TestSchedule.',
                 [
                     'exception' => $e,
                     'TestSchedule_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -265,14 +262,14 @@ class TestScheduleController extends MainController
                 'Data TestSchedule berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $testSchedule->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus TestSchedule.',
                 [
                     'exception' => $e,
                     'TestSchedule_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -281,5 +278,5 @@ class TestScheduleController extends MainController
                 'Data TestSchedule gagal dihapus.'
             );
         }
-    } 
+    }
 }

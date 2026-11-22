@@ -68,7 +68,7 @@ class EmploymentStatusController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'code' => ['required', 'string', 'max:255'],
+            'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'is_active' => ['required', 'string', 'max:255'],
         ]);
@@ -91,7 +91,7 @@ class EmploymentStatusController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -124,17 +124,14 @@ class EmploymentStatusController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'code' => ['required', 'string', 'max:255'],
+            'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'is_active' => ['required', 'string', 'max:255'],
         ]);
 
         try {
             $employmentStatus = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $employmentStatus,
-                $validated
-            ) {
+            DB::transaction(function () use ($employmentStatus, $validated) {
                 $employmentStatus->update($validated);
             });
 
@@ -144,14 +141,14 @@ class EmploymentStatusController extends MainController
                 $employmentStatus
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui EmploymentStatus.',
                 [
                     'exception' => $e,
                     'EmploymentStatus_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -179,14 +176,14 @@ class EmploymentStatusController extends MainController
                 'Data EmploymentStatus berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $employmentStatus->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus EmploymentStatus.',
                 [
                     'exception' => $e,
                     'EmploymentStatus_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -195,5 +192,5 @@ class EmploymentStatusController extends MainController
                 'Data EmploymentStatus gagal dihapus.'
             );
         }
-    } 
+    }
 }

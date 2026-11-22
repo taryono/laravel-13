@@ -68,7 +68,7 @@ class TracerStudyQuestionController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'tracer_study_id' => ['required', 'integer'],
+            'tracer_study_id' => ['required', 'integer'],
             'question_order' => ['required', 'string', 'max:255'],
             'question_text' => ['required', 'string', 'max:255'],
             'question_type' => ['required', 'string', 'max:255'],
@@ -94,7 +94,7 @@ class TracerStudyQuestionController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -127,7 +127,7 @@ class TracerStudyQuestionController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'tracer_study_id' => ['required', 'integer'],
+            'tracer_study_id' => ['required', 'integer'],
             'question_order' => ['required', 'string', 'max:255'],
             'question_text' => ['required', 'string', 'max:255'],
             'question_type' => ['required', 'string', 'max:255'],
@@ -137,10 +137,7 @@ class TracerStudyQuestionController extends MainController
 
         try {
             $tracerStudyQuestion = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $tracerStudyQuestion,
-                $validated
-            ) {
+            DB::transaction(function () use ($tracerStudyQuestion, $validated) {
                 $tracerStudyQuestion->update($validated);
             });
 
@@ -150,14 +147,14 @@ class TracerStudyQuestionController extends MainController
                 $tracerStudyQuestion
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui TracerStudyQuestion.',
                 [
                     'exception' => $e,
                     'TracerStudyQuestion_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -185,14 +182,14 @@ class TracerStudyQuestionController extends MainController
                 'Data TracerStudyQuestion berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $tracerStudyQuestion->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus TracerStudyQuestion.',
                 [
                     'exception' => $e,
                     'TracerStudyQuestion_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -201,5 +198,5 @@ class TracerStudyQuestionController extends MainController
                 'Data TracerStudyQuestion gagal dihapus.'
             );
         }
-    } 
+    }
 }

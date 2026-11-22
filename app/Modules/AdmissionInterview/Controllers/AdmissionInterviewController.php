@@ -68,7 +68,7 @@ class AdmissionInterviewController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'admission_id' => ['required', 'integer'],
+            'admission_id' => ['required', 'integer'],
             'admission_path_id' => ['required', 'integer'],
             'applicant_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
@@ -114,7 +114,7 @@ class AdmissionInterviewController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -147,7 +147,7 @@ class AdmissionInterviewController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'admission_id' => ['required', 'integer'],
+            'admission_id' => ['required', 'integer'],
             'admission_path_id' => ['required', 'integer'],
             'applicant_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
@@ -177,10 +177,7 @@ class AdmissionInterviewController extends MainController
 
         try {
             $admissionInterview = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $admissionInterview,
-                $validated
-            ) {
+            DB::transaction(function () use ($admissionInterview, $validated) {
                 $admissionInterview->update($validated);
             });
 
@@ -190,14 +187,14 @@ class AdmissionInterviewController extends MainController
                 $admissionInterview
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui AdmissionInterview.',
                 [
                     'exception' => $e,
                     'AdmissionInterview_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -225,14 +222,14 @@ class AdmissionInterviewController extends MainController
                 'Data AdmissionInterview berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $admissionInterview->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus AdmissionInterview.',
                 [
                     'exception' => $e,
                     'AdmissionInterview_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -241,5 +238,5 @@ class AdmissionInterviewController extends MainController
                 'Data AdmissionInterview gagal dihapus.'
             );
         }
-    } 
+    }
 }

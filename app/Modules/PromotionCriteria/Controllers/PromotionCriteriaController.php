@@ -97,7 +97,7 @@ class PromotionCriteriaController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -145,10 +145,7 @@ class PromotionCriteriaController extends MainController
 
         try {
             $promotionCriterion = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $promotionCriterion,
-                $validated
-            ) {
+            DB::transaction(function () use ($promotionCriterion, $validated) {
                 $promotionCriterion->update($validated);
             });
 
@@ -164,7 +161,7 @@ class PromotionCriteriaController extends MainController
                     'exception' => $e,
                     'PromotionCriteria_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -198,7 +195,7 @@ class PromotionCriteriaController extends MainController
                 [
                     'exception' => $e,
                     'PromotionCriteria_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 

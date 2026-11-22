@@ -68,7 +68,7 @@ class CurriculumSubjectController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'curriculum_id' => ['required', 'integer'],
             'subject_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
@@ -99,7 +99,7 @@ class CurriculumSubjectController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -132,7 +132,7 @@ class CurriculumSubjectController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'curriculum_id' => ['required', 'integer'],
             'subject_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
@@ -147,10 +147,7 @@ class CurriculumSubjectController extends MainController
 
         try {
             $curriculumSubject = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $curriculumSubject,
-                $validated
-            ) {
+            DB::transaction(function () use ($curriculumSubject, $validated) {
                 $curriculumSubject->update($validated);
             });
 
@@ -160,14 +157,14 @@ class CurriculumSubjectController extends MainController
                 $curriculumSubject
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui CurriculumSubject.',
                 [
                     'exception' => $e,
                     'CurriculumSubject_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -195,14 +192,14 @@ class CurriculumSubjectController extends MainController
                 'Data CurriculumSubject berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $curriculumSubject->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus CurriculumSubject.',
                 [
                     'exception' => $e,
                     'CurriculumSubject_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -211,5 +208,5 @@ class CurriculumSubjectController extends MainController
                 'Data CurriculumSubject gagal dihapus.'
             );
         }
-    } 
+    }
 }

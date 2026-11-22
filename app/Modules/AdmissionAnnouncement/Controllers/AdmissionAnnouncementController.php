@@ -68,7 +68,7 @@ class AdmissionAnnouncementController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'admission_id' => ['required', 'integer'],
+            'admission_id' => ['required', 'integer'],
             'admission_path_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
             'education_level_id' => ['required', 'integer'],
@@ -123,7 +123,7 @@ class AdmissionAnnouncementController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -156,7 +156,7 @@ class AdmissionAnnouncementController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'admission_id' => ['required', 'integer'],
+            'admission_id' => ['required', 'integer'],
             'admission_path_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
             'education_level_id' => ['required', 'integer'],
@@ -195,10 +195,7 @@ class AdmissionAnnouncementController extends MainController
 
         try {
             $admissionAnnouncement = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $admissionAnnouncement,
-                $validated
-            ) {
+            DB::transaction(function () use ($admissionAnnouncement, $validated) {
                 $admissionAnnouncement->update($validated);
             });
 
@@ -208,14 +205,14 @@ class AdmissionAnnouncementController extends MainController
                 $admissionAnnouncement
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui AdmissionAnnouncement.',
                 [
                     'exception' => $e,
                     'AdmissionAnnouncement_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -243,14 +240,14 @@ class AdmissionAnnouncementController extends MainController
                 'Data AdmissionAnnouncement berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $admissionAnnouncement->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus AdmissionAnnouncement.',
                 [
                     'exception' => $e,
                     'AdmissionAnnouncement_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -259,5 +256,5 @@ class AdmissionAnnouncementController extends MainController
                 'Data AdmissionAnnouncement gagal dihapus.'
             );
         }
-    } 
+    }
 }

@@ -68,7 +68,7 @@ class BookCategoryController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'ddc_classification' => ['required', 'string', 'max:255'],
@@ -92,7 +92,7 @@ class BookCategoryController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -125,7 +125,7 @@ class BookCategoryController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'ddc_classification' => ['required', 'string', 'max:255'],
@@ -133,10 +133,7 @@ class BookCategoryController extends MainController
 
         try {
             $bookCategory = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $bookCategory,
-                $validated
-            ) {
+            DB::transaction(function () use ($bookCategory, $validated) {
                 $bookCategory->update($validated);
             });
 
@@ -146,14 +143,14 @@ class BookCategoryController extends MainController
                 $bookCategory
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui BookCategory.',
                 [
                     'exception' => $e,
                     'BookCategory_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -181,14 +178,14 @@ class BookCategoryController extends MainController
                 'Data BookCategory berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $bookCategory->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus BookCategory.',
                 [
                     'exception' => $e,
                     'BookCategory_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -197,5 +194,5 @@ class BookCategoryController extends MainController
                 'Data BookCategory gagal dihapus.'
             );
         }
-    } 
+    }
 }

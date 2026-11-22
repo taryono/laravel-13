@@ -68,7 +68,7 @@ class FiscalPeriodController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'name' => ['required', 'string', 'max:255'],
             'code' => ['required', 'string', 'max:255'],
             'start_date' => ['required', 'string', 'max:255'],
@@ -101,7 +101,7 @@ class FiscalPeriodController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -134,7 +134,7 @@ class FiscalPeriodController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'name' => ['required', 'string', 'max:255'],
             'code' => ['required', 'string', 'max:255'],
             'start_date' => ['required', 'string', 'max:255'],
@@ -151,10 +151,7 @@ class FiscalPeriodController extends MainController
 
         try {
             $fiscalPeriod = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $fiscalPeriod,
-                $validated
-            ) {
+            DB::transaction(function () use ($fiscalPeriod, $validated) {
                 $fiscalPeriod->update($validated);
             });
 
@@ -164,14 +161,14 @@ class FiscalPeriodController extends MainController
                 $fiscalPeriod
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui FiscalPeriod.',
                 [
                     'exception' => $e,
                     'FiscalPeriod_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -199,14 +196,14 @@ class FiscalPeriodController extends MainController
                 'Data FiscalPeriod berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $fiscalPeriod->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus FiscalPeriod.',
                 [
                     'exception' => $e,
                     'FiscalPeriod_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -215,5 +212,5 @@ class FiscalPeriodController extends MainController
                 'Data FiscalPeriod gagal dihapus.'
             );
         }
-    } 
+    }
 }

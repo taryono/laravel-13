@@ -68,7 +68,7 @@ class RkasDocumentController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'academic_year_id' => ['required', 'integer'],
             'fiscal_period_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
@@ -106,7 +106,7 @@ class RkasDocumentController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -139,7 +139,7 @@ class RkasDocumentController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'academic_year_id' => ['required', 'integer'],
             'fiscal_period_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
@@ -161,10 +161,7 @@ class RkasDocumentController extends MainController
 
         try {
             $rkasDocument = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $rkasDocument,
-                $validated
-            ) {
+            DB::transaction(function () use ($rkasDocument, $validated) {
                 $rkasDocument->update($validated);
             });
 
@@ -174,14 +171,14 @@ class RkasDocumentController extends MainController
                 $rkasDocument
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui RkasDocument.',
                 [
                     'exception' => $e,
                     'RkasDocument_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -209,14 +206,14 @@ class RkasDocumentController extends MainController
                 'Data RkasDocument berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $rkasDocument->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus RkasDocument.',
                 [
                     'exception' => $e,
                     'RkasDocument_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -225,5 +222,5 @@ class RkasDocumentController extends MainController
                 'Data RkasDocument gagal dihapus.'
             );
         }
-    } 
+    }
 }

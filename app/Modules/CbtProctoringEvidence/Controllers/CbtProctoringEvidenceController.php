@@ -68,7 +68,7 @@ class CbtProctoringEvidenceController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'session_id' => ['required', 'integer'],
+            'session_id' => ['required', 'integer'],
             'evidence_type' => ['required', 'string', 'max:255'],
             'file_path' => ['required', 'string', 'max:255'],
             'file_size_bytes' => ['required', 'string', 'max:255'],
@@ -96,7 +96,7 @@ class CbtProctoringEvidenceController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -129,7 +129,7 @@ class CbtProctoringEvidenceController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'session_id' => ['required', 'integer'],
+            'session_id' => ['required', 'integer'],
             'evidence_type' => ['required', 'string', 'max:255'],
             'file_path' => ['required', 'string', 'max:255'],
             'file_size_bytes' => ['required', 'string', 'max:255'],
@@ -141,10 +141,7 @@ class CbtProctoringEvidenceController extends MainController
 
         try {
             $cbtProctoringEvidence = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $cbtProctoringEvidence,
-                $validated
-            ) {
+            DB::transaction(function () use ($cbtProctoringEvidence, $validated) {
                 $cbtProctoringEvidence->update($validated);
             });
 
@@ -154,14 +151,14 @@ class CbtProctoringEvidenceController extends MainController
                 $cbtProctoringEvidence
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui CbtProctoringEvidence.',
                 [
                     'exception' => $e,
                     'CbtProctoringEvidence_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -189,14 +186,14 @@ class CbtProctoringEvidenceController extends MainController
                 'Data CbtProctoringEvidence berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $cbtProctoringEvidence->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus CbtProctoringEvidence.',
                 [
                     'exception' => $e,
                     'CbtProctoringEvidence_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -205,5 +202,5 @@ class CbtProctoringEvidenceController extends MainController
                 'Data CbtProctoringEvidence gagal dihapus.'
             );
         }
-    } 
+    }
 }

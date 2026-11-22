@@ -68,7 +68,7 @@ class StockTransferController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'transfer_number' => ['required', 'string', 'max:255'],
             'from_warehouse_id' => ['required', 'integer'],
             'to_warehouse_id' => ['required', 'integer'],
@@ -99,7 +99,7 @@ class StockTransferController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -132,7 +132,7 @@ class StockTransferController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'transfer_number' => ['required', 'string', 'max:255'],
             'from_warehouse_id' => ['required', 'integer'],
             'to_warehouse_id' => ['required', 'integer'],
@@ -147,10 +147,7 @@ class StockTransferController extends MainController
 
         try {
             $stockTransfer = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $stockTransfer,
-                $validated
-            ) {
+            DB::transaction(function () use ($stockTransfer, $validated) {
                 $stockTransfer->update($validated);
             });
 
@@ -160,14 +157,14 @@ class StockTransferController extends MainController
                 $stockTransfer
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui StockTransfer.',
                 [
                     'exception' => $e,
                     'StockTransfer_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -195,14 +192,14 @@ class StockTransferController extends MainController
                 'Data StockTransfer berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $stockTransfer->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus StockTransfer.',
                 [
                     'exception' => $e,
                     'StockTransfer_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -211,5 +208,5 @@ class StockTransferController extends MainController
                 'Data StockTransfer gagal dihapus.'
             );
         }
-    } 
+    }
 }

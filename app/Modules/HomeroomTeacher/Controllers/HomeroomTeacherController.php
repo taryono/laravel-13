@@ -68,7 +68,7 @@ class HomeroomTeacherController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'classroom_id' => ['required', 'integer'],
             'teacher_id' => ['required', 'integer'],
             'academic_year_id' => ['required', 'integer'],
@@ -96,7 +96,7 @@ class HomeroomTeacherController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -129,7 +129,7 @@ class HomeroomTeacherController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'classroom_id' => ['required', 'integer'],
             'teacher_id' => ['required', 'integer'],
             'academic_year_id' => ['required', 'integer'],
@@ -141,10 +141,7 @@ class HomeroomTeacherController extends MainController
 
         try {
             $homeroomTeacher = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $homeroomTeacher,
-                $validated
-            ) {
+            DB::transaction(function () use ($homeroomTeacher, $validated) {
                 $homeroomTeacher->update($validated);
             });
 
@@ -154,14 +151,14 @@ class HomeroomTeacherController extends MainController
                 $homeroomTeacher
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui HomeroomTeacher.',
                 [
                     'exception' => $e,
                     'HomeroomTeacher_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -189,14 +186,14 @@ class HomeroomTeacherController extends MainController
                 'Data HomeroomTeacher berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $homeroomTeacher->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus HomeroomTeacher.',
                 [
                     'exception' => $e,
                     'HomeroomTeacher_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -205,5 +202,5 @@ class HomeroomTeacherController extends MainController
                 'Data HomeroomTeacher gagal dihapus.'
             );
         }
-    } 
+    }
 }

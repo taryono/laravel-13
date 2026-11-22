@@ -70,13 +70,13 @@ class ExtracurricularAttendanceController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'extracurricular_id'      => 'required|exists:extracurriculars,id',
-            'extracurricular_day_id'  => 'required|exists:extracurricular_days,id',
-            'student_id'              => 'required|exists:students,id',
-            'attendance_date'         => 'required|date',
-            'status'                  => ['required', Rule::in(['hadir', 'izin', 'sakit', 'alfa'])],
-            'score'                   => 'nullable|numeric|min:0|max:100',
-            'notes'                   => 'nullable|string',
+            'extracurricular_id' => 'required|exists:extracurriculars,id',
+            'extracurricular_day_id' => 'required|exists:extracurricular_days,id',
+            'student_id' => 'required|exists:students,id',
+            'attendance_date' => 'required|date',
+            'status' => ['required', Rule::in(['hadir', 'izin', 'sakit', 'alfa'])],
+            'score' => 'nullable|numeric|min:0|max:100',
+            'notes' => 'nullable|string',
         ]);
 
         // Cek duplikasi: siswa + jadwal + tanggal sudah ada?
@@ -93,7 +93,7 @@ class ExtracurricularAttendanceController extends MainController
         }
 
         $attendance = ExtracurricularAttendance::create(array_merge($validated, [
-            'created_by' => auth()->id(),
+            'created_by' => request()->user()?->id,
         ]));
 
         return response()->json([
@@ -127,17 +127,17 @@ class ExtracurricularAttendanceController extends MainController
     public function update(Request $request, ExtracurricularAttendance $attendance)
     {
         $validated = $request->validate([
-            'extracurricular_id'      => 'required|exists:extracurriculars,id',
-            'extracurricular_day_id'  => 'required|exists:extracurricular_days,id',
-            'student_id'              => 'required|exists:students,id',
-            'attendance_date'         => 'required|date',
-            'status'                  => ['required', Rule::in(['hadir', 'izin', 'sakit', 'alfa'])],
-            'score'                   => 'nullable|numeric|min:0|max:100',
-            'notes'                   => 'nullable|string',
+            'extracurricular_id' => 'required|exists:extracurriculars,id',
+            'extracurricular_day_id' => 'required|exists:extracurricular_days,id',
+            'student_id' => 'required|exists:students,id',
+            'attendance_date' => 'required|date',
+            'status' => ['required', Rule::in(['hadir', 'izin', 'sakit', 'alfa'])],
+            'score' => 'nullable|numeric|min:0|max:100',
+            'notes' => 'nullable|string',
         ]);
 
         $attendance->update(array_merge($validated, [
-            'updated_by' => auth()->id(),
+            'updated_by' => request()->user()?->id,
         ]));
 
         return response()->json([
@@ -171,7 +171,7 @@ class ExtracurricularAttendanceController extends MainController
                 [
                     'exception' => $e,
                     'ExtracurricularAttendance_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 

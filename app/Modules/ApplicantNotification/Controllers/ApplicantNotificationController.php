@@ -68,7 +68,7 @@ class ApplicantNotificationController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'applicant_id' => ['required', 'integer'],
+            'applicant_id' => ['required', 'integer'],
             'notification_type' => ['required', 'string', 'max:255'],
             'template_code' => ['required', 'string', 'max:255'],
             'subject' => ['required', 'string', 'max:255'],
@@ -107,7 +107,7 @@ class ApplicantNotificationController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -140,7 +140,7 @@ class ApplicantNotificationController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'applicant_id' => ['required', 'integer'],
+            'applicant_id' => ['required', 'integer'],
             'notification_type' => ['required', 'string', 'max:255'],
             'template_code' => ['required', 'string', 'max:255'],
             'subject' => ['required', 'string', 'max:255'],
@@ -163,10 +163,7 @@ class ApplicantNotificationController extends MainController
 
         try {
             $applicantNotification = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $applicantNotification,
-                $validated
-            ) {
+            DB::transaction(function () use ($applicantNotification, $validated) {
                 $applicantNotification->update($validated);
             });
 
@@ -176,14 +173,14 @@ class ApplicantNotificationController extends MainController
                 $applicantNotification
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui ApplicantNotification.',
                 [
                     'exception' => $e,
                     'ApplicantNotification_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -211,14 +208,14 @@ class ApplicantNotificationController extends MainController
                 'Data ApplicantNotification berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $applicantNotification->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus ApplicantNotification.',
                 [
                     'exception' => $e,
                     'ApplicantNotification_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -227,5 +224,5 @@ class ApplicantNotificationController extends MainController
                 'Data ApplicantNotification gagal dihapus.'
             );
         }
-    } 
+    }
 }

@@ -68,7 +68,7 @@ class ExpensePaymentController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'expense_id' => ['required', 'integer'],
+            'expense_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
             'payment_number' => ['required', 'string', 'max:255'],
             'payment_date' => ['required', 'string', 'max:255'],
@@ -99,7 +99,7 @@ class ExpensePaymentController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -132,7 +132,7 @@ class ExpensePaymentController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'expense_id' => ['required', 'integer'],
+            'expense_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
             'payment_number' => ['required', 'string', 'max:255'],
             'payment_date' => ['required', 'string', 'max:255'],
@@ -147,10 +147,7 @@ class ExpensePaymentController extends MainController
 
         try {
             $expensePayment = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $expensePayment,
-                $validated
-            ) {
+            DB::transaction(function () use ($expensePayment, $validated) {
                 $expensePayment->update($validated);
             });
 
@@ -160,14 +157,14 @@ class ExpensePaymentController extends MainController
                 $expensePayment
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui ExpensePayment.',
                 [
                     'exception' => $e,
                     'ExpensePayment_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -195,14 +192,14 @@ class ExpensePaymentController extends MainController
                 'Data ExpensePayment berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $expensePayment->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus ExpensePayment.',
                 [
                     'exception' => $e,
                     'ExpensePayment_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -211,5 +208,5 @@ class ExpensePaymentController extends MainController
                 'Data ExpensePayment gagal dihapus.'
             );
         }
-    } 
+    }
 }

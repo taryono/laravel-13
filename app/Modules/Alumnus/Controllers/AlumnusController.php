@@ -68,7 +68,7 @@ class AlumnusController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'school_id' => ['required', 'integer'],
             'student_id' => ['required', 'integer'],
             'graduation_year' => ['required', 'string', 'max:255'],
@@ -105,7 +105,7 @@ class AlumnusController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -138,7 +138,7 @@ class AlumnusController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'school_id' => ['required', 'integer'],
             'student_id' => ['required', 'integer'],
             'graduation_year' => ['required', 'string', 'max:255'],
@@ -159,10 +159,7 @@ class AlumnusController extends MainController
 
         try {
             $alumnus = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $alumnus,
-                $validated
-            ) {
+            DB::transaction(function () use ($alumnus, $validated) {
                 $alumnus->update($validated);
             });
 
@@ -172,14 +169,14 @@ class AlumnusController extends MainController
                 $alumnus
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui Alumnus.',
                 [
                     'exception' => $e,
                     'Alumnus_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -207,14 +204,14 @@ class AlumnusController extends MainController
                 'Data Alumnus berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $alumnus->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus Alumnus.',
                 [
                     'exception' => $e,
                     'Alumnus_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -223,5 +220,5 @@ class AlumnusController extends MainController
                 'Data Alumnus gagal dihapus.'
             );
         }
-    } 
+    }
 }

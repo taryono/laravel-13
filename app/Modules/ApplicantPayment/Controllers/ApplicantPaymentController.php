@@ -68,7 +68,7 @@ class ApplicantPaymentController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'invoice_id' => ['required', 'integer'],
+            'invoice_id' => ['required', 'integer'],
             'applicant_id' => ['required', 'integer'],
             'payment_method' => ['required', 'string', 'max:255'],
             'payment_date' => ['required', 'string', 'max:255'],
@@ -108,7 +108,7 @@ class ApplicantPaymentController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -141,7 +141,7 @@ class ApplicantPaymentController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'invoice_id' => ['required', 'integer'],
+            'invoice_id' => ['required', 'integer'],
             'applicant_id' => ['required', 'integer'],
             'payment_method' => ['required', 'string', 'max:255'],
             'payment_date' => ['required', 'string', 'max:255'],
@@ -165,10 +165,7 @@ class ApplicantPaymentController extends MainController
 
         try {
             $applicantPayment = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $applicantPayment,
-                $validated
-            ) {
+            DB::transaction(function () use ($applicantPayment, $validated) {
                 $applicantPayment->update($validated);
             });
 
@@ -178,14 +175,14 @@ class ApplicantPaymentController extends MainController
                 $applicantPayment
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui ApplicantPayment.',
                 [
                     'exception' => $e,
                     'ApplicantPayment_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -213,14 +210,14 @@ class ApplicantPaymentController extends MainController
                 'Data ApplicantPayment berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $applicantPayment->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus ApplicantPayment.',
                 [
                     'exception' => $e,
                     'ApplicantPayment_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -229,5 +226,5 @@ class ApplicantPaymentController extends MainController
                 'Data ApplicantPayment gagal dihapus.'
             );
         }
-    } 
+    }
 }

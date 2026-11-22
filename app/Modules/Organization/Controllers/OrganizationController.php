@@ -68,7 +68,7 @@ class OrganizationController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'code' => ['required', 'string', 'max:255'],
+            'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'legal_name' => ['required', 'string', 'max:255'],
         ]);
@@ -91,7 +91,7 @@ class OrganizationController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -124,17 +124,14 @@ class OrganizationController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'code' => ['required', 'string', 'max:255'],
+            'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'legal_name' => ['required', 'string', 'max:255'],
         ]);
 
         try {
             $organization = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $organization,
-                $validated
-            ) {
+            DB::transaction(function () use ($organization, $validated) {
                 $organization->update($validated);
             });
 
@@ -144,14 +141,14 @@ class OrganizationController extends MainController
                 $organization
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui Organization.',
                 [
                     'exception' => $e,
                     'Organization_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -179,14 +176,14 @@ class OrganizationController extends MainController
                 'Data Organization berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $organization->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus Organization.',
                 [
                     'exception' => $e,
                     'Organization_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -195,5 +192,5 @@ class OrganizationController extends MainController
                 'Data Organization gagal dihapus.'
             );
         }
-    } 
+    }
 }

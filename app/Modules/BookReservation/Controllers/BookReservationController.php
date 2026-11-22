@@ -68,7 +68,7 @@ class BookReservationController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'library_book_id' => ['required', 'integer'],
+            'library_book_id' => ['required', 'integer'],
             'library_membership_id' => ['required', 'integer'],
             'reservation_date' => ['required', 'string', 'max:255'],
             'expiry_date' => ['required', 'string', 'max:255'],
@@ -93,7 +93,7 @@ class BookReservationController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -126,7 +126,7 @@ class BookReservationController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'library_book_id' => ['required', 'integer'],
+            'library_book_id' => ['required', 'integer'],
             'library_membership_id' => ['required', 'integer'],
             'reservation_date' => ['required', 'string', 'max:255'],
             'expiry_date' => ['required', 'string', 'max:255'],
@@ -135,10 +135,7 @@ class BookReservationController extends MainController
 
         try {
             $bookReservation = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $bookReservation,
-                $validated
-            ) {
+            DB::transaction(function () use ($bookReservation, $validated) {
                 $bookReservation->update($validated);
             });
 
@@ -148,14 +145,14 @@ class BookReservationController extends MainController
                 $bookReservation
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui BookReservation.',
                 [
                     'exception' => $e,
                     'BookReservation_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -183,14 +180,14 @@ class BookReservationController extends MainController
                 'Data BookReservation berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $bookReservation->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus BookReservation.',
                 [
                     'exception' => $e,
                     'BookReservation_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -199,5 +196,5 @@ class BookReservationController extends MainController
                 'Data BookReservation gagal dihapus.'
             );
         }
-    } 
+    }
 }

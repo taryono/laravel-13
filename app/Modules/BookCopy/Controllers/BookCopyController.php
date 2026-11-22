@@ -68,7 +68,7 @@ class BookCopyController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'library_book_id' => ['required', 'integer'],
+            'library_book_id' => ['required', 'integer'],
             'barcode' => ['required', 'string', 'max:255'],
             'rfid_tag' => ['required', 'string', 'max:255'],
             'call_number' => ['required', 'string', 'max:255'],
@@ -98,7 +98,7 @@ class BookCopyController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -131,7 +131,7 @@ class BookCopyController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'library_book_id' => ['required', 'integer'],
+            'library_book_id' => ['required', 'integer'],
             'barcode' => ['required', 'string', 'max:255'],
             'rfid_tag' => ['required', 'string', 'max:255'],
             'call_number' => ['required', 'string', 'max:255'],
@@ -145,10 +145,7 @@ class BookCopyController extends MainController
 
         try {
             $bookCopy = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $bookCopy,
-                $validated
-            ) {
+            DB::transaction(function () use ($bookCopy, $validated) {
                 $bookCopy->update($validated);
             });
 
@@ -158,14 +155,14 @@ class BookCopyController extends MainController
                 $bookCopy
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui BookCopy.',
                 [
                     'exception' => $e,
                     'BookCopy_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -193,14 +190,14 @@ class BookCopyController extends MainController
                 'Data BookCopy berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $bookCopy->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus BookCopy.',
                 [
                     'exception' => $e,
                     'BookCopy_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -209,5 +206,5 @@ class BookCopyController extends MainController
                 'Data BookCopy gagal dihapus.'
             );
         }
-    } 
+    }
 }

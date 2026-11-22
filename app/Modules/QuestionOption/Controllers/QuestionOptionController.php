@@ -68,7 +68,7 @@ class QuestionOptionController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'question_bank_id' => ['required', 'integer'],
+            'question_bank_id' => ['required', 'integer'],
             'option_label' => ['required', 'string', 'max:255'],
             'option_text' => ['required', 'string', 'max:255'],
             'content_format' => ['required', 'string', 'max:255'],
@@ -94,7 +94,7 @@ class QuestionOptionController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -127,7 +127,7 @@ class QuestionOptionController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'question_bank_id' => ['required', 'integer'],
+            'question_bank_id' => ['required', 'integer'],
             'option_label' => ['required', 'string', 'max:255'],
             'option_text' => ['required', 'string', 'max:255'],
             'content_format' => ['required', 'string', 'max:255'],
@@ -137,10 +137,7 @@ class QuestionOptionController extends MainController
 
         try {
             $questionOption = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $questionOption,
-                $validated
-            ) {
+            DB::transaction(function () use ($questionOption, $validated) {
                 $questionOption->update($validated);
             });
 
@@ -150,14 +147,14 @@ class QuestionOptionController extends MainController
                 $questionOption
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui QuestionOption.',
                 [
                     'exception' => $e,
                     'QuestionOption_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -185,14 +182,14 @@ class QuestionOptionController extends MainController
                 'Data QuestionOption berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $questionOption->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus QuestionOption.',
                 [
                     'exception' => $e,
                     'QuestionOption_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -201,5 +198,5 @@ class QuestionOptionController extends MainController
                 'Data QuestionOption gagal dihapus.'
             );
         }
-    } 
+    }
 }

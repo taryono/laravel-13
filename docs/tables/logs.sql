@@ -77,3 +77,21 @@ CREATE TABLE `provider_message_events` (
   CONSTRAINT `provider_message_events_sms_log_id_foreign`
     FOREIGN KEY (`sms_log_id`) REFERENCES `sms_logs` (`id`) ON DELETE CASCADE
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
+-- ----------------------------
+-- Table structure for `records`
+-- ----------------------------
+DROP TABLE IF EXISTS `records`;
+CREATE TABLE `records` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `record_type` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Model/class asal',
+  `record_key` bigint unsigned NOT NULL COMMENT 'PK di tabel asal',
+  `label` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Nama/label human-readable',
+  `meta` json DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `records_type_key_unique` (`record_type`, `record_key`) USING BTREE,
+  KEY `idx_records_type` (`record_type`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
+

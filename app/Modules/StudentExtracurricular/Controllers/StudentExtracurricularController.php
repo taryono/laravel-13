@@ -68,7 +68,7 @@ class StudentExtracurricularController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'student_id' => ['required', 'integer'],
+            'student_id' => ['required', 'integer'],
             'extracurricular_id' => ['required', 'integer'],
             'enrollment_date' => ['required', 'string', 'max:255'],
             'status' => ['required', 'string', 'max:255'],
@@ -105,7 +105,7 @@ class StudentExtracurricularController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -138,7 +138,7 @@ class StudentExtracurricularController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'student_id' => ['required', 'integer'],
+            'student_id' => ['required', 'integer'],
             'extracurricular_id' => ['required', 'integer'],
             'enrollment_date' => ['required', 'string', 'max:255'],
             'status' => ['required', 'string', 'max:255'],
@@ -159,10 +159,7 @@ class StudentExtracurricularController extends MainController
 
         try {
             $studentExtracurricular = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $studentExtracurricular,
-                $validated
-            ) {
+            DB::transaction(function () use ($studentExtracurricular, $validated) {
                 $studentExtracurricular->update($validated);
             });
 
@@ -172,14 +169,14 @@ class StudentExtracurricularController extends MainController
                 $studentExtracurricular
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui StudentExtracurricular.',
                 [
                     'exception' => $e,
                     'StudentExtracurricular_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -207,14 +204,14 @@ class StudentExtracurricularController extends MainController
                 'Data StudentExtracurricular berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $studentExtracurricular->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus StudentExtracurricular.',
                 [
                     'exception' => $e,
                     'StudentExtracurricular_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -223,5 +220,5 @@ class StudentExtracurricularController extends MainController
                 'Data StudentExtracurricular gagal dihapus.'
             );
         }
-    } 
+    }
 }

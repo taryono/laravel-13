@@ -68,7 +68,7 @@ class SalaryStructureComponentController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'salary_structurename' => ['required', 'string', 'max:255'],
+            'salary_structurename' => ['required', 'string', 'max:255'],
             'salary_componentname' => ['required', 'string', 'max:255'],
             'calculation_type' => ['required', 'string', 'max:255'],
             'value' => ['required', 'string', 'max:255'],
@@ -95,7 +95,7 @@ class SalaryStructureComponentController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -128,7 +128,7 @@ class SalaryStructureComponentController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'salary_structurename' => ['required', 'string', 'max:255'],
+            'salary_structurename' => ['required', 'string', 'max:255'],
             'salary_componentname' => ['required', 'string', 'max:255'],
             'calculation_type' => ['required', 'string', 'max:255'],
             'value' => ['required', 'string', 'max:255'],
@@ -139,10 +139,7 @@ class SalaryStructureComponentController extends MainController
 
         try {
             $salaryStructureComponent = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $salaryStructureComponent,
-                $validated
-            ) {
+            DB::transaction(function () use ($salaryStructureComponent, $validated) {
                 $salaryStructureComponent->update($validated);
             });
 
@@ -152,14 +149,14 @@ class SalaryStructureComponentController extends MainController
                 $salaryStructureComponent
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui SalaryStructureComponent.',
                 [
                     'exception' => $e,
                     'SalaryStructureComponent_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -187,14 +184,14 @@ class SalaryStructureComponentController extends MainController
                 'Data SalaryStructureComponent berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $salaryStructureComponent->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus SalaryStructureComponent.',
                 [
                     'exception' => $e,
                     'SalaryStructureComponent_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -203,5 +200,5 @@ class SalaryStructureComponentController extends MainController
                 'Data SalaryStructureComponent gagal dihapus.'
             );
         }
-    } 
+    }
 }

@@ -68,7 +68,7 @@ class TagController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'name' => ['required', 'string', 'max:255'],
         ]);
 
@@ -90,7 +90,7 @@ class TagController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -123,16 +123,13 @@ class TagController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'name' => ['required', 'string', 'max:255'],
         ]);
 
         try {
             $tag = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $tag,
-                $validated
-            ) {
+            DB::transaction(function () use ($tag, $validated) {
                 $tag->update($validated);
             });
 
@@ -142,14 +139,14 @@ class TagController extends MainController
                 $tag
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui Tag.',
                 [
                     'exception' => $e,
                     'Tag_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -177,14 +174,14 @@ class TagController extends MainController
                 'Data Tag berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $tag->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus Tag.',
                 [
                     'exception' => $e,
                     'Tag_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -193,5 +190,5 @@ class TagController extends MainController
                 'Data Tag gagal dihapus.'
             );
         }
-    } 
+    }
 }

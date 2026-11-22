@@ -68,7 +68,7 @@ class ApplicantSupportProgramController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'applicant_id' => ['required', 'integer'],
+            'applicant_id' => ['required', 'integer'],
             'program_type' => ['required', 'string', 'max:255'],
             'card_number' => ['required', 'string', 'max:255'],
             'program_name' => ['required', 'string', 'max:255'],
@@ -103,7 +103,7 @@ class ApplicantSupportProgramController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -136,7 +136,7 @@ class ApplicantSupportProgramController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'applicant_id' => ['required', 'integer'],
+            'applicant_id' => ['required', 'integer'],
             'program_type' => ['required', 'string', 'max:255'],
             'card_number' => ['required', 'string', 'max:255'],
             'program_name' => ['required', 'string', 'max:255'],
@@ -155,10 +155,7 @@ class ApplicantSupportProgramController extends MainController
 
         try {
             $applicantSupportProgram = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $applicantSupportProgram,
-                $validated
-            ) {
+            DB::transaction(function () use ($applicantSupportProgram, $validated) {
                 $applicantSupportProgram->update($validated);
             });
 
@@ -168,14 +165,14 @@ class ApplicantSupportProgramController extends MainController
                 $applicantSupportProgram
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui ApplicantSupportProgram.',
                 [
                     'exception' => $e,
                     'ApplicantSupportProgram_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -203,14 +200,14 @@ class ApplicantSupportProgramController extends MainController
                 'Data ApplicantSupportProgram berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $applicantSupportProgram->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus ApplicantSupportProgram.',
                 [
                     'exception' => $e,
                     'ApplicantSupportProgram_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -219,5 +216,5 @@ class ApplicantSupportProgramController extends MainController
                 'Data ApplicantSupportProgram gagal dihapus.'
             );
         }
-    } 
+    }
 }

@@ -68,7 +68,7 @@ class StudentRangeController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
             'min_value' => ['required', 'string', 'max:255'],
             'max_value' => ['required', 'string', 'max:255'],
             'sort_order' => ['required', 'string', 'max:255'],
@@ -95,7 +95,7 @@ class StudentRangeController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -128,7 +128,7 @@ class StudentRangeController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
             'min_value' => ['required', 'string', 'max:255'],
             'max_value' => ['required', 'string', 'max:255'],
             'sort_order' => ['required', 'string', 'max:255'],
@@ -139,10 +139,7 @@ class StudentRangeController extends MainController
 
         try {
             $studentRange = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $studentRange,
-                $validated
-            ) {
+            DB::transaction(function () use ($studentRange, $validated) {
                 $studentRange->update($validated);
             });
 
@@ -152,14 +149,14 @@ class StudentRangeController extends MainController
                 $studentRange
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui StudentRange.',
                 [
                     'exception' => $e,
                     'StudentRange_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -187,14 +184,14 @@ class StudentRangeController extends MainController
                 'Data StudentRange berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $studentRange->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus StudentRange.',
                 [
                     'exception' => $e,
                     'StudentRange_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -203,5 +200,5 @@ class StudentRangeController extends MainController
                 'Data StudentRange gagal dihapus.'
             );
         }
-    } 
+    }
 }

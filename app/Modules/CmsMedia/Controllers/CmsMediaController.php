@@ -68,7 +68,7 @@ class CmsMediaController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'user_id' => ['required', 'integer'],
+            'user_id' => ['required', 'integer'],
             'name' => ['required', 'string', 'max:255'],
             'file_name' => ['required', 'string', 'max:255'],
             'disk' => ['required', 'string', 'max:255'],
@@ -102,7 +102,7 @@ class CmsMediaController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -135,7 +135,7 @@ class CmsMediaController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'user_id' => ['required', 'integer'],
+            'user_id' => ['required', 'integer'],
             'name' => ['required', 'string', 'max:255'],
             'file_name' => ['required', 'string', 'max:255'],
             'disk' => ['required', 'string', 'max:255'],
@@ -153,10 +153,7 @@ class CmsMediaController extends MainController
 
         try {
             $cmsMedia = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $cmsMedia,
-                $validated
-            ) {
+            DB::transaction(function () use ($cmsMedia, $validated) {
                 $cmsMedia->update($validated);
             });
 
@@ -166,14 +163,14 @@ class CmsMediaController extends MainController
                 $cmsMedia
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui CmsMedia.',
                 [
                     'exception' => $e,
                     'CmsMedia_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -201,14 +198,14 @@ class CmsMediaController extends MainController
                 'Data CmsMedia berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $cmsMedia->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus CmsMedia.',
                 [
                     'exception' => $e,
                     'CmsMedia_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -217,5 +214,5 @@ class CmsMediaController extends MainController
                 'Data CmsMedia gagal dihapus.'
             );
         }
-    } 
+    }
 }

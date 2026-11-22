@@ -68,7 +68,7 @@ class FiscalPeriodClosingController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'fiscal_period_id' => ['required', 'integer'],
+            'fiscal_period_id' => ['required', 'integer'],
             'closing_type' => ['required', 'string', 'max:255'],
             'closing_date' => ['required', 'string', 'max:255'],
             'total_debit' => ['required', 'string', 'max:255'],
@@ -100,7 +100,7 @@ class FiscalPeriodClosingController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -133,7 +133,7 @@ class FiscalPeriodClosingController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'fiscal_period_id' => ['required', 'integer'],
+            'fiscal_period_id' => ['required', 'integer'],
             'closing_type' => ['required', 'string', 'max:255'],
             'closing_date' => ['required', 'string', 'max:255'],
             'total_debit' => ['required', 'string', 'max:255'],
@@ -149,10 +149,7 @@ class FiscalPeriodClosingController extends MainController
 
         try {
             $fiscalPeriodClosing = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $fiscalPeriodClosing,
-                $validated
-            ) {
+            DB::transaction(function () use ($fiscalPeriodClosing, $validated) {
                 $fiscalPeriodClosing->update($validated);
             });
 
@@ -162,14 +159,14 @@ class FiscalPeriodClosingController extends MainController
                 $fiscalPeriodClosing
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui FiscalPeriodClosing.',
                 [
                     'exception' => $e,
                     'FiscalPeriodClosing_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -197,14 +194,14 @@ class FiscalPeriodClosingController extends MainController
                 'Data FiscalPeriodClosing berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $fiscalPeriodClosing->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus FiscalPeriodClosing.',
                 [
                     'exception' => $e,
                     'FiscalPeriodClosing_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -213,5 +210,5 @@ class FiscalPeriodClosingController extends MainController
                 'Data FiscalPeriodClosing gagal dihapus.'
             );
         }
-    } 
+    }
 }

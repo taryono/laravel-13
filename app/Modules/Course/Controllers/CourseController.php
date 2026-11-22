@@ -68,7 +68,7 @@ class CourseController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'teacher_id' => ['required', 'integer'],
             'subject_id' => ['required', 'integer'],
             'title' => ['required', 'string', 'max:255'],
@@ -103,7 +103,7 @@ class CourseController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -136,7 +136,7 @@ class CourseController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'teacher_id' => ['required', 'integer'],
             'subject_id' => ['required', 'integer'],
             'title' => ['required', 'string', 'max:255'],
@@ -155,10 +155,7 @@ class CourseController extends MainController
 
         try {
             $course = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $course,
-                $validated
-            ) {
+            DB::transaction(function () use ($course, $validated) {
                 $course->update($validated);
             });
 
@@ -168,14 +165,14 @@ class CourseController extends MainController
                 $course
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui Course.',
                 [
                     'exception' => $e,
                     'Course_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -203,14 +200,14 @@ class CourseController extends MainController
                 'Data Course berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $course->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus Course.',
                 [
                     'exception' => $e,
                     'Course_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -219,5 +216,5 @@ class CourseController extends MainController
                 'Data Course gagal dihapus.'
             );
         }
-    } 
+    }
 }

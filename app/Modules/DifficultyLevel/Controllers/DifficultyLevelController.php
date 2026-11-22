@@ -68,7 +68,7 @@ class DifficultyLevelController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
         ]);
 
         try {
@@ -89,7 +89,7 @@ class DifficultyLevelController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -122,15 +122,12 @@ class DifficultyLevelController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
         ]);
 
         try {
             $difficultyLevel = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $difficultyLevel,
-                $validated
-            ) {
+            DB::transaction(function () use ($difficultyLevel, $validated) {
                 $difficultyLevel->update($validated);
             });
 
@@ -140,14 +137,14 @@ class DifficultyLevelController extends MainController
                 $difficultyLevel
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui DifficultyLevel.',
                 [
                     'exception' => $e,
                     'DifficultyLevel_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -175,14 +172,14 @@ class DifficultyLevelController extends MainController
                 'Data DifficultyLevel berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $difficultyLevel->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus DifficultyLevel.',
                 [
                     'exception' => $e,
                     'DifficultyLevel_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -191,5 +188,5 @@ class DifficultyLevelController extends MainController
                 'Data DifficultyLevel gagal dihapus.'
             );
         }
-    } 
+    }
 }

@@ -68,7 +68,7 @@ class ExamPackageQuestionController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'exam_package_id' => ['required', 'integer'],
+            'exam_package_id' => ['required', 'integer'],
             'question_bank_id' => ['required', 'integer'],
             'question_type_id' => ['required', 'integer'],
             'question_text_snapshot' => ['required', 'string', 'max:255'],
@@ -100,7 +100,7 @@ class ExamPackageQuestionController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -133,7 +133,7 @@ class ExamPackageQuestionController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'exam_package_id' => ['required', 'integer'],
+            'exam_package_id' => ['required', 'integer'],
             'question_bank_id' => ['required', 'integer'],
             'question_type_id' => ['required', 'integer'],
             'question_text_snapshot' => ['required', 'string', 'max:255'],
@@ -149,10 +149,7 @@ class ExamPackageQuestionController extends MainController
 
         try {
             $examPackageQuestion = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $examPackageQuestion,
-                $validated
-            ) {
+            DB::transaction(function () use ($examPackageQuestion, $validated) {
                 $examPackageQuestion->update($validated);
             });
 
@@ -162,14 +159,14 @@ class ExamPackageQuestionController extends MainController
                 $examPackageQuestion
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui ExamPackageQuestion.',
                 [
                     'exception' => $e,
                     'ExamPackageQuestion_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -197,14 +194,14 @@ class ExamPackageQuestionController extends MainController
                 'Data ExamPackageQuestion berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $examPackageQuestion->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus ExamPackageQuestion.',
                 [
                     'exception' => $e,
                     'ExamPackageQuestion_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -213,5 +210,5 @@ class ExamPackageQuestionController extends MainController
                 'Data ExamPackageQuestion gagal dihapus.'
             );
         }
-    } 
+    }
 }

@@ -68,7 +68,7 @@ class FacultyController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'code' => ['required', 'string', 'max:255'],
+            'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'school_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
@@ -92,7 +92,7 @@ class FacultyController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -125,7 +125,7 @@ class FacultyController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'code' => ['required', 'string', 'max:255'],
+            'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'school_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
@@ -133,10 +133,7 @@ class FacultyController extends MainController
 
         try {
             $faculty = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $faculty,
-                $validated
-            ) {
+            DB::transaction(function () use ($faculty, $validated) {
                 $faculty->update($validated);
             });
 
@@ -146,14 +143,14 @@ class FacultyController extends MainController
                 $faculty
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui Faculty.',
                 [
                     'exception' => $e,
                     'Faculty_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -181,14 +178,14 @@ class FacultyController extends MainController
                 'Data Faculty berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $faculty->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus Faculty.',
                 [
                     'exception' => $e,
                     'Faculty_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -197,5 +194,5 @@ class FacultyController extends MainController
                 'Data Faculty gagal dihapus.'
             );
         }
-    } 
+    }
 }

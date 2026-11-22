@@ -68,7 +68,7 @@ class PayrollPaymentBatchController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'payroll_run_id' => ['required', 'integer'],
             'bank_account_id' => ['required', 'integer'],
             'batch_number' => ['required', 'string', 'max:255'],
@@ -103,7 +103,7 @@ class PayrollPaymentBatchController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -136,7 +136,7 @@ class PayrollPaymentBatchController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'payroll_run_id' => ['required', 'integer'],
             'bank_account_id' => ['required', 'integer'],
             'batch_number' => ['required', 'string', 'max:255'],
@@ -155,10 +155,7 @@ class PayrollPaymentBatchController extends MainController
 
         try {
             $payrollPaymentBatch = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $payrollPaymentBatch,
-                $validated
-            ) {
+            DB::transaction(function () use ($payrollPaymentBatch, $validated) {
                 $payrollPaymentBatch->update($validated);
             });
 
@@ -168,14 +165,14 @@ class PayrollPaymentBatchController extends MainController
                 $payrollPaymentBatch
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui PayrollPaymentBatch.',
                 [
                     'exception' => $e,
                     'PayrollPaymentBatch_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -203,14 +200,14 @@ class PayrollPaymentBatchController extends MainController
                 'Data PayrollPaymentBatch berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $payrollPaymentBatch->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus PayrollPaymentBatch.',
                 [
                     'exception' => $e,
                     'PayrollPaymentBatch_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -219,5 +216,5 @@ class PayrollPaymentBatchController extends MainController
                 'Data PayrollPaymentBatch gagal dihapus.'
             );
         }
-    } 
+    }
 }

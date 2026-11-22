@@ -89,7 +89,7 @@ class ScheduleController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -128,10 +128,7 @@ class ScheduleController extends MainController
         try {
             $schedule = $this->model->findOrFail($id);
 
-            DB::transaction(function () use (
-                $schedule,
-                $validated
-            ) {
+            DB::transaction(function () use ($schedule, $validated) {
                 $schedule->update($validated);
             });
 
@@ -154,7 +151,7 @@ class ScheduleController extends MainController
                     'exception' => $e,
                     'Schedule_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -191,7 +188,7 @@ class ScheduleController extends MainController
                 [
                     'exception' => $e,
                     'Schedule_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 

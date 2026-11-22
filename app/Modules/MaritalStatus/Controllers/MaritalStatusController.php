@@ -68,7 +68,7 @@ class MaritalStatusController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'code' => ['required', 'string', 'max:255'],
+            'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'is_active' => ['required', 'string', 'max:255'],
             'sort_order' => ['required', 'string', 'max:255'],
@@ -94,7 +94,7 @@ class MaritalStatusController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -127,7 +127,7 @@ class MaritalStatusController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'code' => ['required', 'string', 'max:255'],
+            'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'is_active' => ['required', 'string', 'max:255'],
             'sort_order' => ['required', 'string', 'max:255'],
@@ -137,10 +137,7 @@ class MaritalStatusController extends MainController
 
         try {
             $maritalStatus = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $maritalStatus,
-                $validated
-            ) {
+            DB::transaction(function () use ($maritalStatus, $validated) {
                 $maritalStatus->update($validated);
             });
 
@@ -150,14 +147,14 @@ class MaritalStatusController extends MainController
                 $maritalStatus
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui MaritalStatus.',
                 [
                     'exception' => $e,
                     'MaritalStatus_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -185,14 +182,14 @@ class MaritalStatusController extends MainController
                 'Data MaritalStatus berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $maritalStatus->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus MaritalStatus.',
                 [
                     'exception' => $e,
                     'MaritalStatus_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -201,5 +198,5 @@ class MaritalStatusController extends MainController
                 'Data MaritalStatus gagal dihapus.'
             );
         }
-    } 
+    }
 }

@@ -68,7 +68,7 @@ class UnitOfMeasurementController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'symbol' => ['required', 'string', 'max:255'],
@@ -95,7 +95,7 @@ class UnitOfMeasurementController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -128,7 +128,7 @@ class UnitOfMeasurementController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'symbol' => ['required', 'string', 'max:255'],
@@ -139,10 +139,7 @@ class UnitOfMeasurementController extends MainController
 
         try {
             $unitOfMeasurement = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $unitOfMeasurement,
-                $validated
-            ) {
+            DB::transaction(function () use ($unitOfMeasurement, $validated) {
                 $unitOfMeasurement->update($validated);
             });
 
@@ -152,14 +149,14 @@ class UnitOfMeasurementController extends MainController
                 $unitOfMeasurement
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui UnitOfMeasurement.',
                 [
                     'exception' => $e,
                     'UnitOfMeasurement_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -187,14 +184,14 @@ class UnitOfMeasurementController extends MainController
                 'Data UnitOfMeasurement berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $unitOfMeasurement->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus UnitOfMeasurement.',
                 [
                     'exception' => $e,
                     'UnitOfMeasurement_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -203,5 +200,5 @@ class UnitOfMeasurementController extends MainController
                 'Data UnitOfMeasurement gagal dihapus.'
             );
         }
-    } 
+    }
 }

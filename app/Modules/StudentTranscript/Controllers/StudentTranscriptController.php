@@ -68,7 +68,7 @@ class StudentTranscriptController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'student_id' => ['required', 'integer'],
+            'student_id' => ['required', 'integer'],
             'study_program_id' => ['required', 'integer'],
             'transcript_number' => ['required', 'string', 'max:255'],
             'graduation_date' => ['required', 'string', 'max:255'],
@@ -97,7 +97,7 @@ class StudentTranscriptController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -130,7 +130,7 @@ class StudentTranscriptController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'student_id' => ['required', 'integer'],
+            'student_id' => ['required', 'integer'],
             'study_program_id' => ['required', 'integer'],
             'transcript_number' => ['required', 'string', 'max:255'],
             'graduation_date' => ['required', 'string', 'max:255'],
@@ -143,10 +143,7 @@ class StudentTranscriptController extends MainController
 
         try {
             $studentTranscript = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $studentTranscript,
-                $validated
-            ) {
+            DB::transaction(function () use ($studentTranscript, $validated) {
                 $studentTranscript->update($validated);
             });
 
@@ -156,14 +153,14 @@ class StudentTranscriptController extends MainController
                 $studentTranscript
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui StudentTranscript.',
                 [
                     'exception' => $e,
                     'StudentTranscript_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -191,14 +188,14 @@ class StudentTranscriptController extends MainController
                 'Data StudentTranscript berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $studentTranscript->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus StudentTranscript.',
                 [
                     'exception' => $e,
                     'StudentTranscript_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -207,5 +204,5 @@ class StudentTranscriptController extends MainController
                 'Data StudentTranscript gagal dihapus.'
             );
         }
-    } 
+    }
 }

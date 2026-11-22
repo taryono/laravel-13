@@ -68,7 +68,7 @@ class StudentPaymentController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'invoice_id' => ['required', 'integer'],
+            'invoice_id' => ['required', 'integer'],
             'student_id' => ['required', 'integer'],
             'payment_method' => ['required', 'string', 'max:255'],
             'payment_date' => ['required', 'string', 'max:255'],
@@ -109,7 +109,7 @@ class StudentPaymentController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -142,7 +142,7 @@ class StudentPaymentController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'invoice_id' => ['required', 'integer'],
+            'invoice_id' => ['required', 'integer'],
             'student_id' => ['required', 'integer'],
             'payment_method' => ['required', 'string', 'max:255'],
             'payment_date' => ['required', 'string', 'max:255'],
@@ -167,10 +167,7 @@ class StudentPaymentController extends MainController
 
         try {
             $studentPayment = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $studentPayment,
-                $validated
-            ) {
+            DB::transaction(function () use ($studentPayment, $validated) {
                 $studentPayment->update($validated);
             });
 
@@ -180,14 +177,14 @@ class StudentPaymentController extends MainController
                 $studentPayment
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui StudentPayment.',
                 [
                     'exception' => $e,
                     'StudentPayment_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -215,14 +212,14 @@ class StudentPaymentController extends MainController
                 'Data StudentPayment berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $studentPayment->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus StudentPayment.',
                 [
                     'exception' => $e,
                     'StudentPayment_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -231,5 +228,5 @@ class StudentPaymentController extends MainController
                 'Data StudentPayment gagal dihapus.'
             );
         }
-    } 
+    }
 }

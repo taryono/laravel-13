@@ -68,7 +68,7 @@ class InventoryItemController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'category_id' => ['required', 'integer'],
             'uom_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
@@ -106,7 +106,7 @@ class InventoryItemController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -139,7 +139,7 @@ class InventoryItemController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'category_id' => ['required', 'integer'],
             'uom_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
@@ -161,10 +161,7 @@ class InventoryItemController extends MainController
 
         try {
             $inventoryItem = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $inventoryItem,
-                $validated
-            ) {
+            DB::transaction(function () use ($inventoryItem, $validated) {
                 $inventoryItem->update($validated);
             });
 
@@ -174,14 +171,14 @@ class InventoryItemController extends MainController
                 $inventoryItem
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui InventoryItem.',
                 [
                     'exception' => $e,
                     'InventoryItem_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -209,14 +206,14 @@ class InventoryItemController extends MainController
                 'Data InventoryItem berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $inventoryItem->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus InventoryItem.',
                 [
                     'exception' => $e,
                     'InventoryItem_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -225,5 +222,5 @@ class InventoryItemController extends MainController
                 'Data InventoryItem gagal dihapus.'
             );
         }
-    } 
+    }
 }

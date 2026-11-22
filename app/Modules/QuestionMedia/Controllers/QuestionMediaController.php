@@ -68,7 +68,7 @@ class QuestionMediaController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'question_bank_id' => ['required', 'integer'],
+            'question_bank_id' => ['required', 'integer'],
             'question_option_id' => ['required', 'integer'],
             'question_stimulus_id' => ['required', 'integer'],
             'media_type' => ['required', 'string', 'max:255'],
@@ -99,7 +99,7 @@ class QuestionMediaController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -132,7 +132,7 @@ class QuestionMediaController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'question_bank_id' => ['required', 'integer'],
+            'question_bank_id' => ['required', 'integer'],
             'question_option_id' => ['required', 'integer'],
             'question_stimulus_id' => ['required', 'integer'],
             'media_type' => ['required', 'string', 'max:255'],
@@ -147,10 +147,7 @@ class QuestionMediaController extends MainController
 
         try {
             $questionMedia = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $questionMedia,
-                $validated
-            ) {
+            DB::transaction(function () use ($questionMedia, $validated) {
                 $questionMedia->update($validated);
             });
 
@@ -160,14 +157,14 @@ class QuestionMediaController extends MainController
                 $questionMedia
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui QuestionMedia.',
                 [
                     'exception' => $e,
                     'QuestionMedia_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -195,14 +192,14 @@ class QuestionMediaController extends MainController
                 'Data QuestionMedia berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $questionMedia->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus QuestionMedia.',
                 [
                     'exception' => $e,
                     'QuestionMedia_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -211,5 +208,5 @@ class QuestionMediaController extends MainController
                 'Data QuestionMedia gagal dihapus.'
             );
         }
-    } 
+    }
 }

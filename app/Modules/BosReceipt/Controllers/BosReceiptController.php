@@ -68,7 +68,7 @@ class BosReceiptController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'bos_period_id' => ['required', 'integer'],
+            'bos_period_id' => ['required', 'integer'],
             'bank_account_id' => ['required', 'integer'],
             'receipt_number' => ['required', 'string', 'max:255'],
             'receipt_date' => ['required', 'string', 'max:255'],
@@ -101,7 +101,7 @@ class BosReceiptController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -134,7 +134,7 @@ class BosReceiptController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'bos_period_id' => ['required', 'integer'],
+            'bos_period_id' => ['required', 'integer'],
             'bank_account_id' => ['required', 'integer'],
             'receipt_number' => ['required', 'string', 'max:255'],
             'receipt_date' => ['required', 'string', 'max:255'],
@@ -151,10 +151,7 @@ class BosReceiptController extends MainController
 
         try {
             $bosReceipt = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $bosReceipt,
-                $validated
-            ) {
+            DB::transaction(function () use ($bosReceipt, $validated) {
                 $bosReceipt->update($validated);
             });
 
@@ -164,14 +161,14 @@ class BosReceiptController extends MainController
                 $bosReceipt
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui BosReceipt.',
                 [
                     'exception' => $e,
                     'BosReceipt_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -199,14 +196,14 @@ class BosReceiptController extends MainController
                 'Data BosReceipt berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $bosReceipt->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus BosReceipt.',
                 [
                     'exception' => $e,
                     'BosReceipt_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -215,5 +212,5 @@ class BosReceiptController extends MainController
                 'Data BosReceipt gagal dihapus.'
             );
         }
-    } 
+    }
 }

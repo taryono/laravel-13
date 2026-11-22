@@ -68,7 +68,7 @@ class OpeningBalanceController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'fiscal_year_id' => ['required', 'integer'],
             'account_id' => ['required', 'integer'],
             'cost_center_id' => ['required', 'integer'],
@@ -97,7 +97,7 @@ class OpeningBalanceController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -130,7 +130,7 @@ class OpeningBalanceController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'fiscal_year_id' => ['required', 'integer'],
             'account_id' => ['required', 'integer'],
             'cost_center_id' => ['required', 'integer'],
@@ -143,10 +143,7 @@ class OpeningBalanceController extends MainController
 
         try {
             $openingBalance = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $openingBalance,
-                $validated
-            ) {
+            DB::transaction(function () use ($openingBalance, $validated) {
                 $openingBalance->update($validated);
             });
 
@@ -156,14 +153,14 @@ class OpeningBalanceController extends MainController
                 $openingBalance
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui OpeningBalance.',
                 [
                     'exception' => $e,
                     'OpeningBalance_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -191,14 +188,14 @@ class OpeningBalanceController extends MainController
                 'Data OpeningBalance berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $openingBalance->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus OpeningBalance.',
                 [
                     'exception' => $e,
                     'OpeningBalance_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -207,5 +204,5 @@ class OpeningBalanceController extends MainController
                 'Data OpeningBalance gagal dihapus.'
             );
         }
-    } 
+    }
 }

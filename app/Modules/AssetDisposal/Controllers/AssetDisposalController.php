@@ -68,7 +68,7 @@ class AssetDisposalController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'fixed_asset_id' => ['required', 'integer'],
+            'fixed_asset_id' => ['required', 'integer'],
             'disposal_number' => ['required', 'string', 'max:255'],
             'disposal_date' => ['required', 'string', 'max:255'],
             'disposal_type' => ['required', 'string', 'max:255'],
@@ -101,7 +101,7 @@ class AssetDisposalController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -134,7 +134,7 @@ class AssetDisposalController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'fixed_asset_id' => ['required', 'integer'],
+            'fixed_asset_id' => ['required', 'integer'],
             'disposal_number' => ['required', 'string', 'max:255'],
             'disposal_date' => ['required', 'string', 'max:255'],
             'disposal_type' => ['required', 'string', 'max:255'],
@@ -151,10 +151,7 @@ class AssetDisposalController extends MainController
 
         try {
             $assetDisposal = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $assetDisposal,
-                $validated
-            ) {
+            DB::transaction(function () use ($assetDisposal, $validated) {
                 $assetDisposal->update($validated);
             });
 
@@ -164,14 +161,14 @@ class AssetDisposalController extends MainController
                 $assetDisposal
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui AssetDisposal.',
                 [
                     'exception' => $e,
                     'AssetDisposal_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -199,14 +196,14 @@ class AssetDisposalController extends MainController
                 'Data AssetDisposal berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $assetDisposal->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus AssetDisposal.',
                 [
                     'exception' => $e,
                     'AssetDisposal_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -215,5 +212,5 @@ class AssetDisposalController extends MainController
                 'Data AssetDisposal gagal dihapus.'
             );
         }
-    } 
+    }
 }

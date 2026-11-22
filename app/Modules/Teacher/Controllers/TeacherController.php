@@ -67,7 +67,7 @@ class TeacherController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'user_id' => ['required', 'integer'],
             'nip' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
@@ -92,7 +92,7 @@ class TeacherController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -124,7 +124,7 @@ class TeacherController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'user_id' => ['required', 'integer'],
             'nip' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
@@ -133,10 +133,7 @@ class TeacherController extends MainController
 
         try {
             $teacher = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $teacher,
-                $validated
-            ) {
+            DB::transaction(function () use ($teacher, $validated) {
                 $teacher->update($validated);
             });
 
@@ -146,14 +143,14 @@ class TeacherController extends MainController
                 $teacher
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui Teacher.',
                 [
                     'exception' => $e,
                     'Teacher_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -181,14 +178,14 @@ class TeacherController extends MainController
                 'Data Teacher berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $teacher->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus Teacher.',
                 [
                     'exception' => $e,
                     'Teacher_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -197,5 +194,5 @@ class TeacherController extends MainController
                 'Data Teacher gagal dihapus.'
             );
         }
-    } 
+    }
 }

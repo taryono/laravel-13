@@ -68,7 +68,7 @@ class EmployeeDeductionController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'employee_id' => ['required', 'integer'],
+            'employee_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
             'deduction_number' => ['required', 'string', 'max:255'],
             'deduction_date' => ['required', 'string', 'max:255'],
@@ -102,7 +102,7 @@ class EmployeeDeductionController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -135,7 +135,7 @@ class EmployeeDeductionController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'employee_id' => ['required', 'integer'],
+            'employee_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
             'deduction_number' => ['required', 'string', 'max:255'],
             'deduction_date' => ['required', 'string', 'max:255'],
@@ -153,10 +153,7 @@ class EmployeeDeductionController extends MainController
 
         try {
             $employeeDeduction = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $employeeDeduction,
-                $validated
-            ) {
+            DB::transaction(function () use ($employeeDeduction, $validated) {
                 $employeeDeduction->update($validated);
             });
 
@@ -166,14 +163,14 @@ class EmployeeDeductionController extends MainController
                 $employeeDeduction
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui EmployeeDeduction.',
                 [
                     'exception' => $e,
                     'EmployeeDeduction_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -201,14 +198,14 @@ class EmployeeDeductionController extends MainController
                 'Data EmployeeDeduction berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $employeeDeduction->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus EmployeeDeduction.',
                 [
                     'exception' => $e,
                     'EmployeeDeduction_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -217,5 +214,5 @@ class EmployeeDeductionController extends MainController
                 'Data EmployeeDeduction gagal dihapus.'
             );
         }
-    } 
+    }
 }

@@ -68,7 +68,7 @@ class ReportPeriodController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'academic_year_id' => ['required', 'integer'],
             'name' => ['required', 'string', 'max:255'],
             'code' => ['required', 'string', 'max:255'],
@@ -99,7 +99,7 @@ class ReportPeriodController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -132,7 +132,7 @@ class ReportPeriodController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'academic_year_id' => ['required', 'integer'],
             'name' => ['required', 'string', 'max:255'],
             'code' => ['required', 'string', 'max:255'],
@@ -147,10 +147,7 @@ class ReportPeriodController extends MainController
 
         try {
             $reportPeriod = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $reportPeriod,
-                $validated
-            ) {
+            DB::transaction(function () use ($reportPeriod, $validated) {
                 $reportPeriod->update($validated);
             });
 
@@ -160,14 +157,14 @@ class ReportPeriodController extends MainController
                 $reportPeriod
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui ReportPeriod.',
                 [
                     'exception' => $e,
                     'ReportPeriod_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -195,14 +192,14 @@ class ReportPeriodController extends MainController
                 'Data ReportPeriod berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $reportPeriod->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus ReportPeriod.',
                 [
                     'exception' => $e,
                     'ReportPeriod_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -211,5 +208,5 @@ class ReportPeriodController extends MainController
                 'Data ReportPeriod gagal dihapus.'
             );
         }
-    } 
+    }
 }

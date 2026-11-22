@@ -68,7 +68,7 @@ class BosRealizationController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'bos_period_id' => ['required', 'integer'],
+            'bos_period_id' => ['required', 'integer'],
             'bos_usage_plan_id' => ['required', 'integer'],
             'rkas_realization_id' => ['required', 'integer'],
             'journal_entry_id' => ['required', 'integer'],
@@ -105,7 +105,7 @@ class BosRealizationController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -138,7 +138,7 @@ class BosRealizationController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'bos_period_id' => ['required', 'integer'],
+            'bos_period_id' => ['required', 'integer'],
             'bos_usage_plan_id' => ['required', 'integer'],
             'rkas_realization_id' => ['required', 'integer'],
             'journal_entry_id' => ['required', 'integer'],
@@ -159,10 +159,7 @@ class BosRealizationController extends MainController
 
         try {
             $bosRealization = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $bosRealization,
-                $validated
-            ) {
+            DB::transaction(function () use ($bosRealization, $validated) {
                 $bosRealization->update($validated);
             });
 
@@ -172,14 +169,14 @@ class BosRealizationController extends MainController
                 $bosRealization
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui BosRealization.',
                 [
                     'exception' => $e,
                     'BosRealization_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -207,14 +204,14 @@ class BosRealizationController extends MainController
                 'Data BosRealization berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $bosRealization->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus BosRealization.',
                 [
                     'exception' => $e,
                     'BosRealization_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -223,5 +220,5 @@ class BosRealizationController extends MainController
                 'Data BosRealization gagal dihapus.'
             );
         }
-    } 
+    }
 }

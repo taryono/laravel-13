@@ -68,7 +68,7 @@ class BookPublisherController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'name' => ['required', 'string', 'max:255'],
             'address' => ['required', 'string', 'max:255'],
             'phone' => ['required', 'string', 'max:255'],
@@ -93,7 +93,7 @@ class BookPublisherController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -126,7 +126,7 @@ class BookPublisherController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'name' => ['required', 'string', 'max:255'],
             'address' => ['required', 'string', 'max:255'],
             'phone' => ['required', 'string', 'max:255'],
@@ -135,10 +135,7 @@ class BookPublisherController extends MainController
 
         try {
             $bookPublisher = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $bookPublisher,
-                $validated
-            ) {
+            DB::transaction(function () use ($bookPublisher, $validated) {
                 $bookPublisher->update($validated);
             });
 
@@ -148,14 +145,14 @@ class BookPublisherController extends MainController
                 $bookPublisher
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui BookPublisher.',
                 [
                     'exception' => $e,
                     'BookPublisher_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -183,14 +180,14 @@ class BookPublisherController extends MainController
                 'Data BookPublisher berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $bookPublisher->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus BookPublisher.',
                 [
                     'exception' => $e,
                     'BookPublisher_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -199,5 +196,5 @@ class BookPublisherController extends MainController
                 'Data BookPublisher gagal dihapus.'
             );
         }
-    } 
+    }
 }

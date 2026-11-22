@@ -68,7 +68,7 @@ class CounselingSessionController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'student_id' => ['required', 'integer'],
+            'student_id' => ['required', 'integer'],
             'school_id' => ['required', 'integer'],
             'counselor_id' => ['required', 'integer'],
             'session_date' => ['required', 'string', 'max:255'],
@@ -103,7 +103,7 @@ class CounselingSessionController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -136,7 +136,7 @@ class CounselingSessionController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'student_id' => ['required', 'integer'],
+            'student_id' => ['required', 'integer'],
             'school_id' => ['required', 'integer'],
             'counselor_id' => ['required', 'integer'],
             'session_date' => ['required', 'string', 'max:255'],
@@ -155,10 +155,7 @@ class CounselingSessionController extends MainController
 
         try {
             $counselingSession = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $counselingSession,
-                $validated
-            ) {
+            DB::transaction(function () use ($counselingSession, $validated) {
                 $counselingSession->update($validated);
             });
 
@@ -168,14 +165,14 @@ class CounselingSessionController extends MainController
                 $counselingSession
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui CounselingSession.',
                 [
                     'exception' => $e,
                     'CounselingSession_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -203,14 +200,14 @@ class CounselingSessionController extends MainController
                 'Data CounselingSession berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $counselingSession->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus CounselingSession.',
                 [
                     'exception' => $e,
                     'CounselingSession_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -219,5 +216,5 @@ class CounselingSessionController extends MainController
                 'Data CounselingSession gagal dihapus.'
             );
         }
-    } 
+    }
 }

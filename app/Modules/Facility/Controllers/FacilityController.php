@@ -94,7 +94,7 @@ class FacilityController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -138,10 +138,7 @@ class FacilityController extends MainController
         try {
             $facility = $this->model->findOrFail($id);
 
-            DB::transaction(function () use (
-                $facility,
-                $validated
-            ) {
+            DB::transaction(function () use ($facility, $validated) {
                 $facility->update($validated);
             });
 
@@ -164,7 +161,7 @@ class FacilityController extends MainController
                     'exception' => $e,
                     'Facility_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -201,7 +198,7 @@ class FacilityController extends MainController
                 [
                     'exception' => $e,
                     'Facility_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -211,5 +208,5 @@ class FacilityController extends MainController
             );
         }
     }
- 
+
 }

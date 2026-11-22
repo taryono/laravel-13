@@ -68,7 +68,7 @@ class AttendanceCorrectionController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'employee_attendance_id' => ['required', 'integer'],
+            'employee_attendance_id' => ['required', 'integer'],
             'employee_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
             'correction_type' => ['required', 'string', 'max:255'],
@@ -110,7 +110,7 @@ class AttendanceCorrectionController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -143,7 +143,7 @@ class AttendanceCorrectionController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'employee_attendance_id' => ['required', 'integer'],
+            'employee_attendance_id' => ['required', 'integer'],
             'employee_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
             'correction_type' => ['required', 'string', 'max:255'],
@@ -169,10 +169,7 @@ class AttendanceCorrectionController extends MainController
 
         try {
             $attendanceCorrection = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $attendanceCorrection,
-                $validated
-            ) {
+            DB::transaction(function () use ($attendanceCorrection, $validated) {
                 $attendanceCorrection->update($validated);
             });
 
@@ -182,14 +179,14 @@ class AttendanceCorrectionController extends MainController
                 $attendanceCorrection
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui AttendanceCorrection.',
                 [
                     'exception' => $e,
                     'AttendanceCorrection_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -217,14 +214,14 @@ class AttendanceCorrectionController extends MainController
                 'Data AttendanceCorrection berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $attendanceCorrection->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus AttendanceCorrection.',
                 [
                     'exception' => $e,
                     'AttendanceCorrection_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -233,5 +230,5 @@ class AttendanceCorrectionController extends MainController
                 'Data AttendanceCorrection gagal dihapus.'
             );
         }
-    } 
+    }
 }

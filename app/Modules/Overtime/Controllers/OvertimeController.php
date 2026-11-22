@@ -38,7 +38,7 @@ class OvertimeController extends MainController
             ->orderBy('attendance_date', 'desc')
             ->get();
 
-         return $dataTable->render('Overtime::index', compact('proposals'));
+        return $dataTable->render('Overtime::index', compact('proposals'));
     }
 
     public function create(): View
@@ -52,16 +52,16 @@ class OvertimeController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'employee_id'         => 'required|exists:employees,id',
+            'employee_id' => 'required|exists:employees,id',
             'attendance_daily_id' => 'nullable|exists:attendance_dailies,id', // ✅ Tambah
-            'overtime_date'       => 'required|date',
-            'start_time'          => 'required|date_format:H:i:s',
-            'end_time'            => 'required|date_format:H:i:s|after:start_time',
-            'total_hours'         => 'required|numeric|min:0',
-            'overtime_rate'       => 'required|numeric|min:0',
-            'total_amount'        => 'nullable|numeric|min:0',
-            'notes'               => 'nullable|string',
-            'payroll_period_id'   => 'nullable|exists:payroll_periods,id',
+            'overtime_date' => 'required|date',
+            'start_time' => 'required|date_format:H:i:s',
+            'end_time' => 'required|date_format:H:i:s|after:start_time',
+            'total_hours' => 'required|numeric|min:0',
+            'overtime_rate' => 'required|numeric|min:0',
+            'total_amount' => 'nullable|numeric|min:0',
+            'notes' => 'nullable|string',
+            'payroll_period_id' => 'nullable|exists:payroll_periods,id',
         ]);
 
         try {
@@ -73,7 +73,7 @@ class OvertimeController extends MainController
 
                 // Auto-fill persetujuan jika dari usulan
                 if (!empty($validated['attendance_daily_id'])) {
-                    $validated['approved_by'] = auth()->id();
+                    $validated['approved_by'] = request()->user()?->id;
                     $validated['approved_at'] = now();
                 }
 
@@ -92,12 +92,12 @@ class OvertimeController extends MainController
     {
         $validated = $request->validate([
             'attendance_daily_id' => 'required|exists:attendance_dailies,id',
-            'overtime_rate'       => 'nullable|numeric|min:1',
-            'notes'               => 'nullable|string',
+            'overtime_rate' => 'nullable|numeric|min:1',
+            'notes' => 'nullable|string',
         ]);
 
         try {
-           $overtime =  DB::transaction(function () use ($validated) {
+            $overtime = DB::transaction(function () use ($validated) {
                 $attendanceDaily = AttendanceDaily::findOrFail($validated['attendance_daily_id']);
 
                 $rate = $validated['overtime_rate'] ?? 1.5;
@@ -112,20 +112,20 @@ class OvertimeController extends MainController
                     ->where('end_date', '>=', $attendanceDaily->attendance_date)
                     ->first();
 
-                $overtime =Overtime::create([
-                    'employee_id'         => $attendanceDaily->employee_id,
+                $overtime = Overtime::create([
+                    'employee_id' => $attendanceDaily->employee_id,
                     'attendance_daily_id' => $attendanceDaily->id, // 🔗 Hubungkan
-                    'overtime_date'       => $attendanceDaily->attendance_date,
-                    'start_time'          => $startOvertime?->format('H:i:s') ?? '17:00:00',
-                    'end_time'            => $endOvertime?->format('H:i:s') ?? '17:00:00',
-                    'total_hours'         => $hours,
-                    'overtime_rate'       => $rate,
-                    'total_amount'        => $hours * $rate, // Bisa diubah pakai gaji pokok
-                    'notes'               => $validated['notes'] ?? 'Diusulkan otomatis dari kehadiran',
-                    'payroll_period_id'   => $period?->id ?? $attendanceDaily->payroll_period_id,
-                    'approved_by'         => auth()->id(),
-                    'approved_at'         => now(),
-                    'is_paid'             => false,
+                    'overtime_date' => $attendanceDaily->attendance_date,
+                    'start_time' => $startOvertime?->format('H:i:s') ?? '17:00:00',
+                    'end_time' => $endOvertime?->format('H:i:s') ?? '17:00:00',
+                    'total_hours' => $hours,
+                    'overtime_rate' => $rate,
+                    'total_amount' => $hours * $rate, // Bisa diubah pakai gaji pokok
+                    'notes' => $validated['notes'] ?? 'Diusulkan otomatis dari kehadiran',
+                    'payroll_period_id' => $period?->id ?? $attendanceDaily->payroll_period_id,
+                    'approved_by' => request()->user()?->id,
+                    'approved_at' => now(),
+                    'is_paid' => false,
                 ]);
 
                 // Update status kehadiran
@@ -134,10 +134,10 @@ class OvertimeController extends MainController
                 ]);
                 return $overtime;
             });
- 
+
             return $this->successResponse($request, '✅ Lembur berhasil disahkan & dipindahkan ke daftar resmi.', $overtime);
         } catch (Throwable $e) {
-            Log::error('Gagal menyahkan usulan lembur.', ['exception' => $e]); 
+            Log::error('Gagal menyahkan usulan lembur.', ['exception' => $e]);
             return $this->errorResponse($request, 'Data lembur gagal diperbarui.');
         }
     }
@@ -147,7 +147,7 @@ class OvertimeController extends MainController
         $overtime = $this->model->findOrFail($id);
         $employees = Employee::where('is_active', 1)->pluck('full_name', 'id');
         $periods = PayrollPeriod::where('is_closed', 0)->pluck('code', 'id');
-        
+
         return view('Overtime::edit', compact('overtime', 'employees', 'periods'));
     }
 
@@ -160,16 +160,16 @@ class OvertimeController extends MainController
         }
 
         $validated = $request->validate([
-            'employee_id'         => 'required|exists:employees,id',
+            'employee_id' => 'required|exists:employees,id',
             'attendance_daily_id' => 'nullable|exists:attendance_dailies,id',
-            'overtime_date'       => 'required|date',
-            'start_time'          => 'required|date_format:H:i:s',
-            'end_time'            => 'required|date_format:H:i:s|after:start_time',
-            'total_hours'         => 'required|numeric|min:0',
-            'overtime_rate'       => 'required|numeric|min:0',
-            'total_amount'        => 'nullable|numeric|min:0',
-            'notes'               => 'nullable|string',
-            'payroll_period_id'   => 'nullable|exists:payroll_periods,id',
+            'overtime_date' => 'required|date',
+            'start_time' => 'required|date_format:H:i:s',
+            'end_time' => 'required|date_format:H:i:s|after:start_time',
+            'total_hours' => 'required|numeric|min:0',
+            'overtime_rate' => 'required|numeric|min:0',
+            'total_amount' => 'nullable|numeric|min:0',
+            'notes' => 'nullable|string',
+            'payroll_period_id' => 'nullable|exists:payroll_periods,id',
         ]);
 
         try {
@@ -209,7 +209,7 @@ class OvertimeController extends MainController
             $overtime = $this->model->findOrFail($id);
             DB::transaction(function () use ($overtime) {
                 $overtime->update([
-                    'approved_by' => auth()->id(),
+                    'approved_by' => request()->user()?->id,
                     'approved_at' => now(),
                 ]);
             });
@@ -232,7 +232,7 @@ class OvertimeController extends MainController
                 Overtime::whereIn('id', $validated['ids'])
                     ->where('is_paid', 0)
                     ->update([
-                        'approved_by' => auth()->id(),
+                        'approved_by' => request()->user()?->id,
                         'approved_at' => now(),
                     ]);
             });

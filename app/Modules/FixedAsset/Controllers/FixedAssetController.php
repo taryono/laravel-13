@@ -68,7 +68,7 @@ class FixedAssetController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
             'asset_category_id' => ['required', 'integer'],
             'brand' => ['required', 'string', 'max:255'],
@@ -117,7 +117,7 @@ class FixedAssetController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -150,7 +150,7 @@ class FixedAssetController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
             'asset_category_id' => ['required', 'integer'],
             'brand' => ['required', 'string', 'max:255'],
@@ -183,10 +183,7 @@ class FixedAssetController extends MainController
 
         try {
             $fixedAsset = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $fixedAsset,
-                $validated
-            ) {
+            DB::transaction(function () use ($fixedAsset, $validated) {
                 $fixedAsset->update($validated);
             });
 
@@ -196,14 +193,14 @@ class FixedAssetController extends MainController
                 $fixedAsset
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui FixedAsset.',
                 [
                     'exception' => $e,
                     'FixedAsset_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -231,14 +228,14 @@ class FixedAssetController extends MainController
                 'Data FixedAsset berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $fixedAsset->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus FixedAsset.',
                 [
                     'exception' => $e,
                     'FixedAsset_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -247,5 +244,5 @@ class FixedAssetController extends MainController
                 'Data FixedAsset gagal dihapus.'
             );
         }
-    } 
+    }
 }

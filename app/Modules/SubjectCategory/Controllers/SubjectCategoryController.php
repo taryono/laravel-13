@@ -68,7 +68,7 @@ class SubjectCategoryController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
         ]);
 
         try {
@@ -89,7 +89,7 @@ class SubjectCategoryController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -122,15 +122,12 @@ class SubjectCategoryController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
         ]);
 
         try {
             $subjectCategory = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $subjectCategory,
-                $validated
-            ) {
+            DB::transaction(function () use ($subjectCategory, $validated) {
                 $subjectCategory->update($validated);
             });
 
@@ -140,14 +137,14 @@ class SubjectCategoryController extends MainController
                 $subjectCategory
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui SubjectCategory.',
                 [
                     'exception' => $e,
                     'SubjectCategory_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -175,14 +172,14 @@ class SubjectCategoryController extends MainController
                 'Data SubjectCategory berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $subjectCategory->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus SubjectCategory.',
                 [
                     'exception' => $e,
                     'SubjectCategory_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -191,5 +188,5 @@ class SubjectCategoryController extends MainController
                 'Data SubjectCategory gagal dihapus.'
             );
         }
-    } 
+    }
 }

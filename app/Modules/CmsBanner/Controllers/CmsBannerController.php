@@ -68,7 +68,7 @@ class CmsBannerController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'title' => ['required', 'string', 'max:255'],
+            'title' => ['required', 'string', 'max:255'],
             'subtitle' => ['required', 'string', 'max:255'],
             'image' => ['required', 'string', 'max:255'],
             'link_url' => ['required', 'string', 'max:255'],
@@ -98,7 +98,7 @@ class CmsBannerController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -131,7 +131,7 @@ class CmsBannerController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'title' => ['required', 'string', 'max:255'],
+            'title' => ['required', 'string', 'max:255'],
             'subtitle' => ['required', 'string', 'max:255'],
             'image' => ['required', 'string', 'max:255'],
             'link_url' => ['required', 'string', 'max:255'],
@@ -145,10 +145,7 @@ class CmsBannerController extends MainController
 
         try {
             $cmsBanner = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $cmsBanner,
-                $validated
-            ) {
+            DB::transaction(function () use ($cmsBanner, $validated) {
                 $cmsBanner->update($validated);
             });
 
@@ -158,14 +155,14 @@ class CmsBannerController extends MainController
                 $cmsBanner
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui CmsBanner.',
                 [
                     'exception' => $e,
                     'CmsBanner_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -193,14 +190,14 @@ class CmsBannerController extends MainController
                 'Data CmsBanner berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $cmsBanner->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus CmsBanner.',
                 [
                     'exception' => $e,
                     'CmsBanner_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -209,5 +206,5 @@ class CmsBannerController extends MainController
                 'Data CmsBanner gagal dihapus.'
             );
         }
-    } 
+    }
 }

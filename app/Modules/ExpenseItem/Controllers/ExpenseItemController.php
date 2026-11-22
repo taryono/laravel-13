@@ -68,7 +68,7 @@ class ExpenseItemController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'expense_id' => ['required', 'integer'],
+            'expense_id' => ['required', 'integer'],
             'description' => ['required', 'string', 'max:255'],
             'quantity' => ['required', 'string', 'max:255'],
             'unit_amount' => ['required', 'string', 'max:255'],
@@ -98,7 +98,7 @@ class ExpenseItemController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -131,7 +131,7 @@ class ExpenseItemController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'expense_id' => ['required', 'integer'],
+            'expense_id' => ['required', 'integer'],
             'description' => ['required', 'string', 'max:255'],
             'quantity' => ['required', 'string', 'max:255'],
             'unit_amount' => ['required', 'string', 'max:255'],
@@ -145,10 +145,7 @@ class ExpenseItemController extends MainController
 
         try {
             $expenseItem = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $expenseItem,
-                $validated
-            ) {
+            DB::transaction(function () use ($expenseItem, $validated) {
                 $expenseItem->update($validated);
             });
 
@@ -158,14 +155,14 @@ class ExpenseItemController extends MainController
                 $expenseItem
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui ExpenseItem.',
                 [
                     'exception' => $e,
                     'ExpenseItem_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -193,14 +190,14 @@ class ExpenseItemController extends MainController
                 'Data ExpenseItem berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $expenseItem->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus ExpenseItem.',
                 [
                     'exception' => $e,
                     'ExpenseItem_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -209,5 +206,5 @@ class ExpenseItemController extends MainController
                 'Data ExpenseItem gagal dihapus.'
             );
         }
-    } 
+    }
 }

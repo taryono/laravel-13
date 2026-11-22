@@ -68,7 +68,7 @@ class DocumentAccessLogController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'document_id' => ['required', 'integer'],
+            'document_id' => ['required', 'integer'],
             'document_version_id' => ['required', 'integer'],
             'user_id' => ['required', 'integer'],
             'student_id' => ['required', 'integer'],
@@ -111,7 +111,7 @@ class DocumentAccessLogController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -144,7 +144,7 @@ class DocumentAccessLogController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'document_id' => ['required', 'integer'],
+            'document_id' => ['required', 'integer'],
             'document_version_id' => ['required', 'integer'],
             'user_id' => ['required', 'integer'],
             'student_id' => ['required', 'integer'],
@@ -171,10 +171,7 @@ class DocumentAccessLogController extends MainController
 
         try {
             $documentAccessLog = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $documentAccessLog,
-                $validated
-            ) {
+            DB::transaction(function () use ($documentAccessLog, $validated) {
                 $documentAccessLog->update($validated);
             });
 
@@ -184,14 +181,14 @@ class DocumentAccessLogController extends MainController
                 $documentAccessLog
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui DocumentAccessLog.',
                 [
                     'exception' => $e,
                     'DocumentAccessLog_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -219,14 +216,14 @@ class DocumentAccessLogController extends MainController
                 'Data DocumentAccessLog berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $documentAccessLog->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus DocumentAccessLog.',
                 [
                     'exception' => $e,
                     'DocumentAccessLog_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -235,5 +232,5 @@ class DocumentAccessLogController extends MainController
                 'Data DocumentAccessLog gagal dihapus.'
             );
         }
-    } 
+    }
 }

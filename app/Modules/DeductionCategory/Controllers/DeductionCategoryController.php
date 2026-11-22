@@ -68,7 +68,7 @@ class DeductionCategoryController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'code' => ['required', 'string', 'max:255'],
+            'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'category_type' => ['required', 'string', 'max:255'],
             'deduction_group' => ['required', 'string', 'max:255'],
@@ -103,7 +103,7 @@ class DeductionCategoryController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -136,7 +136,7 @@ class DeductionCategoryController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'code' => ['required', 'string', 'max:255'],
+            'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'category_type' => ['required', 'string', 'max:255'],
             'deduction_group' => ['required', 'string', 'max:255'],
@@ -155,10 +155,7 @@ class DeductionCategoryController extends MainController
 
         try {
             $deductionCategory = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $deductionCategory,
-                $validated
-            ) {
+            DB::transaction(function () use ($deductionCategory, $validated) {
                 $deductionCategory->update($validated);
             });
 
@@ -168,14 +165,14 @@ class DeductionCategoryController extends MainController
                 $deductionCategory
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui DeductionCategory.',
                 [
                     'exception' => $e,
                     'DeductionCategory_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -203,14 +200,14 @@ class DeductionCategoryController extends MainController
                 'Data DeductionCategory berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $deductionCategory->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus DeductionCategory.',
                 [
                     'exception' => $e,
                     'DeductionCategory_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -219,5 +216,5 @@ class DeductionCategoryController extends MainController
                 'Data DeductionCategory gagal dihapus.'
             );
         }
-    } 
+    }
 }

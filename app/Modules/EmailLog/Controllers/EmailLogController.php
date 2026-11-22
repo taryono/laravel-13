@@ -68,7 +68,7 @@ class EmailLogController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'notification_template_id' => ['required', 'integer'],
             'recipient_user_id' => ['required', 'integer'],
             'recipient_student_id' => ['required', 'integer'],
@@ -124,7 +124,7 @@ class EmailLogController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -157,7 +157,7 @@ class EmailLogController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'notification_template_id' => ['required', 'integer'],
             'recipient_user_id' => ['required', 'integer'],
             'recipient_student_id' => ['required', 'integer'],
@@ -197,10 +197,7 @@ class EmailLogController extends MainController
 
         try {
             $emailLog = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $emailLog,
-                $validated
-            ) {
+            DB::transaction(function () use ($emailLog, $validated) {
                 $emailLog->update($validated);
             });
 
@@ -210,14 +207,14 @@ class EmailLogController extends MainController
                 $emailLog
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui EmailLog.',
                 [
                     'exception' => $e,
                     'EmailLog_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -245,14 +242,14 @@ class EmailLogController extends MainController
                 'Data EmailLog berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $emailLog->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus EmailLog.',
                 [
                     'exception' => $e,
                     'EmailLog_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -261,5 +258,5 @@ class EmailLogController extends MainController
                 'Data EmailLog gagal dihapus.'
             );
         }
-    } 
+    }
 }

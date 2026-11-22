@@ -68,7 +68,7 @@ class ReportCardTemplateCurriculumController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'report_card_template_id' => ['required', 'integer'],
+            'report_card_template_id' => ['required', 'integer'],
             'curriculum_id' => ['required', 'integer'],
             'is_active' => ['required', 'string', 'max:255'],
             'created_by' => ['required', 'string', 'max:255'],
@@ -93,7 +93,7 @@ class ReportCardTemplateCurriculumController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -126,7 +126,7 @@ class ReportCardTemplateCurriculumController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'report_card_template_id' => ['required', 'integer'],
+            'report_card_template_id' => ['required', 'integer'],
             'curriculum_id' => ['required', 'integer'],
             'is_active' => ['required', 'string', 'max:255'],
             'created_by' => ['required', 'string', 'max:255'],
@@ -135,10 +135,7 @@ class ReportCardTemplateCurriculumController extends MainController
 
         try {
             $reportCardTemplateCurriculum = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $reportCardTemplateCurriculum,
-                $validated
-            ) {
+            DB::transaction(function () use ($reportCardTemplateCurriculum, $validated) {
                 $reportCardTemplateCurriculum->update($validated);
             });
 
@@ -148,14 +145,14 @@ class ReportCardTemplateCurriculumController extends MainController
                 $reportCardTemplateCurriculum
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui ReportCardTemplateCurriculum.',
                 [
                     'exception' => $e,
                     'ReportCardTemplateCurriculum_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -183,14 +180,14 @@ class ReportCardTemplateCurriculumController extends MainController
                 'Data ReportCardTemplateCurriculum berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $reportCardTemplateCurriculum->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus ReportCardTemplateCurriculum.',
                 [
                     'exception' => $e,
                     'ReportCardTemplateCurriculum_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -199,5 +196,5 @@ class ReportCardTemplateCurriculumController extends MainController
                 'Data ReportCardTemplateCurriculum gagal dihapus.'
             );
         }
-    } 
+    }
 }

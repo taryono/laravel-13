@@ -68,7 +68,7 @@ class DapodikSyncScheduleController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'schedule_name' => ['required', 'string', 'max:255'],
             'sync_type' => ['required', 'string', 'max:255'],
             'frequency' => ['required', 'string', 'max:255'],
@@ -97,7 +97,7 @@ class DapodikSyncScheduleController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -130,7 +130,7 @@ class DapodikSyncScheduleController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'schedule_name' => ['required', 'string', 'max:255'],
             'sync_type' => ['required', 'string', 'max:255'],
             'frequency' => ['required', 'string', 'max:255'],
@@ -143,10 +143,7 @@ class DapodikSyncScheduleController extends MainController
 
         try {
             $dapodikSyncSchedule = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $dapodikSyncSchedule,
-                $validated
-            ) {
+            DB::transaction(function () use ($dapodikSyncSchedule, $validated) {
                 $dapodikSyncSchedule->update($validated);
             });
 
@@ -156,14 +153,14 @@ class DapodikSyncScheduleController extends MainController
                 $dapodikSyncSchedule
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui DapodikSyncSchedule.',
                 [
                     'exception' => $e,
                     'DapodikSyncSchedule_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -191,14 +188,14 @@ class DapodikSyncScheduleController extends MainController
                 'Data DapodikSyncSchedule berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $dapodikSyncSchedule->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus DapodikSyncSchedule.',
                 [
                     'exception' => $e,
                     'DapodikSyncSchedule_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -207,5 +204,5 @@ class DapodikSyncScheduleController extends MainController
                 'Data DapodikSyncSchedule gagal dihapus.'
             );
         }
-    } 
+    }
 }

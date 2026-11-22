@@ -68,7 +68,7 @@ class PushNotificationTokenController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'user_id' => ['required', 'integer'],
+            'user_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
             'token' => ['required', 'string', 'max:255'],
             'token_hash' => ['required', 'string', 'max:255'],
@@ -104,7 +104,7 @@ class PushNotificationTokenController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -137,7 +137,7 @@ class PushNotificationTokenController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'user_id' => ['required', 'integer'],
+            'user_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
             'token' => ['required', 'string', 'max:255'],
             'token_hash' => ['required', 'string', 'max:255'],
@@ -157,10 +157,7 @@ class PushNotificationTokenController extends MainController
 
         try {
             $pushNotificationToken = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $pushNotificationToken,
-                $validated
-            ) {
+            DB::transaction(function () use ($pushNotificationToken, $validated) {
                 $pushNotificationToken->update($validated);
             });
 
@@ -170,14 +167,14 @@ class PushNotificationTokenController extends MainController
                 $pushNotificationToken
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui PushNotificationToken.',
                 [
                     'exception' => $e,
                     'PushNotificationToken_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -205,14 +202,14 @@ class PushNotificationTokenController extends MainController
                 'Data PushNotificationToken berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $pushNotificationToken->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus PushNotificationToken.',
                 [
                     'exception' => $e,
                     'PushNotificationToken_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -221,5 +218,5 @@ class PushNotificationTokenController extends MainController
                 'Data PushNotificationToken gagal dihapus.'
             );
         }
-    } 
+    }
 }

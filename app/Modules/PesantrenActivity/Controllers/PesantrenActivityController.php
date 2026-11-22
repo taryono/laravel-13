@@ -68,7 +68,7 @@ class PesantrenActivityController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'dormitory_id' => ['required', 'integer'],
             'room_id' => ['required', 'integer'],
             'kitab_reference_id' => ['required', 'integer'],
@@ -124,7 +124,7 @@ class PesantrenActivityController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -157,7 +157,7 @@ class PesantrenActivityController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'dormitory_id' => ['required', 'integer'],
             'room_id' => ['required', 'integer'],
             'kitab_reference_id' => ['required', 'integer'],
@@ -197,10 +197,7 @@ class PesantrenActivityController extends MainController
 
         try {
             $pesantrenActivity = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $pesantrenActivity,
-                $validated
-            ) {
+            DB::transaction(function () use ($pesantrenActivity, $validated) {
                 $pesantrenActivity->update($validated);
             });
 
@@ -210,14 +207,14 @@ class PesantrenActivityController extends MainController
                 $pesantrenActivity
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui PesantrenActivity.',
                 [
                     'exception' => $e,
                     'PesantrenActivity_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -245,14 +242,14 @@ class PesantrenActivityController extends MainController
                 'Data PesantrenActivity berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $pesantrenActivity->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus PesantrenActivity.',
                 [
                     'exception' => $e,
                     'PesantrenActivity_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -261,5 +258,5 @@ class PesantrenActivityController extends MainController
                 'Data PesantrenActivity gagal dihapus.'
             );
         }
-    } 
+    }
 }

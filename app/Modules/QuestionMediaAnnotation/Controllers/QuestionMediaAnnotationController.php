@@ -68,7 +68,7 @@ class QuestionMediaAnnotationController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'question_media_id' => ['required', 'integer'],
+            'question_media_id' => ['required', 'integer'],
             'label' => ['required', 'string', 'max:255'],
             'position_x' => ['required', 'string', 'max:255'],
             'position_y' => ['required', 'string', 'max:255'],
@@ -95,7 +95,7 @@ class QuestionMediaAnnotationController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -128,7 +128,7 @@ class QuestionMediaAnnotationController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'question_media_id' => ['required', 'integer'],
+            'question_media_id' => ['required', 'integer'],
             'label' => ['required', 'string', 'max:255'],
             'position_x' => ['required', 'string', 'max:255'],
             'position_y' => ['required', 'string', 'max:255'],
@@ -139,10 +139,7 @@ class QuestionMediaAnnotationController extends MainController
 
         try {
             $questionMediaAnnotation = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $questionMediaAnnotation,
-                $validated
-            ) {
+            DB::transaction(function () use ($questionMediaAnnotation, $validated) {
                 $questionMediaAnnotation->update($validated);
             });
 
@@ -152,14 +149,14 @@ class QuestionMediaAnnotationController extends MainController
                 $questionMediaAnnotation
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui QuestionMediaAnnotation.',
                 [
                     'exception' => $e,
                     'QuestionMediaAnnotation_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -187,14 +184,14 @@ class QuestionMediaAnnotationController extends MainController
                 'Data QuestionMediaAnnotation berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $questionMediaAnnotation->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus QuestionMediaAnnotation.',
                 [
                     'exception' => $e,
                     'QuestionMediaAnnotation_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -203,5 +200,5 @@ class QuestionMediaAnnotationController extends MainController
                 'Data QuestionMediaAnnotation gagal dihapus.'
             );
         }
-    } 
+    }
 }

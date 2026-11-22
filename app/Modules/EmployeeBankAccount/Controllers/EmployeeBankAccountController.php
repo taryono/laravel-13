@@ -68,7 +68,7 @@ class EmployeeBankAccountController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'employee_id' => ['required', 'integer'],
+            'employee_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
             'bank_name' => ['required', 'string', 'max:255'],
             'account_number' => ['required', 'string', 'max:255'],
@@ -94,7 +94,7 @@ class EmployeeBankAccountController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -127,7 +127,7 @@ class EmployeeBankAccountController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'employee_id' => ['required', 'integer'],
+            'employee_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
             'bank_name' => ['required', 'string', 'max:255'],
             'account_number' => ['required', 'string', 'max:255'],
@@ -137,10 +137,7 @@ class EmployeeBankAccountController extends MainController
 
         try {
             $employeeBankAccount = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $employeeBankAccount,
-                $validated
-            ) {
+            DB::transaction(function () use ($employeeBankAccount, $validated) {
                 $employeeBankAccount->update($validated);
             });
 
@@ -150,14 +147,14 @@ class EmployeeBankAccountController extends MainController
                 $employeeBankAccount
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui EmployeeBankAccount.',
                 [
                     'exception' => $e,
                     'EmployeeBankAccount_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -185,14 +182,14 @@ class EmployeeBankAccountController extends MainController
                 'Data EmployeeBankAccount berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $employeeBankAccount->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus EmployeeBankAccount.',
                 [
                     'exception' => $e,
                     'EmployeeBankAccount_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -201,5 +198,5 @@ class EmployeeBankAccountController extends MainController
                 'Data EmployeeBankAccount gagal dihapus.'
             );
         }
-    } 
+    }
 }

@@ -68,7 +68,7 @@ class ClinicPrescriptionController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'clinic_visit_id' => ['required', 'integer'],
+            'clinic_visit_id' => ['required', 'integer'],
             'clinic_medicine_id' => ['required', 'integer'],
             'qty_given' => ['required', 'string', 'max:255'],
             'dosage_instructions' => ['required', 'string', 'max:255'],
@@ -92,7 +92,7 @@ class ClinicPrescriptionController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -125,7 +125,7 @@ class ClinicPrescriptionController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'clinic_visit_id' => ['required', 'integer'],
+            'clinic_visit_id' => ['required', 'integer'],
             'clinic_medicine_id' => ['required', 'integer'],
             'qty_given' => ['required', 'string', 'max:255'],
             'dosage_instructions' => ['required', 'string', 'max:255'],
@@ -133,10 +133,7 @@ class ClinicPrescriptionController extends MainController
 
         try {
             $clinicPrescription = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $clinicPrescription,
-                $validated
-            ) {
+            DB::transaction(function () use ($clinicPrescription, $validated) {
                 $clinicPrescription->update($validated);
             });
 
@@ -146,14 +143,14 @@ class ClinicPrescriptionController extends MainController
                 $clinicPrescription
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui ClinicPrescription.',
                 [
                     'exception' => $e,
                     'ClinicPrescription_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -181,14 +178,14 @@ class ClinicPrescriptionController extends MainController
                 'Data ClinicPrescription berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $clinicPrescription->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus ClinicPrescription.',
                 [
                     'exception' => $e,
                     'ClinicPrescription_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -197,5 +194,5 @@ class ClinicPrescriptionController extends MainController
                 'Data ClinicPrescription gagal dihapus.'
             );
         }
-    } 
+    }
 }

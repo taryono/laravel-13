@@ -68,7 +68,7 @@ class SystemLogController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'user_id' => ['required', 'integer'],
+            'user_id' => ['required', 'integer'],
             'action' => ['required', 'string', 'max:255'],
             'table_name' => ['required', 'string', 'max:255'],
             'record_id' => ['required', 'integer'],
@@ -101,7 +101,7 @@ class SystemLogController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -134,7 +134,7 @@ class SystemLogController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'user_id' => ['required', 'integer'],
+            'user_id' => ['required', 'integer'],
             'action' => ['required', 'string', 'max:255'],
             'table_name' => ['required', 'string', 'max:255'],
             'record_id' => ['required', 'integer'],
@@ -151,10 +151,7 @@ class SystemLogController extends MainController
 
         try {
             $systemLog = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $systemLog,
-                $validated
-            ) {
+            DB::transaction(function () use ($systemLog, $validated) {
                 $systemLog->update($validated);
             });
 
@@ -164,14 +161,14 @@ class SystemLogController extends MainController
                 $systemLog
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui SystemLog.',
                 [
                     'exception' => $e,
                     'SystemLog_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -199,14 +196,14 @@ class SystemLogController extends MainController
                 'Data SystemLog berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $systemLog->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus SystemLog.',
                 [
                     'exception' => $e,
                     'SystemLog_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -215,5 +212,5 @@ class SystemLogController extends MainController
                 'Data SystemLog gagal dihapus.'
             );
         }
-    } 
+    }
 }

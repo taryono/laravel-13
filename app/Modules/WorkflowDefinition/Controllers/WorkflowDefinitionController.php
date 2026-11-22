@@ -68,7 +68,7 @@ class WorkflowDefinitionController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'school_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
@@ -97,7 +97,7 @@ class WorkflowDefinitionController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -130,7 +130,7 @@ class WorkflowDefinitionController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'school_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
@@ -143,10 +143,7 @@ class WorkflowDefinitionController extends MainController
 
         try {
             $workflowDefinition = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $workflowDefinition,
-                $validated
-            ) {
+            DB::transaction(function () use ($workflowDefinition, $validated) {
                 $workflowDefinition->update($validated);
             });
 
@@ -156,14 +153,14 @@ class WorkflowDefinitionController extends MainController
                 $workflowDefinition
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui WorkflowDefinition.',
                 [
                     'exception' => $e,
                     'WorkflowDefinition_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -191,14 +188,14 @@ class WorkflowDefinitionController extends MainController
                 'Data WorkflowDefinition berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $workflowDefinition->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus WorkflowDefinition.',
                 [
                     'exception' => $e,
                     'WorkflowDefinition_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -207,5 +204,5 @@ class WorkflowDefinitionController extends MainController
                 'Data WorkflowDefinition gagal dihapus.'
             );
         }
-    } 
+    }
 }

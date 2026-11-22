@@ -68,7 +68,7 @@ class AdmissionDocumentVerificationController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'applicant_id' => ['required', 'integer'],
+            'applicant_id' => ['required', 'integer'],
             'application_document_id' => ['required', 'integer'],
             'admission_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
@@ -108,7 +108,7 @@ class AdmissionDocumentVerificationController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -141,7 +141,7 @@ class AdmissionDocumentVerificationController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'applicant_id' => ['required', 'integer'],
+            'applicant_id' => ['required', 'integer'],
             'application_document_id' => ['required', 'integer'],
             'admission_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
@@ -165,10 +165,7 @@ class AdmissionDocumentVerificationController extends MainController
 
         try {
             $admissionDocumentVerification = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $admissionDocumentVerification,
-                $validated
-            ) {
+            DB::transaction(function () use ($admissionDocumentVerification, $validated) {
                 $admissionDocumentVerification->update($validated);
             });
 
@@ -178,14 +175,14 @@ class AdmissionDocumentVerificationController extends MainController
                 $admissionDocumentVerification
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui AdmissionDocumentVerification.',
                 [
                     'exception' => $e,
                     'AdmissionDocumentVerification_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -213,14 +210,14 @@ class AdmissionDocumentVerificationController extends MainController
                 'Data AdmissionDocumentVerification berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $admissionDocumentVerification->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus AdmissionDocumentVerification.',
                 [
                     'exception' => $e,
                     'AdmissionDocumentVerification_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -229,5 +226,5 @@ class AdmissionDocumentVerificationController extends MainController
                 'Data AdmissionDocumentVerification gagal dihapus.'
             );
         }
-    } 
+    }
 }

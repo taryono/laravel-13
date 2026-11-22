@@ -68,7 +68,7 @@ class SmsLogController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'notification_template_id' => ['required', 'integer'],
             'recipient_user_id' => ['required', 'integer'],
             'recipient_student_id' => ['required', 'integer'],
@@ -116,7 +116,7 @@ class SmsLogController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -149,7 +149,7 @@ class SmsLogController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'notification_template_id' => ['required', 'integer'],
             'recipient_user_id' => ['required', 'integer'],
             'recipient_student_id' => ['required', 'integer'],
@@ -181,10 +181,7 @@ class SmsLogController extends MainController
 
         try {
             $smsLog = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $smsLog,
-                $validated
-            ) {
+            DB::transaction(function () use ($smsLog, $validated) {
                 $smsLog->update($validated);
             });
 
@@ -194,14 +191,14 @@ class SmsLogController extends MainController
                 $smsLog
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui SmsLog.',
                 [
                     'exception' => $e,
                     'SmsLog_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -229,14 +226,14 @@ class SmsLogController extends MainController
                 'Data SmsLog berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $smsLog->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus SmsLog.',
                 [
                     'exception' => $e,
                     'SmsLog_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -245,5 +242,5 @@ class SmsLogController extends MainController
                 'Data SmsLog gagal dihapus.'
             );
         }
-    } 
+    }
 }

@@ -68,7 +68,7 @@ class NotificationController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'user_id' => ['required', 'integer'],
+            'user_id' => ['required', 'integer'],
             'type' => ['required', 'string', 'max:255'],
             'title' => ['required', 'string', 'max:255'],
             'message' => ['required', 'string', 'max:255'],
@@ -101,7 +101,7 @@ class NotificationController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -134,7 +134,7 @@ class NotificationController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'user_id' => ['required', 'integer'],
+            'user_id' => ['required', 'integer'],
             'type' => ['required', 'string', 'max:255'],
             'title' => ['required', 'string', 'max:255'],
             'message' => ['required', 'string', 'max:255'],
@@ -151,10 +151,7 @@ class NotificationController extends MainController
 
         try {
             $notification = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $notification,
-                $validated
-            ) {
+            DB::transaction(function () use ($notification, $validated) {
                 $notification->update($validated);
             });
 
@@ -164,14 +161,14 @@ class NotificationController extends MainController
                 $notification
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui Notification.',
                 [
                     'exception' => $e,
                     'Notification_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -199,14 +196,14 @@ class NotificationController extends MainController
                 'Data Notification berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $notification->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus Notification.',
                 [
                     'exception' => $e,
                     'Notification_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -215,5 +212,5 @@ class NotificationController extends MainController
                 'Data Notification gagal dihapus.'
             );
         }
-    } 
+    }
 }

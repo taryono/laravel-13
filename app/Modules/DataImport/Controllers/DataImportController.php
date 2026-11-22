@@ -91,7 +91,7 @@ class DataImportController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -132,10 +132,7 @@ class DataImportController extends MainController
         try {
             $dataImport = $this->model->findOrFail($id);
 
-            DB::transaction(function () use (
-                $dataImport,
-                $validated
-            ) {
+            DB::transaction(function () use ($dataImport, $validated) {
                 $dataImport->update($validated);
             });
 
@@ -158,7 +155,7 @@ class DataImportController extends MainController
                     'exception' => $e,
                     'DataImport_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -195,7 +192,7 @@ class DataImportController extends MainController
                 [
                     'exception' => $e,
                     'DataImport_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -204,5 +201,5 @@ class DataImportController extends MainController
                 'Data DataImport gagal dihapus.'
             );
         }
-    } 
+    }
 }

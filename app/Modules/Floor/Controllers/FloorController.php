@@ -93,7 +93,7 @@ class FloorController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -136,10 +136,7 @@ class FloorController extends MainController
         try {
             $floor = $this->model->findOrFail($id);
 
-            DB::transaction(function () use (
-                $floor,
-                $validated
-            ) {
+            DB::transaction(function () use ($floor, $validated) {
                 $floor->update($validated);
             });
 
@@ -162,7 +159,7 @@ class FloorController extends MainController
                     'exception' => $e,
                     'Floor_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -199,7 +196,7 @@ class FloorController extends MainController
                 [
                     'exception' => $e,
                     'Floor_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -209,5 +206,5 @@ class FloorController extends MainController
             );
         }
     }
- 
+
 }

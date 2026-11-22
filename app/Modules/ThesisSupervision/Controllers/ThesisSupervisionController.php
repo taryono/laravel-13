@@ -68,7 +68,7 @@ class ThesisSupervisionController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'student_id' => ['required', 'integer'],
+            'student_id' => ['required', 'integer'],
             'study_program_id' => ['required', 'integer'],
             'title' => ['required', 'string', 'max:255'],
             'supervisor_1_id' => ['required', 'integer'],
@@ -100,7 +100,7 @@ class ThesisSupervisionController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -133,7 +133,7 @@ class ThesisSupervisionController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'student_id' => ['required', 'integer'],
+            'student_id' => ['required', 'integer'],
             'study_program_id' => ['required', 'integer'],
             'title' => ['required', 'string', 'max:255'],
             'supervisor_1_id' => ['required', 'integer'],
@@ -149,10 +149,7 @@ class ThesisSupervisionController extends MainController
 
         try {
             $thesisSupervision = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $thesisSupervision,
-                $validated
-            ) {
+            DB::transaction(function () use ($thesisSupervision, $validated) {
                 $thesisSupervision->update($validated);
             });
 
@@ -162,14 +159,14 @@ class ThesisSupervisionController extends MainController
                 $thesisSupervision
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui ThesisSupervision.',
                 [
                     'exception' => $e,
                     'ThesisSupervision_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -197,14 +194,14 @@ class ThesisSupervisionController extends MainController
                 'Data ThesisSupervision berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $thesisSupervision->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus ThesisSupervision.',
                 [
                     'exception' => $e,
                     'ThesisSupervision_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -213,5 +210,5 @@ class ThesisSupervisionController extends MainController
                 'Data ThesisSupervision gagal dihapus.'
             );
         }
-    } 
+    }
 }

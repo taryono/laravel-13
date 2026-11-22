@@ -68,7 +68,7 @@ class DigitalWalletController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'owner_type' => ['required', 'string', 'max:255'],
             'owner_id' => ['required', 'integer'],
             'wallet_number' => ['required', 'string', 'max:255'],
@@ -97,7 +97,7 @@ class DigitalWalletController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -130,7 +130,7 @@ class DigitalWalletController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'owner_type' => ['required', 'string', 'max:255'],
             'owner_id' => ['required', 'integer'],
             'wallet_number' => ['required', 'string', 'max:255'],
@@ -143,10 +143,7 @@ class DigitalWalletController extends MainController
 
         try {
             $digitalWallet = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $digitalWallet,
-                $validated
-            ) {
+            DB::transaction(function () use ($digitalWallet, $validated) {
                 $digitalWallet->update($validated);
             });
 
@@ -156,14 +153,14 @@ class DigitalWalletController extends MainController
                 $digitalWallet
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui DigitalWallet.',
                 [
                     'exception' => $e,
                     'DigitalWallet_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -191,14 +188,14 @@ class DigitalWalletController extends MainController
                 'Data DigitalWallet berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $digitalWallet->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus DigitalWallet.',
                 [
                     'exception' => $e,
                     'DigitalWallet_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -207,5 +204,5 @@ class DigitalWalletController extends MainController
                 'Data DigitalWallet gagal dihapus.'
             );
         }
-    } 
+    }
 }

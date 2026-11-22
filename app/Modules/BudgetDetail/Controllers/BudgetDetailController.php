@@ -68,7 +68,7 @@ class BudgetDetailController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'budget_id' => ['required', 'integer'],
+            'budget_id' => ['required', 'integer'],
             'accounting_period_id' => ['required', 'integer'],
             'account_id' => ['required', 'integer'],
             'cost_center_id' => ['required', 'integer'],
@@ -99,7 +99,7 @@ class BudgetDetailController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -132,7 +132,7 @@ class BudgetDetailController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'budget_id' => ['required', 'integer'],
+            'budget_id' => ['required', 'integer'],
             'accounting_period_id' => ['required', 'integer'],
             'account_id' => ['required', 'integer'],
             'cost_center_id' => ['required', 'integer'],
@@ -147,10 +147,7 @@ class BudgetDetailController extends MainController
 
         try {
             $budgetDetail = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $budgetDetail,
-                $validated
-            ) {
+            DB::transaction(function () use ($budgetDetail, $validated) {
                 $budgetDetail->update($validated);
             });
 
@@ -160,14 +157,14 @@ class BudgetDetailController extends MainController
                 $budgetDetail
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui BudgetDetail.',
                 [
                     'exception' => $e,
                     'BudgetDetail_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -195,14 +192,14 @@ class BudgetDetailController extends MainController
                 'Data BudgetDetail berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $budgetDetail->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus BudgetDetail.',
                 [
                     'exception' => $e,
                     'BudgetDetail_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -211,5 +208,5 @@ class BudgetDetailController extends MainController
                 'Data BudgetDetail gagal dihapus.'
             );
         }
-    } 
+    }
 }

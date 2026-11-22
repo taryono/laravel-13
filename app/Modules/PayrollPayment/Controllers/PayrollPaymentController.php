@@ -68,7 +68,7 @@ class PayrollPaymentController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'payroll_payment_batch_id' => ['required', 'integer'],
+            'payroll_payment_batch_id' => ['required', 'integer'],
             'payroll_detail_id' => ['required', 'integer'],
             'employee_id' => ['required', 'integer'],
             'amount' => ['required', 'string', 'max:255'],
@@ -99,7 +99,7 @@ class PayrollPaymentController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -132,7 +132,7 @@ class PayrollPaymentController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'payroll_payment_batch_id' => ['required', 'integer'],
+            'payroll_payment_batch_id' => ['required', 'integer'],
             'payroll_detail_id' => ['required', 'integer'],
             'employee_id' => ['required', 'integer'],
             'amount' => ['required', 'string', 'max:255'],
@@ -147,10 +147,7 @@ class PayrollPaymentController extends MainController
 
         try {
             $payrollPayment = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $payrollPayment,
-                $validated
-            ) {
+            DB::transaction(function () use ($payrollPayment, $validated) {
                 $payrollPayment->update($validated);
             });
 
@@ -160,14 +157,14 @@ class PayrollPaymentController extends MainController
                 $payrollPayment
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui PayrollPayment.',
                 [
                     'exception' => $e,
                     'PayrollPayment_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -195,14 +192,14 @@ class PayrollPaymentController extends MainController
                 'Data PayrollPayment berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $payrollPayment->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus PayrollPayment.',
                 [
                     'exception' => $e,
                     'PayrollPayment_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -211,5 +208,5 @@ class PayrollPaymentController extends MainController
                 'Data PayrollPayment gagal dihapus.'
             );
         }
-    } 
+    }
 }

@@ -16,7 +16,8 @@ use Throwable;
 class ActionPermissionController extends MainController
 {
 
-    public function __construct(){
+    public function __construct()
+    {
         parent::__construct(new ActionPermission());
     }
 
@@ -50,13 +51,13 @@ class ActionPermissionController extends MainController
      * Show the form for creating a new resource.
      */
     public function create(): View
-    {   
+    {
         $actionPermission = new ActionPermission();
         $forms = $this->getForm($actionPermission);
         return view(
             'ActionPermission::create',
             compact('actionPermission', 'forms')
-        ); 
+        );
     }
 
     /**
@@ -90,7 +91,7 @@ class ActionPermissionController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -105,7 +106,8 @@ class ActionPermissionController extends MainController
      * Show the form for editing the specified resource.
      */
     public function edit($id): View
-    {   $actionPermission = $this->model->findOrFail($id);
+    {
+        $actionPermission = $this->model->findOrFail($id);
         $forms = $this->getForm($actionPermission);
         return view(
             'ActionPermission::edit',
@@ -116,7 +118,8 @@ class ActionPermissionController extends MainController
     /**
      * Update the specified resource.
      */
-    public function update(Request $request,$id) {
+    public function update(Request $request, $id)
+    {
         $validated = $request->validate([
             'name' => [
                 'required',
@@ -127,10 +130,7 @@ class ActionPermissionController extends MainController
 
         try {
             $actionPermission = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $actionPermission,
-                $validated
-            ) {
+            DB::transaction(function () use ($actionPermission, $validated) {
                 $actionPermission->update($validated);
             });
 
@@ -148,7 +148,7 @@ class ActionPermissionController extends MainController
                     'exception' => $e,
                     'ActionPermission_id' => $actionPermission->getKey(),
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -162,9 +162,10 @@ class ActionPermissionController extends MainController
     /**
      * Remove the specified resource.
      */
-    public function destroy(Request $request,$id): JsonResponse|RedirectResponse {
+    public function destroy(Request $request, $id): JsonResponse|RedirectResponse
+    {
         try {
-             $actionPermission = $this->model->findOrFail($id);
+            $actionPermission = $this->model->findOrFail($id);
             DB::transaction(function () use ($actionPermission) {
                 $actionPermission->delete();
             });
@@ -181,7 +182,7 @@ class ActionPermissionController extends MainController
                 [
                     'exception' => $e,
                     'ActionPermission_id' => $actionPermission->getKey(),
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -191,5 +192,5 @@ class ActionPermissionController extends MainController
             );
         }
     }
- 
+
 }

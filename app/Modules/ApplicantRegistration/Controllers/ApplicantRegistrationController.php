@@ -68,7 +68,7 @@ class ApplicantRegistrationController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'applicant_id' => ['required', 'integer'],
+            'applicant_id' => ['required', 'integer'],
             'admission_id' => ['required', 'integer'],
             'registration_number' => ['required', 'string', 'max:255'],
             'registration_date' => ['required', 'string', 'max:255'],
@@ -101,7 +101,7 @@ class ApplicantRegistrationController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -134,7 +134,7 @@ class ApplicantRegistrationController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'applicant_id' => ['required', 'integer'],
+            'applicant_id' => ['required', 'integer'],
             'admission_id' => ['required', 'integer'],
             'registration_number' => ['required', 'string', 'max:255'],
             'registration_date' => ['required', 'string', 'max:255'],
@@ -151,10 +151,7 @@ class ApplicantRegistrationController extends MainController
 
         try {
             $applicantRegistration = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $applicantRegistration,
-                $validated
-            ) {
+            DB::transaction(function () use ($applicantRegistration, $validated) {
                 $applicantRegistration->update($validated);
             });
 
@@ -164,14 +161,14 @@ class ApplicantRegistrationController extends MainController
                 $applicantRegistration
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui ApplicantRegistration.',
                 [
                     'exception' => $e,
                     'ApplicantRegistration_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -199,14 +196,14 @@ class ApplicantRegistrationController extends MainController
                 'Data ApplicantRegistration berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $applicantRegistration->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus ApplicantRegistration.',
                 [
                     'exception' => $e,
                     'ApplicantRegistration_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -215,5 +212,5 @@ class ApplicantRegistrationController extends MainController
                 'Data ApplicantRegistration gagal dihapus.'
             );
         }
-    } 
+    }
 }

@@ -68,7 +68,7 @@ class AssetCategoryController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
         ]);
 
         try {
@@ -89,7 +89,7 @@ class AssetCategoryController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -122,15 +122,12 @@ class AssetCategoryController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
         ]);
 
         try {
             $assetCategory = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $assetCategory,
-                $validated
-            ) {
+            DB::transaction(function () use ($assetCategory, $validated) {
                 $assetCategory->update($validated);
             });
 
@@ -140,14 +137,14 @@ class AssetCategoryController extends MainController
                 $assetCategory
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui AssetCategory.',
                 [
                     'exception' => $e,
                     'AssetCategory_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -175,14 +172,14 @@ class AssetCategoryController extends MainController
                 'Data AssetCategory berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $assetCategory->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus AssetCategory.',
                 [
                     'exception' => $e,
                     'AssetCategory_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -191,5 +188,5 @@ class AssetCategoryController extends MainController
                 'Data AssetCategory gagal dihapus.'
             );
         }
-    } 
+    }
 }

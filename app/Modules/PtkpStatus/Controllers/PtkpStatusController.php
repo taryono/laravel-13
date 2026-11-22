@@ -68,7 +68,7 @@ class PtkpStatusController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
             'amount' => ['required', 'string', 'max:255'],
             'is_active' => ['required', 'string', 'max:255'],
             'sort_order' => ['required', 'string', 'max:255'],
@@ -94,7 +94,7 @@ class PtkpStatusController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -127,7 +127,7 @@ class PtkpStatusController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
             'amount' => ['required', 'string', 'max:255'],
             'is_active' => ['required', 'string', 'max:255'],
             'sort_order' => ['required', 'string', 'max:255'],
@@ -137,10 +137,7 @@ class PtkpStatusController extends MainController
 
         try {
             $ptkpStatus = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $ptkpStatus,
-                $validated
-            ) {
+            DB::transaction(function () use ($ptkpStatus, $validated) {
                 $ptkpStatus->update($validated);
             });
 
@@ -150,14 +147,14 @@ class PtkpStatusController extends MainController
                 $ptkpStatus
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui PtkpStatus.',
                 [
                     'exception' => $e,
                     'PtkpStatus_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -185,14 +182,14 @@ class PtkpStatusController extends MainController
                 'Data PtkpStatus berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $ptkpStatus->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus PtkpStatus.',
                 [
                     'exception' => $e,
                     'PtkpStatus_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -201,5 +198,5 @@ class PtkpStatusController extends MainController
                 'Data PtkpStatus gagal dihapus.'
             );
         }
-    } 
+    }
 }

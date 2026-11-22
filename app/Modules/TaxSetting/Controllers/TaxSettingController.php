@@ -53,7 +53,7 @@ class TaxSettingController extends MainController
      */
     public function create(): View
     {
-        $taxSetting = new TaxSetting();  
+        $taxSetting = new TaxSetting();
         $taxTypes = TaxType::all();
         $organizations = Organization::all();
         return view(
@@ -68,7 +68,7 @@ class TaxSettingController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'tax_code' => ['required', 'string', 'max:255'],
+            'tax_code' => ['required', 'string', 'max:255'],
             'tax_name' => ['required', 'string', 'max:255'],
             'tax_rate' => ['required', 'string', 'max:255'],
             'min_amount' => ['required', 'string', 'max:255'],
@@ -100,7 +100,7 @@ class TaxSettingController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -116,7 +116,7 @@ class TaxSettingController extends MainController
      */
     public function edit($id): View
     {
-        $taxSetting = $this->model->findOrFail($id); 
+        $taxSetting = $this->model->findOrFail($id);
         $taxTypes = TaxType::all();
         $organizations = Organization::all();
         return view(
@@ -131,7 +131,7 @@ class TaxSettingController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'tax_code' => ['required', 'string', 'max:255'],
+            'tax_code' => ['required', 'string', 'max:255'],
             'tax_name' => ['required', 'string', 'max:255'],
             'tax_rate' => ['required', 'string', 'max:255'],
             'min_amount' => ['required', 'string', 'max:255'],
@@ -147,10 +147,7 @@ class TaxSettingController extends MainController
 
         try {
             $taxSetting = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $taxSetting,
-                $validated
-            ) {
+            DB::transaction(function () use ($taxSetting, $validated) {
                 $taxSetting->update($validated);
             });
 
@@ -160,14 +157,14 @@ class TaxSettingController extends MainController
                 $taxSetting
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui TaxSetting.',
                 [
                     'exception' => $e,
                     'TaxSetting_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -195,14 +192,14 @@ class TaxSettingController extends MainController
                 'Data TaxSetting berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $taxSetting->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus TaxSetting.',
                 [
                     'exception' => $e,
                     'TaxSetting_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -211,5 +208,5 @@ class TaxSettingController extends MainController
                 'Data TaxSetting gagal dihapus.'
             );
         }
-    } 
+    }
 }

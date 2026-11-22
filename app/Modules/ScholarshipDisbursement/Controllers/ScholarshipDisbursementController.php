@@ -68,7 +68,7 @@ class ScholarshipDisbursementController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'scholarship_recipient_id' => ['required', 'integer'],
+            'scholarship_recipient_id' => ['required', 'integer'],
             'scholarship_id' => ['required', 'integer'],
             'student_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
@@ -119,7 +119,7 @@ class ScholarshipDisbursementController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -152,7 +152,7 @@ class ScholarshipDisbursementController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'scholarship_recipient_id' => ['required', 'integer'],
+            'scholarship_recipient_id' => ['required', 'integer'],
             'scholarship_id' => ['required', 'integer'],
             'student_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
@@ -187,10 +187,7 @@ class ScholarshipDisbursementController extends MainController
 
         try {
             $scholarshipDisbursement = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $scholarshipDisbursement,
-                $validated
-            ) {
+            DB::transaction(function () use ($scholarshipDisbursement, $validated) {
                 $scholarshipDisbursement->update($validated);
             });
 
@@ -200,14 +197,14 @@ class ScholarshipDisbursementController extends MainController
                 $scholarshipDisbursement
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui ScholarshipDisbursement.',
                 [
                     'exception' => $e,
                     'ScholarshipDisbursement_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -235,14 +232,14 @@ class ScholarshipDisbursementController extends MainController
                 'Data ScholarshipDisbursement berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $scholarshipDisbursement->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus ScholarshipDisbursement.',
                 [
                     'exception' => $e,
                     'ScholarshipDisbursement_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -251,5 +248,5 @@ class ScholarshipDisbursementController extends MainController
                 'Data ScholarshipDisbursement gagal dihapus.'
             );
         }
-    } 
+    }
 }

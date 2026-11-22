@@ -89,7 +89,7 @@ class TrialRegistrationController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -128,10 +128,7 @@ class TrialRegistrationController extends MainController
         try {
             $trialRegistration = $this->model->findOrFail($id);
 
-            DB::transaction(function () use (
-                $trialRegistration,
-                $validated
-            ) {
+            DB::transaction(function () use ($trialRegistration, $validated) {
                 $trialRegistration->update($validated);
             });
 
@@ -154,7 +151,7 @@ class TrialRegistrationController extends MainController
                     'exception' => $e,
                     'TrialRegistration_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -191,7 +188,7 @@ class TrialRegistrationController extends MainController
                 [
                     'exception' => $e,
                     'TrialRegistration_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -201,5 +198,5 @@ class TrialRegistrationController extends MainController
             );
         }
     }
- 
+
 }

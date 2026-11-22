@@ -68,7 +68,7 @@ class SubmissionController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'assignment_quiz_id' => ['required', 'integer'],
+            'assignment_quiz_id' => ['required', 'integer'],
             'student_id' => ['required', 'integer'],
             'submission_text' => ['required', 'string', 'max:255'],
             'file_urls' => ['required', 'string', 'max:255'],
@@ -99,7 +99,7 @@ class SubmissionController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -132,7 +132,7 @@ class SubmissionController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'assignment_quiz_id' => ['required', 'integer'],
+            'assignment_quiz_id' => ['required', 'integer'],
             'student_id' => ['required', 'integer'],
             'submission_text' => ['required', 'string', 'max:255'],
             'file_urls' => ['required', 'string', 'max:255'],
@@ -147,10 +147,7 @@ class SubmissionController extends MainController
 
         try {
             $submission = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $submission,
-                $validated
-            ) {
+            DB::transaction(function () use ($submission, $validated) {
                 $submission->update($validated);
             });
 
@@ -160,14 +157,14 @@ class SubmissionController extends MainController
                 $submission
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui Submission.',
                 [
                     'exception' => $e,
                     'Submission_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -195,14 +192,14 @@ class SubmissionController extends MainController
                 'Data Submission berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $submission->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus Submission.',
                 [
                     'exception' => $e,
                     'Submission_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -211,5 +208,5 @@ class SubmissionController extends MainController
                 'Data Submission gagal dihapus.'
             );
         }
-    } 
+    }
 }

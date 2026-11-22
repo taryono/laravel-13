@@ -68,7 +68,7 @@ class TaxLiabilityController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'tax_type' => ['required', 'string', 'max:255'],
             'tax_period' => ['required', 'string', 'max:255'],
             'tax_amount' => ['required', 'string', 'max:255'],
@@ -98,7 +98,7 @@ class TaxLiabilityController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -131,7 +131,7 @@ class TaxLiabilityController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'tax_type' => ['required', 'string', 'max:255'],
             'tax_period' => ['required', 'string', 'max:255'],
             'tax_amount' => ['required', 'string', 'max:255'],
@@ -145,10 +145,7 @@ class TaxLiabilityController extends MainController
 
         try {
             $taxLiability = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $taxLiability,
-                $validated
-            ) {
+            DB::transaction(function () use ($taxLiability, $validated) {
                 $taxLiability->update($validated);
             });
 
@@ -158,14 +155,14 @@ class TaxLiabilityController extends MainController
                 $taxLiability
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui TaxLiability.',
                 [
                     'exception' => $e,
                     'TaxLiability_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -193,14 +190,14 @@ class TaxLiabilityController extends MainController
                 'Data TaxLiability berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $taxLiability->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus TaxLiability.',
                 [
                     'exception' => $e,
                     'TaxLiability_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -209,5 +206,5 @@ class TaxLiabilityController extends MainController
                 'Data TaxLiability gagal dihapus.'
             );
         }
-    } 
+    }
 }

@@ -68,7 +68,7 @@ class WalletCardController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'digital_wallet_id' => ['required', 'integer'],
+            'digital_wallet_id' => ['required', 'integer'],
             'card_uid' => ['required', 'string', 'max:255'],
             'status' => ['required', 'string', 'max:255'],
             'issued_at' => ['required', 'string', 'max:255'],
@@ -92,7 +92,7 @@ class WalletCardController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -125,7 +125,7 @@ class WalletCardController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'digital_wallet_id' => ['required', 'integer'],
+            'digital_wallet_id' => ['required', 'integer'],
             'card_uid' => ['required', 'string', 'max:255'],
             'status' => ['required', 'string', 'max:255'],
             'issued_at' => ['required', 'string', 'max:255'],
@@ -133,10 +133,7 @@ class WalletCardController extends MainController
 
         try {
             $walletCard = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $walletCard,
-                $validated
-            ) {
+            DB::transaction(function () use ($walletCard, $validated) {
                 $walletCard->update($validated);
             });
 
@@ -146,14 +143,14 @@ class WalletCardController extends MainController
                 $walletCard
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui WalletCard.',
                 [
                     'exception' => $e,
                     'WalletCard_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -181,14 +178,14 @@ class WalletCardController extends MainController
                 'Data WalletCard berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $walletCard->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus WalletCard.',
                 [
                     'exception' => $e,
                     'WalletCard_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -197,5 +194,5 @@ class WalletCardController extends MainController
                 'Data WalletCard gagal dihapus.'
             );
         }
-    } 
+    }
 }

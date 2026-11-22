@@ -68,7 +68,7 @@ class DapodikSyncLogController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'sync_date' => ['required', 'string', 'max:255'],
             'sync_type' => ['required', 'string', 'max:255'],
             'status' => ['required', 'string', 'max:255'],
@@ -103,7 +103,7 @@ class DapodikSyncLogController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -136,7 +136,7 @@ class DapodikSyncLogController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'sync_date' => ['required', 'string', 'max:255'],
             'sync_type' => ['required', 'string', 'max:255'],
             'status' => ['required', 'string', 'max:255'],
@@ -155,10 +155,7 @@ class DapodikSyncLogController extends MainController
 
         try {
             $dapodikSyncLog = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $dapodikSyncLog,
-                $validated
-            ) {
+            DB::transaction(function () use ($dapodikSyncLog, $validated) {
                 $dapodikSyncLog->update($validated);
             });
 
@@ -168,14 +165,14 @@ class DapodikSyncLogController extends MainController
                 $dapodikSyncLog
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui DapodikSyncLog.',
                 [
                     'exception' => $e,
                     'DapodikSyncLog_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -203,14 +200,14 @@ class DapodikSyncLogController extends MainController
                 'Data DapodikSyncLog berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $dapodikSyncLog->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus DapodikSyncLog.',
                 [
                     'exception' => $e,
                     'DapodikSyncLog_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -219,5 +216,5 @@ class DapodikSyncLogController extends MainController
                 'Data DapodikSyncLog gagal dihapus.'
             );
         }
-    } 
+    }
 }

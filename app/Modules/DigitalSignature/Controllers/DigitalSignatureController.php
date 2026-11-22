@@ -68,7 +68,7 @@ class DigitalSignatureController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'document_id' => ['required', 'integer'],
+            'document_id' => ['required', 'integer'],
             'document_version_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
             'signer_user_id' => ['required', 'integer'],
@@ -136,7 +136,7 @@ class DigitalSignatureController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -169,7 +169,7 @@ class DigitalSignatureController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'document_id' => ['required', 'integer'],
+            'document_id' => ['required', 'integer'],
             'document_version_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
             'signer_user_id' => ['required', 'integer'],
@@ -221,10 +221,7 @@ class DigitalSignatureController extends MainController
 
         try {
             $digitalSignature = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $digitalSignature,
-                $validated
-            ) {
+            DB::transaction(function () use ($digitalSignature, $validated) {
                 $digitalSignature->update($validated);
             });
 
@@ -234,14 +231,14 @@ class DigitalSignatureController extends MainController
                 $digitalSignature
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui DigitalSignature.',
                 [
                     'exception' => $e,
                     'DigitalSignature_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -269,14 +266,14 @@ class DigitalSignatureController extends MainController
                 'Data DigitalSignature berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $digitalSignature->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus DigitalSignature.',
                 [
                     'exception' => $e,
                     'DigitalSignature_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -285,5 +282,5 @@ class DigitalSignatureController extends MainController
                 'Data DigitalSignature gagal dihapus.'
             );
         }
-    } 
+    }
 }

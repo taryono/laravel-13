@@ -68,7 +68,7 @@ class DormitoryMovementController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'dormitory_assignment_id' => ['required', 'integer'],
+            'dormitory_assignment_id' => ['required', 'integer'],
             'student_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
             'from_dormitory_id' => ['required', 'integer'],
@@ -107,7 +107,7 @@ class DormitoryMovementController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -140,7 +140,7 @@ class DormitoryMovementController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'dormitory_assignment_id' => ['required', 'integer'],
+            'dormitory_assignment_id' => ['required', 'integer'],
             'student_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
             'from_dormitory_id' => ['required', 'integer'],
@@ -163,10 +163,7 @@ class DormitoryMovementController extends MainController
 
         try {
             $dormitoryMovement = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $dormitoryMovement,
-                $validated
-            ) {
+            DB::transaction(function () use ($dormitoryMovement, $validated) {
                 $dormitoryMovement->update($validated);
             });
 
@@ -176,14 +173,14 @@ class DormitoryMovementController extends MainController
                 $dormitoryMovement
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui DormitoryMovement.',
                 [
                     'exception' => $e,
                     'DormitoryMovement_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -211,14 +208,14 @@ class DormitoryMovementController extends MainController
                 'Data DormitoryMovement berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $dormitoryMovement->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus DormitoryMovement.',
                 [
                     'exception' => $e,
                     'DormitoryMovement_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -227,5 +224,5 @@ class DormitoryMovementController extends MainController
                 'Data DormitoryMovement gagal dihapus.'
             );
         }
-    } 
+    }
 }

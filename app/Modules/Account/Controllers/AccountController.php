@@ -68,7 +68,7 @@ class AccountController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
         ]);
 
         try {
@@ -89,7 +89,7 @@ class AccountController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -122,15 +122,12 @@ class AccountController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
         ]);
 
         try {
             $account = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $account,
-                $validated
-            ) {
+            DB::transaction(function () use ($account, $validated) {
                 $account->update($validated);
             });
 
@@ -140,14 +137,14 @@ class AccountController extends MainController
                 $account
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui Account.',
                 [
                     'exception' => $e,
                     'Account_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -175,14 +172,14 @@ class AccountController extends MainController
                 'Data Account berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $account->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus Account.',
                 [
                     'exception' => $e,
                     'Account_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -191,5 +188,5 @@ class AccountController extends MainController
                 'Data Account gagal dihapus.'
             );
         }
-    } 
+    }
 }

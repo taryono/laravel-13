@@ -68,7 +68,7 @@ class CmsTagController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
             'slug' => ['required', 'string', 'max:255'],
         ]);
 
@@ -90,7 +90,7 @@ class CmsTagController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -123,16 +123,13 @@ class CmsTagController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
             'slug' => ['required', 'string', 'max:255'],
         ]);
 
         try {
             $cmsTag = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $cmsTag,
-                $validated
-            ) {
+            DB::transaction(function () use ($cmsTag, $validated) {
                 $cmsTag->update($validated);
             });
 
@@ -142,14 +139,14 @@ class CmsTagController extends MainController
                 $cmsTag
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui CmsTag.',
                 [
                     'exception' => $e,
                     'CmsTag_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -177,14 +174,14 @@ class CmsTagController extends MainController
                 'Data CmsTag berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $cmsTag->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus CmsTag.',
                 [
                     'exception' => $e,
                     'CmsTag_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -193,5 +190,5 @@ class CmsTagController extends MainController
                 'Data CmsTag gagal dihapus.'
             );
         }
-    } 
+    }
 }

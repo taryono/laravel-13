@@ -68,7 +68,7 @@ class VendorPaymentController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'vendor_id' => ['required', 'integer'],
             'vendor_invoice_id' => ['required', 'integer'],
             'bank_account_id' => ['required', 'integer'],
@@ -109,7 +109,7 @@ class VendorPaymentController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -142,7 +142,7 @@ class VendorPaymentController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'vendor_id' => ['required', 'integer'],
             'vendor_invoice_id' => ['required', 'integer'],
             'bank_account_id' => ['required', 'integer'],
@@ -167,10 +167,7 @@ class VendorPaymentController extends MainController
 
         try {
             $vendorPayment = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $vendorPayment,
-                $validated
-            ) {
+            DB::transaction(function () use ($vendorPayment, $validated) {
                 $vendorPayment->update($validated);
             });
 
@@ -180,14 +177,14 @@ class VendorPaymentController extends MainController
                 $vendorPayment
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui VendorPayment.',
                 [
                     'exception' => $e,
                     'VendorPayment_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -215,14 +212,14 @@ class VendorPaymentController extends MainController
                 'Data VendorPayment berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $vendorPayment->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus VendorPayment.',
                 [
                     'exception' => $e,
                     'VendorPayment_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -231,5 +228,5 @@ class VendorPaymentController extends MainController
                 'Data VendorPayment gagal dihapus.'
             );
         }
-    } 
+    }
 }

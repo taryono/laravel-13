@@ -68,7 +68,7 @@ class PaymentWebhookLogController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'payment_gateway_id' => ['required', 'integer'],
+            'payment_gateway_id' => ['required', 'integer'],
             'order_id' => ['required', 'integer'],
             'transaction_id' => ['required', 'integer'],
             'event_type' => ['required', 'string', 'max:255'],
@@ -108,7 +108,7 @@ class PaymentWebhookLogController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -141,7 +141,7 @@ class PaymentWebhookLogController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'payment_gateway_id' => ['required', 'integer'],
+            'payment_gateway_id' => ['required', 'integer'],
             'order_id' => ['required', 'integer'],
             'transaction_id' => ['required', 'integer'],
             'event_type' => ['required', 'string', 'max:255'],
@@ -165,10 +165,7 @@ class PaymentWebhookLogController extends MainController
 
         try {
             $paymentWebhookLog = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $paymentWebhookLog,
-                $validated
-            ) {
+            DB::transaction(function () use ($paymentWebhookLog, $validated) {
                 $paymentWebhookLog->update($validated);
             });
 
@@ -178,14 +175,14 @@ class PaymentWebhookLogController extends MainController
                 $paymentWebhookLog
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui PaymentWebhookLog.',
                 [
                     'exception' => $e,
                     'PaymentWebhookLog_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -213,14 +210,14 @@ class PaymentWebhookLogController extends MainController
                 'Data PaymentWebhookLog berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $paymentWebhookLog->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus PaymentWebhookLog.',
                 [
                     'exception' => $e,
                     'PaymentWebhookLog_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -229,5 +226,5 @@ class PaymentWebhookLogController extends MainController
                 'Data PaymentWebhookLog gagal dihapus.'
             );
         }
-    } 
+    }
 }

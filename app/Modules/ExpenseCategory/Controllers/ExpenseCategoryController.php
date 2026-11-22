@@ -68,7 +68,7 @@ class ExpenseCategoryController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
             'code' => ['required', 'string', 'max:255'],
             'is_active' => ['required', 'string', 'max:255'],
             'parent_id' => ['required', 'integer'],
@@ -94,7 +94,7 @@ class ExpenseCategoryController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -127,7 +127,7 @@ class ExpenseCategoryController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
             'code' => ['required', 'string', 'max:255'],
             'is_active' => ['required', 'string', 'max:255'],
             'parent_id' => ['required', 'integer'],
@@ -137,10 +137,7 @@ class ExpenseCategoryController extends MainController
 
         try {
             $expenseCategory = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $expenseCategory,
-                $validated
-            ) {
+            DB::transaction(function () use ($expenseCategory, $validated) {
                 $expenseCategory->update($validated);
             });
 
@@ -150,14 +147,14 @@ class ExpenseCategoryController extends MainController
                 $expenseCategory
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui ExpenseCategory.',
                 [
                     'exception' => $e,
                     'ExpenseCategory_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -185,14 +182,14 @@ class ExpenseCategoryController extends MainController
                 'Data ExpenseCategory berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $expenseCategory->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus ExpenseCategory.',
                 [
                     'exception' => $e,
                     'ExpenseCategory_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -201,5 +198,5 @@ class ExpenseCategoryController extends MainController
                 'Data ExpenseCategory gagal dihapus.'
             );
         }
-    } 
+    }
 }

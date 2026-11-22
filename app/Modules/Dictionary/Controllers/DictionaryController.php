@@ -92,7 +92,7 @@ class DictionaryController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -134,10 +134,7 @@ class DictionaryController extends MainController
         try {
             $dictionary = $this->model->findOrFail($id);
 
-            DB::transaction(function () use (
-                $dictionary,
-                $validated
-            ) {
+            DB::transaction(function () use ($dictionary, $validated) {
                 $dictionary->update($validated);
             });
 
@@ -160,7 +157,7 @@ class DictionaryController extends MainController
                     'exception' => $e,
                     'Dictionary_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -197,7 +194,7 @@ class DictionaryController extends MainController
                 [
                     'exception' => $e,
                     'Dictionary_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -206,5 +203,5 @@ class DictionaryController extends MainController
                 'Data Dictionary gagal dihapus.'
             );
         }
-    } 
+    }
 }

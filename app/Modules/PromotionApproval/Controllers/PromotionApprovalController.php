@@ -68,7 +68,7 @@ class PromotionApprovalController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'promotion_id' => ['required', 'integer'],
+            'promotion_id' => ['required', 'integer'],
             'approver_id' => ['required', 'integer'],
             'approver_role' => ['required', 'string', 'max:255'],
             'approval_level' => ['required', 'string', 'max:255'],
@@ -95,7 +95,7 @@ class PromotionApprovalController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -128,7 +128,7 @@ class PromotionApprovalController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'promotion_id' => ['required', 'integer'],
+            'promotion_id' => ['required', 'integer'],
             'approver_id' => ['required', 'integer'],
             'approver_role' => ['required', 'string', 'max:255'],
             'approval_level' => ['required', 'string', 'max:255'],
@@ -139,10 +139,7 @@ class PromotionApprovalController extends MainController
 
         try {
             $promotionApproval = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $promotionApproval,
-                $validated
-            ) {
+            DB::transaction(function () use ($promotionApproval, $validated) {
                 $promotionApproval->update($validated);
             });
 
@@ -152,14 +149,14 @@ class PromotionApprovalController extends MainController
                 $promotionApproval
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui PromotionApproval.',
                 [
                     'exception' => $e,
                     'PromotionApproval_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -187,14 +184,14 @@ class PromotionApprovalController extends MainController
                 'Data PromotionApproval berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $promotionApproval->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus PromotionApproval.',
                 [
                     'exception' => $e,
                     'PromotionApproval_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -203,5 +200,5 @@ class PromotionApprovalController extends MainController
                 'Data PromotionApproval gagal dihapus.'
             );
         }
-    } 
+    }
 }

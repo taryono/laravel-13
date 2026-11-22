@@ -54,7 +54,7 @@ class PeriodController extends MainController
      */
     public function create(): View
     {
-       return view('Period::create', [
+        return view('Period::create', [
             'Organization' => Organization::pluck('name', 'id'),
             'schools' => School::pluck('name', 'id'),
             'academicYears' => AcademicYear::pluck('name', 'id'),
@@ -67,7 +67,7 @@ class PeriodController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'academic_year_id' => ['required', 'integer'],
+            'academic_year_id' => ['required', 'integer'],
             'name' => ['required', 'string', 'max:255'],
             'code' => ['required', 'string', 'max:255'],
             'assessment_type' => ['required', 'string', 'max:255'],
@@ -97,7 +97,7 @@ class PeriodController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -128,7 +128,7 @@ class PeriodController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'academic_year_id' => ['required', 'integer'],
+            'academic_year_id' => ['required', 'integer'],
             'name' => ['required', 'string', 'max:255'],
             'code' => ['required', 'string', 'max:255'],
             'assessment_type' => ['required', 'string', 'max:255'],
@@ -142,10 +142,7 @@ class PeriodController extends MainController
 
         try {
             $period = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $period,
-                $validated
-            ) {
+            DB::transaction(function () use ($period, $validated) {
                 $period->update($validated);
             });
 
@@ -155,14 +152,14 @@ class PeriodController extends MainController
                 $period
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui Period.',
                 [
                     'exception' => $e,
                     'Period_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -190,14 +187,14 @@ class PeriodController extends MainController
                 'Data Period berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $period->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus Period.',
                 [
                     'exception' => $e,
                     'Period_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -206,5 +203,5 @@ class PeriodController extends MainController
                 'Data Period gagal dihapus.'
             );
         }
-    } 
+    }
 }

@@ -68,7 +68,7 @@ class TaxTypeController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
         ]);
 
         try {
@@ -89,7 +89,7 @@ class TaxTypeController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -122,15 +122,12 @@ class TaxTypeController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
         ]);
 
         try {
             $taxType = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $taxType,
-                $validated
-            ) {
+            DB::transaction(function () use ($taxType, $validated) {
                 $taxType->update($validated);
             });
 
@@ -140,14 +137,14 @@ class TaxTypeController extends MainController
                 $taxType
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui TaxType.',
                 [
                     'exception' => $e,
                     'TaxType_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -175,14 +172,14 @@ class TaxTypeController extends MainController
                 'Data TaxType berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $taxType->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus TaxType.',
                 [
                     'exception' => $e,
                     'TaxType_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -191,5 +188,5 @@ class TaxTypeController extends MainController
                 'Data TaxType gagal dihapus.'
             );
         }
-    } 
+    }
 }

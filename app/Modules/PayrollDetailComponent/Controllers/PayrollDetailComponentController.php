@@ -68,7 +68,7 @@ class PayrollDetailComponentController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'payroll_detail_id' => ['required', 'integer'],
+            'payroll_detail_id' => ['required', 'integer'],
             'salary_component_id' => ['required', 'integer'],
             'component_code' => ['required', 'string', 'max:255'],
             'component_name' => ['required', 'string', 'max:255'],
@@ -100,7 +100,7 @@ class PayrollDetailComponentController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -133,7 +133,7 @@ class PayrollDetailComponentController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'payroll_detail_id' => ['required', 'integer'],
+            'payroll_detail_id' => ['required', 'integer'],
             'salary_component_id' => ['required', 'integer'],
             'component_code' => ['required', 'string', 'max:255'],
             'component_name' => ['required', 'string', 'max:255'],
@@ -149,10 +149,7 @@ class PayrollDetailComponentController extends MainController
 
         try {
             $payrollDetailComponent = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $payrollDetailComponent,
-                $validated
-            ) {
+            DB::transaction(function () use ($payrollDetailComponent, $validated) {
                 $payrollDetailComponent->update($validated);
             });
 
@@ -162,14 +159,14 @@ class PayrollDetailComponentController extends MainController
                 $payrollDetailComponent
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui PayrollDetailComponent.',
                 [
                     'exception' => $e,
                     'PayrollDetailComponent_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -197,14 +194,14 @@ class PayrollDetailComponentController extends MainController
                 'Data PayrollDetailComponent berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $payrollDetailComponent->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus PayrollDetailComponent.',
                 [
                     'exception' => $e,
                     'PayrollDetailComponent_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -213,5 +210,5 @@ class PayrollDetailComponentController extends MainController
                 'Data PayrollDetailComponent gagal dihapus.'
             );
         }
-    } 
+    }
 }

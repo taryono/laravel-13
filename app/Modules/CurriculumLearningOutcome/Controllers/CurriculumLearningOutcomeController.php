@@ -68,7 +68,7 @@ class CurriculumLearningOutcomeController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'curriculum_phase_id' => ['required', 'integer'],
             'subject_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
@@ -98,7 +98,7 @@ class CurriculumLearningOutcomeController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -131,7 +131,7 @@ class CurriculumLearningOutcomeController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'curriculum_phase_id' => ['required', 'integer'],
             'subject_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
@@ -145,10 +145,7 @@ class CurriculumLearningOutcomeController extends MainController
 
         try {
             $curriculumLearningOutcome = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $curriculumLearningOutcome,
-                $validated
-            ) {
+            DB::transaction(function () use ($curriculumLearningOutcome, $validated) {
                 $curriculumLearningOutcome->update($validated);
             });
 
@@ -158,14 +155,14 @@ class CurriculumLearningOutcomeController extends MainController
                 $curriculumLearningOutcome
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui CurriculumLearningOutcome.',
                 [
                     'exception' => $e,
                     'CurriculumLearningOutcome_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -193,14 +190,14 @@ class CurriculumLearningOutcomeController extends MainController
                 'Data CurriculumLearningOutcome berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $curriculumLearningOutcome->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus CurriculumLearningOutcome.',
                 [
                     'exception' => $e,
                     'CurriculumLearningOutcome_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -209,5 +206,5 @@ class CurriculumLearningOutcomeController extends MainController
                 'Data CurriculumLearningOutcome gagal dihapus.'
             );
         }
-    } 
+    }
 }

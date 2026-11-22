@@ -68,7 +68,7 @@ class CmsPageController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'user_id' => ['required', 'integer'],
+            'user_id' => ['required', 'integer'],
             'parent_id' => ['required', 'integer'],
             'title' => ['required', 'string', 'max:255'],
             'slug' => ['required', 'string', 'max:255'],
@@ -101,7 +101,7 @@ class CmsPageController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -134,7 +134,7 @@ class CmsPageController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'user_id' => ['required', 'integer'],
+            'user_id' => ['required', 'integer'],
             'parent_id' => ['required', 'integer'],
             'title' => ['required', 'string', 'max:255'],
             'slug' => ['required', 'string', 'max:255'],
@@ -151,10 +151,7 @@ class CmsPageController extends MainController
 
         try {
             $cmsPage = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $cmsPage,
-                $validated
-            ) {
+            DB::transaction(function () use ($cmsPage, $validated) {
                 $cmsPage->update($validated);
             });
 
@@ -164,14 +161,14 @@ class CmsPageController extends MainController
                 $cmsPage
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui CmsPage.',
                 [
                     'exception' => $e,
                     'CmsPage_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -199,14 +196,14 @@ class CmsPageController extends MainController
                 'Data CmsPage berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $cmsPage->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus CmsPage.',
                 [
                     'exception' => $e,
                     'CmsPage_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -215,5 +212,5 @@ class CmsPageController extends MainController
                 'Data CmsPage gagal dihapus.'
             );
         }
-    } 
+    }
 }

@@ -66,13 +66,13 @@ class CurriculumController extends MainController
     {
         $validated = $request->validate([
             'organization_id' => ['nullable', 'integer'],
-            'type'            => ['nullable', 'in:national,international,local,hybrid'],
-            'code'            => ['required', 'string', 'max:20'],
-            'name'            => ['required', 'string', 'max:100'],
-            'start_year'      => ['nullable', 'integer', 'min:1901', 'max:2155'],
-            'end_year'        => ['nullable', 'integer', 'min:1901', 'max:2155'],
-            'is_active'       => ['nullable', 'boolean'],
-            'description'     => ['nullable', 'string'],
+            'type' => ['nullable', 'in:national,international,local,hybrid'],
+            'code' => ['required', 'string', 'max:20'],
+            'name' => ['required', 'string', 'max:100'],
+            'start_year' => ['nullable', 'integer', 'min:1901', 'max:2155'],
+            'end_year' => ['nullable', 'integer', 'min:1901', 'max:2155'],
+            'is_active' => ['nullable', 'boolean'],
+            'description' => ['nullable', 'string'],
         ]);
 
         try {
@@ -93,7 +93,7 @@ class CurriculumController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -128,13 +128,13 @@ class CurriculumController extends MainController
     {
         $validated = $request->validate([
             'organization_id' => ['nullable', 'integer'],
-            'type'            => ['nullable', 'in:national,international,local,hybrid'],
-            'code'            => ['required', 'string', 'max:20'],
-            'name'            => ['required', 'string', 'max:100'],
-            'start_year'      => ['nullable', 'integer', 'min:1901', 'max:2155'],
-            'end_year'        => ['nullable', 'integer', 'min:1901', 'max:2155'],
-            'is_active'       => ['nullable', 'boolean'],
-            'description'     => ['nullable', 'string'],
+            'type' => ['nullable', 'in:national,international,local,hybrid'],
+            'code' => ['required', 'string', 'max:20'],
+            'name' => ['required', 'string', 'max:100'],
+            'start_year' => ['nullable', 'integer', 'min:1901', 'max:2155'],
+            'end_year' => ['nullable', 'integer', 'min:1901', 'max:2155'],
+            'is_active' => ['nullable', 'boolean'],
+            'description' => ['nullable', 'string'],
         ]);
 
         try {
@@ -156,7 +156,7 @@ class CurriculumController extends MainController
                     'exception' => $e,
                     'Curriculum_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -191,7 +191,7 @@ class CurriculumController extends MainController
                 [
                     'exception' => $e,
                     'Curriculum_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 

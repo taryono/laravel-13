@@ -91,17 +91,17 @@ class PayslipController extends MainController
             ],
             'total_allowance' => 'nullable|numeric|min:0',
             'total_deduction' => 'nullable|numeric|min:0',
-            'gross_salary'    => 'nullable|numeric|min:0',
-            'net_salary'      => 'nullable|numeric|min:0',
-            'currency'        => 'nullable|string|max:3',
-            'status'          => 'required|in:draft,generated,sent,downloaded,void',
-            'generated_at'    => 'nullable|date',
-            'pdf_path'        => 'nullable|string|max:1000',
-            'html_content'    => 'nullable|string',
-            'is_sent'         => 'nullable|boolean',
-            'sent_at'         => 'nullable|date',
-            'is_downloaded'   => 'nullable|boolean',
-            'downloaded_at'   => 'nullable|date',
+            'gross_salary' => 'nullable|numeric|min:0',
+            'net_salary' => 'nullable|numeric|min:0',
+            'currency' => 'nullable|string|max:3',
+            'status' => 'required|in:draft,generated,sent,downloaded,void',
+            'generated_at' => 'nullable|date',
+            'pdf_path' => 'nullable|string|max:1000',
+            'html_content' => 'nullable|string',
+            'is_sent' => 'nullable|boolean',
+            'sent_at' => 'nullable|date',
+            'is_downloaded' => 'nullable|boolean',
+            'downloaded_at' => 'nullable|date',
         ]);
 
         try {
@@ -116,12 +116,12 @@ class PayslipController extends MainController
             // Normalisasi nilai default
             $validated['total_allowance'] = $validated['total_allowance'] ?? 0.00;
             $validated['total_deduction'] = $validated['total_deduction'] ?? 0.00;
-            $validated['gross_salary']    = $validated['gross_salary'] ?? 0.00;
-            $validated['net_salary']      = $validated['net_salary'] ?? 0.00;
-            $validated['currency']        = $validated['currency'] ?? 'IDR';
-            $validated['status']          = $validated['status'] ?? 'draft';
-            $validated['is_sent']         = $request->boolean('is_sent');
-            $validated['is_downloaded']   = $request->boolean('is_downloaded');
+            $validated['gross_salary'] = $validated['gross_salary'] ?? 0.00;
+            $validated['net_salary'] = $validated['net_salary'] ?? 0.00;
+            $validated['currency'] = $validated['currency'] ?? 'IDR';
+            $validated['status'] = $validated['status'] ?? 'draft';
+            $validated['is_sent'] = $request->boolean('is_sent');
+            $validated['is_downloaded'] = $request->boolean('is_downloaded');
 
             if ($validated['is_sent'] && empty($validated['sent_at'])) {
                 $validated['sent_at'] = now();
@@ -146,28 +146,28 @@ class PayslipController extends MainController
                         $payrollRun = PayrollRun::firstOrCreate(
                             [
                                 'payroll_period_id' => $validated['payroll_period_id'],
-                                'organization_id'   => $orgId,
+                                'organization_id' => $orgId,
                             ],
                             [
-                                'run_number'  => 'PR/' . date('Ym') . '/001',
-                                'run_type'    => 'regular',
-                                'status'      => 'draft',
+                                'run_number' => 'PR/' . date('Ym') . '/001',
+                                'run_type' => 'regular',
+                                'status' => 'draft',
                                 'total_gross' => $validated['gross_salary'],
-                                'total_net'   => $validated['net_salary'],
+                                'total_net' => $validated['net_salary'],
                             ]
                         );
 
                         $employee = Employee::find($validated['employee_id']);
 
                         $newDetail = PayrollDetail::create([
-                            'payroll_run_id'           => $payrollRun->id,
-                            'employee_id'              => $validated['employee_id'],
+                            'payroll_run_id' => $payrollRun->id,
+                            'employee_id' => $validated['employee_id'],
                             'employee_number_snapshot' => $employee?->employee_number ?? ('EMP-' . $validated['employee_id']),
-                            'employee_name_snapshot'   => $employee?->name ?? ('Employee #' . $validated['employee_id']),
-                            'gross_salary'             => $validated['gross_salary'],
-                            'total_deduction'          => $validated['total_deduction'],
-                            'net_salary'               => $validated['net_salary'],
-                            'status'                   => 'calculated',
+                            'employee_name_snapshot' => $employee?->name ?? ('Employee #' . $validated['employee_id']),
+                            'gross_salary' => $validated['gross_salary'],
+                            'total_deduction' => $validated['total_deduction'],
+                            'net_salary' => $validated['net_salary'],
+                            'status' => 'calculated',
                         ]);
 
                         $validated['payroll_detail_id'] = $newDetail->id;
@@ -185,8 +185,8 @@ class PayslipController extends MainController
         } catch (Throwable $e) {
             Log::error('Gagal menambahkan payslip.', [
                 'exception' => $e,
-                'data'      => $validated,
-                'user_id'   => auth()->id(),
+                'data' => $validated,
+                'user_id' => request()->user()?->id,
             ]);
 
             return $this->errorResponse(
@@ -271,27 +271,27 @@ class PayslipController extends MainController
             ],
             'total_allowance' => 'nullable|numeric|min:0',
             'total_deduction' => 'nullable|numeric|min:0',
-            'gross_salary'    => 'nullable|numeric|min:0',
-            'net_salary'      => 'nullable|numeric|min:0',
-            'currency'        => 'nullable|string|max:3',
-            'status'          => 'required|in:draft,generated,sent,downloaded,void',
-            'generated_at'    => 'nullable|date',
-            'pdf_path'        => 'nullable|string|max:1000',
-            'html_content'    => 'nullable|string',
-            'is_sent'         => 'nullable|boolean',
-            'sent_at'         => 'nullable|date',
-            'is_downloaded'   => 'nullable|boolean',
-            'downloaded_at'   => 'nullable|date',
+            'gross_salary' => 'nullable|numeric|min:0',
+            'net_salary' => 'nullable|numeric|min:0',
+            'currency' => 'nullable|string|max:3',
+            'status' => 'required|in:draft,generated,sent,downloaded,void',
+            'generated_at' => 'nullable|date',
+            'pdf_path' => 'nullable|string|max:1000',
+            'html_content' => 'nullable|string',
+            'is_sent' => 'nullable|boolean',
+            'sent_at' => 'nullable|date',
+            'is_downloaded' => 'nullable|boolean',
+            'downloaded_at' => 'nullable|date',
         ]);
 
         try {
             $validated['total_allowance'] = $validated['total_allowance'] ?? 0.00;
             $validated['total_deduction'] = $validated['total_deduction'] ?? 0.00;
-            $validated['gross_salary']    = $validated['gross_salary'] ?? 0.00;
-            $validated['net_salary']      = $validated['net_salary'] ?? 0.00;
-            $validated['currency']        = $validated['currency'] ?? 'IDR';
-            $validated['is_sent']         = $request->boolean('is_sent');
-            $validated['is_downloaded']   = $request->boolean('is_downloaded');
+            $validated['gross_salary'] = $validated['gross_salary'] ?? 0.00;
+            $validated['net_salary'] = $validated['net_salary'] ?? 0.00;
+            $validated['currency'] = $validated['currency'] ?? 'IDR';
+            $validated['is_sent'] = $request->boolean('is_sent');
+            $validated['is_downloaded'] = $request->boolean('is_downloaded');
 
             if ($validated['is_sent'] && empty($validated['sent_at'])) {
                 $validated['sent_at'] = now();
@@ -311,10 +311,10 @@ class PayslipController extends MainController
             );
         } catch (Throwable $e) {
             Log::error('Gagal memperbarui payslip.', [
-                'exception'  => $e,
+                'exception' => $e,
                 'payslip_id' => $id,
-                'data'       => $validated,
-                'user_id'    => auth()->id(),
+                'data' => $validated,
+                'user_id' => request()->user()?->id,
             ]);
 
             return $this->errorResponse(
@@ -342,9 +342,9 @@ class PayslipController extends MainController
             );
         } catch (Throwable $e) {
             Log::error('Gagal menghapus payslip.', [
-                'exception'  => $e,
+                'exception' => $e,
                 'payslip_id' => $id,
-                'user_id'    => auth()->id(),
+                'user_id' => request()->user()?->id,
             ]);
 
             return $this->errorResponse(

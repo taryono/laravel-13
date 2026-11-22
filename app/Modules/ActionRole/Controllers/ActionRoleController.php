@@ -16,7 +16,8 @@ use Throwable;
 class ActionRoleController extends MainController
 {
 
-    public function __construct(){
+    public function __construct()
+    {
         parent::__construct(new ActionRole());
     }
 
@@ -50,7 +51,7 @@ class ActionRoleController extends MainController
      * Show the form for creating a new resource.
      */
     public function create(): View
-    {   
+    {
         $actionRole = new ActionRole();
         $forms = $this->getForm($actionRole);
         return view(
@@ -90,7 +91,7 @@ class ActionRoleController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -105,7 +106,8 @@ class ActionRoleController extends MainController
      * Show the form for editing the specified resource.
      */
     public function edit($id): View
-    {   $actionRole = $this->model->findOrFail($id);
+    {
+        $actionRole = $this->model->findOrFail($id);
         $forms = $this->getForm($actionRole);
         return view(
             'ActionRole::edit',
@@ -116,7 +118,8 @@ class ActionRoleController extends MainController
     /**
      * Update the specified resource.
      */
-    public function update(Request $request,$id) {
+    public function update(Request $request, $id)
+    {
         $validated = $request->validate([
             'name' => [
                 'required',
@@ -127,10 +130,7 @@ class ActionRoleController extends MainController
 
         try {
             $actionRole = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $actionRole,
-                $validated
-            ) {
+            DB::transaction(function () use ($actionRole, $validated) {
                 $actionRole->update($validated);
             });
 
@@ -148,7 +148,7 @@ class ActionRoleController extends MainController
                     'exception' => $e,
                     'ActionRole_id' => $actionRole->getKey(),
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -162,9 +162,10 @@ class ActionRoleController extends MainController
     /**
      * Remove the specified resource.
      */
-    public function destroy(Request $request,$id): JsonResponse|RedirectResponse {
+    public function destroy(Request $request, $id): JsonResponse|RedirectResponse
+    {
         try {
-             $actionRole = $this->model->findOrFail($id);
+            $actionRole = $this->model->findOrFail($id);
             DB::transaction(function () use ($actionRole) {
                 $actionRole->delete();
             });
@@ -181,7 +182,7 @@ class ActionRoleController extends MainController
                 [
                     'exception' => $e,
                     'ActionRole_id' => $actionRole->getKey(),
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -191,5 +192,5 @@ class ActionRoleController extends MainController
             );
         }
     }
- 
+
 }

@@ -68,7 +68,7 @@ class CanteenOrderController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'canteen_tenant_id' => ['required', 'integer'],
+            'canteen_tenant_id' => ['required', 'integer'],
             'digital_wallet_id' => ['required', 'integer'],
             'order_number' => ['required', 'string', 'max:255'],
             'total_amount' => ['required', 'string', 'max:255'],
@@ -99,7 +99,7 @@ class CanteenOrderController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -132,7 +132,7 @@ class CanteenOrderController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'canteen_tenant_id' => ['required', 'integer'],
+            'canteen_tenant_id' => ['required', 'integer'],
             'digital_wallet_id' => ['required', 'integer'],
             'order_number' => ['required', 'string', 'max:255'],
             'total_amount' => ['required', 'string', 'max:255'],
@@ -147,10 +147,7 @@ class CanteenOrderController extends MainController
 
         try {
             $canteenOrder = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $canteenOrder,
-                $validated
-            ) {
+            DB::transaction(function () use ($canteenOrder, $validated) {
                 $canteenOrder->update($validated);
             });
 
@@ -160,14 +157,14 @@ class CanteenOrderController extends MainController
                 $canteenOrder
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui CanteenOrder.',
                 [
                     'exception' => $e,
                     'CanteenOrder_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -195,14 +192,14 @@ class CanteenOrderController extends MainController
                 'Data CanteenOrder berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $canteenOrder->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus CanteenOrder.',
                 [
                     'exception' => $e,
                     'CanteenOrder_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -211,5 +208,5 @@ class CanteenOrderController extends MainController
                 'Data CanteenOrder gagal dihapus.'
             );
         }
-    } 
+    }
 }

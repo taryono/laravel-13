@@ -68,7 +68,7 @@ class ApplicantParentController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'applicant_id' => ['required', 'integer'],
+            'applicant_id' => ['required', 'integer'],
             'relation_type' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'nik' => ['required', 'string', 'max:255'],
@@ -105,7 +105,7 @@ class ApplicantParentController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -138,7 +138,7 @@ class ApplicantParentController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'applicant_id' => ['required', 'integer'],
+            'applicant_id' => ['required', 'integer'],
             'relation_type' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'nik' => ['required', 'string', 'max:255'],
@@ -159,10 +159,7 @@ class ApplicantParentController extends MainController
 
         try {
             $applicantParent = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $applicantParent,
-                $validated
-            ) {
+            DB::transaction(function () use ($applicantParent, $validated) {
                 $applicantParent->update($validated);
             });
 
@@ -172,14 +169,14 @@ class ApplicantParentController extends MainController
                 $applicantParent
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui ApplicantParent.',
                 [
                     'exception' => $e,
                     'ApplicantParent_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -207,14 +204,14 @@ class ApplicantParentController extends MainController
                 'Data ApplicantParent berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $applicantParent->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus ApplicantParent.',
                 [
                     'exception' => $e,
                     'ApplicantParent_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -223,5 +220,5 @@ class ApplicantParentController extends MainController
                 'Data ApplicantParent gagal dihapus.'
             );
         }
-    } 
+    }
 }

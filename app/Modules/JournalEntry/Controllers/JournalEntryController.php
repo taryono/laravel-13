@@ -100,7 +100,7 @@ class JournalEntryController extends MainController
             Log::error('Gagal membuat jurnal.', [
                 'exception' => $e,
                 'data' => $validated,
-                'user_id' => auth()->id(),
+                'user_id' => request()->user()?->id,
             ]);
 
             return $this->errorResponse(
@@ -201,7 +201,7 @@ class JournalEntryController extends MainController
                 'exception' => $e,
                 'journal_id' => $id,
                 'data' => $validated,
-                'user_id' => auth()->id(),
+                'user_id' => request()->user()?->id,
             ]);
 
             return $this->errorResponse(
@@ -239,7 +239,7 @@ class JournalEntryController extends MainController
             Log::error('Gagal memposting jurnal.', [
                 'exception' => $e,
                 'journal_id' => $id,
-                'user_id' => auth()->id(),
+                'user_id' => request()->user()?->id,
             ]);
 
             return $this->errorResponse(
@@ -277,7 +277,7 @@ class JournalEntryController extends MainController
             Log::error('Gagal membatalkan jurnal.', [
                 'exception' => $e,
                 'journal_id' => $id,
-                'user_id' => auth()->id(),
+                'user_id' => request()->user()?->id,
             ]);
 
             return $this->errorResponse(
@@ -315,7 +315,7 @@ class JournalEntryController extends MainController
             Log::error('Gagal menghapus jurnal.', [
                 'exception' => $e,
                 'journal_id' => $id,
-                'user_id' => auth()->id(),
+                'user_id' => request()->user()?->id,
             ]);
 
             return $this->errorResponse(

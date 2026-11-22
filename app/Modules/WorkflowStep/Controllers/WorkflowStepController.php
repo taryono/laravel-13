@@ -68,7 +68,7 @@ class WorkflowStepController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'workflow_definition_id' => ['required', 'integer'],
+            'workflow_definition_id' => ['required', 'integer'],
             'step_order' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'approver_type' => ['required', 'string', 'max:255'],
@@ -96,7 +96,7 @@ class WorkflowStepController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -129,7 +129,7 @@ class WorkflowStepController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'workflow_definition_id' => ['required', 'integer'],
+            'workflow_definition_id' => ['required', 'integer'],
             'step_order' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'approver_type' => ['required', 'string', 'max:255'],
@@ -141,10 +141,7 @@ class WorkflowStepController extends MainController
 
         try {
             $workflowStep = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $workflowStep,
-                $validated
-            ) {
+            DB::transaction(function () use ($workflowStep, $validated) {
                 $workflowStep->update($validated);
             });
 
@@ -154,14 +151,14 @@ class WorkflowStepController extends MainController
                 $workflowStep
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui WorkflowStep.',
                 [
                     'exception' => $e,
                     'WorkflowStep_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -189,14 +186,14 @@ class WorkflowStepController extends MainController
                 'Data WorkflowStep berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $workflowStep->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus WorkflowStep.',
                 [
                     'exception' => $e,
                     'WorkflowStep_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -205,5 +202,5 @@ class WorkflowStepController extends MainController
                 'Data WorkflowStep gagal dihapus.'
             );
         }
-    } 
+    }
 }

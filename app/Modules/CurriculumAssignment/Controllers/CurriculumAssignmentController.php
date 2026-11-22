@@ -68,7 +68,7 @@ class CurriculumAssignmentController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'curriculum_id' => ['required', 'integer'],
+            'curriculum_id' => ['required', 'integer'],
             'school_id' => ['required', 'integer'],
             'class_level_id' => ['required', 'integer'],
             'academic_year_id' => ['required', 'integer'],
@@ -95,7 +95,7 @@ class CurriculumAssignmentController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -128,7 +128,7 @@ class CurriculumAssignmentController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'curriculum_id' => ['required', 'integer'],
+            'curriculum_id' => ['required', 'integer'],
             'school_id' => ['required', 'integer'],
             'class_level_id' => ['required', 'integer'],
             'academic_year_id' => ['required', 'integer'],
@@ -139,10 +139,7 @@ class CurriculumAssignmentController extends MainController
 
         try {
             $curriculumAssignment = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $curriculumAssignment,
-                $validated
-            ) {
+            DB::transaction(function () use ($curriculumAssignment, $validated) {
                 $curriculumAssignment->update($validated);
             });
 
@@ -152,14 +149,14 @@ class CurriculumAssignmentController extends MainController
                 $curriculumAssignment
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui CurriculumAssignment.',
                 [
                     'exception' => $e,
                     'CurriculumAssignment_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -187,14 +184,14 @@ class CurriculumAssignmentController extends MainController
                 'Data CurriculumAssignment berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $curriculumAssignment->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus CurriculumAssignment.',
                 [
                     'exception' => $e,
                     'CurriculumAssignment_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -203,5 +200,5 @@ class CurriculumAssignmentController extends MainController
                 'Data CurriculumAssignment gagal dihapus.'
             );
         }
-    } 
+    }
 }

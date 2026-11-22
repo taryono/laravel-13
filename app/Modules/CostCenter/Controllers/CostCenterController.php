@@ -68,7 +68,7 @@ class CostCenterController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'parent_id' => ['required', 'integer'],
@@ -93,7 +93,7 @@ class CostCenterController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -126,7 +126,7 @@ class CostCenterController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'parent_id' => ['required', 'integer'],
@@ -135,10 +135,7 @@ class CostCenterController extends MainController
 
         try {
             $costCenter = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $costCenter,
-                $validated
-            ) {
+            DB::transaction(function () use ($costCenter, $validated) {
                 $costCenter->update($validated);
             });
 
@@ -148,14 +145,14 @@ class CostCenterController extends MainController
                 $costCenter
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui CostCenter.',
                 [
                     'exception' => $e,
                     'CostCenter_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -183,14 +180,14 @@ class CostCenterController extends MainController
                 'Data CostCenter berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $costCenter->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus CostCenter.',
                 [
                     'exception' => $e,
                     'CostCenter_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -199,5 +196,5 @@ class CostCenterController extends MainController
                 'Data CostCenter gagal dihapus.'
             );
         }
-    } 
+    }
 }

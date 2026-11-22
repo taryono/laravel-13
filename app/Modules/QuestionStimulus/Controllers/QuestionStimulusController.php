@@ -68,7 +68,7 @@ class QuestionStimulusController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'subject_id' => ['required', 'integer'],
             'title' => ['required', 'string', 'max:255'],
             'content' => ['required', 'string', 'max:255'],
@@ -96,7 +96,7 @@ class QuestionStimulusController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -129,7 +129,7 @@ class QuestionStimulusController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'subject_id' => ['required', 'integer'],
             'title' => ['required', 'string', 'max:255'],
             'content' => ['required', 'string', 'max:255'],
@@ -141,10 +141,7 @@ class QuestionStimulusController extends MainController
 
         try {
             $questionStimulus = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $questionStimulus,
-                $validated
-            ) {
+            DB::transaction(function () use ($questionStimulus, $validated) {
                 $questionStimulus->update($validated);
             });
 
@@ -154,14 +151,14 @@ class QuestionStimulusController extends MainController
                 $questionStimulus
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui QuestionStimulus.',
                 [
                     'exception' => $e,
                     'QuestionStimulus_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -189,14 +186,14 @@ class QuestionStimulusController extends MainController
                 'Data QuestionStimulus berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $questionStimulus->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus QuestionStimulus.',
                 [
                     'exception' => $e,
                     'QuestionStimulus_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -205,5 +202,5 @@ class QuestionStimulusController extends MainController
                 'Data QuestionStimulus gagal dihapus.'
             );
         }
-    } 
+    }
 }

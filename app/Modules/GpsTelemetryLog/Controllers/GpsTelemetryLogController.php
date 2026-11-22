@@ -68,7 +68,7 @@ class GpsTelemetryLogController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'vehicle_id' => ['required', 'integer'],
+            'vehicle_id' => ['required', 'integer'],
             'latitude' => ['required', 'string', 'max:255'],
             'longitude' => ['required', 'string', 'max:255'],
             'speed_kmh' => ['required', 'string', 'max:255'],
@@ -96,7 +96,7 @@ class GpsTelemetryLogController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -129,7 +129,7 @@ class GpsTelemetryLogController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'vehicle_id' => ['required', 'integer'],
+            'vehicle_id' => ['required', 'integer'],
             'latitude' => ['required', 'string', 'max:255'],
             'longitude' => ['required', 'string', 'max:255'],
             'speed_kmh' => ['required', 'string', 'max:255'],
@@ -141,10 +141,7 @@ class GpsTelemetryLogController extends MainController
 
         try {
             $gpsTelemetryLog = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $gpsTelemetryLog,
-                $validated
-            ) {
+            DB::transaction(function () use ($gpsTelemetryLog, $validated) {
                 $gpsTelemetryLog->update($validated);
             });
 
@@ -154,14 +151,14 @@ class GpsTelemetryLogController extends MainController
                 $gpsTelemetryLog
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui GpsTelemetryLog.',
                 [
                     'exception' => $e,
                     'GpsTelemetryLog_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -189,14 +186,14 @@ class GpsTelemetryLogController extends MainController
                 'Data GpsTelemetryLog berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $gpsTelemetryLog->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus GpsTelemetryLog.',
                 [
                     'exception' => $e,
                     'GpsTelemetryLog_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -205,5 +202,5 @@ class GpsTelemetryLogController extends MainController
                 'Data GpsTelemetryLog gagal dihapus.'
             );
         }
-    } 
+    }
 }

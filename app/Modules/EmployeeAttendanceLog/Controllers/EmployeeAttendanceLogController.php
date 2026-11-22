@@ -68,7 +68,7 @@ class EmployeeAttendanceLogController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'employee_attendance_id' => ['required', 'integer'],
+            'employee_attendance_id' => ['required', 'integer'],
             'employee_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
             'device_id' => ['required', 'integer'],
@@ -107,7 +107,7 @@ class EmployeeAttendanceLogController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -140,7 +140,7 @@ class EmployeeAttendanceLogController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'employee_attendance_id' => ['required', 'integer'],
+            'employee_attendance_id' => ['required', 'integer'],
             'employee_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
             'device_id' => ['required', 'integer'],
@@ -163,10 +163,7 @@ class EmployeeAttendanceLogController extends MainController
 
         try {
             $employeeAttendanceLog = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $employeeAttendanceLog,
-                $validated
-            ) {
+            DB::transaction(function () use ($employeeAttendanceLog, $validated) {
                 $employeeAttendanceLog->update($validated);
             });
 
@@ -176,14 +173,14 @@ class EmployeeAttendanceLogController extends MainController
                 $employeeAttendanceLog
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui EmployeeAttendanceLog.',
                 [
                     'exception' => $e,
                     'EmployeeAttendanceLog_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -211,14 +208,14 @@ class EmployeeAttendanceLogController extends MainController
                 'Data EmployeeAttendanceLog berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $employeeAttendanceLog->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus EmployeeAttendanceLog.',
                 [
                     'exception' => $e,
                     'EmployeeAttendanceLog_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -227,5 +224,5 @@ class EmployeeAttendanceLogController extends MainController
                 'Data EmployeeAttendanceLog gagal dihapus.'
             );
         }
-    } 
+    }
 }

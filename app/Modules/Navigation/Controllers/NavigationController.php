@@ -68,7 +68,7 @@ class NavigationController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'title' => ['required', 'string', 'max:255'],
             'subtitle' => ['required', 'string', 'max:255'],
             'intro' => ['required', 'string', 'max:255'],
@@ -96,7 +96,7 @@ class NavigationController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -129,7 +129,7 @@ class NavigationController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'title' => ['required', 'string', 'max:255'],
             'subtitle' => ['required', 'string', 'max:255'],
             'intro' => ['required', 'string', 'max:255'],
@@ -141,10 +141,7 @@ class NavigationController extends MainController
 
         try {
             $navigation = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $navigation,
-                $validated
-            ) {
+            DB::transaction(function () use ($navigation, $validated) {
                 $navigation->update($validated);
             });
 
@@ -154,14 +151,14 @@ class NavigationController extends MainController
                 $navigation
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui Navigation.',
                 [
                     'exception' => $e,
                     'Navigation_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -189,14 +186,14 @@ class NavigationController extends MainController
                 'Data Navigation berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $navigation->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus Navigation.',
                 [
                     'exception' => $e,
                     'Navigation_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -205,5 +202,5 @@ class NavigationController extends MainController
                 'Data Navigation gagal dihapus.'
             );
         }
-    } 
+    }
 }

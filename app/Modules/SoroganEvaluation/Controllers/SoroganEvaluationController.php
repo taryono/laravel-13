@@ -68,7 +68,7 @@ class SoroganEvaluationController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'sorogan_session_id' => ['required', 'integer'],
+            'sorogan_session_id' => ['required', 'integer'],
             'sorogan_schedule_id' => ['required', 'integer'],
             'student_id' => ['required', 'integer'],
             'teacher_id' => ['required', 'integer'],
@@ -117,7 +117,7 @@ class SoroganEvaluationController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -150,7 +150,7 @@ class SoroganEvaluationController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'sorogan_session_id' => ['required', 'integer'],
+            'sorogan_session_id' => ['required', 'integer'],
             'sorogan_schedule_id' => ['required', 'integer'],
             'student_id' => ['required', 'integer'],
             'teacher_id' => ['required', 'integer'],
@@ -183,10 +183,7 @@ class SoroganEvaluationController extends MainController
 
         try {
             $soroganEvaluation = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $soroganEvaluation,
-                $validated
-            ) {
+            DB::transaction(function () use ($soroganEvaluation, $validated) {
                 $soroganEvaluation->update($validated);
             });
 
@@ -196,14 +193,14 @@ class SoroganEvaluationController extends MainController
                 $soroganEvaluation
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui SoroganEvaluation.',
                 [
                     'exception' => $e,
                     'SoroganEvaluation_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -231,14 +228,14 @@ class SoroganEvaluationController extends MainController
                 'Data SoroganEvaluation berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $soroganEvaluation->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus SoroganEvaluation.',
                 [
                     'exception' => $e,
                     'SoroganEvaluation_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -247,5 +244,5 @@ class SoroganEvaluationController extends MainController
                 'Data SoroganEvaluation gagal dihapus.'
             );
         }
-    } 
+    }
 }

@@ -68,7 +68,7 @@ class AdmissionTestScheduleController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
             'test_date' => ['required', 'string', 'max:255'],
             'start_time' => ['required', 'string', 'max:255'],
             'end_time' => ['required', 'string', 'max:255'],
@@ -103,7 +103,7 @@ class AdmissionTestScheduleController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -136,7 +136,7 @@ class AdmissionTestScheduleController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
             'test_date' => ['required', 'string', 'max:255'],
             'start_time' => ['required', 'string', 'max:255'],
             'end_time' => ['required', 'string', 'max:255'],
@@ -155,10 +155,7 @@ class AdmissionTestScheduleController extends MainController
 
         try {
             $admissionTestSchedule = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $admissionTestSchedule,
-                $validated
-            ) {
+            DB::transaction(function () use ($admissionTestSchedule, $validated) {
                 $admissionTestSchedule->update($validated);
             });
 
@@ -168,14 +165,14 @@ class AdmissionTestScheduleController extends MainController
                 $admissionTestSchedule
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui AdmissionTestSchedule.',
                 [
                     'exception' => $e,
                     'AdmissionTestSchedule_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -203,14 +200,14 @@ class AdmissionTestScheduleController extends MainController
                 'Data AdmissionTestSchedule berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $admissionTestSchedule->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus AdmissionTestSchedule.',
                 [
                     'exception' => $e,
                     'AdmissionTestSchedule_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -219,5 +216,5 @@ class AdmissionTestScheduleController extends MainController
                 'Data AdmissionTestSchedule gagal dihapus.'
             );
         }
-    } 
+    }
 }

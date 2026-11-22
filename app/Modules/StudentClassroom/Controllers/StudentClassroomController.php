@@ -98,7 +98,7 @@ class StudentClassroomController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -165,7 +165,7 @@ class StudentClassroomController extends MainController
                     'exception' => $e,
                     'StudentClassroom_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -200,7 +200,7 @@ class StudentClassroomController extends MainController
                 [
                     'exception' => $e,
                     'StudentClassroom_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 

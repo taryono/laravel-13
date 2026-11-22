@@ -68,7 +68,7 @@ class StudentCurriculumController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'student_id' => ['required', 'integer'],
+            'student_id' => ['required', 'integer'],
             'curriculum_id' => ['required', 'integer'],
         ]);
 
@@ -90,7 +90,7 @@ class StudentCurriculumController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -123,16 +123,13 @@ class StudentCurriculumController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'student_id' => ['required', 'integer'],
+            'student_id' => ['required', 'integer'],
             'curriculum_id' => ['required', 'integer'],
         ]);
 
         try {
             $studentCurriculum = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $studentCurriculum,
-                $validated
-            ) {
+            DB::transaction(function () use ($studentCurriculum, $validated) {
                 $studentCurriculum->update($validated);
             });
 
@@ -142,14 +139,14 @@ class StudentCurriculumController extends MainController
                 $studentCurriculum
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui StudentCurriculum.',
                 [
                     'exception' => $e,
                     'StudentCurriculum_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -177,14 +174,14 @@ class StudentCurriculumController extends MainController
                 'Data StudentCurriculum berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $studentCurriculum->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus StudentCurriculum.',
                 [
                     'exception' => $e,
                     'StudentCurriculum_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -193,5 +190,5 @@ class StudentCurriculumController extends MainController
                 'Data StudentCurriculum gagal dihapus.'
             );
         }
-    } 
+    }
 }

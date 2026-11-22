@@ -68,7 +68,7 @@ class LessonProgressController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'student_id' => ['required', 'integer'],
+            'student_id' => ['required', 'integer'],
             'lesson_id' => ['required', 'integer'],
             'is_completed' => ['required', 'string', 'max:255'],
             'progress_percent' => ['required', 'string', 'max:255'],
@@ -98,7 +98,7 @@ class LessonProgressController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -131,7 +131,7 @@ class LessonProgressController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'student_id' => ['required', 'integer'],
+            'student_id' => ['required', 'integer'],
             'lesson_id' => ['required', 'integer'],
             'is_completed' => ['required', 'string', 'max:255'],
             'progress_percent' => ['required', 'string', 'max:255'],
@@ -145,10 +145,7 @@ class LessonProgressController extends MainController
 
         try {
             $lessonProgress = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $lessonProgress,
-                $validated
-            ) {
+            DB::transaction(function () use ($lessonProgress, $validated) {
                 $lessonProgress->update($validated);
             });
 
@@ -158,14 +155,14 @@ class LessonProgressController extends MainController
                 $lessonProgress
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui LessonProgress.',
                 [
                     'exception' => $e,
                     'LessonProgress_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -193,14 +190,14 @@ class LessonProgressController extends MainController
                 'Data LessonProgress berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $lessonProgress->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus LessonProgress.',
                 [
                     'exception' => $e,
                     'LessonProgress_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -209,5 +206,5 @@ class LessonProgressController extends MainController
                 'Data LessonProgress gagal dihapus.'
             );
         }
-    } 
+    }
 }

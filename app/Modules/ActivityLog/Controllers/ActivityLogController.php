@@ -68,7 +68,7 @@ class ActivityLogController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'user_id' => ['required', 'integer'],
+            'user_id' => ['required', 'integer'],
             'user_role' => ['required', 'string', 'max:255'],
             'action' => ['required', 'string', 'max:255'],
             'module' => ['required', 'string', 'max:255'],
@@ -103,7 +103,7 @@ class ActivityLogController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -136,7 +136,7 @@ class ActivityLogController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'user_id' => ['required', 'integer'],
+            'user_id' => ['required', 'integer'],
             'user_role' => ['required', 'string', 'max:255'],
             'action' => ['required', 'string', 'max:255'],
             'module' => ['required', 'string', 'max:255'],
@@ -155,10 +155,7 @@ class ActivityLogController extends MainController
 
         try {
             $activityLog = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $activityLog,
-                $validated
-            ) {
+            DB::transaction(function () use ($activityLog, $validated) {
                 $activityLog->update($validated);
             });
 
@@ -168,14 +165,14 @@ class ActivityLogController extends MainController
                 $activityLog
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui ActivityLog.',
                 [
                     'exception' => $e,
                     'ActivityLog_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -203,14 +200,14 @@ class ActivityLogController extends MainController
                 'Data ActivityLog berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $activityLog->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus ActivityLog.',
                 [
                     'exception' => $e,
                     'ActivityLog_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -219,5 +216,5 @@ class ActivityLogController extends MainController
                 'Data ActivityLog gagal dihapus.'
             );
         }
-    } 
+    }
 }

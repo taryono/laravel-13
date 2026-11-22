@@ -68,7 +68,7 @@ class QuestionBankVersionController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'question_bank_id' => ['required', 'integer'],
+            'question_bank_id' => ['required', 'integer'],
             'version_number' => ['required', 'string', 'max:255'],
             'snapshot_data' => ['required', 'string', 'max:255'],
             'change_note' => ['required', 'string', 'max:255'],
@@ -93,7 +93,7 @@ class QuestionBankVersionController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -126,7 +126,7 @@ class QuestionBankVersionController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'question_bank_id' => ['required', 'integer'],
+            'question_bank_id' => ['required', 'integer'],
             'version_number' => ['required', 'string', 'max:255'],
             'snapshot_data' => ['required', 'string', 'max:255'],
             'change_note' => ['required', 'string', 'max:255'],
@@ -135,10 +135,7 @@ class QuestionBankVersionController extends MainController
 
         try {
             $questionBankVersion = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $questionBankVersion,
-                $validated
-            ) {
+            DB::transaction(function () use ($questionBankVersion, $validated) {
                 $questionBankVersion->update($validated);
             });
 
@@ -148,14 +145,14 @@ class QuestionBankVersionController extends MainController
                 $questionBankVersion
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui QuestionBankVersion.',
                 [
                     'exception' => $e,
                     'QuestionBankVersion_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -183,14 +180,14 @@ class QuestionBankVersionController extends MainController
                 'Data QuestionBankVersion berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $questionBankVersion->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus QuestionBankVersion.',
                 [
                     'exception' => $e,
                     'QuestionBankVersion_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -199,5 +196,5 @@ class QuestionBankVersionController extends MainController
                 'Data QuestionBankVersion gagal dihapus.'
             );
         }
-    } 
+    }
 }

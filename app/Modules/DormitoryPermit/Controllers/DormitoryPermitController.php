@@ -68,7 +68,7 @@ class DormitoryPermitController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'student_id' => ['required', 'integer'],
+            'student_id' => ['required', 'integer'],
             'dormitory_assignment_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
             'dormitory_id' => ['required', 'integer'],
@@ -121,7 +121,7 @@ class DormitoryPermitController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -154,7 +154,7 @@ class DormitoryPermitController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'student_id' => ['required', 'integer'],
+            'student_id' => ['required', 'integer'],
             'dormitory_assignment_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
             'dormitory_id' => ['required', 'integer'],
@@ -191,10 +191,7 @@ class DormitoryPermitController extends MainController
 
         try {
             $dormitoryPermit = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $dormitoryPermit,
-                $validated
-            ) {
+            DB::transaction(function () use ($dormitoryPermit, $validated) {
                 $dormitoryPermit->update($validated);
             });
 
@@ -204,14 +201,14 @@ class DormitoryPermitController extends MainController
                 $dormitoryPermit
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui DormitoryPermit.',
                 [
                     'exception' => $e,
                     'DormitoryPermit_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -239,14 +236,14 @@ class DormitoryPermitController extends MainController
                 'Data DormitoryPermit berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $dormitoryPermit->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus DormitoryPermit.',
                 [
                     'exception' => $e,
                     'DormitoryPermit_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -255,5 +252,5 @@ class DormitoryPermitController extends MainController
                 'Data DormitoryPermit gagal dihapus.'
             );
         }
-    } 
+    }
 }

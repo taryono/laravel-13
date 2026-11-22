@@ -68,7 +68,7 @@ class MessageParticipantController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'message_thread_id' => ['required', 'integer'],
+            'message_thread_id' => ['required', 'integer'],
             'user_id' => ['required', 'integer'],
             'role' => ['required', 'string', 'max:255'],
             'nickname' => ['required', 'string', 'max:255'],
@@ -102,7 +102,7 @@ class MessageParticipantController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -135,7 +135,7 @@ class MessageParticipantController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'message_thread_id' => ['required', 'integer'],
+            'message_thread_id' => ['required', 'integer'],
             'user_id' => ['required', 'integer'],
             'role' => ['required', 'string', 'max:255'],
             'nickname' => ['required', 'string', 'max:255'],
@@ -153,10 +153,7 @@ class MessageParticipantController extends MainController
 
         try {
             $messageParticipant = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $messageParticipant,
-                $validated
-            ) {
+            DB::transaction(function () use ($messageParticipant, $validated) {
                 $messageParticipant->update($validated);
             });
 
@@ -166,14 +163,14 @@ class MessageParticipantController extends MainController
                 $messageParticipant
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui MessageParticipant.',
                 [
                     'exception' => $e,
                     'MessageParticipant_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -201,14 +198,14 @@ class MessageParticipantController extends MainController
                 'Data MessageParticipant berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $messageParticipant->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus MessageParticipant.',
                 [
                     'exception' => $e,
                     'MessageParticipant_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -217,5 +214,5 @@ class MessageParticipantController extends MainController
                 'Data MessageParticipant gagal dihapus.'
             );
         }
-    } 
+    }
 }

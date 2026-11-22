@@ -68,7 +68,7 @@ class BosComponentController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'authority' => ['required', 'string', 'max:255'],
+            'authority' => ['required', 'string', 'max:255'],
             'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'component_type' => ['required', 'string', 'max:255'],
@@ -104,7 +104,7 @@ class BosComponentController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -137,7 +137,7 @@ class BosComponentController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'authority' => ['required', 'string', 'max:255'],
+            'authority' => ['required', 'string', 'max:255'],
             'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'component_type' => ['required', 'string', 'max:255'],
@@ -157,10 +157,7 @@ class BosComponentController extends MainController
 
         try {
             $bosComponent = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $bosComponent,
-                $validated
-            ) {
+            DB::transaction(function () use ($bosComponent, $validated) {
                 $bosComponent->update($validated);
             });
 
@@ -170,14 +167,14 @@ class BosComponentController extends MainController
                 $bosComponent
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui BosComponent.',
                 [
                     'exception' => $e,
                     'BosComponent_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -205,14 +202,14 @@ class BosComponentController extends MainController
                 'Data BosComponent berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $bosComponent->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus BosComponent.',
                 [
                     'exception' => $e,
                     'BosComponent_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -221,5 +218,5 @@ class BosComponentController extends MainController
                 'Data BosComponent gagal dihapus.'
             );
         }
-    } 
+    }
 }

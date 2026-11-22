@@ -68,7 +68,7 @@ class RkasApprovalController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'rkas_document_id' => ['required', 'integer'],
+            'rkas_document_id' => ['required', 'integer'],
             'approval_level' => ['required', 'string', 'max:255'],
             'approval_role' => ['required', 'string', 'max:255'],
             'approver_id' => ['required', 'integer'],
@@ -100,7 +100,7 @@ class RkasApprovalController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -133,7 +133,7 @@ class RkasApprovalController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'rkas_document_id' => ['required', 'integer'],
+            'rkas_document_id' => ['required', 'integer'],
             'approval_level' => ['required', 'string', 'max:255'],
             'approval_role' => ['required', 'string', 'max:255'],
             'approver_id' => ['required', 'integer'],
@@ -149,10 +149,7 @@ class RkasApprovalController extends MainController
 
         try {
             $rkasApproval = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $rkasApproval,
-                $validated
-            ) {
+            DB::transaction(function () use ($rkasApproval, $validated) {
                 $rkasApproval->update($validated);
             });
 
@@ -162,14 +159,14 @@ class RkasApprovalController extends MainController
                 $rkasApproval
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui RkasApproval.',
                 [
                     'exception' => $e,
                     'RkasApproval_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -197,14 +194,14 @@ class RkasApprovalController extends MainController
                 'Data RkasApproval berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $rkasApproval->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus RkasApproval.',
                 [
                     'exception' => $e,
                     'RkasApproval_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -213,5 +210,5 @@ class RkasApprovalController extends MainController
                 'Data RkasApproval gagal dihapus.'
             );
         }
-    } 
+    }
 }

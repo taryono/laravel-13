@@ -68,7 +68,7 @@ class NotificationPreferenceController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'user_id' => ['required', 'integer'],
+            'user_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
             'category' => ['required', 'string', 'max:255'],
             'email_enabled' => ['required', 'string', 'max:255'],
@@ -100,7 +100,7 @@ class NotificationPreferenceController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -133,7 +133,7 @@ class NotificationPreferenceController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'user_id' => ['required', 'integer'],
+            'user_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
             'category' => ['required', 'string', 'max:255'],
             'email_enabled' => ['required', 'string', 'max:255'],
@@ -149,10 +149,7 @@ class NotificationPreferenceController extends MainController
 
         try {
             $notificationPreference = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $notificationPreference,
-                $validated
-            ) {
+            DB::transaction(function () use ($notificationPreference, $validated) {
                 $notificationPreference->update($validated);
             });
 
@@ -162,14 +159,14 @@ class NotificationPreferenceController extends MainController
                 $notificationPreference
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui NotificationPreference.',
                 [
                     'exception' => $e,
                     'NotificationPreference_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -197,14 +194,14 @@ class NotificationPreferenceController extends MainController
                 'Data NotificationPreference berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $notificationPreference->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus NotificationPreference.',
                 [
                     'exception' => $e,
                     'NotificationPreference_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -213,5 +210,5 @@ class NotificationPreferenceController extends MainController
                 'Data NotificationPreference gagal dihapus.'
             );
         }
-    } 
+    }
 }

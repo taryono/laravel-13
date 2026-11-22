@@ -68,7 +68,7 @@ class BosPeriodController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'academic_year_id' => ['required', 'integer'],
             'fiscal_period_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
@@ -107,7 +107,7 @@ class BosPeriodController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -140,7 +140,7 @@ class BosPeriodController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'academic_year_id' => ['required', 'integer'],
             'fiscal_period_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
@@ -163,10 +163,7 @@ class BosPeriodController extends MainController
 
         try {
             $bosPeriod = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $bosPeriod,
-                $validated
-            ) {
+            DB::transaction(function () use ($bosPeriod, $validated) {
                 $bosPeriod->update($validated);
             });
 
@@ -176,14 +173,14 @@ class BosPeriodController extends MainController
                 $bosPeriod
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui BosPeriod.',
                 [
                     'exception' => $e,
                     'BosPeriod_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -211,14 +208,14 @@ class BosPeriodController extends MainController
                 'Data BosPeriod berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $bosPeriod->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus BosPeriod.',
                 [
                     'exception' => $e,
                     'BosPeriod_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -227,5 +224,5 @@ class BosPeriodController extends MainController
                 'Data BosPeriod gagal dihapus.'
             );
         }
-    } 
+    }
 }

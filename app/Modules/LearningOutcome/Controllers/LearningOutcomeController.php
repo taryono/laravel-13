@@ -68,7 +68,7 @@ class LearningOutcomeController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'curriculum_phase_id' => ['required', 'integer'],
             'subject_id' => ['required', 'integer'],
             'element' => ['required', 'string', 'max:255'],
@@ -99,7 +99,7 @@ class LearningOutcomeController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -132,7 +132,7 @@ class LearningOutcomeController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'curriculum_phase_id' => ['required', 'integer'],
             'subject_id' => ['required', 'integer'],
             'element' => ['required', 'string', 'max:255'],
@@ -147,10 +147,7 @@ class LearningOutcomeController extends MainController
 
         try {
             $learningOutcome = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $learningOutcome,
-                $validated
-            ) {
+            DB::transaction(function () use ($learningOutcome, $validated) {
                 $learningOutcome->update($validated);
             });
 
@@ -160,14 +157,14 @@ class LearningOutcomeController extends MainController
                 $learningOutcome
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui LearningOutcome.',
                 [
                     'exception' => $e,
                     'LearningOutcome_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -195,14 +192,14 @@ class LearningOutcomeController extends MainController
                 'Data LearningOutcome berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $learningOutcome->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus LearningOutcome.',
                 [
                     'exception' => $e,
                     'LearningOutcome_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -211,5 +208,5 @@ class LearningOutcomeController extends MainController
                 'Data LearningOutcome gagal dihapus.'
             );
         }
-    } 
+    }
 }

@@ -68,7 +68,7 @@ class StudyProgramController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'school_id' => ['required', 'integer'],
             'faculty_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
@@ -98,7 +98,7 @@ class StudyProgramController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -131,7 +131,7 @@ class StudyProgramController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'school_id' => ['required', 'integer'],
             'faculty_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
@@ -145,10 +145,7 @@ class StudyProgramController extends MainController
 
         try {
             $studyProgram = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $studyProgram,
-                $validated
-            ) {
+            DB::transaction(function () use ($studyProgram, $validated) {
                 $studyProgram->update($validated);
             });
 
@@ -158,14 +155,14 @@ class StudyProgramController extends MainController
                 $studyProgram
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui StudyProgram.',
                 [
                     'exception' => $e,
                     'StudyProgram_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -193,14 +190,14 @@ class StudyProgramController extends MainController
                 'Data StudyProgram berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $studyProgram->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus StudyProgram.',
                 [
                     'exception' => $e,
                     'StudyProgram_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -209,5 +206,5 @@ class StudyProgramController extends MainController
                 'Data StudyProgram gagal dihapus.'
             );
         }
-    } 
+    }
 }

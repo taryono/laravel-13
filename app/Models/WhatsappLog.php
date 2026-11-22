@@ -14,24 +14,14 @@ class WhatsappLog extends BasedModel
         return $this->belongsTo(NotificationTemplate::class, 'notification_template_id');
     }
 
-    public function recipientUser()
+    public function recipient()
     {
-        return $this->belongsTo(RecipientUser::class, 'recipient_user_id');
+        return $this->morphTo(); // recipient_type + recipient_id
     }
 
-    public function recipientStudent()
+    public function events()
     {
-        return $this->belongsTo(RecipientStudent::class, 'recipient_student_id');
-    }
-
-    public function recipientEmployee()
-    {
-        return $this->belongsTo(RecipientEmployee::class, 'recipient_employee_id');
-    }
-
-    public function providerMessage()
-    {
-        return $this->belongsTo(ProviderMessage::class, 'provider_message_id');
+        return $this->hasMany(ProviderMessageEvent::class);
     }
 
     public function currency()
@@ -41,7 +31,7 @@ class WhatsappLog extends BasedModel
 
     public function reference()
     {
-        return $this->belongsTo(Reference::class, 'reference_id');
+        return $this->belongsTo(ReferenceValue::class, 'reference_id');
     }
 
 

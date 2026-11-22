@@ -68,7 +68,7 @@ class WorkflowApproverController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'workflow_step_id' => ['required', 'integer'],
+            'workflow_step_id' => ['required', 'integer'],
             'role_id' => ['required', 'integer'],
             'user_id' => ['required', 'integer'],
             'is_mandatory' => ['required', 'string', 'max:255'],
@@ -92,7 +92,7 @@ class WorkflowApproverController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -125,7 +125,7 @@ class WorkflowApproverController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'workflow_step_id' => ['required', 'integer'],
+            'workflow_step_id' => ['required', 'integer'],
             'role_id' => ['required', 'integer'],
             'user_id' => ['required', 'integer'],
             'is_mandatory' => ['required', 'string', 'max:255'],
@@ -133,10 +133,7 @@ class WorkflowApproverController extends MainController
 
         try {
             $workflowApprover = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $workflowApprover,
-                $validated
-            ) {
+            DB::transaction(function () use ($workflowApprover, $validated) {
                 $workflowApprover->update($validated);
             });
 
@@ -146,14 +143,14 @@ class WorkflowApproverController extends MainController
                 $workflowApprover
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui WorkflowApprover.',
                 [
                     'exception' => $e,
                     'WorkflowApprover_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -181,14 +178,14 @@ class WorkflowApproverController extends MainController
                 'Data WorkflowApprover berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $workflowApprover->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus WorkflowApprover.',
                 [
                     'exception' => $e,
                     'WorkflowApprover_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -197,5 +194,5 @@ class WorkflowApproverController extends MainController
                 'Data WorkflowApprover gagal dihapus.'
             );
         }
-    } 
+    }
 }

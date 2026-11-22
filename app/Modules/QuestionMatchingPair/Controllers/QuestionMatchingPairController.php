@@ -68,7 +68,7 @@ class QuestionMatchingPairController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'question_bank_id' => ['required', 'integer'],
+            'question_bank_id' => ['required', 'integer'],
             'left_item' => ['required', 'string', 'max:255'],
             'right_item' => ['required', 'string', 'max:255'],
             'content_format' => ['required', 'string', 'max:255'],
@@ -94,7 +94,7 @@ class QuestionMatchingPairController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -127,7 +127,7 @@ class QuestionMatchingPairController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'question_bank_id' => ['required', 'integer'],
+            'question_bank_id' => ['required', 'integer'],
             'left_item' => ['required', 'string', 'max:255'],
             'right_item' => ['required', 'string', 'max:255'],
             'content_format' => ['required', 'string', 'max:255'],
@@ -137,10 +137,7 @@ class QuestionMatchingPairController extends MainController
 
         try {
             $questionMatchingPair = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $questionMatchingPair,
-                $validated
-            ) {
+            DB::transaction(function () use ($questionMatchingPair, $validated) {
                 $questionMatchingPair->update($validated);
             });
 
@@ -150,14 +147,14 @@ class QuestionMatchingPairController extends MainController
                 $questionMatchingPair
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui QuestionMatchingPair.',
                 [
                     'exception' => $e,
                     'QuestionMatchingPair_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -185,14 +182,14 @@ class QuestionMatchingPairController extends MainController
                 'Data QuestionMatchingPair berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $questionMatchingPair->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus QuestionMatchingPair.',
                 [
                     'exception' => $e,
                     'QuestionMatchingPair_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -201,5 +198,5 @@ class QuestionMatchingPairController extends MainController
                 'Data QuestionMatchingPair gagal dihapus.'
             );
         }
-    } 
+    }
 }

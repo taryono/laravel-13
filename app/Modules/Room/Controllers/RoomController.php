@@ -94,7 +94,7 @@ class RoomController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -138,10 +138,7 @@ class RoomController extends MainController
         try {
             $room = $this->model->findOrFail($id);
 
-            DB::transaction(function () use (
-                $room,
-                $validated
-            ) {
+            DB::transaction(function () use ($room, $validated) {
                 $room->update($validated);
             });
 
@@ -164,7 +161,7 @@ class RoomController extends MainController
                     'exception' => $e,
                     'Room_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -201,7 +198,7 @@ class RoomController extends MainController
                 [
                     'exception' => $e,
                     'Room_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -210,5 +207,5 @@ class RoomController extends MainController
                 'Data Room gagal dihapus.'
             );
         }
-    } 
+    }
 }

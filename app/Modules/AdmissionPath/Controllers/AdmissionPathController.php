@@ -68,7 +68,7 @@ class AdmissionPathController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'admission_id' => ['required', 'integer'],
+            'admission_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
@@ -101,7 +101,7 @@ class AdmissionPathController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -134,7 +134,7 @@ class AdmissionPathController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'admission_id' => ['required', 'integer'],
+            'admission_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
@@ -151,10 +151,7 @@ class AdmissionPathController extends MainController
 
         try {
             $admissionPath = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $admissionPath,
-                $validated
-            ) {
+            DB::transaction(function () use ($admissionPath, $validated) {
                 $admissionPath->update($validated);
             });
 
@@ -164,14 +161,14 @@ class AdmissionPathController extends MainController
                 $admissionPath
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui AdmissionPath.',
                 [
                     'exception' => $e,
                     'AdmissionPath_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -199,14 +196,14 @@ class AdmissionPathController extends MainController
                 'Data AdmissionPath berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $admissionPath->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus AdmissionPath.',
                 [
                     'exception' => $e,
                     'AdmissionPath_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -215,5 +212,5 @@ class AdmissionPathController extends MainController
                 'Data AdmissionPath gagal dihapus.'
             );
         }
-    } 
+    }
 }

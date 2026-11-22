@@ -68,7 +68,7 @@ class VehicleController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'school_id' => ['required', 'integer'],
             'plate_number' => ['required', 'string', 'max:255'],
             'vehicle_type' => ['required', 'string', 'max:255'],
@@ -100,7 +100,7 @@ class VehicleController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -133,7 +133,7 @@ class VehicleController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'school_id' => ['required', 'integer'],
             'plate_number' => ['required', 'string', 'max:255'],
             'vehicle_type' => ['required', 'string', 'max:255'],
@@ -149,10 +149,7 @@ class VehicleController extends MainController
 
         try {
             $vehicle = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $vehicle,
-                $validated
-            ) {
+            DB::transaction(function () use ($vehicle, $validated) {
                 $vehicle->update($validated);
             });
 
@@ -162,14 +159,14 @@ class VehicleController extends MainController
                 $vehicle
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui Vehicle.',
                 [
                     'exception' => $e,
                     'Vehicle_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -197,14 +194,14 @@ class VehicleController extends MainController
                 'Data Vehicle berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $vehicle->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus Vehicle.',
                 [
                     'exception' => $e,
                     'Vehicle_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -213,5 +210,5 @@ class VehicleController extends MainController
                 'Data Vehicle gagal dihapus.'
             );
         }
-    } 
+    }
 }

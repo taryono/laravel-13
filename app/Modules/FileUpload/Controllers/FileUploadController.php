@@ -68,7 +68,7 @@ class FileUploadController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'uploaded_by' => ['required', 'string', 'max:255'],
             'uploadable_type' => ['required', 'string', 'max:255'],
             'uploadable_id' => ['required', 'integer'],
@@ -107,7 +107,7 @@ class FileUploadController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -140,7 +140,7 @@ class FileUploadController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'uploaded_by' => ['required', 'string', 'max:255'],
             'uploadable_type' => ['required', 'string', 'max:255'],
             'uploadable_id' => ['required', 'integer'],
@@ -163,10 +163,7 @@ class FileUploadController extends MainController
 
         try {
             $fileUpload = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $fileUpload,
-                $validated
-            ) {
+            DB::transaction(function () use ($fileUpload, $validated) {
                 $fileUpload->update($validated);
             });
 
@@ -176,14 +173,14 @@ class FileUploadController extends MainController
                 $fileUpload
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui FileUpload.',
                 [
                     'exception' => $e,
                     'FileUpload_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -211,14 +208,14 @@ class FileUploadController extends MainController
                 'Data FileUpload berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $fileUpload->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus FileUpload.',
                 [
                     'exception' => $e,
                     'FileUpload_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -227,5 +224,5 @@ class FileUploadController extends MainController
                 'Data FileUpload gagal dihapus.'
             );
         }
-    } 
+    }
 }

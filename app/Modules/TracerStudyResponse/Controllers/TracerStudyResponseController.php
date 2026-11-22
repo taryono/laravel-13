@@ -68,7 +68,7 @@ class TracerStudyResponseController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'tracer_study_id' => ['required', 'integer'],
+            'tracer_study_id' => ['required', 'integer'],
             'alumni_id' => ['required', 'integer'],
             'question_id' => ['required', 'integer'],
             'answer_text' => ['required', 'string', 'max:255'],
@@ -94,7 +94,7 @@ class TracerStudyResponseController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -127,7 +127,7 @@ class TracerStudyResponseController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'tracer_study_id' => ['required', 'integer'],
+            'tracer_study_id' => ['required', 'integer'],
             'alumni_id' => ['required', 'integer'],
             'question_id' => ['required', 'integer'],
             'answer_text' => ['required', 'string', 'max:255'],
@@ -137,10 +137,7 @@ class TracerStudyResponseController extends MainController
 
         try {
             $tracerStudyResponse = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $tracerStudyResponse,
-                $validated
-            ) {
+            DB::transaction(function () use ($tracerStudyResponse, $validated) {
                 $tracerStudyResponse->update($validated);
             });
 
@@ -150,14 +147,14 @@ class TracerStudyResponseController extends MainController
                 $tracerStudyResponse
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui TracerStudyResponse.',
                 [
                     'exception' => $e,
                     'TracerStudyResponse_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -185,14 +182,14 @@ class TracerStudyResponseController extends MainController
                 'Data TracerStudyResponse berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $tracerStudyResponse->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus TracerStudyResponse.',
                 [
                     'exception' => $e,
                     'TracerStudyResponse_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -201,5 +198,5 @@ class TracerStudyResponseController extends MainController
                 'Data TracerStudyResponse gagal dihapus.'
             );
         }
-    } 
+    }
 }

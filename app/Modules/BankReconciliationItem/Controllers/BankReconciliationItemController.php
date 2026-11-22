@@ -68,7 +68,7 @@ class BankReconciliationItemController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'bank_reconciliation_id' => ['required', 'integer'],
+            'bank_reconciliation_id' => ['required', 'integer'],
             'bank_mutation_id' => ['required', 'integer'],
             'journal_entry_id' => ['required', 'integer'],
             'match_type' => ['required', 'string', 'max:255'],
@@ -99,7 +99,7 @@ class BankReconciliationItemController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -132,7 +132,7 @@ class BankReconciliationItemController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'bank_reconciliation_id' => ['required', 'integer'],
+            'bank_reconciliation_id' => ['required', 'integer'],
             'bank_mutation_id' => ['required', 'integer'],
             'journal_entry_id' => ['required', 'integer'],
             'match_type' => ['required', 'string', 'max:255'],
@@ -147,10 +147,7 @@ class BankReconciliationItemController extends MainController
 
         try {
             $bankReconciliationItem = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $bankReconciliationItem,
-                $validated
-            ) {
+            DB::transaction(function () use ($bankReconciliationItem, $validated) {
                 $bankReconciliationItem->update($validated);
             });
 
@@ -160,14 +157,14 @@ class BankReconciliationItemController extends MainController
                 $bankReconciliationItem
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui BankReconciliationItem.',
                 [
                     'exception' => $e,
                     'BankReconciliationItem_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -195,14 +192,14 @@ class BankReconciliationItemController extends MainController
                 'Data BankReconciliationItem berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $bankReconciliationItem->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus BankReconciliationItem.',
                 [
                     'exception' => $e,
                     'BankReconciliationItem_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -211,5 +208,5 @@ class BankReconciliationItemController extends MainController
                 'Data BankReconciliationItem gagal dihapus.'
             );
         }
-    } 
+    }
 }

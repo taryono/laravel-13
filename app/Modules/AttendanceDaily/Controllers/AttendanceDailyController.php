@@ -30,7 +30,7 @@ class AttendanceDailyController extends MainController
 
         // Filter summary
         $summary = $this->getSummary($request);
-        
+
         return $dataTable->render('Attendance::index', compact('summary'));
     }
 
@@ -40,7 +40,7 @@ class AttendanceDailyController extends MainController
     public function show($id): View
     {
         $attendance = $this->model->with(['employee', 'shift'])->findOrFail($id);
-        
+
         // Ambil semua log untuk hari itu
         $logs = $attendance->employee->attendanceLogs()
             ->where('attendance_date', $attendance->attendance_date)
@@ -57,7 +57,7 @@ class AttendanceDailyController extends MainController
     {
         $attendance = $this->model->findOrFail($id);
         $employees = Employee::where('is_active', true)->orderBy('full_name')->get();
-        
+
         return view('Attendance::edit', compact('attendance', 'employees'));
     }
 
@@ -82,9 +82,9 @@ class AttendanceDailyController extends MainController
         try {
             DB::transaction(function () use ($attendance, $validated) {
                 $validated['is_approved'] = true;
-                $validated['approved_by'] = auth()->id();
+                $validated['approved_by'] = request()->user()?->id;
                 $validated['approved_at'] = now();
-                
+
                 $attendance->update($validated);
             });
 
@@ -112,7 +112,7 @@ class AttendanceDailyController extends MainController
                     ->update([
                         'attendance_status' => $validated['attendance_status'],
                         'is_approved' => true,
-                        'approved_by' => auth()->id(),
+                        'approved_by' => request()->user()?->id,
                         'approved_at' => now(),
                     ]);
             });
@@ -137,7 +137,7 @@ class AttendanceDailyController extends MainController
 
         // Implementasi export menggunakan Maatwebsite Excel atau DOMPDF
         // return Excel::download(new AttendanceExport($request), 'attendance.xlsx');
-        
+
         return $this->successResponse($request, 'Export akan diproses.');
     }
 

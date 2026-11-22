@@ -68,7 +68,7 @@ class EmployeeTypeController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'code' => ['required', 'string', 'max:255'],
+            'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
         ]);
 
@@ -90,7 +90,7 @@ class EmployeeTypeController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -123,16 +123,13 @@ class EmployeeTypeController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'code' => ['required', 'string', 'max:255'],
+            'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
         ]);
 
         try {
             $employeeType = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $employeeType,
-                $validated
-            ) {
+            DB::transaction(function () use ($employeeType, $validated) {
                 $employeeType->update($validated);
             });
 
@@ -142,14 +139,14 @@ class EmployeeTypeController extends MainController
                 $employeeType
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui EmployeeType.',
                 [
                     'exception' => $e,
                     'EmployeeType_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -177,14 +174,14 @@ class EmployeeTypeController extends MainController
                 'Data EmployeeType berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $employeeType->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus EmployeeType.',
                 [
                     'exception' => $e,
                     'EmployeeType_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -193,5 +190,5 @@ class EmployeeTypeController extends MainController
                 'Data EmployeeType gagal dihapus.'
             );
         }
-    } 
+    }
 }

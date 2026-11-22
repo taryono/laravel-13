@@ -104,7 +104,7 @@ class DemoRequestController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -151,10 +151,7 @@ class DemoRequestController extends MainController
 
         try {
             $demoRequest = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $demoRequest,
-                $validated
-            ) {
+            DB::transaction(function () use ($demoRequest, $validated) {
                 $demoRequest->update($validated);
             });
 
@@ -164,14 +161,14 @@ class DemoRequestController extends MainController
                 $demoRequest
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui DemoRequest.',
                 [
                     'exception' => $e,
                     'DemoRequest_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -199,14 +196,14 @@ class DemoRequestController extends MainController
                 'Data DemoRequest berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $demoRequest->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus DemoRequest.',
                 [
                     'exception' => $e,
                     'DemoRequest_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -215,5 +212,5 @@ class DemoRequestController extends MainController
                 'Data DemoRequest gagal dihapus.'
             );
         }
-    } 
+    }
 }

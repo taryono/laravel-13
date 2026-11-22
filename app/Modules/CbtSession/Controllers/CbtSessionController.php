@@ -55,9 +55,9 @@ class CbtSessionController extends MainController
     {
         $cbtSession = new CbtSession();
         $examPackages = ExamPackage::select('id', 'name')->get();
-        $students     = Student::select('id', 'name', 'nis')->get();
-        $schedules    = Schedule::select('id', 'name')->get();
-        $classrooms   = Classroom::select('id', 'name')->get();
+        $students = Student::select('id', 'name', 'nis')->get();
+        $schedules = Schedule::select('id', 'name')->get();
+        $classrooms = Classroom::select('id', 'name')->get();
 
         return view(
             'CbtSession::create',
@@ -97,7 +97,7 @@ class CbtSessionController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -115,16 +115,16 @@ class CbtSessionController extends MainController
     {
         $cbtSession = $this->model->findOrFail($id);
         $examPackages = ExamPackage::select('id', 'name')->get();
-        $students     = Student::select('id', 'name', 'nis')->get();
-        $schedules    = Schedule::select('id', 'name')->get();
-        $classrooms   = Classroom::select('id', 'name')->get();
+        $students = Student::select('id', 'name', 'nis')->get();
+        $schedules = Schedule::select('id', 'name')->get();
+        $classrooms = Classroom::select('id', 'name')->get();
 
         return view('CbtSession::edit', [
-            'session'      => $cbtSession,
+            'session' => $cbtSession,
             'examPackages' => $examPackages,
-            'students'     => $students,
-            'schedules'    => $schedules,
-            'classrooms'   => $classrooms,
+            'students' => $students,
+            'schedules' => $schedules,
+            'classrooms' => $classrooms,
         ]);
     }
 
@@ -141,12 +141,9 @@ class CbtSessionController extends MainController
                 $validated['final_score'] = $request->final_score;
             }
 
-            $validated['updated_by'] = auth()->id();
+            $validated['updated_by'] = request()->user()?->id;
 
-            DB::transaction(function () use (
-                $cbtSession,
-                $validated
-            ) {
+            DB::transaction(function () use ($cbtSession, $validated) {
                 $cbtSession->update($validated);
             });
 
@@ -162,7 +159,7 @@ class CbtSessionController extends MainController
                     'exception' => $e,
                     'CbtSession_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -196,7 +193,7 @@ class CbtSessionController extends MainController
                 [
                     'exception' => $e,
                     'CbtSession_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -210,15 +207,15 @@ class CbtSessionController extends MainController
     private function validateData(Request $request, $id = null): array
     {
         $data = $request->validate([
-            'exam_package_id'  => ['required', 'exists:exam_packages,id'],
-            'student_id'       => ['required', 'exists:students,id'],
-            'schedule_id'      => ['nullable', 'exists:schedules,id'],
-            'classroom_id'     => ['nullable', 'exists:classrooms,id'],
-            'start_time'       => ['nullable', 'date'],
-            'end_time'         => ['nullable', 'date', 'after_or_equal:start_time'],
+            'exam_package_id' => ['required', 'exists:exam_packages,id'],
+            'student_id' => ['required', 'exists:students,id'],
+            'schedule_id' => ['nullable', 'exists:schedules,id'],
+            'classroom_id' => ['nullable', 'exists:classrooms,id'],
+            'start_time' => ['nullable', 'date'],
+            'end_time' => ['nullable', 'date', 'after_or_equal:start_time'],
             'duration_seconds' => ['nullable', 'integer', 'min:0'],
-            'status'           => ['nullable', 'in:pending,ongoing,submitted,expired'],
-            'proctor_notes'    => ['nullable', 'string'],
+            'status' => ['nullable', 'in:pending,ongoing,submitted,expired'],
+            'proctor_notes' => ['nullable', 'string'],
         ]);
 
         // checkbox is_active tidak terkirim kalau tidak dicentang

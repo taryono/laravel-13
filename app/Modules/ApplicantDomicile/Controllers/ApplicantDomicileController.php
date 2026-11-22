@@ -68,7 +68,7 @@ class ApplicantDomicileController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'applicant_id' => ['required', 'integer'],
+            'applicant_id' => ['required', 'integer'],
             'address' => ['required', 'string', 'max:255'],
             'rt' => ['required', 'string', 'max:255'],
             'rw' => ['required', 'string', 'max:255'],
@@ -110,7 +110,7 @@ class ApplicantDomicileController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -143,7 +143,7 @@ class ApplicantDomicileController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'applicant_id' => ['required', 'integer'],
+            'applicant_id' => ['required', 'integer'],
             'address' => ['required', 'string', 'max:255'],
             'rt' => ['required', 'string', 'max:255'],
             'rw' => ['required', 'string', 'max:255'],
@@ -169,10 +169,7 @@ class ApplicantDomicileController extends MainController
 
         try {
             $applicantDomicile = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $applicantDomicile,
-                $validated
-            ) {
+            DB::transaction(function () use ($applicantDomicile, $validated) {
                 $applicantDomicile->update($validated);
             });
 
@@ -182,14 +179,14 @@ class ApplicantDomicileController extends MainController
                 $applicantDomicile
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui ApplicantDomicile.',
                 [
                     'exception' => $e,
                     'ApplicantDomicile_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -217,14 +214,14 @@ class ApplicantDomicileController extends MainController
                 'Data ApplicantDomicile berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $applicantDomicile->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus ApplicantDomicile.',
                 [
                     'exception' => $e,
                     'ApplicantDomicile_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -233,5 +230,5 @@ class ApplicantDomicileController extends MainController
                 'Data ApplicantDomicile gagal dihapus.'
             );
         }
-    } 
+    }
 }

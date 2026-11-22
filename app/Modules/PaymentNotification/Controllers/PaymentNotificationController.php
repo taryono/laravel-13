@@ -68,7 +68,7 @@ class PaymentNotificationController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'payment_transaction_id' => ['required', 'integer'],
             'student_invoice_id' => ['required', 'integer'],
             'applicant_invoice_id' => ['required', 'integer'],
@@ -112,7 +112,7 @@ class PaymentNotificationController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -145,7 +145,7 @@ class PaymentNotificationController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'payment_transaction_id' => ['required', 'integer'],
             'student_invoice_id' => ['required', 'integer'],
             'applicant_invoice_id' => ['required', 'integer'],
@@ -173,10 +173,7 @@ class PaymentNotificationController extends MainController
 
         try {
             $paymentNotification = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $paymentNotification,
-                $validated
-            ) {
+            DB::transaction(function () use ($paymentNotification, $validated) {
                 $paymentNotification->update($validated);
             });
 
@@ -186,14 +183,14 @@ class PaymentNotificationController extends MainController
                 $paymentNotification
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui PaymentNotification.',
                 [
                     'exception' => $e,
                     'PaymentNotification_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -221,14 +218,14 @@ class PaymentNotificationController extends MainController
                 'Data PaymentNotification berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $paymentNotification->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus PaymentNotification.',
                 [
                     'exception' => $e,
                     'PaymentNotification_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -237,5 +234,5 @@ class PaymentNotificationController extends MainController
                 'Data PaymentNotification gagal dihapus.'
             );
         }
-    } 
+    }
 }

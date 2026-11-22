@@ -154,7 +154,7 @@ class ShiftSwapController extends MainController
                 [
                     'exception' => $e,
                     'ShiftSwap_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 

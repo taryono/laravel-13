@@ -68,7 +68,7 @@ class GeneratedReportController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'report_card_id' => ['required', 'integer'],
             'student_id' => ['required', 'integer'],
             'period_id' => ['required', 'integer'],
@@ -104,7 +104,7 @@ class GeneratedReportController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -137,7 +137,7 @@ class GeneratedReportController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'report_card_id' => ['required', 'integer'],
             'student_id' => ['required', 'integer'],
             'period_id' => ['required', 'integer'],
@@ -157,10 +157,7 @@ class GeneratedReportController extends MainController
 
         try {
             $generatedReport = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $generatedReport,
-                $validated
-            ) {
+            DB::transaction(function () use ($generatedReport, $validated) {
                 $generatedReport->update($validated);
             });
 
@@ -170,14 +167,14 @@ class GeneratedReportController extends MainController
                 $generatedReport
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui GeneratedReport.',
                 [
                     'exception' => $e,
                     'GeneratedReport_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -205,14 +202,14 @@ class GeneratedReportController extends MainController
                 'Data GeneratedReport berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $generatedReport->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus GeneratedReport.',
                 [
                     'exception' => $e,
                     'GeneratedReport_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -221,5 +218,5 @@ class GeneratedReportController extends MainController
                 'Data GeneratedReport gagal dihapus.'
             );
         }
-    } 
+    }
 }

@@ -68,7 +68,7 @@ class RkasReportController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'rkas_document_id' => ['required', 'integer'],
             'fiscal_period_id' => ['required', 'integer'],
             'report_code' => ['required', 'string', 'max:255'],
@@ -111,7 +111,7 @@ class RkasReportController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -144,7 +144,7 @@ class RkasReportController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'rkas_document_id' => ['required', 'integer'],
             'fiscal_period_id' => ['required', 'integer'],
             'report_code' => ['required', 'string', 'max:255'],
@@ -171,10 +171,7 @@ class RkasReportController extends MainController
 
         try {
             $rkasReport = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $rkasReport,
-                $validated
-            ) {
+            DB::transaction(function () use ($rkasReport, $validated) {
                 $rkasReport->update($validated);
             });
 
@@ -184,14 +181,14 @@ class RkasReportController extends MainController
                 $rkasReport
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui RkasReport.',
                 [
                     'exception' => $e,
                     'RkasReport_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -219,14 +216,14 @@ class RkasReportController extends MainController
                 'Data RkasReport berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $rkasReport->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus RkasReport.',
                 [
                     'exception' => $e,
                     'RkasReport_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -235,5 +232,5 @@ class RkasReportController extends MainController
                 'Data RkasReport gagal dihapus.'
             );
         }
-    } 
+    }
 }

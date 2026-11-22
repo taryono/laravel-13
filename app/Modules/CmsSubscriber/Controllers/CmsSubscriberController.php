@@ -68,7 +68,7 @@ class CmsSubscriberController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'email' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'token' => ['required', 'string', 'max:255'],
             'is_active' => ['required', 'string', 'max:255'],
@@ -94,7 +94,7 @@ class CmsSubscriberController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -127,7 +127,7 @@ class CmsSubscriberController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'email' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'token' => ['required', 'string', 'max:255'],
             'is_active' => ['required', 'string', 'max:255'],
@@ -137,10 +137,7 @@ class CmsSubscriberController extends MainController
 
         try {
             $cmsSubscriber = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $cmsSubscriber,
-                $validated
-            ) {
+            DB::transaction(function () use ($cmsSubscriber, $validated) {
                 $cmsSubscriber->update($validated);
             });
 
@@ -150,14 +147,14 @@ class CmsSubscriberController extends MainController
                 $cmsSubscriber
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui CmsSubscriber.',
                 [
                     'exception' => $e,
                     'CmsSubscriber_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -185,14 +182,14 @@ class CmsSubscriberController extends MainController
                 'Data CmsSubscriber berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $cmsSubscriber->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus CmsSubscriber.',
                 [
                     'exception' => $e,
                     'CmsSubscriber_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -201,5 +198,5 @@ class CmsSubscriberController extends MainController
                 'Data CmsSubscriber gagal dihapus.'
             );
         }
-    } 
+    }
 }

@@ -68,7 +68,7 @@ class AccountingPeriodController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'organizationname' => ['required', 'string', 'max:255'],
+            'organizationname' => ['required', 'string', 'max:255'],
             'fiscal_yearyear' => ['required', 'string', 'max:255'],
             'period' => ['required', 'string', 'max:255'],
         ]);
@@ -91,7 +91,7 @@ class AccountingPeriodController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -124,17 +124,14 @@ class AccountingPeriodController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'organizationname' => ['required', 'string', 'max:255'],
+            'organizationname' => ['required', 'string', 'max:255'],
             'fiscal_yearyear' => ['required', 'string', 'max:255'],
             'period' => ['required', 'string', 'max:255'],
         ]);
 
         try {
             $accountingPeriod = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $accountingPeriod,
-                $validated
-            ) {
+            DB::transaction(function () use ($accountingPeriod, $validated) {
                 $accountingPeriod->update($validated);
             });
 
@@ -144,14 +141,14 @@ class AccountingPeriodController extends MainController
                 $accountingPeriod
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui AccountingPeriod.',
                 [
                     'exception' => $e,
                     'AccountingPeriod_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -179,14 +176,14 @@ class AccountingPeriodController extends MainController
                 'Data AccountingPeriod berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $accountingPeriod->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus AccountingPeriod.',
                 [
                     'exception' => $e,
                     'AccountingPeriod_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -195,5 +192,5 @@ class AccountingPeriodController extends MainController
                 'Data AccountingPeriod gagal dihapus.'
             );
         }
-    } 
+    }
 }

@@ -68,7 +68,7 @@ class DormitoryAssignmentController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'dormitory_id' => ['required', 'integer'],
+            'dormitory_id' => ['required', 'integer'],
             'dormitory_room_id' => ['required', 'integer'],
             'student_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
@@ -117,7 +117,7 @@ class DormitoryAssignmentController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -150,7 +150,7 @@ class DormitoryAssignmentController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'dormitory_id' => ['required', 'integer'],
+            'dormitory_id' => ['required', 'integer'],
             'dormitory_room_id' => ['required', 'integer'],
             'student_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
@@ -183,10 +183,7 @@ class DormitoryAssignmentController extends MainController
 
         try {
             $dormitoryAssignment = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $dormitoryAssignment,
-                $validated
-            ) {
+            DB::transaction(function () use ($dormitoryAssignment, $validated) {
                 $dormitoryAssignment->update($validated);
             });
 
@@ -196,14 +193,14 @@ class DormitoryAssignmentController extends MainController
                 $dormitoryAssignment
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui DormitoryAssignment.',
                 [
                     'exception' => $e,
                     'DormitoryAssignment_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -231,14 +228,14 @@ class DormitoryAssignmentController extends MainController
                 'Data DormitoryAssignment berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $dormitoryAssignment->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus DormitoryAssignment.',
                 [
                     'exception' => $e,
                     'DormitoryAssignment_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -247,5 +244,5 @@ class DormitoryAssignmentController extends MainController
                 'Data DormitoryAssignment gagal dihapus.'
             );
         }
-    } 
+    }
 }

@@ -68,7 +68,7 @@ class RkasComponentController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'component_type' => ['required', 'string', 'max:255'],
@@ -103,7 +103,7 @@ class RkasComponentController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -136,7 +136,7 @@ class RkasComponentController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'component_type' => ['required', 'string', 'max:255'],
@@ -155,10 +155,7 @@ class RkasComponentController extends MainController
 
         try {
             $rkasComponent = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $rkasComponent,
-                $validated
-            ) {
+            DB::transaction(function () use ($rkasComponent, $validated) {
                 $rkasComponent->update($validated);
             });
 
@@ -168,14 +165,14 @@ class RkasComponentController extends MainController
                 $rkasComponent
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui RkasComponent.',
                 [
                     'exception' => $e,
                     'RkasComponent_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -203,14 +200,14 @@ class RkasComponentController extends MainController
                 'Data RkasComponent berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $rkasComponent->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus RkasComponent.',
                 [
                     'exception' => $e,
                     'RkasComponent_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -219,5 +216,5 @@ class RkasComponentController extends MainController
                 'Data RkasComponent gagal dihapus.'
             );
         }
-    } 
+    }
 }

@@ -68,7 +68,7 @@ class ScholarshipApplicationController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'scholarship_id' => ['required', 'integer'],
+            'scholarship_id' => ['required', 'integer'],
             'student_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
             'application_number' => ['required', 'string', 'max:255'],
@@ -126,7 +126,7 @@ class ScholarshipApplicationController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -159,7 +159,7 @@ class ScholarshipApplicationController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'scholarship_id' => ['required', 'integer'],
+            'scholarship_id' => ['required', 'integer'],
             'student_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
             'application_number' => ['required', 'string', 'max:255'],
@@ -201,10 +201,7 @@ class ScholarshipApplicationController extends MainController
 
         try {
             $scholarshipApplication = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $scholarshipApplication,
-                $validated
-            ) {
+            DB::transaction(function () use ($scholarshipApplication, $validated) {
                 $scholarshipApplication->update($validated);
             });
 
@@ -214,14 +211,14 @@ class ScholarshipApplicationController extends MainController
                 $scholarshipApplication
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui ScholarshipApplication.',
                 [
                     'exception' => $e,
                     'ScholarshipApplication_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -249,14 +246,14 @@ class ScholarshipApplicationController extends MainController
                 'Data ScholarshipApplication berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $scholarshipApplication->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus ScholarshipApplication.',
                 [
                     'exception' => $e,
                     'ScholarshipApplication_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -265,5 +262,5 @@ class ScholarshipApplicationController extends MainController
                 'Data ScholarshipApplication gagal dihapus.'
             );
         }
-    } 
+    }
 }

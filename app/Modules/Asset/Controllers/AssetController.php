@@ -59,7 +59,7 @@ class AssetController extends MainController
         } catch (Throwable $e) {
             Log::error('Gagal menambahkan aset tetap.', [
                 'exception' => $e,
-                'data'      => $validated,
+                'data' => $validated,
             ]);
 
             return $this->errorResponse($request, 'Data aset tetap gagal ditambahkan.');
@@ -96,7 +96,7 @@ class AssetController extends MainController
         } catch (Throwable $e) {
             Log::error('Gagal memperbarui aset tetap.', [
                 'exception' => $e,
-                'asset_id'  => $id,
+                'asset_id' => $id,
             ]);
 
             return $this->errorResponse($request, 'Data aset tetap gagal diperbarui.');
@@ -135,7 +135,7 @@ class AssetController extends MainController
         } catch (Throwable $e) {
             Log::error('Gagal menghapus aset tetap.', [
                 'exception' => $e,
-                'asset_id'  => $id,
+                'asset_id' => $id,
             ]);
 
             return $this->errorResponse($request, 'Data aset tetap gagal dihapus.');
@@ -149,17 +149,17 @@ class AssetController extends MainController
     {
         try {
             $asset = Asset::findOrFail($id);
-            $now   = now();
+            $now = now();
 
             $calc = $service->calculateForPeriod($asset, $now->year, $now->month);
 
             return response()->json([
                 'success' => true,
-                'data'    => [
+                'data' => [
                     'monthly_depreciation' => $calc['depreciation_amount'],
-                    'annual_depreciation'  => $calc['depreciation_amount'] * 12,
-                    'current_book_value'   => $calc['closing_book_value'],
-                    'accumulated'          => $calc['accumulated_depreciation'],
+                    'annual_depreciation' => $calc['depreciation_amount'] * 12,
+                    'current_book_value' => $calc['closing_book_value'],
+                    'accumulated' => $calc['accumulated_depreciation'],
                 ],
             ]);
         } catch (Throwable $e) {
@@ -175,20 +175,20 @@ class AssetController extends MainController
     public function postMonthlyDepreciation(Request $request, AssetDepreciationService $service): JsonResponse
     {
         $validated = $request->validate([
-            'year'  => 'required|integer|min:2000|max:2100',
+            'year' => 'required|integer|min:2000|max:2100',
             'month' => 'required|integer|min:1|max:12',
         ]);
 
         $stats = $service->postMonthlyBatch(
             $validated['year'],
             $validated['month'],
-            auth()->id()
+            request()->user()?->id
         );
 
         return response()->json([
             'success' => true,
             'message' => "Posting selesai. Processed: {$stats['processed']}, Skipped: {$stats['skipped']}, Failed: {$stats['failed']}",
-            'data'    => $stats,
+            'data' => $stats,
         ]);
     }
 
@@ -207,7 +207,7 @@ class AssetController extends MainController
         } catch (Throwable $e) {
             Log::error('Gagal mengambil aset per kategori.', [
                 'exception' => $e,
-                'category'  => $category,
+                'category' => $category,
             ]);
 
             return response()->json([
@@ -228,36 +228,36 @@ class AssetController extends MainController
     {
         return [
             'organization_id' => 'nullable|exists:organizations,id',
-            'school_id'       => 'nullable|exists:schools,id',
+            'school_id' => 'nullable|exists:schools,id',
 
-            'code'            => 'required|string|max:50|unique:assets,code' . ($ignoreId ? ",{$ignoreId}" : ''),
-            'name'            => 'required|string|max:200',
+            'code' => 'required|string|max:50|unique:assets,code' . ($ignoreId ? ",{$ignoreId}" : ''),
+            'name' => 'required|string|max:200',
             'asset_category_id' => 'required|exists:asset_categories,id',
-            'supplier_id'     => 'nullable|exists:suppliers,id',
-            'location_id'     => 'nullable|exists:locations,id',
+            'supplier_id' => 'nullable|exists:suppliers,id',
+            'location_id' => 'nullable|exists:locations,id',
 
-            'brand'           => 'nullable|string|max:100',
-            'model'           => 'nullable|string|max:100',
-            'specification'   => 'nullable|string',
-            'serial_number'   => 'nullable|string|max:100',
+            'brand' => 'nullable|string|max:100',
+            'model' => 'nullable|string|max:100',
+            'specification' => 'nullable|string',
+            'serial_number' => 'nullable|string|max:100',
 
-            'purchase_date'   => 'required|date',
-            'purchase_price'  => 'required|numeric|min:0',
-            'salvage_value'   => 'nullable|numeric|min:0',
+            'purchase_date' => 'required|date',
+            'purchase_price' => 'required|numeric|min:0',
+            'salvage_value' => 'nullable|numeric|min:0',
             'useful_life_months' => 'required|integer|min:1',
             'depreciation_method' => 'required|in:straight_line,declining_balance,sum_of_years,double_declining',
 
             'asset_chart_of_account_id' => 'required|exists:chart_of_accounts,id',
             'accumulated_depreciation_chart_of_account_id' => 'required|exists:chart_of_accounts,id',
-            'depreciation_expense_chart_of_account_id'     => 'required|exists:chart_of_accounts,id',
+            'depreciation_expense_chart_of_account_id' => 'required|exists:chart_of_accounts,id',
 
-            'status'          => 'required|string|max:50',
-            'condition'       => 'required|string|max:20',
-            'assigned_to'     => 'nullable|exists:users,id',
-            'warranty_end'    => 'nullable|date',
+            'status' => 'required|string|max:50',
+            'condition' => 'required|string|max:20',
+            'assigned_to' => 'nullable|exists:users,id',
+            'warranty_end' => 'nullable|date',
 
-            'photo_url'       => 'nullable|string',
-            'notes'           => 'nullable|string',
+            'photo_url' => 'nullable|string',
+            'notes' => 'nullable|string',
         ];
     }
 
@@ -278,14 +278,14 @@ class AssetController extends MainController
     private function formData(Asset $asset): array
     {
         return [
-            'asset'         => $asset,
-            'accounts'      => $this->getAccountOptions(),
-            'categories'    => \Models\AssetCategory::orderBy('name')->pluck('name', 'id'),
-            'suppliers'     => \Models\Supplier::orderBy('name')->pluck('name', 'id'),
-            'locations'     => \Models\Location::orderBy('name')->pluck('name', 'id'),
+            'asset' => $asset,
+            'accounts' => $this->getAccountOptions(),
+            'categories' => \Models\AssetCategory::orderBy('name')->pluck('name', 'id'),
+            'suppliers' => \Models\Supplier::orderBy('name')->pluck('name', 'id'),
+            'locations' => \Models\Location::orderBy('name')->pluck('name', 'id'),
             'organizations' => \Models\Organization::orderBy('name')->pluck('name', 'id'),
-            'schools'       => \Models\School::orderBy('name')->pluck('name', 'id'),
-            'users'         => \App\Models\User::orderBy('name')->pluck('name', 'id'),
+            'schools' => \Models\School::orderBy('name')->pluck('name', 'id'),
+            'users' => \App\Models\User::orderBy('name')->pluck('name', 'id'),
         ];
     }
 }

@@ -68,7 +68,7 @@ class DigitalLibraryAccessLogController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'digital_library_item_id' => ['required', 'integer'],
+            'digital_library_item_id' => ['required', 'integer'],
             'user_id' => ['required', 'integer'],
             'student_id' => ['required', 'integer'],
             'employee_id' => ['required', 'integer'],
@@ -108,7 +108,7 @@ class DigitalLibraryAccessLogController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -141,7 +141,7 @@ class DigitalLibraryAccessLogController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'digital_library_item_id' => ['required', 'integer'],
+            'digital_library_item_id' => ['required', 'integer'],
             'user_id' => ['required', 'integer'],
             'student_id' => ['required', 'integer'],
             'employee_id' => ['required', 'integer'],
@@ -165,10 +165,7 @@ class DigitalLibraryAccessLogController extends MainController
 
         try {
             $digitalLibraryAccessLog = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $digitalLibraryAccessLog,
-                $validated
-            ) {
+            DB::transaction(function () use ($digitalLibraryAccessLog, $validated) {
                 $digitalLibraryAccessLog->update($validated);
             });
 
@@ -178,14 +175,14 @@ class DigitalLibraryAccessLogController extends MainController
                 $digitalLibraryAccessLog
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui DigitalLibraryAccessLog.',
                 [
                     'exception' => $e,
                     'DigitalLibraryAccessLog_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -213,14 +210,14 @@ class DigitalLibraryAccessLogController extends MainController
                 'Data DigitalLibraryAccessLog berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $digitalLibraryAccessLog->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus DigitalLibraryAccessLog.',
                 [
                     'exception' => $e,
                     'DigitalLibraryAccessLog_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -229,5 +226,5 @@ class DigitalLibraryAccessLogController extends MainController
                 'Data DigitalLibraryAccessLog gagal dihapus.'
             );
         }
-    } 
+    }
 }

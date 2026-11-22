@@ -68,7 +68,7 @@ class UomConversionController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'from_uom_id' => ['required', 'integer'],
             'to_uom_id' => ['required', 'integer'],
             'multiplier' => ['required', 'string', 'max:255'],
@@ -92,7 +92,7 @@ class UomConversionController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -125,7 +125,7 @@ class UomConversionController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'from_uom_id' => ['required', 'integer'],
             'to_uom_id' => ['required', 'integer'],
             'multiplier' => ['required', 'string', 'max:255'],
@@ -133,10 +133,7 @@ class UomConversionController extends MainController
 
         try {
             $uomConversion = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $uomConversion,
-                $validated
-            ) {
+            DB::transaction(function () use ($uomConversion, $validated) {
                 $uomConversion->update($validated);
             });
 
@@ -146,14 +143,14 @@ class UomConversionController extends MainController
                 $uomConversion
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui UomConversion.',
                 [
                     'exception' => $e,
                     'UomConversion_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -181,14 +178,14 @@ class UomConversionController extends MainController
                 'Data UomConversion berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $uomConversion->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus UomConversion.',
                 [
                     'exception' => $e,
                     'UomConversion_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -197,5 +194,5 @@ class UomConversionController extends MainController
                 'Data UomConversion gagal dihapus.'
             );
         }
-    } 
+    }
 }

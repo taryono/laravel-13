@@ -68,7 +68,7 @@ class EmployeeBonusController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'employee_id' => ['required', 'integer'],
+            'employee_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
             'bonus_number' => ['required', 'string', 'max:255'],
             'bonus_date' => ['required', 'string', 'max:255'],
@@ -101,7 +101,7 @@ class EmployeeBonusController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -134,7 +134,7 @@ class EmployeeBonusController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'employee_id' => ['required', 'integer'],
+            'employee_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
             'bonus_number' => ['required', 'string', 'max:255'],
             'bonus_date' => ['required', 'string', 'max:255'],
@@ -151,10 +151,7 @@ class EmployeeBonusController extends MainController
 
         try {
             $employeeBonus = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $employeeBonus,
-                $validated
-            ) {
+            DB::transaction(function () use ($employeeBonus, $validated) {
                 $employeeBonus->update($validated);
             });
 
@@ -164,14 +161,14 @@ class EmployeeBonusController extends MainController
                 $employeeBonus
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui EmployeeBonus.',
                 [
                     'exception' => $e,
                     'EmployeeBonus_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -199,14 +196,14 @@ class EmployeeBonusController extends MainController
                 'Data EmployeeBonus berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $employeeBonus->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus EmployeeBonus.',
                 [
                     'exception' => $e,
                     'EmployeeBonus_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -215,5 +212,5 @@ class EmployeeBonusController extends MainController
                 'Data EmployeeBonus gagal dihapus.'
             );
         }
-    } 
+    }
 }

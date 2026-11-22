@@ -68,7 +68,7 @@ class TimetableConstraintController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'teacher_id' => ['required', 'integer'],
             'day_of_week' => ['required', 'string', 'max:255'],
             'time_slot_start' => ['required', 'string', 'max:255'],
@@ -96,7 +96,7 @@ class TimetableConstraintController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -129,7 +129,7 @@ class TimetableConstraintController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'teacher_id' => ['required', 'integer'],
             'day_of_week' => ['required', 'string', 'max:255'],
             'time_slot_start' => ['required', 'string', 'max:255'],
@@ -141,10 +141,7 @@ class TimetableConstraintController extends MainController
 
         try {
             $timetableConstraint = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $timetableConstraint,
-                $validated
-            ) {
+            DB::transaction(function () use ($timetableConstraint, $validated) {
                 $timetableConstraint->update($validated);
             });
 
@@ -154,14 +151,14 @@ class TimetableConstraintController extends MainController
                 $timetableConstraint
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui TimetableConstraint.',
                 [
                     'exception' => $e,
                     'TimetableConstraint_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -189,14 +186,14 @@ class TimetableConstraintController extends MainController
                 'Data TimetableConstraint berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $timetableConstraint->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus TimetableConstraint.',
                 [
                     'exception' => $e,
                     'TimetableConstraint_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -205,5 +202,5 @@ class TimetableConstraintController extends MainController
                 'Data TimetableConstraint gagal dihapus.'
             );
         }
-    } 
+    }
 }

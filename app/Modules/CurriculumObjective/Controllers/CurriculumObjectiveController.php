@@ -68,7 +68,7 @@ class CurriculumObjectiveController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'learning_outcome_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string', 'max:255'],
@@ -97,7 +97,7 @@ class CurriculumObjectiveController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -130,7 +130,7 @@ class CurriculumObjectiveController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'learning_outcome_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string', 'max:255'],
@@ -143,10 +143,7 @@ class CurriculumObjectiveController extends MainController
 
         try {
             $curriculumObjective = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $curriculumObjective,
-                $validated
-            ) {
+            DB::transaction(function () use ($curriculumObjective, $validated) {
                 $curriculumObjective->update($validated);
             });
 
@@ -156,14 +153,14 @@ class CurriculumObjectiveController extends MainController
                 $curriculumObjective
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui CurriculumObjective.',
                 [
                     'exception' => $e,
                     'CurriculumObjective_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -191,14 +188,14 @@ class CurriculumObjectiveController extends MainController
                 'Data CurriculumObjective berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $curriculumObjective->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus CurriculumObjective.',
                 [
                     'exception' => $e,
                     'CurriculumObjective_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -207,5 +204,5 @@ class CurriculumObjectiveController extends MainController
                 'Data CurriculumObjective gagal dihapus.'
             );
         }
-    } 
+    }
 }

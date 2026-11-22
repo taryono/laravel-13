@@ -68,7 +68,7 @@ class ReportCardTemplateController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
             'type' => ['required', 'string', 'max:255'],
             'category' => ['required', 'string', 'max:255'],
             'icon' => ['required', 'string', 'max:255'],
@@ -93,7 +93,7 @@ class ReportCardTemplateController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -126,7 +126,7 @@ class ReportCardTemplateController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
             'type' => ['required', 'string', 'max:255'],
             'category' => ['required', 'string', 'max:255'],
             'icon' => ['required', 'string', 'max:255'],
@@ -135,10 +135,7 @@ class ReportCardTemplateController extends MainController
 
         try {
             $reportCardTemplate = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $reportCardTemplate,
-                $validated
-            ) {
+            DB::transaction(function () use ($reportCardTemplate, $validated) {
                 $reportCardTemplate->update($validated);
             });
 
@@ -148,14 +145,14 @@ class ReportCardTemplateController extends MainController
                 $reportCardTemplate
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui ReportCardTemplate.',
                 [
                     'exception' => $e,
                     'ReportCardTemplate_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -183,14 +180,14 @@ class ReportCardTemplateController extends MainController
                 'Data ReportCardTemplate berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $reportCardTemplate->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus ReportCardTemplate.',
                 [
                     'exception' => $e,
                     'ReportCardTemplate_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -199,5 +196,5 @@ class ReportCardTemplateController extends MainController
                 'Data ReportCardTemplate gagal dihapus.'
             );
         }
-    } 
+    }
 }

@@ -68,7 +68,7 @@ class VendorInvoiceLineController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'vendor_invoice_id' => ['required', 'integer'],
+            'vendor_invoice_id' => ['required', 'integer'],
             'chart_of_account_id' => ['required', 'integer'],
             'description' => ['required', 'string', 'max:255'],
             'quantity' => ['required', 'string', 'max:255'],
@@ -102,7 +102,7 @@ class VendorInvoiceLineController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -135,7 +135,7 @@ class VendorInvoiceLineController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'vendor_invoice_id' => ['required', 'integer'],
+            'vendor_invoice_id' => ['required', 'integer'],
             'chart_of_account_id' => ['required', 'integer'],
             'description' => ['required', 'string', 'max:255'],
             'quantity' => ['required', 'string', 'max:255'],
@@ -153,10 +153,7 @@ class VendorInvoiceLineController extends MainController
 
         try {
             $vendorInvoiceLine = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $vendorInvoiceLine,
-                $validated
-            ) {
+            DB::transaction(function () use ($vendorInvoiceLine, $validated) {
                 $vendorInvoiceLine->update($validated);
             });
 
@@ -166,14 +163,14 @@ class VendorInvoiceLineController extends MainController
                 $vendorInvoiceLine
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui VendorInvoiceLine.',
                 [
                     'exception' => $e,
                     'VendorInvoiceLine_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -201,14 +198,14 @@ class VendorInvoiceLineController extends MainController
                 'Data VendorInvoiceLine berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $vendorInvoiceLine->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus VendorInvoiceLine.',
                 [
                     'exception' => $e,
                     'VendorInvoiceLine_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -217,5 +214,5 @@ class VendorInvoiceLineController extends MainController
                 'Data VendorInvoiceLine gagal dihapus.'
             );
         }
-    } 
+    }
 }

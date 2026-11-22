@@ -68,7 +68,7 @@ class CmsContactMessageController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'max:255'],
             'phone' => ['required', 'string', 'max:255'],
             'subject' => ['required', 'string', 'max:255'],
@@ -96,7 +96,7 @@ class CmsContactMessageController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -129,7 +129,7 @@ class CmsContactMessageController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'max:255'],
             'phone' => ['required', 'string', 'max:255'],
             'subject' => ['required', 'string', 'max:255'],
@@ -141,10 +141,7 @@ class CmsContactMessageController extends MainController
 
         try {
             $cmsContactMessage = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $cmsContactMessage,
-                $validated
-            ) {
+            DB::transaction(function () use ($cmsContactMessage, $validated) {
                 $cmsContactMessage->update($validated);
             });
 
@@ -154,14 +151,14 @@ class CmsContactMessageController extends MainController
                 $cmsContactMessage
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui CmsContactMessage.',
                 [
                     'exception' => $e,
                     'CmsContactMessage_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -189,14 +186,14 @@ class CmsContactMessageController extends MainController
                 'Data CmsContactMessage berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $cmsContactMessage->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus CmsContactMessage.',
                 [
                     'exception' => $e,
                     'CmsContactMessage_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -205,5 +202,5 @@ class CmsContactMessageController extends MainController
                 'Data CmsContactMessage gagal dihapus.'
             );
         }
-    } 
+    }
 }

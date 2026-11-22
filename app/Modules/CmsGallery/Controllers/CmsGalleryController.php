@@ -68,7 +68,7 @@ class CmsGalleryController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'title' => ['required', 'string', 'max:255'],
+            'title' => ['required', 'string', 'max:255'],
             'slug' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string', 'max:255'],
             'cover_image' => ['required', 'string', 'max:255'],
@@ -94,7 +94,7 @@ class CmsGalleryController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -127,7 +127,7 @@ class CmsGalleryController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'title' => ['required', 'string', 'max:255'],
+            'title' => ['required', 'string', 'max:255'],
             'slug' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string', 'max:255'],
             'cover_image' => ['required', 'string', 'max:255'],
@@ -137,10 +137,7 @@ class CmsGalleryController extends MainController
 
         try {
             $cmsGallery = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $cmsGallery,
-                $validated
-            ) {
+            DB::transaction(function () use ($cmsGallery, $validated) {
                 $cmsGallery->update($validated);
             });
 
@@ -150,14 +147,14 @@ class CmsGalleryController extends MainController
                 $cmsGallery
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui CmsGallery.',
                 [
                     'exception' => $e,
                     'CmsGallery_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -185,14 +182,14 @@ class CmsGalleryController extends MainController
                 'Data CmsGallery berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $cmsGallery->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus CmsGallery.',
                 [
                     'exception' => $e,
                     'CmsGallery_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -201,5 +198,5 @@ class CmsGalleryController extends MainController
                 'Data CmsGallery gagal dihapus.'
             );
         }
-    } 
+    }
 }

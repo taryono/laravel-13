@@ -68,7 +68,7 @@ class WalletTransactionController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'digital_wallet_id' => ['required', 'integer'],
+            'digital_wallet_id' => ['required', 'integer'],
             'transaction_type' => ['required', 'string', 'max:255'],
             'amount' => ['required', 'string', 'max:255'],
             'balance_before' => ['required', 'string', 'max:255'],
@@ -97,7 +97,7 @@ class WalletTransactionController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -130,7 +130,7 @@ class WalletTransactionController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'digital_wallet_id' => ['required', 'integer'],
+            'digital_wallet_id' => ['required', 'integer'],
             'transaction_type' => ['required', 'string', 'max:255'],
             'amount' => ['required', 'string', 'max:255'],
             'balance_before' => ['required', 'string', 'max:255'],
@@ -143,10 +143,7 @@ class WalletTransactionController extends MainController
 
         try {
             $walletTransaction = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $walletTransaction,
-                $validated
-            ) {
+            DB::transaction(function () use ($walletTransaction, $validated) {
                 $walletTransaction->update($validated);
             });
 
@@ -156,14 +153,14 @@ class WalletTransactionController extends MainController
                 $walletTransaction
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui WalletTransaction.',
                 [
                     'exception' => $e,
                     'WalletTransaction_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -191,14 +188,14 @@ class WalletTransactionController extends MainController
                 'Data WalletTransaction berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $walletTransaction->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus WalletTransaction.',
                 [
                     'exception' => $e,
                     'WalletTransaction_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -207,5 +204,5 @@ class WalletTransactionController extends MainController
                 'Data WalletTransaction gagal dihapus.'
             );
         }
-    } 
+    }
 }

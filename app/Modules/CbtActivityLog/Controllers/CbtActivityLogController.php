@@ -68,7 +68,7 @@ class CbtActivityLogController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'session_id' => ['required', 'integer'],
+            'session_id' => ['required', 'integer'],
             'activity_type' => ['required', 'string', 'max:255'],
             'activity_data' => ['required', 'string', 'max:255'],
             'severity' => ['required', 'string', 'max:255'],
@@ -93,7 +93,7 @@ class CbtActivityLogController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -126,7 +126,7 @@ class CbtActivityLogController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'session_id' => ['required', 'integer'],
+            'session_id' => ['required', 'integer'],
             'activity_type' => ['required', 'string', 'max:255'],
             'activity_data' => ['required', 'string', 'max:255'],
             'severity' => ['required', 'string', 'max:255'],
@@ -135,10 +135,7 @@ class CbtActivityLogController extends MainController
 
         try {
             $cbtActivityLog = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $cbtActivityLog,
-                $validated
-            ) {
+            DB::transaction(function () use ($cbtActivityLog, $validated) {
                 $cbtActivityLog->update($validated);
             });
 
@@ -148,14 +145,14 @@ class CbtActivityLogController extends MainController
                 $cbtActivityLog
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui CbtActivityLog.',
                 [
                     'exception' => $e,
                     'CbtActivityLog_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -183,14 +180,14 @@ class CbtActivityLogController extends MainController
                 'Data CbtActivityLog berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $cbtActivityLog->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus CbtActivityLog.',
                 [
                     'exception' => $e,
                     'CbtActivityLog_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -199,5 +196,5 @@ class CbtActivityLogController extends MainController
                 'Data CbtActivityLog gagal dihapus.'
             );
         }
-    } 
+    }
 }

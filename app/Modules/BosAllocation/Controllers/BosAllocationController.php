@@ -68,7 +68,7 @@ class BosAllocationController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'bos_period_id' => ['required', 'integer'],
+            'bos_period_id' => ['required', 'integer'],
             'bos_component_id' => ['required', 'integer'],
             'allocation_amount' => ['required', 'string', 'max:255'],
             'percentage' => ['required', 'string', 'max:255'],
@@ -96,7 +96,7 @@ class BosAllocationController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -129,7 +129,7 @@ class BosAllocationController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'bos_period_id' => ['required', 'integer'],
+            'bos_period_id' => ['required', 'integer'],
             'bos_component_id' => ['required', 'integer'],
             'allocation_amount' => ['required', 'string', 'max:255'],
             'percentage' => ['required', 'string', 'max:255'],
@@ -141,10 +141,7 @@ class BosAllocationController extends MainController
 
         try {
             $bosAllocation = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $bosAllocation,
-                $validated
-            ) {
+            DB::transaction(function () use ($bosAllocation, $validated) {
                 $bosAllocation->update($validated);
             });
 
@@ -154,14 +151,14 @@ class BosAllocationController extends MainController
                 $bosAllocation
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui BosAllocation.',
                 [
                     'exception' => $e,
                     'BosAllocation_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -189,14 +186,14 @@ class BosAllocationController extends MainController
                 'Data BosAllocation berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $bosAllocation->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus BosAllocation.',
                 [
                     'exception' => $e,
                     'BosAllocation_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -205,5 +202,5 @@ class BosAllocationController extends MainController
                 'Data BosAllocation gagal dihapus.'
             );
         }
-    } 
+    }
 }

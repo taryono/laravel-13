@@ -68,7 +68,7 @@ class ReportCardNoteController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'report_card_id' => ['required', 'integer'],
+            'report_card_id' => ['required', 'integer'],
             'note_type' => ['required', 'string', 'max:255'],
             'note' => ['required', 'string', 'max:255'],
             'author_id' => ['required', 'integer'],
@@ -95,7 +95,7 @@ class ReportCardNoteController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -128,7 +128,7 @@ class ReportCardNoteController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'report_card_id' => ['required', 'integer'],
+            'report_card_id' => ['required', 'integer'],
             'note_type' => ['required', 'string', 'max:255'],
             'note' => ['required', 'string', 'max:255'],
             'author_id' => ['required', 'integer'],
@@ -139,10 +139,7 @@ class ReportCardNoteController extends MainController
 
         try {
             $reportCardNote = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $reportCardNote,
-                $validated
-            ) {
+            DB::transaction(function () use ($reportCardNote, $validated) {
                 $reportCardNote->update($validated);
             });
 
@@ -152,14 +149,14 @@ class ReportCardNoteController extends MainController
                 $reportCardNote
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui ReportCardNote.',
                 [
                     'exception' => $e,
                     'ReportCardNote_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -187,14 +184,14 @@ class ReportCardNoteController extends MainController
                 'Data ReportCardNote berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $reportCardNote->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus ReportCardNote.',
                 [
                     'exception' => $e,
                     'ReportCardNote_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -203,5 +200,5 @@ class ReportCardNoteController extends MainController
                 'Data ReportCardNote gagal dihapus.'
             );
         }
-    } 
+    }
 }

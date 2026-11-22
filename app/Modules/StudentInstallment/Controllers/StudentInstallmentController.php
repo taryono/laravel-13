@@ -68,7 +68,7 @@ class StudentInstallmentController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'invoice_id' => ['required', 'integer'],
+            'invoice_id' => ['required', 'integer'],
             'installment_number' => ['required', 'string', 'max:255'],
             'due_date' => ['required', 'string', 'max:255'],
             'amount' => ['required', 'string', 'max:255'],
@@ -99,7 +99,7 @@ class StudentInstallmentController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -132,7 +132,7 @@ class StudentInstallmentController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'invoice_id' => ['required', 'integer'],
+            'invoice_id' => ['required', 'integer'],
             'installment_number' => ['required', 'string', 'max:255'],
             'due_date' => ['required', 'string', 'max:255'],
             'amount' => ['required', 'string', 'max:255'],
@@ -147,10 +147,7 @@ class StudentInstallmentController extends MainController
 
         try {
             $studentInstallment = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $studentInstallment,
-                $validated
-            ) {
+            DB::transaction(function () use ($studentInstallment, $validated) {
                 $studentInstallment->update($validated);
             });
 
@@ -160,14 +157,14 @@ class StudentInstallmentController extends MainController
                 $studentInstallment
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui StudentInstallment.',
                 [
                     'exception' => $e,
                     'StudentInstallment_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -195,14 +192,14 @@ class StudentInstallmentController extends MainController
                 'Data StudentInstallment berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $studentInstallment->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus StudentInstallment.',
                 [
                     'exception' => $e,
                     'StudentInstallment_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -211,5 +208,5 @@ class StudentInstallmentController extends MainController
                 'Data StudentInstallment gagal dihapus.'
             );
         }
-    } 
+    }
 }

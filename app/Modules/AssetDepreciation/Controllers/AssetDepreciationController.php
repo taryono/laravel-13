@@ -68,7 +68,7 @@ class AssetDepreciationController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'organizationname' => ['required', 'string', 'max:255'],
+            'organizationname' => ['required', 'string', 'max:255'],
             'accounting_periodperiod' => ['required', 'string', 'max:255'],
             'amount' => ['required', 'string', 'max:255'],
         ]);
@@ -91,7 +91,7 @@ class AssetDepreciationController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -124,17 +124,14 @@ class AssetDepreciationController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'organizationname' => ['required', 'string', 'max:255'],
+            'organizationname' => ['required', 'string', 'max:255'],
             'accounting_periodperiod' => ['required', 'string', 'max:255'],
             'amount' => ['required', 'string', 'max:255'],
         ]);
 
         try {
             $assetDepreciation = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $assetDepreciation,
-                $validated
-            ) {
+            DB::transaction(function () use ($assetDepreciation, $validated) {
                 $assetDepreciation->update($validated);
             });
 
@@ -144,14 +141,14 @@ class AssetDepreciationController extends MainController
                 $assetDepreciation
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui AssetDepreciation.',
                 [
                     'exception' => $e,
                     'AssetDepreciation_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -179,14 +176,14 @@ class AssetDepreciationController extends MainController
                 'Data AssetDepreciation berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $assetDepreciation->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus AssetDepreciation.',
                 [
                     'exception' => $e,
                     'AssetDepreciation_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -195,5 +192,5 @@ class AssetDepreciationController extends MainController
                 'Data AssetDepreciation gagal dihapus.'
             );
         }
-    } 
+    }
 }

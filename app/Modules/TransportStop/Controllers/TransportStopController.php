@@ -68,7 +68,7 @@ class TransportStopController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'transport_route_id' => ['required', 'integer'],
+            'transport_route_id' => ['required', 'integer'],
             'stop_order' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'address' => ['required', 'string', 'max:255'],
@@ -96,7 +96,7 @@ class TransportStopController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -129,7 +129,7 @@ class TransportStopController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'transport_route_id' => ['required', 'integer'],
+            'transport_route_id' => ['required', 'integer'],
             'stop_order' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'address' => ['required', 'string', 'max:255'],
@@ -141,10 +141,7 @@ class TransportStopController extends MainController
 
         try {
             $transportStop = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $transportStop,
-                $validated
-            ) {
+            DB::transaction(function () use ($transportStop, $validated) {
                 $transportStop->update($validated);
             });
 
@@ -154,14 +151,14 @@ class TransportStopController extends MainController
                 $transportStop
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui TransportStop.',
                 [
                     'exception' => $e,
                     'TransportStop_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -189,14 +186,14 @@ class TransportStopController extends MainController
                 'Data TransportStop berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $transportStop->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus TransportStop.',
                 [
                     'exception' => $e,
                     'TransportStop_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -205,5 +202,5 @@ class TransportStopController extends MainController
                 'Data TransportStop gagal dihapus.'
             );
         }
-    } 
+    }
 }

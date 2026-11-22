@@ -89,7 +89,7 @@ class SchoolController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -128,10 +128,7 @@ class SchoolController extends MainController
         try {
             $school = $this->model->findOrFail($id);
 
-            DB::transaction(function () use (
-                $school,
-                $validated
-            ) {
+            DB::transaction(function () use ($school, $validated) {
                 $school->update($validated);
             });
 
@@ -154,7 +151,7 @@ class SchoolController extends MainController
                     'exception' => $e,
                     'School_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -191,7 +188,7 @@ class SchoolController extends MainController
                 [
                     'exception' => $e,
                     'School_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -200,5 +197,5 @@ class SchoolController extends MainController
                 'Data School gagal dihapus.'
             );
         }
-    } 
+    }
 }

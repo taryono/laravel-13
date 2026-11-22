@@ -68,7 +68,7 @@ class RkasActivityController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'rkas_program_id' => ['required', 'integer'],
+            'rkas_program_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string', 'max:255'],
@@ -98,7 +98,7 @@ class RkasActivityController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -131,7 +131,7 @@ class RkasActivityController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'rkas_program_id' => ['required', 'integer'],
+            'rkas_program_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string', 'max:255'],
@@ -145,10 +145,7 @@ class RkasActivityController extends MainController
 
         try {
             $rkasActivity = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $rkasActivity,
-                $validated
-            ) {
+            DB::transaction(function () use ($rkasActivity, $validated) {
                 $rkasActivity->update($validated);
             });
 
@@ -158,14 +155,14 @@ class RkasActivityController extends MainController
                 $rkasActivity
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui RkasActivity.',
                 [
                     'exception' => $e,
                     'RkasActivity_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -193,14 +190,14 @@ class RkasActivityController extends MainController
                 'Data RkasActivity berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $rkasActivity->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus RkasActivity.',
                 [
                     'exception' => $e,
                     'RkasActivity_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -209,5 +206,5 @@ class RkasActivityController extends MainController
                 'Data RkasActivity gagal dihapus.'
             );
         }
-    } 
+    }
 }

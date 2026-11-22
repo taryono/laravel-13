@@ -68,7 +68,7 @@ class InvoicePaymentController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'invoice_id' => ['required', 'integer'],
+            'invoice_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
             'payment_number' => ['required', 'string', 'max:255'],
             'payment_date' => ['required', 'string', 'max:255'],
@@ -100,7 +100,7 @@ class InvoicePaymentController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -133,7 +133,7 @@ class InvoicePaymentController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'invoice_id' => ['required', 'integer'],
+            'invoice_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
             'payment_number' => ['required', 'string', 'max:255'],
             'payment_date' => ['required', 'string', 'max:255'],
@@ -149,10 +149,7 @@ class InvoicePaymentController extends MainController
 
         try {
             $invoicePayment = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $invoicePayment,
-                $validated
-            ) {
+            DB::transaction(function () use ($invoicePayment, $validated) {
                 $invoicePayment->update($validated);
             });
 
@@ -162,14 +159,14 @@ class InvoicePaymentController extends MainController
                 $invoicePayment
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui InvoicePayment.',
                 [
                     'exception' => $e,
                     'InvoicePayment_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -197,14 +194,14 @@ class InvoicePaymentController extends MainController
                 'Data InvoicePayment berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $invoicePayment->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus InvoicePayment.',
                 [
                     'exception' => $e,
                     'InvoicePayment_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -213,5 +210,5 @@ class InvoicePaymentController extends MainController
                 'Data InvoicePayment gagal dihapus.'
             );
         }
-    } 
+    }
 }

@@ -68,7 +68,7 @@ class AdmissionSelectionController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'admission_id' => ['required', 'integer'],
+            'admission_id' => ['required', 'integer'],
             'applicant_id' => ['required', 'integer'],
             'selection_type' => ['required', 'string', 'max:255'],
             'score' => ['required', 'string', 'max:255'],
@@ -102,7 +102,7 @@ class AdmissionSelectionController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -135,7 +135,7 @@ class AdmissionSelectionController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'admission_id' => ['required', 'integer'],
+            'admission_id' => ['required', 'integer'],
             'applicant_id' => ['required', 'integer'],
             'selection_type' => ['required', 'string', 'max:255'],
             'score' => ['required', 'string', 'max:255'],
@@ -153,10 +153,7 @@ class AdmissionSelectionController extends MainController
 
         try {
             $admissionSelection = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $admissionSelection,
-                $validated
-            ) {
+            DB::transaction(function () use ($admissionSelection, $validated) {
                 $admissionSelection->update($validated);
             });
 
@@ -166,14 +163,14 @@ class AdmissionSelectionController extends MainController
                 $admissionSelection
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui AdmissionSelection.',
                 [
                     'exception' => $e,
                     'AdmissionSelection_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -201,14 +198,14 @@ class AdmissionSelectionController extends MainController
                 'Data AdmissionSelection berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $admissionSelection->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus AdmissionSelection.',
                 [
                     'exception' => $e,
                     'AdmissionSelection_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -217,5 +214,5 @@ class AdmissionSelectionController extends MainController
                 'Data AdmissionSelection gagal dihapus.'
             );
         }
-    } 
+    }
 }

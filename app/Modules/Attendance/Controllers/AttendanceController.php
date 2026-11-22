@@ -37,7 +37,7 @@ class AttendanceController extends MainController
     {
         $attendance = new Attendance();
         $employees = Employee::where('is_active', 1)->pluck('full_name', 'id');
-        $periods = PayrollPeriod::where('is_closed', 0)->pluck('code', 'id'); 
+        $periods = PayrollPeriod::where('is_closed', 0)->pluck('code', 'id');
 
         return view('Attendance::create', compact('attendance', 'employees', 'periods'));
     }
@@ -45,96 +45,96 @@ class AttendanceController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'employee_id'        => 'required|exists:employees,id',
-            'attendance_date'    => 'required|date',
-            'status'             => 'required|in:present,sick,excused,absent_unexcused,on_leave,business_trip',
-            'notes'              => 'nullable|string',
-            'payroll_period_id'  => 'nullable|exists:payroll_periods,id',
+            'employee_id' => 'required|exists:employees,id',
+            'attendance_date' => 'required|date',
+            'status' => 'required|in:present,sick,excused,absent_unexcused,on_leave,business_trip',
+            'notes' => 'nullable|string',
+            'payroll_period_id' => 'nullable|exists:payroll_periods,id',
             // ✅ Validasi jam masuk/pulang
-            'actual_check_in'    => 'nullable|date_format:Y-m-d\TH:i',
-            'actual_check_out'   => 'nullable|date_format:Y-m-d\TH:i|after:actual_check_in',
-            'overtime_hours'     => 'nullable|numeric|min:0',
+            'actual_check_in' => 'nullable|date_format:Y-m-d\TH:i',
+            'actual_check_out' => 'nullable|date_format:Y-m-d\TH:i|after:actual_check_in',
+            'overtime_hours' => 'nullable|numeric|min:0',
         ]);
 
         // Cari periode penggajian otomatis
         $period = PayrollPeriod::where('start_date', '<=', $validated['attendance_date'])
             ->where('end_date', '>=', $validated['attendance_date'])
             ->first();
-        if (!$period) { 
+        if (!$period) {
             return $this->errorResponse($request, 'Tidak ada periode penggajian untuk tanggal ini.');
         }
         $validated['payroll_period_id'] = $period->id;
 
 
-         try {
-            $attendance =  DB::transaction(function () use ($validated) {
+        try {
+            $attendance = DB::transaction(function () use ($validated) {
 
-            // ✅ === TAMBAHKAN BARIS INI ===
-            $analysis = $this->calculateAttendance(
-                $validated['employee_id'],
-                $validated['attendance_date'],
-                $validated['actual_check_in'] ?? null,
-                $validated['actual_check_out'] ?? null
-            );
+                // ✅ === TAMBAHKAN BARIS INI ===
+                $analysis = $this->calculateAttendance(
+                    $validated['employee_id'],
+                    $validated['attendance_date'],
+                    $validated['actual_check_in'] ?? null,
+                    $validated['actual_check_out'] ?? null
+                );
 
-            // Opsional: Jika ingin menolak simpan jika tidak ada jadwal
-            // if (!$analysis['success']) {
-            //     throw new \Exception($analysis['message']);
-            // }
-            // ✅ === AKHIR PENAMBAHAN ===
-            
-            // =============================================
-            // LANGKAH 1: Simpan/Update ke attendance_daily
-            // =============================================
-            $attendanceDaily = AttendanceDaily::firstOrNew([
-                'employee_id'      => $validated['employee_id'],
-                'attendance_date'  => $validated['attendance_date'],
-            ]);
+                // Opsional: Jika ingin menolak simpan jika tidak ada jadwal
+                // if (!$analysis['success']) {
+                //     throw new \Exception($analysis['message']);
+                // }
+                // ✅ === AKHIR PENAMBAHAN ===
 
-            if (!empty($validated['actual_check_in'])) {
-                $attendanceDaily->actual_check_in = Carbon::parse($validated['actual_check_in']);
-                $attendanceDaily->first_scan = Carbon::parse($validated['actual_check_in']);
-            }
-            if (!empty($validated['actual_check_out'])) {
-                $attendanceDaily->actual_check_out = Carbon::parse($validated['actual_check_out']);
-                $attendanceDaily->last_scan = Carbon::parse($validated['actual_check_out']);
-            }
-            if (isset($validated['overtime_hours'])) {
-                $attendanceDaily->overtime_hours = $validated['overtime_hours'];
-            }
+                // =============================================
+                // LANGKAH 1: Simpan/Update ke attendance_daily
+                // =============================================
+                $attendanceDaily = AttendanceDaily::firstOrNew([
+                    'employee_id' => $validated['employee_id'],
+                    'attendance_date' => $validated['attendance_date'],
+                ]);
 
-            $attendanceDaily->attendance_status = $validated['status'];
-            $attendanceDaily->payroll_period_id = $validated['payroll_period_id'];
-            $attendanceDaily->is_approved = true;
-            $attendanceDaily->adjustment_notes = $validated['notes'] ?? 'Input manual oleh admin';
-            $attendanceDaily->save();
+                if (!empty($validated['actual_check_in'])) {
+                    $attendanceDaily->actual_check_in = Carbon::parse($validated['actual_check_in']);
+                    $attendanceDaily->first_scan = Carbon::parse($validated['actual_check_in']);
+                }
+                if (!empty($validated['actual_check_out'])) {
+                    $attendanceDaily->actual_check_out = Carbon::parse($validated['actual_check_out']);
+                    $attendanceDaily->last_scan = Carbon::parse($validated['actual_check_out']);
+                }
+                if (isset($validated['overtime_hours'])) {
+                    $attendanceDaily->overtime_hours = $validated['overtime_hours'];
+                }
 
-            // =============================================
-            // ✅ LANGKAH 2: Gunakan updateOrCreate untuk attendances
-            // =============================================
-            $uniqueKey = [
-                'employee_id'     => $validated['employee_id'],
-                'attendance_date' => $validated['attendance_date'],
-            ];
+                $attendanceDaily->attendance_status = $validated['status'];
+                $attendanceDaily->payroll_period_id = $validated['payroll_period_id'];
+                $attendanceDaily->is_approved = true;
+                $attendanceDaily->adjustment_notes = $validated['notes'] ?? 'Input manual oleh admin';
+                $attendanceDaily->save();
 
-            $data = [
-                'payroll_period_id'   => $validated['payroll_period_id'],
-                'attendance_daily_id' => $attendanceDaily->id,
-                'status'              => $validated['status'],
-                'notes'               => $validated['notes'] ?? '(Input manual)',
-                'approved_by'         => auth()->id(),
-                'approved_at'         => now(),
-            ];
+                // =============================================
+                // ✅ LANGKAH 2: Gunakan updateOrCreate untuk attendances
+                // =============================================
+                $uniqueKey = [
+                    'employee_id' => $validated['employee_id'],
+                    'attendance_date' => $validated['attendance_date'],
+                ];
 
-            // ✅ Kalau ADA → UPDATE, Kalau TIDAK ADA → CREATE
-            $attendance = Attendance::updateOrCreate($uniqueKey, $data);
+                $data = [
+                    'payroll_period_id' => $validated['payroll_period_id'],
+                    'attendance_daily_id' => $attendanceDaily->id,
+                    'status' => $validated['status'],
+                    'notes' => $validated['notes'] ?? '(Input manual)',
+                    'approved_by' => request()->user()?->id,
+                    'approved_at' => now(),
+                ];
 
-            return $attendance;
-        });
+                // ✅ Kalau ADA → UPDATE, Kalau TIDAK ADA → CREATE
+                $attendance = Attendance::updateOrCreate($uniqueKey, $data);
+
+                return $attendance;
+            });
 
             return $this->successResponse(
                 $request,
-                'Catatan absensi berhasil ditambahkan. ' . 
+                'Catatan absensi berhasil ditambahkan. ' .
                 ($analysis['is_swap'] ? ' ⚠️ Menggunakan shift hasil pertukaran.' : '') .
                 ($analysis['is_late'] ? ' Karyawan terlambat ' . $analysis['minutes_late'] . ' menit.' : ''),
                 $attendance
@@ -142,7 +142,7 @@ class AttendanceController extends MainController
         } catch (Throwable $e) {
             Log::error('Gagal menyimpan catatan absensi.', [
                 'exception' => $e,
-                'data'      => $validated,
+                'data' => $validated,
             ]);
 
             return $this->errorResponse($request, 'Gagal menyimpan data. Silakan coba lagi.');
@@ -152,9 +152,9 @@ class AttendanceController extends MainController
     public function edit($id): View
     {
         $attendance = $this->model->findOrFail($id);
-        $employees = Employee::where('is_active', 1)->pluck('full_name', 'id');  
-        $periods = PayrollPeriod::where('is_closed', 0)->pluck('code', 'id'); 
-        return view('Attendance::edit', compact('attendance',  'employees', 'periods'));
+        $employees = Employee::where('is_active', 1)->pluck('full_name', 'id');
+        $periods = PayrollPeriod::where('is_closed', 0)->pluck('code', 'id');
+        return view('Attendance::edit', compact('attendance', 'employees', 'periods'));
     }
 
     public function update(Request $request, $id)
@@ -164,14 +164,14 @@ class AttendanceController extends MainController
 
         // ✅ Validasi sama persis seperti store()
         $validated = $request->validate([
-            'employee_id'        => 'required|exists:employees,id',
-            'attendance_date'    => 'required|date',
-            'status'             => 'required|in:present,sick,excused,absent_unexcused,on_leave,business_trip',
-            'notes'              => 'nullable|string',
-            'payroll_period_id'  => 'nullable|exists:payroll_periods,id',
-            'actual_check_in'    => 'nullable|date_format:Y-m-d\TH:i',
-            'actual_check_out'   => 'nullable|date_format:Y-m-d\TH:i|after:actual_check_in',
-            'overtime_hours'     => 'nullable|numeric|min:0',
+            'employee_id' => 'required|exists:employees,id',
+            'attendance_date' => 'required|date',
+            'status' => 'required|in:present,sick,excused,absent_unexcused,on_leave,business_trip',
+            'notes' => 'nullable|string',
+            'payroll_period_id' => 'nullable|exists:payroll_periods,id',
+            'actual_check_in' => 'nullable|date_format:Y-m-d\TH:i',
+            'actual_check_out' => 'nullable|date_format:Y-m-d\TH:i|after:actual_check_in',
+            'overtime_hours' => 'nullable|numeric|min:0',
         ]);
 
         // =============================================
@@ -187,75 +187,75 @@ class AttendanceController extends MainController
         $validated['payroll_period_id'] = $period->id;
 
         try {
-            $attendance =  DB::transaction(function () use ($attendance, $validated) {
+            $attendance = DB::transaction(function () use ($attendance, $validated) {
 
-            // ✅ === TAMBAHKAN BARIS INI ===
-            $analysis = $this->calculateAttendance(
-                $validated['employee_id'],
-                $validated['attendance_date'],
-                $validated['actual_check_in'] ?? null,
-                $validated['actual_check_out'] ?? null
-            );
-            // ✅ === AKHIR PENAMBAHAN ===
-            // =============================================
-            // ✅ LANGKAH 1: Cari/buat data attendance_daily
-            // =============================================
-            // Jika karyawan atau tanggal BERUBAH → cari yang baru
-            $attendanceDaily = AttendanceDaily::where('employee_id', $validated['employee_id'])
-                ->where('attendance_date', $validated['attendance_date'])
-                ->first();
+                // ✅ === TAMBAHKAN BARIS INI ===
+                $analysis = $this->calculateAttendance(
+                    $validated['employee_id'],
+                    $validated['attendance_date'],
+                    $validated['actual_check_in'] ?? null,
+                    $validated['actual_check_out'] ?? null
+                );
+                // ✅ === AKHIR PENAMBAHAN ===
+                // =============================================
+                // ✅ LANGKAH 1: Cari/buat data attendance_daily
+                // =============================================
+                // Jika karyawan atau tanggal BERUBAH → cari yang baru
+                $attendanceDaily = AttendanceDaily::where('employee_id', $validated['employee_id'])
+                    ->where('attendance_date', $validated['attendance_date'])
+                    ->first();
 
-            // Jika TIDAK DITEMUKAN → buat baru (karena berubah tanggal/karyawan)
-            if (!$attendanceDaily) {
-                $attendanceDaily = new AttendanceDaily();
-                $attendanceDaily->employee_id = $validated['employee_id'];
-                $attendanceDaily->attendance_date = $validated['attendance_date'];
-            }
+                // Jika TIDAK DITEMUKAN → buat baru (karena berubah tanggal/karyawan)
+                if (!$attendanceDaily) {
+                    $attendanceDaily = new AttendanceDaily();
+                    $attendanceDaily->employee_id = $validated['employee_id'];
+                    $attendanceDaily->attendance_date = $validated['attendance_date'];
+                }
 
-            // ✅ Isi/perbarui jam masuk & pulang
-            if (!empty($validated['actual_check_in'])) {
-                $attendanceDaily->actual_check_in = Carbon::parse($validated['actual_check_in']);
-                $attendanceDaily->first_scan = Carbon::parse($validated['actual_check_in']);
-            }
-            if (!empty($validated['actual_check_out'])) {
-                $attendanceDaily->actual_check_out = Carbon::parse($validated['actual_check_out']);
-                $attendanceDaily->last_scan = Carbon::parse($validated['actual_check_out']);
-            }
-            if (isset($validated['overtime_hours'])) {
-                $attendanceDaily->overtime_hours = $validated['overtime_hours'];
-            }
+                // ✅ Isi/perbarui jam masuk & pulang
+                if (!empty($validated['actual_check_in'])) {
+                    $attendanceDaily->actual_check_in = Carbon::parse($validated['actual_check_in']);
+                    $attendanceDaily->first_scan = Carbon::parse($validated['actual_check_in']);
+                }
+                if (!empty($validated['actual_check_out'])) {
+                    $attendanceDaily->actual_check_out = Carbon::parse($validated['actual_check_out']);
+                    $attendanceDaily->last_scan = Carbon::parse($validated['actual_check_out']);
+                }
+                if (isset($validated['overtime_hours'])) {
+                    $attendanceDaily->overtime_hours = $validated['overtime_hours'];
+                }
 
-            // ✅ Perbarui status & metadata
-            $attendanceDaily->attendance_status = $validated['status'];
-            $attendanceDaily->payroll_period_id = $validated['payroll_period_id'];
-            $attendanceDaily->is_approved = true;
-            $attendanceDaily->adjustment_notes = $validated['notes'] ?? 'Diedit manual oleh admin';
-            $attendanceDaily->save();
+                // ✅ Perbarui status & metadata
+                $attendanceDaily->attendance_status = $validated['status'];
+                $attendanceDaily->payroll_period_id = $validated['payroll_period_id'];
+                $attendanceDaily->is_approved = true;
+                $attendanceDaily->adjustment_notes = $validated['notes'] ?? 'Diedit manual oleh admin';
+                $attendanceDaily->save();
 
-            // =============================================
-            // ✅ LANGKAH 2: Perbarui data attendance
-            // =============================================
-            // Hapus dulu kolom yang TIDAK ada di tabel attendances
-            unset(
-                $validated['actual_check_in'],
-                $validated['actual_check_out'],
-                $validated['overtime_hours']
-            );
+                // =============================================
+                // ✅ LANGKAH 2: Perbarui data attendance
+                // =============================================
+                // Hapus dulu kolom yang TIDAK ada di tabel attendances
+                unset(
+                    $validated['actual_check_in'],
+                    $validated['actual_check_out'],
+                    $validated['overtime_hours']
+                );
 
-            // Tambahkan penghubung ke attendance_daily yang baru/diperbarui
-            $validated['attendance_daily_id'] = $attendanceDaily->id;
-            $validated['approved_by'] = auth()->id();
-            $validated['approved_at'] = now();
+                // Tambahkan penghubung ke attendance_daily yang baru/diperbarui
+                $validated['attendance_daily_id'] = $attendanceDaily->id;
+                $validated['approved_by'] = request()->user()?->id;
+                $validated['approved_at'] = now();
 
-            // Simpan perubahan ke tabel attendances
-            $attendance->update($validated);
+                // Simpan perubahan ke tabel attendances
+                $attendance->update($validated);
 
-            return $attendance;
-        });
+                return $attendance;
+            });
 
             return $this->successResponse(
                 $request,
-                'Catatan absensi berhasil diperbarui.. ' . 
+                'Catatan absensi berhasil diperbarui.. ' .
                 ($analysis['is_swap'] ? ' ⚠️ Menggunakan shift hasil pertukaran.' : '') .
                 ($analysis['is_late'] ? ' Karyawan terlambat ' . $analysis['minutes_late'] . ' menit.' : ''),
                 $attendance
@@ -378,9 +378,9 @@ class AttendanceController extends MainController
     {
         $period = PayrollPeriod::findOrFail($periodId);
         $attendances = Attendance::with('employee')
-                                ->where('payroll_period_id', $periodId)
-                                ->get();
-        
+            ->where('payroll_period_id', $periodId)
+            ->get();
+
         // Hitung rekap
         $summary = [
             'total_hadir' => $attendances->where('status', 'present')->count(),
@@ -391,9 +391,9 @@ class AttendanceController extends MainController
             'total_dinas_luar' => $attendances->where('status', 'business_trip')->count(),
             'total_overtime' => $attendances->sum('overtime_hours'),
         ];
-        
+
         return view('Attendance::report', compact('period', 'attendances', 'summary'));
-    }  
+    }
 
 
     /**
@@ -416,7 +416,7 @@ class AttendanceController extends MainController
         // Konversi waktu
         $dateStr = $attendanceDate;
         $startTime = strtotime($dateStr . ' ' . $shift->start_time);
-        $endTime   = strtotime($dateStr . ' ' . $shift->end_time);
+        $endTime = strtotime($dateStr . ' ' . $shift->end_time);
 
         // Tangani shift melewati tengah malam
         if ($shift->crosses_midnight) {
@@ -451,7 +451,7 @@ class AttendanceController extends MainController
             ->where('status', 'approved')
             ->where(function ($q) use ($employeeId) {
                 $q->where('employee_id_a', $employeeId)
-                ->orWhere('employee_id_b', $employeeId);
+                    ->orWhere('employee_id_b', $employeeId);
             })
             ->exists();
 

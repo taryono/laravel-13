@@ -68,7 +68,7 @@ class RkasRevisionController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'rkas_document_id' => ['required', 'integer'],
+            'rkas_document_id' => ['required', 'integer'],
             'parent_revision_id' => ['required', 'integer'],
             'revision_number' => ['required', 'string', 'max:255'],
             'revision_type' => ['required', 'string', 'max:255'],
@@ -105,7 +105,7 @@ class RkasRevisionController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -138,7 +138,7 @@ class RkasRevisionController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'rkas_document_id' => ['required', 'integer'],
+            'rkas_document_id' => ['required', 'integer'],
             'parent_revision_id' => ['required', 'integer'],
             'revision_number' => ['required', 'string', 'max:255'],
             'revision_type' => ['required', 'string', 'max:255'],
@@ -159,10 +159,7 @@ class RkasRevisionController extends MainController
 
         try {
             $rkasRevision = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $rkasRevision,
-                $validated
-            ) {
+            DB::transaction(function () use ($rkasRevision, $validated) {
                 $rkasRevision->update($validated);
             });
 
@@ -172,14 +169,14 @@ class RkasRevisionController extends MainController
                 $rkasRevision
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui RkasRevision.',
                 [
                     'exception' => $e,
                     'RkasRevision_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -207,14 +204,14 @@ class RkasRevisionController extends MainController
                 'Data RkasRevision berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $rkasRevision->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus RkasRevision.',
                 [
                     'exception' => $e,
                     'RkasRevision_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -223,5 +220,5 @@ class RkasRevisionController extends MainController
                 'Data RkasRevision gagal dihapus.'
             );
         }
-    } 
+    }
 }

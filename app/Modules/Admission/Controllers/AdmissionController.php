@@ -68,7 +68,7 @@ class AdmissionController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'academic_year_id' => ['required', 'integer'],
             'class_level_id' => ['required', 'integer'],
             'name' => ['required', 'string', 'max:255'],
@@ -107,7 +107,7 @@ class AdmissionController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -140,7 +140,7 @@ class AdmissionController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'academic_year_id' => ['required', 'integer'],
             'class_level_id' => ['required', 'integer'],
             'name' => ['required', 'string', 'max:255'],
@@ -163,10 +163,7 @@ class AdmissionController extends MainController
 
         try {
             $admission = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $admission,
-                $validated
-            ) {
+            DB::transaction(function () use ($admission, $validated) {
                 $admission->update($validated);
             });
 
@@ -176,14 +173,14 @@ class AdmissionController extends MainController
                 $admission
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui Admission.',
                 [
                     'exception' => $e,
                     'Admission_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -211,14 +208,14 @@ class AdmissionController extends MainController
                 'Data Admission berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $admission->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus Admission.',
                 [
                     'exception' => $e,
                     'Admission_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -227,5 +224,5 @@ class AdmissionController extends MainController
                 'Data Admission gagal dihapus.'
             );
         }
-    } 
+    }
 }

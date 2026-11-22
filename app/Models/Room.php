@@ -2,12 +2,8 @@
 
 namespace Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
-
-class Room extends Model
+class Room extends BasedModel
 {
-    use SoftDeletes;
 
     protected $table = 'rooms';
     protected $guarded = ['id'];

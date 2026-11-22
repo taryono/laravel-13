@@ -17,7 +17,8 @@ class ActionController extends MainController
 {
 
 
-    public function __construct(){
+    public function __construct()
+    {
         parent::__construct(new Action());
     }
 
@@ -53,12 +54,12 @@ class ActionController extends MainController
     public function create(): View
     {
         $action = new Action();
- 
+
         // getForm() sekarang return ['forms' => ..., 'grouped' => ...]
         $result = $this->getForm($action);
         $forms = $result['forms'];
         $groupedForms = $result['grouped'];
- 
+
         return view(
             'Action::edit',
             compact('action', 'forms', 'groupedForms')
@@ -96,7 +97,7 @@ class ActionController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -111,7 +112,7 @@ class ActionController extends MainController
      * Show the form for editing the specified resource.
      */
     public function edit($id): View
-    {   
+    {
         $action = $this->model->findOrFail($id);
         $result = $this->getForm($action);
         $forms = $result['forms'];
@@ -126,7 +127,8 @@ class ActionController extends MainController
     /**
      * Update the specified resource.
      */
-    public function update(Request $request,$id) {
+    public function update(Request $request, $id)
+    {
         $validated = $request->validate([
             'name' => [
                 'required',
@@ -137,10 +139,7 @@ class ActionController extends MainController
 
         try {
             $action = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $action,
-                $validated
-            ) {
+            DB::transaction(function () use ($action, $validated) {
                 $action->update($validated);
             });
 
@@ -158,7 +157,7 @@ class ActionController extends MainController
                     'exception' => $e,
                     'Action_id' => $action->getKey(),
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -172,9 +171,10 @@ class ActionController extends MainController
     /**
      * Remove the specified resource.
      */
-    public function destroy(Request $request,$id): JsonResponse|RedirectResponse {
+    public function destroy(Request $request, $id): JsonResponse|RedirectResponse
+    {
         try {
-             $action = $this->model->findOrFail($id);
+            $action = $this->model->findOrFail($id);
             DB::transaction(function () use ($action) {
                 $action->delete();
             });
@@ -191,7 +191,7 @@ class ActionController extends MainController
                 [
                     'exception' => $e,
                     'Action_id' => $action->getKey(),
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -200,5 +200,5 @@ class ActionController extends MainController
                 'Data Action gagal dihapus.'
             );
         }
-    } 
+    }
 }

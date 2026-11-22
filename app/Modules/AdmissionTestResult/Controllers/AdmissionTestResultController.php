@@ -68,7 +68,7 @@ class AdmissionTestResultController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'admission_test_schedule_id' => ['required', 'integer'],
+            'admission_test_schedule_id' => ['required', 'integer'],
             'applicant_id' => ['required', 'integer'],
             'admission_id' => ['required', 'integer'],
             'admission_path_id' => ['required', 'integer'],
@@ -113,7 +113,7 @@ class AdmissionTestResultController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -146,7 +146,7 @@ class AdmissionTestResultController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'admission_test_schedule_id' => ['required', 'integer'],
+            'admission_test_schedule_id' => ['required', 'integer'],
             'applicant_id' => ['required', 'integer'],
             'admission_id' => ['required', 'integer'],
             'admission_path_id' => ['required', 'integer'],
@@ -175,10 +175,7 @@ class AdmissionTestResultController extends MainController
 
         try {
             $admissionTestResult = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $admissionTestResult,
-                $validated
-            ) {
+            DB::transaction(function () use ($admissionTestResult, $validated) {
                 $admissionTestResult->update($validated);
             });
 
@@ -188,14 +185,14 @@ class AdmissionTestResultController extends MainController
                 $admissionTestResult
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui AdmissionTestResult.',
                 [
                     'exception' => $e,
                     'AdmissionTestResult_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -223,14 +220,14 @@ class AdmissionTestResultController extends MainController
                 'Data AdmissionTestResult berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $admissionTestResult->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus AdmissionTestResult.',
                 [
                     'exception' => $e,
                     'AdmissionTestResult_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -239,5 +236,5 @@ class AdmissionTestResultController extends MainController
                 'Data AdmissionTestResult gagal dihapus.'
             );
         }
-    } 
+    }
 }

@@ -134,7 +134,7 @@ class PayrollNotificationController extends MainController
     {
         try {
             DB::transaction(function () use ($request) {
-                PayrollNotification::where('user_id', auth()->id())
+                PayrollNotification::where('user_id', request()->user()?->id)
                     ->where('is_read', 0)
                     ->update([
                         'is_read' => true,
@@ -152,7 +152,7 @@ class PayrollNotificationController extends MainController
     public function getUnreadCount(): JsonResponse
     {
         try {
-            $count = PayrollNotification::where('user_id', auth()->id())
+            $count = PayrollNotification::where('user_id', request()->user()?->id)
                 ->where('is_read', 0)
                 ->count();
 

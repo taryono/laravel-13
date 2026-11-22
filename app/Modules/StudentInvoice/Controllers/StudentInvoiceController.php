@@ -68,7 +68,7 @@ class StudentInvoiceController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'student_id' => ['required', 'integer'],
             'fee_master_id' => ['required', 'integer'],
             'student_classroom_id' => ['required', 'integer'],
@@ -107,7 +107,7 @@ class StudentInvoiceController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -140,7 +140,7 @@ class StudentInvoiceController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'student_id' => ['required', 'integer'],
             'fee_master_id' => ['required', 'integer'],
             'student_classroom_id' => ['required', 'integer'],
@@ -163,10 +163,7 @@ class StudentInvoiceController extends MainController
 
         try {
             $studentInvoice = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $studentInvoice,
-                $validated
-            ) {
+            DB::transaction(function () use ($studentInvoice, $validated) {
                 $studentInvoice->update($validated);
             });
 
@@ -176,14 +173,14 @@ class StudentInvoiceController extends MainController
                 $studentInvoice
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui StudentInvoice.',
                 [
                     'exception' => $e,
                     'StudentInvoice_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -211,14 +208,14 @@ class StudentInvoiceController extends MainController
                 'Data StudentInvoice berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $studentInvoice->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus StudentInvoice.',
                 [
                     'exception' => $e,
                     'StudentInvoice_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -227,5 +224,5 @@ class StudentInvoiceController extends MainController
                 'Data StudentInvoice gagal dihapus.'
             );
         }
-    } 
+    }
 }

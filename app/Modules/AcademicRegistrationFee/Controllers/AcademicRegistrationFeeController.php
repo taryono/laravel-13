@@ -68,7 +68,7 @@ class AcademicRegistrationFeeController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
         ]);
 
         try {
@@ -89,7 +89,7 @@ class AcademicRegistrationFeeController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -122,15 +122,12 @@ class AcademicRegistrationFeeController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
         ]);
 
         try {
             $academicRegistrationFee = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $academicRegistrationFee,
-                $validated
-            ) {
+            DB::transaction(function () use ($academicRegistrationFee, $validated) {
                 $academicRegistrationFee->update($validated);
             });
 
@@ -140,14 +137,14 @@ class AcademicRegistrationFeeController extends MainController
                 $academicRegistrationFee
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui AcademicRegistrationFee.',
                 [
                     'exception' => $e,
                     'AcademicRegistrationFee_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -175,14 +172,14 @@ class AcademicRegistrationFeeController extends MainController
                 'Data AcademicRegistrationFee berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $academicRegistrationFee->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus AcademicRegistrationFee.',
                 [
                     'exception' => $e,
                     'AcademicRegistrationFee_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -191,5 +188,5 @@ class AcademicRegistrationFeeController extends MainController
                 'Data AcademicRegistrationFee gagal dihapus.'
             );
         }
-    } 
+    }
 }

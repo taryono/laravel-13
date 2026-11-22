@@ -92,7 +92,7 @@ class PackageController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -134,10 +134,7 @@ class PackageController extends MainController
         try {
             $package = $this->model->findOrFail($id);
 
-            DB::transaction(function () use (
-                $package,
-                $validated
-            ) {
+            DB::transaction(function () use ($package, $validated) {
                 $package->update($validated);
             });
 
@@ -160,7 +157,7 @@ class PackageController extends MainController
                     'exception' => $e,
                     'Package_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -197,7 +194,7 @@ class PackageController extends MainController
                 [
                     'exception' => $e,
                     'Package_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -207,5 +204,5 @@ class PackageController extends MainController
             );
         }
     }
- 
+
 }

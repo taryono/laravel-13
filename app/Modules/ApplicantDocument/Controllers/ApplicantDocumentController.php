@@ -68,7 +68,7 @@ class ApplicantDocumentController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'applicant_id' => ['required', 'integer'],
+            'applicant_id' => ['required', 'integer'],
             'applicant_id' => ['required', 'integer'],
             'document_type' => ['required', 'string', 'max:255'],
             'document_url' => ['required', 'string', 'max:255'],
@@ -98,7 +98,7 @@ class ApplicantDocumentController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -131,7 +131,7 @@ class ApplicantDocumentController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'applicant_id' => ['required', 'integer'],
+            'applicant_id' => ['required', 'integer'],
             'applicant_id' => ['required', 'integer'],
             'document_type' => ['required', 'string', 'max:255'],
             'document_url' => ['required', 'string', 'max:255'],
@@ -145,10 +145,7 @@ class ApplicantDocumentController extends MainController
 
         try {
             $applicantDocument = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $applicantDocument,
-                $validated
-            ) {
+            DB::transaction(function () use ($applicantDocument, $validated) {
                 $applicantDocument->update($validated);
             });
 
@@ -158,14 +155,14 @@ class ApplicantDocumentController extends MainController
                 $applicantDocument
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui ApplicantDocument.',
                 [
                     'exception' => $e,
                     'ApplicantDocument_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -193,14 +190,14 @@ class ApplicantDocumentController extends MainController
                 'Data ApplicantDocument berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $applicantDocument->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus ApplicantDocument.',
                 [
                     'exception' => $e,
                     'ApplicantDocument_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -209,5 +206,5 @@ class ApplicantDocumentController extends MainController
                 'Data ApplicantDocument gagal dihapus.'
             );
         }
-    } 
+    }
 }

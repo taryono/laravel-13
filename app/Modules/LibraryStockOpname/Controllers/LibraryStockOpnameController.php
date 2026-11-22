@@ -68,7 +68,7 @@ class LibraryStockOpnameController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'library_book_id' => ['required', 'integer'],
             'book_copy_id' => ['required', 'integer'],
             'opname_batch' => ['required', 'string', 'max:255'],
@@ -109,7 +109,7 @@ class LibraryStockOpnameController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -142,7 +142,7 @@ class LibraryStockOpnameController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'library_book_id' => ['required', 'integer'],
             'book_copy_id' => ['required', 'integer'],
             'opname_batch' => ['required', 'string', 'max:255'],
@@ -167,10 +167,7 @@ class LibraryStockOpnameController extends MainController
 
         try {
             $libraryStockOpname = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $libraryStockOpname,
-                $validated
-            ) {
+            DB::transaction(function () use ($libraryStockOpname, $validated) {
                 $libraryStockOpname->update($validated);
             });
 
@@ -180,14 +177,14 @@ class LibraryStockOpnameController extends MainController
                 $libraryStockOpname
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui LibraryStockOpname.',
                 [
                     'exception' => $e,
                     'LibraryStockOpname_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -215,14 +212,14 @@ class LibraryStockOpnameController extends MainController
                 'Data LibraryStockOpname berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $libraryStockOpname->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus LibraryStockOpname.',
                 [
                     'exception' => $e,
                     'LibraryStockOpname_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -231,5 +228,5 @@ class LibraryStockOpnameController extends MainController
                 'Data LibraryStockOpname gagal dihapus.'
             );
         }
-    } 
+    }
 }

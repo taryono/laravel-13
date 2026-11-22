@@ -68,7 +68,7 @@ class ApplicantInvoiceController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'applicant_id' => ['required', 'integer'],
+            'applicant_id' => ['required', 'integer'],
             'school_id' => ['required', 'integer'],
             'admission_id' => ['required', 'integer'],
             'invoice_number' => ['required', 'string', 'max:255'],
@@ -106,7 +106,7 @@ class ApplicantInvoiceController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -139,7 +139,7 @@ class ApplicantInvoiceController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'applicant_id' => ['required', 'integer'],
+            'applicant_id' => ['required', 'integer'],
             'school_id' => ['required', 'integer'],
             'admission_id' => ['required', 'integer'],
             'invoice_number' => ['required', 'string', 'max:255'],
@@ -161,10 +161,7 @@ class ApplicantInvoiceController extends MainController
 
         try {
             $applicantInvoice = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $applicantInvoice,
-                $validated
-            ) {
+            DB::transaction(function () use ($applicantInvoice, $validated) {
                 $applicantInvoice->update($validated);
             });
 
@@ -174,14 +171,14 @@ class ApplicantInvoiceController extends MainController
                 $applicantInvoice
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui ApplicantInvoice.',
                 [
                     'exception' => $e,
                     'ApplicantInvoice_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -209,14 +206,14 @@ class ApplicantInvoiceController extends MainController
                 'Data ApplicantInvoice berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $applicantInvoice->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus ApplicantInvoice.',
                 [
                     'exception' => $e,
                     'ApplicantInvoice_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -225,5 +222,5 @@ class ApplicantInvoiceController extends MainController
                 'Data ApplicantInvoice gagal dihapus.'
             );
         }
-    } 
+    }
 }

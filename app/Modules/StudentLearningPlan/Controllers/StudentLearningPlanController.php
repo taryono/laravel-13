@@ -68,7 +68,7 @@ class StudentLearningPlanController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'student_id' => ['required', 'integer'],
             'curriculum_id' => ['required', 'integer'],
             'academic_year_id' => ['required', 'integer'],
@@ -97,7 +97,7 @@ class StudentLearningPlanController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -130,7 +130,7 @@ class StudentLearningPlanController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'student_id' => ['required', 'integer'],
             'curriculum_id' => ['required', 'integer'],
             'academic_year_id' => ['required', 'integer'],
@@ -143,10 +143,7 @@ class StudentLearningPlanController extends MainController
 
         try {
             $studentLearningPlan = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $studentLearningPlan,
-                $validated
-            ) {
+            DB::transaction(function () use ($studentLearningPlan, $validated) {
                 $studentLearningPlan->update($validated);
             });
 
@@ -156,14 +153,14 @@ class StudentLearningPlanController extends MainController
                 $studentLearningPlan
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui StudentLearningPlan.',
                 [
                     'exception' => $e,
                     'StudentLearningPlan_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -191,14 +188,14 @@ class StudentLearningPlanController extends MainController
                 'Data StudentLearningPlan berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $studentLearningPlan->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus StudentLearningPlan.',
                 [
                     'exception' => $e,
                     'StudentLearningPlan_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -207,5 +204,5 @@ class StudentLearningPlanController extends MainController
                 'Data StudentLearningPlan gagal dihapus.'
             );
         }
-    } 
+    }
 }

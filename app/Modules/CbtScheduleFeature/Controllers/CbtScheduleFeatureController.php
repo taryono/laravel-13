@@ -68,7 +68,7 @@ class CbtScheduleFeatureController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'schedule_id' => ['required', 'integer'],
+            'schedule_id' => ['required', 'integer'],
             'feature_id' => ['required', 'integer'],
             'is_enabled' => ['required', 'string', 'max:255'],
             'config' => ['required', 'string', 'max:255'],
@@ -94,7 +94,7 @@ class CbtScheduleFeatureController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -127,7 +127,7 @@ class CbtScheduleFeatureController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'schedule_id' => ['required', 'integer'],
+            'schedule_id' => ['required', 'integer'],
             'feature_id' => ['required', 'integer'],
             'is_enabled' => ['required', 'string', 'max:255'],
             'config' => ['required', 'string', 'max:255'],
@@ -137,10 +137,7 @@ class CbtScheduleFeatureController extends MainController
 
         try {
             $cbtScheduleFeature = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $cbtScheduleFeature,
-                $validated
-            ) {
+            DB::transaction(function () use ($cbtScheduleFeature, $validated) {
                 $cbtScheduleFeature->update($validated);
             });
 
@@ -150,14 +147,14 @@ class CbtScheduleFeatureController extends MainController
                 $cbtScheduleFeature
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui CbtScheduleFeature.',
                 [
                     'exception' => $e,
                     'CbtScheduleFeature_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -185,14 +182,14 @@ class CbtScheduleFeatureController extends MainController
                 'Data CbtScheduleFeature berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $cbtScheduleFeature->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus CbtScheduleFeature.',
                 [
                     'exception' => $e,
                     'CbtScheduleFeature_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -201,5 +198,5 @@ class CbtScheduleFeatureController extends MainController
                 'Data CbtScheduleFeature gagal dihapus.'
             );
         }
-    } 
+    }
 }

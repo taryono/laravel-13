@@ -68,7 +68,7 @@ class WhatsappLogController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'notification_template_id' => ['required', 'integer'],
             'recipient_user_id' => ['required', 'integer'],
             'recipient_student_id' => ['required', 'integer'],
@@ -119,7 +119,7 @@ class WhatsappLogController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -152,7 +152,7 @@ class WhatsappLogController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'notification_template_id' => ['required', 'integer'],
             'recipient_user_id' => ['required', 'integer'],
             'recipient_student_id' => ['required', 'integer'],
@@ -187,10 +187,7 @@ class WhatsappLogController extends MainController
 
         try {
             $whatsappLog = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $whatsappLog,
-                $validated
-            ) {
+            DB::transaction(function () use ($whatsappLog, $validated) {
                 $whatsappLog->update($validated);
             });
 
@@ -200,14 +197,14 @@ class WhatsappLogController extends MainController
                 $whatsappLog
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui WhatsappLog.',
                 [
                     'exception' => $e,
                     'WhatsappLog_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -235,14 +232,14 @@ class WhatsappLogController extends MainController
                 'Data WhatsappLog berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $whatsappLog->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus WhatsappLog.',
                 [
                     'exception' => $e,
                     'WhatsappLog_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -251,5 +248,5 @@ class WhatsappLogController extends MainController
                 'Data WhatsappLog gagal dihapus.'
             );
         }
-    } 
+    }
 }

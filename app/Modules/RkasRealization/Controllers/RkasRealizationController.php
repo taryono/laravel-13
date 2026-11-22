@@ -68,7 +68,7 @@ class RkasRealizationController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'rkas_item_id' => ['required', 'integer'],
+            'rkas_item_id' => ['required', 'integer'],
             'rkas_source_id' => ['required', 'integer'],
             'fiscal_period_id' => ['required', 'integer'],
             'journal_entry_id' => ['required', 'integer'],
@@ -104,7 +104,7 @@ class RkasRealizationController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -137,7 +137,7 @@ class RkasRealizationController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'rkas_item_id' => ['required', 'integer'],
+            'rkas_item_id' => ['required', 'integer'],
             'rkas_source_id' => ['required', 'integer'],
             'fiscal_period_id' => ['required', 'integer'],
             'journal_entry_id' => ['required', 'integer'],
@@ -157,10 +157,7 @@ class RkasRealizationController extends MainController
 
         try {
             $rkasRealization = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $rkasRealization,
-                $validated
-            ) {
+            DB::transaction(function () use ($rkasRealization, $validated) {
                 $rkasRealization->update($validated);
             });
 
@@ -170,14 +167,14 @@ class RkasRealizationController extends MainController
                 $rkasRealization
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui RkasRealization.',
                 [
                     'exception' => $e,
                     'RkasRealization_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -205,14 +202,14 @@ class RkasRealizationController extends MainController
                 'Data RkasRealization berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $rkasRealization->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus RkasRealization.',
                 [
                     'exception' => $e,
                     'RkasRealization_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -221,5 +218,5 @@ class RkasRealizationController extends MainController
                 'Data RkasRealization gagal dihapus.'
             );
         }
-    } 
+    }
 }

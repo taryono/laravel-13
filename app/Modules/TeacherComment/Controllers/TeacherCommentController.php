@@ -68,7 +68,7 @@ class TeacherCommentController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'student_id' => ['required', 'integer'],
+            'student_id' => ['required', 'integer'],
             'period_id' => ['required', 'integer'],
             'classroom_id' => ['required', 'integer'],
             'teacher_id' => ['required', 'integer'],
@@ -97,7 +97,7 @@ class TeacherCommentController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -130,7 +130,7 @@ class TeacherCommentController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'student_id' => ['required', 'integer'],
+            'student_id' => ['required', 'integer'],
             'period_id' => ['required', 'integer'],
             'classroom_id' => ['required', 'integer'],
             'teacher_id' => ['required', 'integer'],
@@ -143,10 +143,7 @@ class TeacherCommentController extends MainController
 
         try {
             $teacherComment = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $teacherComment,
-                $validated
-            ) {
+            DB::transaction(function () use ($teacherComment, $validated) {
                 $teacherComment->update($validated);
             });
 
@@ -156,14 +153,14 @@ class TeacherCommentController extends MainController
                 $teacherComment
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui TeacherComment.',
                 [
                     'exception' => $e,
                     'TeacherComment_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -191,14 +188,14 @@ class TeacherCommentController extends MainController
                 'Data TeacherComment berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $teacherComment->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus TeacherComment.',
                 [
                     'exception' => $e,
                     'TeacherComment_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -207,5 +204,5 @@ class TeacherCommentController extends MainController
                 'Data TeacherComment gagal dihapus.'
             );
         }
-    } 
+    }
 }

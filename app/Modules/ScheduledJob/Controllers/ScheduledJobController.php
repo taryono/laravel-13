@@ -68,7 +68,7 @@ class ScheduledJobController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'name' => ['required', 'string', 'max:255'],
             'command' => ['required', 'string', 'max:255'],
             'schedule' => ['required', 'string', 'max:255'],
@@ -98,7 +98,7 @@ class ScheduledJobController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -131,7 +131,7 @@ class ScheduledJobController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'name' => ['required', 'string', 'max:255'],
             'command' => ['required', 'string', 'max:255'],
             'schedule' => ['required', 'string', 'max:255'],
@@ -145,10 +145,7 @@ class ScheduledJobController extends MainController
 
         try {
             $scheduledJob = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $scheduledJob,
-                $validated
-            ) {
+            DB::transaction(function () use ($scheduledJob, $validated) {
                 $scheduledJob->update($validated);
             });
 
@@ -158,14 +155,14 @@ class ScheduledJobController extends MainController
                 $scheduledJob
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui ScheduledJob.',
                 [
                     'exception' => $e,
                     'ScheduledJob_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -193,14 +190,14 @@ class ScheduledJobController extends MainController
                 'Data ScheduledJob berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $scheduledJob->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus ScheduledJob.',
                 [
                     'exception' => $e,
                     'ScheduledJob_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -209,5 +206,5 @@ class ScheduledJobController extends MainController
                 'Data ScheduledJob gagal dihapus.'
             );
         }
-    } 
+    }
 }

@@ -68,7 +68,7 @@ class CurriculumCourseController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'study_program_id' => ['required', 'integer'],
+            'study_program_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'sks_theory' => ['required', 'string', 'max:255'],
@@ -99,7 +99,7 @@ class CurriculumCourseController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -132,7 +132,7 @@ class CurriculumCourseController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'study_program_id' => ['required', 'integer'],
+            'study_program_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'sks_theory' => ['required', 'string', 'max:255'],
@@ -147,10 +147,7 @@ class CurriculumCourseController extends MainController
 
         try {
             $curriculumCourse = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $curriculumCourse,
-                $validated
-            ) {
+            DB::transaction(function () use ($curriculumCourse, $validated) {
                 $curriculumCourse->update($validated);
             });
 
@@ -160,14 +157,14 @@ class CurriculumCourseController extends MainController
                 $curriculumCourse
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui CurriculumCourse.',
                 [
                     'exception' => $e,
                     'CurriculumCourse_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -195,14 +192,14 @@ class CurriculumCourseController extends MainController
                 'Data CurriculumCourse berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $curriculumCourse->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus CurriculumCourse.',
                 [
                     'exception' => $e,
                     'CurriculumCourse_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -211,5 +208,5 @@ class CurriculumCourseController extends MainController
                 'Data CurriculumCourse gagal dihapus.'
             );
         }
-    } 
+    }
 }

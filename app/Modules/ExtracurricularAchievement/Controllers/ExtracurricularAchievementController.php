@@ -68,7 +68,7 @@ class ExtracurricularAchievementController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'extracurricular_id' => ['required', 'integer'],
+            'extracurricular_id' => ['required', 'integer'],
             'student_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
             'coach_id' => ['required', 'integer'],
@@ -114,7 +114,7 @@ class ExtracurricularAchievementController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -147,7 +147,7 @@ class ExtracurricularAchievementController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'extracurricular_id' => ['required', 'integer'],
+            'extracurricular_id' => ['required', 'integer'],
             'student_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
             'coach_id' => ['required', 'integer'],
@@ -177,10 +177,7 @@ class ExtracurricularAchievementController extends MainController
 
         try {
             $extracurricularAchievement = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $extracurricularAchievement,
-                $validated
-            ) {
+            DB::transaction(function () use ($extracurricularAchievement, $validated) {
                 $extracurricularAchievement->update($validated);
             });
 
@@ -190,14 +187,14 @@ class ExtracurricularAchievementController extends MainController
                 $extracurricularAchievement
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui ExtracurricularAchievement.',
                 [
                     'exception' => $e,
                     'ExtracurricularAchievement_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -225,14 +222,14 @@ class ExtracurricularAchievementController extends MainController
                 'Data ExtracurricularAchievement berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $extracurricularAchievement->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus ExtracurricularAchievement.',
                 [
                     'exception' => $e,
                     'ExtracurricularAchievement_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -241,5 +238,5 @@ class ExtracurricularAchievementController extends MainController
                 'Data ExtracurricularAchievement gagal dihapus.'
             );
         }
-    } 
+    }
 }

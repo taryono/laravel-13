@@ -68,7 +68,7 @@ class PermissionRequestController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'student_id' => ['required', 'integer'],
+            'student_id' => ['required', 'integer'],
             'school_id' => ['required', 'integer'],
             'request_type' => ['required', 'string', 'max:255'],
             'start_date' => ['required', 'string', 'max:255'],
@@ -102,7 +102,7 @@ class PermissionRequestController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -135,7 +135,7 @@ class PermissionRequestController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'student_id' => ['required', 'integer'],
+            'student_id' => ['required', 'integer'],
             'school_id' => ['required', 'integer'],
             'request_type' => ['required', 'string', 'max:255'],
             'start_date' => ['required', 'string', 'max:255'],
@@ -153,10 +153,7 @@ class PermissionRequestController extends MainController
 
         try {
             $permissionRequest = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $permissionRequest,
-                $validated
-            ) {
+            DB::transaction(function () use ($permissionRequest, $validated) {
                 $permissionRequest->update($validated);
             });
 
@@ -166,14 +163,14 @@ class PermissionRequestController extends MainController
                 $permissionRequest
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui PermissionRequest.',
                 [
                     'exception' => $e,
                     'PermissionRequest_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -201,14 +198,14 @@ class PermissionRequestController extends MainController
                 'Data PermissionRequest berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $permissionRequest->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus PermissionRequest.',
                 [
                     'exception' => $e,
                     'PermissionRequest_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -217,5 +214,5 @@ class PermissionRequestController extends MainController
                 'Data PermissionRequest gagal dihapus.'
             );
         }
-    } 
+    }
 }

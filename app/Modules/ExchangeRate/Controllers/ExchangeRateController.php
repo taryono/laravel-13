@@ -68,7 +68,7 @@ class ExchangeRateController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'currency_id' => ['required', 'integer'],
+            'currency_id' => ['required', 'integer'],
             'base_currency_id' => ['required', 'integer'],
             'rate_date' => ['required', 'string', 'max:255'],
             'rate' => ['required', 'string', 'max:255'],
@@ -97,7 +97,7 @@ class ExchangeRateController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -130,7 +130,7 @@ class ExchangeRateController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'currency_id' => ['required', 'integer'],
+            'currency_id' => ['required', 'integer'],
             'base_currency_id' => ['required', 'integer'],
             'rate_date' => ['required', 'string', 'max:255'],
             'rate' => ['required', 'string', 'max:255'],
@@ -143,10 +143,7 @@ class ExchangeRateController extends MainController
 
         try {
             $exchangeRate = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $exchangeRate,
-                $validated
-            ) {
+            DB::transaction(function () use ($exchangeRate, $validated) {
                 $exchangeRate->update($validated);
             });
 
@@ -156,14 +153,14 @@ class ExchangeRateController extends MainController
                 $exchangeRate
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui ExchangeRate.',
                 [
                     'exception' => $e,
                     'ExchangeRate_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -191,14 +188,14 @@ class ExchangeRateController extends MainController
                 'Data ExchangeRate berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $exchangeRate->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus ExchangeRate.',
                 [
                     'exception' => $e,
                     'ExchangeRate_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -207,5 +204,5 @@ class ExchangeRateController extends MainController
                 'Data ExchangeRate gagal dihapus.'
             );
         }
-    } 
+    }
 }

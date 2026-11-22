@@ -68,7 +68,7 @@ class AdmissionRegistrationFeeController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'admission_id' => ['required', 'integer'],
+            'admission_id' => ['required', 'integer'],
             'admission_path_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
             'education_level_id' => ['required', 'integer'],
@@ -106,7 +106,7 @@ class AdmissionRegistrationFeeController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -139,7 +139,7 @@ class AdmissionRegistrationFeeController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'admission_id' => ['required', 'integer'],
+            'admission_id' => ['required', 'integer'],
             'admission_path_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
             'education_level_id' => ['required', 'integer'],
@@ -161,10 +161,7 @@ class AdmissionRegistrationFeeController extends MainController
 
         try {
             $admissionRegistrationFee = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $admissionRegistrationFee,
-                $validated
-            ) {
+            DB::transaction(function () use ($admissionRegistrationFee, $validated) {
                 $admissionRegistrationFee->update($validated);
             });
 
@@ -174,14 +171,14 @@ class AdmissionRegistrationFeeController extends MainController
                 $admissionRegistrationFee
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui AdmissionRegistrationFee.',
                 [
                     'exception' => $e,
                     'AdmissionRegistrationFee_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -209,14 +206,14 @@ class AdmissionRegistrationFeeController extends MainController
                 'Data AdmissionRegistrationFee berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $admissionRegistrationFee->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus AdmissionRegistrationFee.',
                 [
                     'exception' => $e,
                     'AdmissionRegistrationFee_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -225,5 +222,5 @@ class AdmissionRegistrationFeeController extends MainController
                 'Data AdmissionRegistrationFee gagal dihapus.'
             );
         }
-    } 
+    }
 }

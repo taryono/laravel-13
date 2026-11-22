@@ -48,7 +48,8 @@ class ReferenceValueController extends MainController
     }
 
     public function data($id)
-   {    $referenceValue = ReferenceValue::findOrFail($id);
+    {
+        $referenceValue = ReferenceValue::findOrFail($id);
         $values = $referenceType->values()->orderBy('sort_order')->get();
 
         return response()->json(['data' => $values]);
@@ -59,7 +60,7 @@ class ReferenceValueController extends MainController
      */
     public function create(): View
     {
-        $referenceValue = new ReferenceValue(); 
+        $referenceValue = new ReferenceValue();
         $reference_types = ReferenceType::orderBy('name')->pluck('name', 'id')->prepend('Select Reference Type', '')->toArray();
 
         return view(
@@ -74,7 +75,7 @@ class ReferenceValueController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'reference_type_id' => ['required', 'integer'],
+            'reference_type_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string', 'max:255'],
@@ -104,7 +105,7 @@ class ReferenceValueController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -134,7 +135,7 @@ class ReferenceValueController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'reference_type_id' => ['required', 'integer'],
+            'reference_type_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string', 'max:255'],
@@ -148,10 +149,7 @@ class ReferenceValueController extends MainController
 
         try {
             $referenceValue = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $referenceValue,
-                $validated
-            ) {
+            DB::transaction(function () use ($referenceValue, $validated) {
                 $referenceValue->update($validated);
             });
 
@@ -161,14 +159,14 @@ class ReferenceValueController extends MainController
                 $referenceValue
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui ReferenceValue.',
                 [
                     'exception' => $e,
                     'ReferenceValue_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -196,14 +194,14 @@ class ReferenceValueController extends MainController
                 'Data ReferenceValue berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $referenceValue->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus ReferenceValue.',
                 [
                     'exception' => $e,
                     'ReferenceValue_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -212,5 +210,5 @@ class ReferenceValueController extends MainController
                 'Data ReferenceValue gagal dihapus.'
             );
         }
-    } 
+    }
 }

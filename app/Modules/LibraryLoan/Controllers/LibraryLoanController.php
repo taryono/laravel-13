@@ -68,7 +68,7 @@ class LibraryLoanController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'book_id' => ['required', 'integer'],
+            'book_id' => ['required', 'integer'],
             'student_id' => ['required', 'integer'],
             'teacher_id' => ['required', 'integer'],
             'school_id' => ['required', 'integer'],
@@ -103,7 +103,7 @@ class LibraryLoanController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -136,7 +136,7 @@ class LibraryLoanController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'book_id' => ['required', 'integer'],
+            'book_id' => ['required', 'integer'],
             'student_id' => ['required', 'integer'],
             'teacher_id' => ['required', 'integer'],
             'school_id' => ['required', 'integer'],
@@ -155,10 +155,7 @@ class LibraryLoanController extends MainController
 
         try {
             $libraryLoan = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $libraryLoan,
-                $validated
-            ) {
+            DB::transaction(function () use ($libraryLoan, $validated) {
                 $libraryLoan->update($validated);
             });
 
@@ -168,14 +165,14 @@ class LibraryLoanController extends MainController
                 $libraryLoan
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui LibraryLoan.',
                 [
                     'exception' => $e,
                     'LibraryLoan_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -203,14 +200,14 @@ class LibraryLoanController extends MainController
                 'Data LibraryLoan berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $libraryLoan->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus LibraryLoan.',
                 [
                     'exception' => $e,
                     'LibraryLoan_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -219,5 +216,5 @@ class LibraryLoanController extends MainController
                 'Data LibraryLoan gagal dihapus.'
             );
         }
-    } 
+    }
 }

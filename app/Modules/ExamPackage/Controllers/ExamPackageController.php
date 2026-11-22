@@ -103,7 +103,7 @@ class ExamPackageController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -156,10 +156,7 @@ class ExamPackageController extends MainController
 
         try {
             $examPackage = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $examPackage,
-                $validated
-            ) {
+            DB::transaction(function () use ($examPackage, $validated) {
                 $examPackage->update($validated);
             });
 
@@ -175,7 +172,7 @@ class ExamPackageController extends MainController
                     'exception' => $e,
                     'ExamPackage_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -209,7 +206,7 @@ class ExamPackageController extends MainController
                 [
                     'exception' => $e,
                     'ExamPackage_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 

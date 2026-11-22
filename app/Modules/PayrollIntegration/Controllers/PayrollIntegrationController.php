@@ -89,7 +89,7 @@ class PayrollIntegrationController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -128,10 +128,7 @@ class PayrollIntegrationController extends MainController
         try {
             $payrollIntegration = $this->model->findOrFail($id);
 
-            DB::transaction(function () use (
-                $payrollIntegration,
-                $validated
-            ) {
+            DB::transaction(function () use ($payrollIntegration, $validated) {
                 $payrollIntegration->update($validated);
             });
 
@@ -154,7 +151,7 @@ class PayrollIntegrationController extends MainController
                     'exception' => $e,
                     'PayrollIntegration_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -191,7 +188,7 @@ class PayrollIntegrationController extends MainController
                 [
                     'exception' => $e,
                     'PayrollIntegration_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 

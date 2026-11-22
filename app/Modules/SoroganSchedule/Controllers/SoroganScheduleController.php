@@ -68,7 +68,7 @@ class SoroganScheduleController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'pesantren_activity_id' => ['required', 'integer'],
+            'pesantren_activity_id' => ['required', 'integer'],
             'kitab_reference_id' => ['required', 'integer'],
             'teacher_id' => ['required', 'integer'],
             'student_id' => ['required', 'integer'],
@@ -97,7 +97,7 @@ class SoroganScheduleController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -130,7 +130,7 @@ class SoroganScheduleController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'pesantren_activity_id' => ['required', 'integer'],
+            'pesantren_activity_id' => ['required', 'integer'],
             'kitab_reference_id' => ['required', 'integer'],
             'teacher_id' => ['required', 'integer'],
             'student_id' => ['required', 'integer'],
@@ -143,10 +143,7 @@ class SoroganScheduleController extends MainController
 
         try {
             $soroganSchedule = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $soroganSchedule,
-                $validated
-            ) {
+            DB::transaction(function () use ($soroganSchedule, $validated) {
                 $soroganSchedule->update($validated);
             });
 
@@ -156,14 +153,14 @@ class SoroganScheduleController extends MainController
                 $soroganSchedule
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui SoroganSchedule.',
                 [
                     'exception' => $e,
                     'SoroganSchedule_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -191,14 +188,14 @@ class SoroganScheduleController extends MainController
                 'Data SoroganSchedule berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $soroganSchedule->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus SoroganSchedule.',
                 [
                     'exception' => $e,
                     'SoroganSchedule_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -207,5 +204,5 @@ class SoroganScheduleController extends MainController
                 'Data SoroganSchedule gagal dihapus.'
             );
         }
-    } 
+    }
 }

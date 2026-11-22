@@ -150,7 +150,7 @@ class BudgetController extends MainController
             DB::transaction(function () use ($budget) {
                 $budget->update([
                     'status' => 'approved',
-                    'approved_by' => auth()->id(),
+                    'approved_by' => request()->user()?->id,
                     'approved_at' => now(),
                 ]);
             });

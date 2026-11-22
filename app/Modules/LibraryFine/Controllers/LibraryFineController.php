@@ -68,7 +68,7 @@ class LibraryFineController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'library_loan_id' => ['required', 'integer'],
+            'library_loan_id' => ['required', 'integer'],
             'library_membership_id' => ['required', 'integer'],
             'days_overdue' => ['required', 'string', 'max:255'],
             'fine_amount' => ['required', 'string', 'max:255'],
@@ -96,7 +96,7 @@ class LibraryFineController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -129,7 +129,7 @@ class LibraryFineController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'library_loan_id' => ['required', 'integer'],
+            'library_loan_id' => ['required', 'integer'],
             'library_membership_id' => ['required', 'integer'],
             'days_overdue' => ['required', 'string', 'max:255'],
             'fine_amount' => ['required', 'string', 'max:255'],
@@ -141,10 +141,7 @@ class LibraryFineController extends MainController
 
         try {
             $libraryFine = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $libraryFine,
-                $validated
-            ) {
+            DB::transaction(function () use ($libraryFine, $validated) {
                 $libraryFine->update($validated);
             });
 
@@ -154,14 +151,14 @@ class LibraryFineController extends MainController
                 $libraryFine
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui LibraryFine.',
                 [
                     'exception' => $e,
                     'LibraryFine_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -189,14 +186,14 @@ class LibraryFineController extends MainController
                 'Data LibraryFine berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $libraryFine->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus LibraryFine.',
                 [
                     'exception' => $e,
                     'LibraryFine_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -205,5 +202,5 @@ class LibraryFineController extends MainController
                 'Data LibraryFine gagal dihapus.'
             );
         }
-    } 
+    }
 }

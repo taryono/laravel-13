@@ -68,7 +68,7 @@ class CmsPostRevisionController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'post_id' => ['required', 'integer'],
+            'post_id' => ['required', 'integer'],
             'user_id' => ['required', 'integer'],
             'title' => ['required', 'string', 'max:255'],
             'excerpt' => ['required', 'string', 'max:255'],
@@ -94,7 +94,7 @@ class CmsPostRevisionController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -127,7 +127,7 @@ class CmsPostRevisionController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'post_id' => ['required', 'integer'],
+            'post_id' => ['required', 'integer'],
             'user_id' => ['required', 'integer'],
             'title' => ['required', 'string', 'max:255'],
             'excerpt' => ['required', 'string', 'max:255'],
@@ -137,10 +137,7 @@ class CmsPostRevisionController extends MainController
 
         try {
             $cmsPostRevision = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $cmsPostRevision,
-                $validated
-            ) {
+            DB::transaction(function () use ($cmsPostRevision, $validated) {
                 $cmsPostRevision->update($validated);
             });
 
@@ -150,14 +147,14 @@ class CmsPostRevisionController extends MainController
                 $cmsPostRevision
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui CmsPostRevision.',
                 [
                     'exception' => $e,
                     'CmsPostRevision_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -185,14 +182,14 @@ class CmsPostRevisionController extends MainController
                 'Data CmsPostRevision berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $cmsPostRevision->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus CmsPostRevision.',
                 [
                     'exception' => $e,
                     'CmsPostRevision_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -201,5 +198,5 @@ class CmsPostRevisionController extends MainController
                 'Data CmsPostRevision gagal dihapus.'
             );
         }
-    } 
+    }
 }

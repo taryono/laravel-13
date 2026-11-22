@@ -68,7 +68,7 @@ class StudentDisciplineController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'student_id' => ['required', 'integer'],
+            'student_id' => ['required', 'integer'],
             'school_id' => ['required', 'integer'],
             'category' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string', 'max:255'],
@@ -106,7 +106,7 @@ class StudentDisciplineController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -139,7 +139,7 @@ class StudentDisciplineController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'student_id' => ['required', 'integer'],
+            'student_id' => ['required', 'integer'],
             'school_id' => ['required', 'integer'],
             'category' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string', 'max:255'],
@@ -161,10 +161,7 @@ class StudentDisciplineController extends MainController
 
         try {
             $studentDiscipline = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $studentDiscipline,
-                $validated
-            ) {
+            DB::transaction(function () use ($studentDiscipline, $validated) {
                 $studentDiscipline->update($validated);
             });
 
@@ -174,14 +171,14 @@ class StudentDisciplineController extends MainController
                 $studentDiscipline
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui StudentDiscipline.',
                 [
                     'exception' => $e,
                     'StudentDiscipline_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -209,14 +206,14 @@ class StudentDisciplineController extends MainController
                 'Data StudentDiscipline berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $studentDiscipline->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus StudentDiscipline.',
                 [
                     'exception' => $e,
                     'StudentDiscipline_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -225,5 +222,5 @@ class StudentDisciplineController extends MainController
                 'Data StudentDiscipline gagal dihapus.'
             );
         }
-    } 
+    }
 }

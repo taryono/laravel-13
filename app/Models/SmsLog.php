@@ -35,11 +35,10 @@ class SmsLog extends BasedModel
         return $this->morphTo(); // recipient_type + recipient_id
     }
 
-    public function providerMessage()
+    public function events()
     {
-        return $this->belongsTo(ProviderMessage::class, 'provider_message_id');
+        return $this->hasMany(ProviderMessageEvent::class);
     }
-
     public function sender()
     {
         return $this->belongsTo(Sender::class, 'sender_id');
@@ -52,7 +51,7 @@ class SmsLog extends BasedModel
 
     public function reference()
     {
-        return $this->belongsTo(Reference::class, 'reference_id');
+        return $this->belongsTo(ReferenceValue::class, 'reference_id');
     }
 
 

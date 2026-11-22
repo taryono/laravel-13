@@ -68,7 +68,7 @@ class TransportRouteController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'school_id' => ['required', 'integer'],
             'vehicle_id' => ['required', 'integer'],
             'driver_id' => ['required', 'integer'],
@@ -99,7 +99,7 @@ class TransportRouteController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -132,7 +132,7 @@ class TransportRouteController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'school_id' => ['required', 'integer'],
             'vehicle_id' => ['required', 'integer'],
             'driver_id' => ['required', 'integer'],
@@ -147,10 +147,7 @@ class TransportRouteController extends MainController
 
         try {
             $transportRoute = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $transportRoute,
-                $validated
-            ) {
+            DB::transaction(function () use ($transportRoute, $validated) {
                 $transportRoute->update($validated);
             });
 
@@ -160,14 +157,14 @@ class TransportRouteController extends MainController
                 $transportRoute
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui TransportRoute.',
                 [
                     'exception' => $e,
                     'TransportRoute_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -195,14 +192,14 @@ class TransportRouteController extends MainController
                 'Data TransportRoute berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $transportRoute->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus TransportRoute.',
                 [
                     'exception' => $e,
                     'TransportRoute_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -211,5 +208,5 @@ class TransportRouteController extends MainController
                 'Data TransportRoute gagal dihapus.'
             );
         }
-    } 
+    }
 }

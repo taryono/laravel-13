@@ -68,7 +68,7 @@ class SenderController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
             'organization_id' => ['required', 'integer'],
             'phone_number' => ['required', 'string', 'max:255'],
             'provider' => ['required', 'string', 'max:255'],
@@ -93,7 +93,7 @@ class SenderController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -126,7 +126,7 @@ class SenderController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
             'organization_id' => ['required', 'integer'],
             'phone_number' => ['required', 'string', 'max:255'],
             'provider' => ['required', 'string', 'max:255'],
@@ -135,10 +135,7 @@ class SenderController extends MainController
 
         try {
             $sender = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $sender,
-                $validated
-            ) {
+            DB::transaction(function () use ($sender, $validated) {
                 $sender->update($validated);
             });
 
@@ -148,14 +145,14 @@ class SenderController extends MainController
                 $sender
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui Sender.',
                 [
                     'exception' => $e,
                     'Sender_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -183,14 +180,14 @@ class SenderController extends MainController
                 'Data Sender berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $sender->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus Sender.',
                 [
                     'exception' => $e,
                     'Sender_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -199,5 +196,5 @@ class SenderController extends MainController
                 'Data Sender gagal dihapus.'
             );
         }
-    } 
+    }
 }

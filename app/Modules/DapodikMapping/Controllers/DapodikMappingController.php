@@ -68,7 +68,7 @@ class DapodikMappingController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'local_table' => ['required', 'string', 'max:255'],
             'local_id' => ['required', 'integer'],
             'dapodik_id' => ['required', 'integer'],
@@ -101,7 +101,7 @@ class DapodikMappingController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -134,7 +134,7 @@ class DapodikMappingController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'local_table' => ['required', 'string', 'max:255'],
             'local_id' => ['required', 'integer'],
             'dapodik_id' => ['required', 'integer'],
@@ -151,10 +151,7 @@ class DapodikMappingController extends MainController
 
         try {
             $dapodikMapping = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $dapodikMapping,
-                $validated
-            ) {
+            DB::transaction(function () use ($dapodikMapping, $validated) {
                 $dapodikMapping->update($validated);
             });
 
@@ -164,14 +161,14 @@ class DapodikMappingController extends MainController
                 $dapodikMapping
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui DapodikMapping.',
                 [
                     'exception' => $e,
                     'DapodikMapping_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -199,14 +196,14 @@ class DapodikMappingController extends MainController
                 'Data DapodikMapping berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $dapodikMapping->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus DapodikMapping.',
                 [
                     'exception' => $e,
                     'DapodikMapping_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -215,5 +212,5 @@ class DapodikMappingController extends MainController
                 'Data DapodikMapping gagal dihapus.'
             );
         }
-    } 
+    }
 }

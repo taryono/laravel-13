@@ -68,7 +68,7 @@ class CognitiveLevelController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
         ]);
 
         try {
@@ -89,7 +89,7 @@ class CognitiveLevelController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -122,15 +122,12 @@ class CognitiveLevelController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
         ]);
 
         try {
             $cognitiveLevel = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $cognitiveLevel,
-                $validated
-            ) {
+            DB::transaction(function () use ($cognitiveLevel, $validated) {
                 $cognitiveLevel->update($validated);
             });
 
@@ -140,14 +137,14 @@ class CognitiveLevelController extends MainController
                 $cognitiveLevel
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui CognitiveLevel.',
                 [
                     'exception' => $e,
                     'CognitiveLevel_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -175,14 +172,14 @@ class CognitiveLevelController extends MainController
                 'Data CognitiveLevel berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $cognitiveLevel->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus CognitiveLevel.',
                 [
                     'exception' => $e,
                     'CognitiveLevel_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -191,5 +188,5 @@ class CognitiveLevelController extends MainController
                 'Data CognitiveLevel gagal dihapus.'
             );
         }
-    } 
+    }
 }

@@ -68,7 +68,7 @@ class CmsActivityLogController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'user_id' => ['required', 'integer'],
+            'user_id' => ['required', 'integer'],
             'action' => ['required', 'string', 'max:255'],
             'subject_type' => ['required', 'string', 'max:255'],
             'subject_id' => ['required', 'integer'],
@@ -94,7 +94,7 @@ class CmsActivityLogController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -127,7 +127,7 @@ class CmsActivityLogController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'user_id' => ['required', 'integer'],
+            'user_id' => ['required', 'integer'],
             'action' => ['required', 'string', 'max:255'],
             'subject_type' => ['required', 'string', 'max:255'],
             'subject_id' => ['required', 'integer'],
@@ -137,10 +137,7 @@ class CmsActivityLogController extends MainController
 
         try {
             $cmsActivityLog = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $cmsActivityLog,
-                $validated
-            ) {
+            DB::transaction(function () use ($cmsActivityLog, $validated) {
                 $cmsActivityLog->update($validated);
             });
 
@@ -150,14 +147,14 @@ class CmsActivityLogController extends MainController
                 $cmsActivityLog
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui CmsActivityLog.',
                 [
                     'exception' => $e,
                     'CmsActivityLog_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -185,14 +182,14 @@ class CmsActivityLogController extends MainController
                 'Data CmsActivityLog berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $cmsActivityLog->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus CmsActivityLog.',
                 [
                     'exception' => $e,
                     'CmsActivityLog_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -201,5 +198,5 @@ class CmsActivityLogController extends MainController
                 'Data CmsActivityLog gagal dihapus.'
             );
         }
-    } 
+    }
 }

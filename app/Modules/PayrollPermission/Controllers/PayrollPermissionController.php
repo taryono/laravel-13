@@ -93,7 +93,7 @@ class PayrollPermissionController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -136,10 +136,7 @@ class PayrollPermissionController extends MainController
         try {
             $payrollPermission = $this->model->findOrFail($id);
 
-            DB::transaction(function () use (
-                $payrollPermission,
-                $validated
-            ) {
+            DB::transaction(function () use ($payrollPermission, $validated) {
                 $payrollPermission->update($validated);
             });
 
@@ -162,7 +159,7 @@ class PayrollPermissionController extends MainController
                     'exception' => $e,
                     'PayrollPermission_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -199,7 +196,7 @@ class PayrollPermissionController extends MainController
                 [
                     'exception' => $e,
                     'PayrollPermission_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -208,5 +205,5 @@ class PayrollPermissionController extends MainController
                 'Data PayrollPermission gagal dihapus.'
             );
         }
-    } 
+    }
 }

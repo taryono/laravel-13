@@ -68,7 +68,7 @@ class ExtracurricularFeeController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'extracurricular_id' => ['required', 'integer'],
+            'extracurricular_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
             'education_level_id' => ['required', 'integer'],
             'fee_type' => ['required', 'string', 'max:255'],
@@ -106,7 +106,7 @@ class ExtracurricularFeeController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -139,7 +139,7 @@ class ExtracurricularFeeController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'extracurricular_id' => ['required', 'integer'],
+            'extracurricular_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
             'education_level_id' => ['required', 'integer'],
             'fee_type' => ['required', 'string', 'max:255'],
@@ -161,10 +161,7 @@ class ExtracurricularFeeController extends MainController
 
         try {
             $extracurricularFee = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $extracurricularFee,
-                $validated
-            ) {
+            DB::transaction(function () use ($extracurricularFee, $validated) {
                 $extracurricularFee->update($validated);
             });
 
@@ -174,14 +171,14 @@ class ExtracurricularFeeController extends MainController
                 $extracurricularFee
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui ExtracurricularFee.',
                 [
                     'exception' => $e,
                     'ExtracurricularFee_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -209,14 +206,14 @@ class ExtracurricularFeeController extends MainController
                 'Data ExtracurricularFee berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $extracurricularFee->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus ExtracurricularFee.',
                 [
                     'exception' => $e,
                     'ExtracurricularFee_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -225,5 +222,5 @@ class ExtracurricularFeeController extends MainController
                 'Data ExtracurricularFee gagal dihapus.'
             );
         }
-    } 
+    }
 }

@@ -68,7 +68,7 @@ class AttendanceLogController extends MainController
                     'file_path' => $path,
                     'machine_source' => $request->machine_id,
                     'status' => 'uploaded',
-                    'imported_by' => auth()->id(),
+                    'imported_by' => request()->user()?->id,
                 ]);
 
                 return $batch;
@@ -95,7 +95,7 @@ class AttendanceLogController extends MainController
 
         try {
             $preview = $this->importer->preview($request->file('file'));
-            
+
             return response()->json([
                 'success' => true,
                 'data' => $preview,
@@ -116,7 +116,7 @@ class AttendanceLogController extends MainController
     {
         try {
             $count = AttendanceLog::where('is_processed', false)->count();
-            
+
             if ($count === 0) {
                 return $this->errorResponse($request, 'Tidak ada data yang perlu diproses.');
             }
@@ -125,7 +125,7 @@ class AttendanceLogController extends MainController
             $processed = app(AttendanceProcessor::class)->processBatch();
 
             return $this->successResponse(
-                $request, 
+                $request,
                 "Berhasil memproses {$processed['processed']} data absensi. " .
                 "Gagal: {$processed['failed']} data."
             );

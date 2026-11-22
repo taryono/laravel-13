@@ -68,7 +68,7 @@ class CbtProctoringController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'session_id' => ['required', 'integer'],
+            'session_id' => ['required', 'integer'],
             'proctor_id' => ['required', 'integer'],
             'start_proctoring' => ['required', 'string', 'max:255'],
             'end_proctoring' => ['required', 'string', 'max:255'],
@@ -95,7 +95,7 @@ class CbtProctoringController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -128,7 +128,7 @@ class CbtProctoringController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'session_id' => ['required', 'integer'],
+            'session_id' => ['required', 'integer'],
             'proctor_id' => ['required', 'integer'],
             'start_proctoring' => ['required', 'string', 'max:255'],
             'end_proctoring' => ['required', 'string', 'max:255'],
@@ -139,10 +139,7 @@ class CbtProctoringController extends MainController
 
         try {
             $cbtProctoring = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $cbtProctoring,
-                $validated
-            ) {
+            DB::transaction(function () use ($cbtProctoring, $validated) {
                 $cbtProctoring->update($validated);
             });
 
@@ -152,14 +149,14 @@ class CbtProctoringController extends MainController
                 $cbtProctoring
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui CbtProctoring.',
                 [
                     'exception' => $e,
                     'CbtProctoring_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -187,14 +184,14 @@ class CbtProctoringController extends MainController
                 'Data CbtProctoring berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $cbtProctoring->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus CbtProctoring.',
                 [
                     'exception' => $e,
                     'CbtProctoring_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -203,5 +200,5 @@ class CbtProctoringController extends MainController
                 'Data CbtProctoring gagal dihapus.'
             );
         }
-    } 
+    }
 }

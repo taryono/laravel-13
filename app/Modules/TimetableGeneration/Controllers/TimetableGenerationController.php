@@ -68,7 +68,7 @@ class TimetableGenerationController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'academic_year_id' => ['required', 'integer'],
             'semester' => ['required', 'string', 'max:255'],
             'generation_date' => ['required', 'string', 'max:255'],
@@ -100,7 +100,7 @@ class TimetableGenerationController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -133,7 +133,7 @@ class TimetableGenerationController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'academic_year_id' => ['required', 'integer'],
             'semester' => ['required', 'string', 'max:255'],
             'generation_date' => ['required', 'string', 'max:255'],
@@ -149,10 +149,7 @@ class TimetableGenerationController extends MainController
 
         try {
             $timetableGeneration = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $timetableGeneration,
-                $validated
-            ) {
+            DB::transaction(function () use ($timetableGeneration, $validated) {
                 $timetableGeneration->update($validated);
             });
 
@@ -162,14 +159,14 @@ class TimetableGenerationController extends MainController
                 $timetableGeneration
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui TimetableGeneration.',
                 [
                     'exception' => $e,
                     'TimetableGeneration_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -197,14 +194,14 @@ class TimetableGenerationController extends MainController
                 'Data TimetableGeneration berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $timetableGeneration->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus TimetableGeneration.',
                 [
                     'exception' => $e,
                     'TimetableGeneration_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -213,5 +210,5 @@ class TimetableGenerationController extends MainController
                 'Data TimetableGeneration gagal dihapus.'
             );
         }
-    } 
+    }
 }

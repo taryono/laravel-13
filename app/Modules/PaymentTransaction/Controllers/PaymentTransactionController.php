@@ -68,7 +68,7 @@ class PaymentTransactionController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'payment_gateway_id' => ['required', 'integer'],
             'payment_channel_id' => ['required', 'integer'],
             'student_invoice_id' => ['required', 'integer'],
@@ -131,7 +131,7 @@ class PaymentTransactionController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -164,7 +164,7 @@ class PaymentTransactionController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'payment_gateway_id' => ['required', 'integer'],
             'payment_channel_id' => ['required', 'integer'],
             'student_invoice_id' => ['required', 'integer'],
@@ -211,10 +211,7 @@ class PaymentTransactionController extends MainController
 
         try {
             $paymentTransaction = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $paymentTransaction,
-                $validated
-            ) {
+            DB::transaction(function () use ($paymentTransaction, $validated) {
                 $paymentTransaction->update($validated);
             });
 
@@ -224,14 +221,14 @@ class PaymentTransactionController extends MainController
                 $paymentTransaction
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui PaymentTransaction.',
                 [
                     'exception' => $e,
                     'PaymentTransaction_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -259,14 +256,14 @@ class PaymentTransactionController extends MainController
                 'Data PaymentTransaction berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $paymentTransaction->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus PaymentTransaction.',
                 [
                     'exception' => $e,
                     'PaymentTransaction_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -275,5 +272,5 @@ class PaymentTransactionController extends MainController
                 'Data PaymentTransaction gagal dihapus.'
             );
         }
-    } 
+    }
 }

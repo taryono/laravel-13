@@ -68,7 +68,7 @@ class CbtScheduleProctorController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'schedule_id' => ['required', 'integer'],
+            'schedule_id' => ['required', 'integer'],
             'proctor_id' => ['required', 'integer'],
             'classroom_id' => ['required', 'integer'],
         ]);
@@ -91,7 +91,7 @@ class CbtScheduleProctorController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -124,17 +124,14 @@ class CbtScheduleProctorController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'schedule_id' => ['required', 'integer'],
+            'schedule_id' => ['required', 'integer'],
             'proctor_id' => ['required', 'integer'],
             'classroom_id' => ['required', 'integer'],
         ]);
 
         try {
             $cbtScheduleProctor = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $cbtScheduleProctor,
-                $validated
-            ) {
+            DB::transaction(function () use ($cbtScheduleProctor, $validated) {
                 $cbtScheduleProctor->update($validated);
             });
 
@@ -144,14 +141,14 @@ class CbtScheduleProctorController extends MainController
                 $cbtScheduleProctor
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui CbtScheduleProctor.',
                 [
                     'exception' => $e,
                     'CbtScheduleProctor_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -179,14 +176,14 @@ class CbtScheduleProctorController extends MainController
                 'Data CbtScheduleProctor berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $cbtScheduleProctor->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus CbtScheduleProctor.',
                 [
                     'exception' => $e,
                     'CbtScheduleProctor_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -195,5 +192,5 @@ class CbtScheduleProctorController extends MainController
                 'Data CbtScheduleProctor gagal dihapus.'
             );
         }
-    } 
+    }
 }

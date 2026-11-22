@@ -68,7 +68,7 @@ class StudentHealthRecordController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'student_id' => ['required', 'integer'],
+            'student_id' => ['required', 'integer'],
             'school_id' => ['required', 'integer'],
             'record_date' => ['required', 'string', 'max:255'],
             'complaint' => ['required', 'string', 'max:255'],
@@ -108,7 +108,7 @@ class StudentHealthRecordController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -141,7 +141,7 @@ class StudentHealthRecordController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'student_id' => ['required', 'integer'],
+            'student_id' => ['required', 'integer'],
             'school_id' => ['required', 'integer'],
             'record_date' => ['required', 'string', 'max:255'],
             'complaint' => ['required', 'string', 'max:255'],
@@ -165,10 +165,7 @@ class StudentHealthRecordController extends MainController
 
         try {
             $studentHealthRecord = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $studentHealthRecord,
-                $validated
-            ) {
+            DB::transaction(function () use ($studentHealthRecord, $validated) {
                 $studentHealthRecord->update($validated);
             });
 
@@ -178,14 +175,14 @@ class StudentHealthRecordController extends MainController
                 $studentHealthRecord
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui StudentHealthRecord.',
                 [
                     'exception' => $e,
                     'StudentHealthRecord_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -213,14 +210,14 @@ class StudentHealthRecordController extends MainController
                 'Data StudentHealthRecord berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $studentHealthRecord->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus StudentHealthRecord.',
                 [
                     'exception' => $e,
                     'StudentHealthRecord_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -229,5 +226,5 @@ class StudentHealthRecordController extends MainController
                 'Data StudentHealthRecord gagal dihapus.'
             );
         }
-    } 
+    }
 }

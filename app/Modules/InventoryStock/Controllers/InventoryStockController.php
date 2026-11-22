@@ -68,7 +68,7 @@ class InventoryStockController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'warehouse_id' => ['required', 'integer'],
+            'warehouse_id' => ['required', 'integer'],
             'item_id' => ['required', 'integer'],
             'qty_on_hand' => ['required', 'string', 'max:255'],
             'qty_reserved' => ['required', 'string', 'max:255'],
@@ -95,7 +95,7 @@ class InventoryStockController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -128,7 +128,7 @@ class InventoryStockController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'warehouse_id' => ['required', 'integer'],
+            'warehouse_id' => ['required', 'integer'],
             'item_id' => ['required', 'integer'],
             'qty_on_hand' => ['required', 'string', 'max:255'],
             'qty_reserved' => ['required', 'string', 'max:255'],
@@ -139,10 +139,7 @@ class InventoryStockController extends MainController
 
         try {
             $inventoryStock = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $inventoryStock,
-                $validated
-            ) {
+            DB::transaction(function () use ($inventoryStock, $validated) {
                 $inventoryStock->update($validated);
             });
 
@@ -152,14 +149,14 @@ class InventoryStockController extends MainController
                 $inventoryStock
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui InventoryStock.',
                 [
                     'exception' => $e,
                     'InventoryStock_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -187,14 +184,14 @@ class InventoryStockController extends MainController
                 'Data InventoryStock berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $inventoryStock->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus InventoryStock.',
                 [
                     'exception' => $e,
                     'InventoryStock_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -203,5 +200,5 @@ class InventoryStockController extends MainController
                 'Data InventoryStock gagal dihapus.'
             );
         }
-    } 
+    }
 }

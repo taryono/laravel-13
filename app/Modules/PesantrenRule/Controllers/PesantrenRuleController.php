@@ -68,7 +68,7 @@ class PesantrenRuleController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'dormitory_id' => ['required', 'integer'],
             'parent_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
@@ -107,7 +107,7 @@ class PesantrenRuleController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -140,7 +140,7 @@ class PesantrenRuleController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'dormitory_id' => ['required', 'integer'],
             'parent_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
@@ -163,10 +163,7 @@ class PesantrenRuleController extends MainController
 
         try {
             $pesantrenRule = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $pesantrenRule,
-                $validated
-            ) {
+            DB::transaction(function () use ($pesantrenRule, $validated) {
                 $pesantrenRule->update($validated);
             });
 
@@ -176,14 +173,14 @@ class PesantrenRuleController extends MainController
                 $pesantrenRule
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui PesantrenRule.',
                 [
                     'exception' => $e,
                     'PesantrenRule_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -211,14 +208,14 @@ class PesantrenRuleController extends MainController
                 'Data PesantrenRule berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $pesantrenRule->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus PesantrenRule.',
                 [
                     'exception' => $e,
                     'PesantrenRule_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -227,5 +224,5 @@ class PesantrenRuleController extends MainController
                 'Data PesantrenRule gagal dihapus.'
             );
         }
-    } 
+    }
 }

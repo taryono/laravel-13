@@ -68,7 +68,7 @@ class CbtSessionAnswerController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'cbt_session_id' => ['required', 'integer'],
+            'cbt_session_id' => ['required', 'integer'],
             'exam_package_question_id' => ['required', 'integer'],
             'student_answer' => ['required', 'string', 'max:255'],
             'is_correct' => ['required', 'string', 'max:255'],
@@ -100,7 +100,7 @@ class CbtSessionAnswerController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -133,7 +133,7 @@ class CbtSessionAnswerController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'cbt_session_id' => ['required', 'integer'],
+            'cbt_session_id' => ['required', 'integer'],
             'exam_package_question_id' => ['required', 'integer'],
             'student_answer' => ['required', 'string', 'max:255'],
             'is_correct' => ['required', 'string', 'max:255'],
@@ -149,10 +149,7 @@ class CbtSessionAnswerController extends MainController
 
         try {
             $cbtSessionAnswer = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $cbtSessionAnswer,
-                $validated
-            ) {
+            DB::transaction(function () use ($cbtSessionAnswer, $validated) {
                 $cbtSessionAnswer->update($validated);
             });
 
@@ -162,14 +159,14 @@ class CbtSessionAnswerController extends MainController
                 $cbtSessionAnswer
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui CbtSessionAnswer.',
                 [
                     'exception' => $e,
                     'CbtSessionAnswer_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -197,14 +194,14 @@ class CbtSessionAnswerController extends MainController
                 'Data CbtSessionAnswer berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $cbtSessionAnswer->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus CbtSessionAnswer.',
                 [
                     'exception' => $e,
                     'CbtSessionAnswer_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -213,5 +210,5 @@ class CbtSessionAnswerController extends MainController
                 'Data CbtSessionAnswer gagal dihapus.'
             );
         }
-    } 
+    }
 }

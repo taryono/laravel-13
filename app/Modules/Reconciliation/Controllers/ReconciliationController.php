@@ -142,7 +142,7 @@ class ReconciliationController extends MainController
             DB::transaction(function () use ($reconciliation) {
                 $reconciliation->update([
                     'status' => 'completed',
-                    'completed_by' => auth()->id(),
+                    'completed_by' => request()->user()?->id,
                     'completed_at' => now(),
                 ]);
 

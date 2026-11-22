@@ -90,7 +90,7 @@ class EducationLevelController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -130,10 +130,7 @@ class EducationLevelController extends MainController
         try {
             $educationLevel = $this->model->findOrFail($id);
 
-            DB::transaction(function () use (
-                $educationLevel,
-                $validated
-            ) {
+            DB::transaction(function () use ($educationLevel, $validated) {
                 $educationLevel->update($validated);
             });
 
@@ -156,7 +153,7 @@ class EducationLevelController extends MainController
                     'exception' => $e,
                     'EducationLevel_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -193,7 +190,7 @@ class EducationLevelController extends MainController
                 [
                     'exception' => $e,
                     'EducationLevel_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -202,5 +199,5 @@ class EducationLevelController extends MainController
                 'Data EducationLevel gagal dihapus.'
             );
         }
-    } 
+    }
 }

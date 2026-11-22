@@ -68,7 +68,7 @@ class RkasItemController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'rkas_sub_activity_id' => ['required', 'integer'],
+            'rkas_sub_activity_id' => ['required', 'integer'],
             'rkas_component_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
@@ -107,7 +107,7 @@ class RkasItemController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -140,7 +140,7 @@ class RkasItemController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'rkas_sub_activity_id' => ['required', 'integer'],
+            'rkas_sub_activity_id' => ['required', 'integer'],
             'rkas_component_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
@@ -163,10 +163,7 @@ class RkasItemController extends MainController
 
         try {
             $rkasItem = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $rkasItem,
-                $validated
-            ) {
+            DB::transaction(function () use ($rkasItem, $validated) {
                 $rkasItem->update($validated);
             });
 
@@ -176,14 +173,14 @@ class RkasItemController extends MainController
                 $rkasItem
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui RkasItem.',
                 [
                     'exception' => $e,
                     'RkasItem_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -211,14 +208,14 @@ class RkasItemController extends MainController
                 'Data RkasItem berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $rkasItem->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus RkasItem.',
                 [
                     'exception' => $e,
                     'RkasItem_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -227,5 +224,5 @@ class RkasItemController extends MainController
                 'Data RkasItem gagal dihapus.'
             );
         }
-    } 
+    }
 }

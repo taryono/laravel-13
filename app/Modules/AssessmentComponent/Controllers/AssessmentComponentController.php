@@ -68,7 +68,7 @@ class AssessmentComponentController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'assessment_id' => ['required', 'integer'],
+            'assessment_id' => ['required', 'integer'],
             'name' => ['required', 'string', 'max:255'],
             'weight' => ['required', 'string', 'max:255'],
             'max_score' => ['required', 'string', 'max:255'],
@@ -96,7 +96,7 @@ class AssessmentComponentController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -129,7 +129,7 @@ class AssessmentComponentController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'assessment_id' => ['required', 'integer'],
+            'assessment_id' => ['required', 'integer'],
             'name' => ['required', 'string', 'max:255'],
             'weight' => ['required', 'string', 'max:255'],
             'max_score' => ['required', 'string', 'max:255'],
@@ -141,10 +141,7 @@ class AssessmentComponentController extends MainController
 
         try {
             $assessmentComponent = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $assessmentComponent,
-                $validated
-            ) {
+            DB::transaction(function () use ($assessmentComponent, $validated) {
                 $assessmentComponent->update($validated);
             });
 
@@ -154,14 +151,14 @@ class AssessmentComponentController extends MainController
                 $assessmentComponent
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui AssessmentComponent.',
                 [
                     'exception' => $e,
                     'AssessmentComponent_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -189,14 +186,14 @@ class AssessmentComponentController extends MainController
                 'Data AssessmentComponent berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $assessmentComponent->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus AssessmentComponent.',
                 [
                     'exception' => $e,
                     'AssessmentComponent_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -205,5 +202,5 @@ class AssessmentComponentController extends MainController
                 'Data AssessmentComponent gagal dihapus.'
             );
         }
-    } 
+    }
 }

@@ -68,7 +68,7 @@ class ProductController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'code' => ['required', 'string', 'max:255'],
+            'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'legal_name' => ['required', 'string', 'max:255'],
         ]);
@@ -91,7 +91,7 @@ class ProductController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -124,17 +124,14 @@ class ProductController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'code' => ['required', 'string', 'max:255'],
+            'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'legal_name' => ['required', 'string', 'max:255'],
         ]);
 
         try {
             $product = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $product,
-                $validated
-            ) {
+            DB::transaction(function () use ($product, $validated) {
                 $product->update($validated);
             });
 
@@ -144,14 +141,14 @@ class ProductController extends MainController
                 $product
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui Product.',
                 [
                     'exception' => $e,
                     'Product_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -179,14 +176,14 @@ class ProductController extends MainController
                 'Data Product berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $product->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus Product.',
                 [
                     'exception' => $e,
                     'Product_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -195,5 +192,5 @@ class ProductController extends MainController
                 'Data Product gagal dihapus.'
             );
         }
-    } 
+    }
 }

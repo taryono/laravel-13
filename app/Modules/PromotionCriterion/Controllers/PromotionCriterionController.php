@@ -68,7 +68,7 @@ class PromotionCriterionController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'academic_year_id' => ['required', 'integer'],
+            'academic_year_id' => ['required', 'integer'],
             'class_level_id' => ['required', 'integer'],
             'min_final_score' => ['required', 'string', 'max:255'],
             'min_attendance_rate' => ['required', 'string', 'max:255'],
@@ -98,7 +98,7 @@ class PromotionCriterionController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -131,7 +131,7 @@ class PromotionCriterionController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'academic_year_id' => ['required', 'integer'],
+            'academic_year_id' => ['required', 'integer'],
             'class_level_id' => ['required', 'integer'],
             'min_final_score' => ['required', 'string', 'max:255'],
             'min_attendance_rate' => ['required', 'string', 'max:255'],
@@ -145,10 +145,7 @@ class PromotionCriterionController extends MainController
 
         try {
             $promotionCriterion = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $promotionCriterion,
-                $validated
-            ) {
+            DB::transaction(function () use ($promotionCriterion, $validated) {
                 $promotionCriterion->update($validated);
             });
 
@@ -158,14 +155,14 @@ class PromotionCriterionController extends MainController
                 $promotionCriterion
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui PromotionCriterion.',
                 [
                     'exception' => $e,
                     'PromotionCriterion_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -193,14 +190,14 @@ class PromotionCriterionController extends MainController
                 'Data PromotionCriterion berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $promotionCriterion->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus PromotionCriterion.',
                 [
                     'exception' => $e,
                     'PromotionCriterion_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -209,5 +206,5 @@ class PromotionCriterionController extends MainController
                 'Data PromotionCriterion gagal dihapus.'
             );
         }
-    } 
+    }
 }

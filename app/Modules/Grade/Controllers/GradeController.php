@@ -68,7 +68,7 @@ class GradeController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'student_classroom_id' => ['required', 'integer'],
+            'student_classroom_id' => ['required', 'integer'],
             'subject_id' => ['required', 'integer'],
             'period_id' => ['required', 'integer'],
             'teacher_id' => ['required', 'integer'],
@@ -103,7 +103,7 @@ class GradeController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -136,7 +136,7 @@ class GradeController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'student_classroom_id' => ['required', 'integer'],
+            'student_classroom_id' => ['required', 'integer'],
             'subject_id' => ['required', 'integer'],
             'period_id' => ['required', 'integer'],
             'teacher_id' => ['required', 'integer'],
@@ -155,10 +155,7 @@ class GradeController extends MainController
 
         try {
             $grade = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $grade,
-                $validated
-            ) {
+            DB::transaction(function () use ($grade, $validated) {
                 $grade->update($validated);
             });
 
@@ -168,14 +165,14 @@ class GradeController extends MainController
                 $grade
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui Grade.',
                 [
                     'exception' => $e,
                     'Grade_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -203,14 +200,14 @@ class GradeController extends MainController
                 'Data Grade berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $grade->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus Grade.',
                 [
                     'exception' => $e,
                     'Grade_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -219,5 +216,5 @@ class GradeController extends MainController
                 'Data Grade gagal dihapus.'
             );
         }
-    } 
+    }
 }

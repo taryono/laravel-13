@@ -68,7 +68,7 @@ class CoursePrerequisiteController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'course_id' => ['required', 'integer'],
+            'course_id' => ['required', 'integer'],
             'prerequisite_course_id' => ['required', 'integer'],
             'min_grade' => ['required', 'string', 'max:255'],
         ]);
@@ -91,7 +91,7 @@ class CoursePrerequisiteController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -124,17 +124,14 @@ class CoursePrerequisiteController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'course_id' => ['required', 'integer'],
+            'course_id' => ['required', 'integer'],
             'prerequisite_course_id' => ['required', 'integer'],
             'min_grade' => ['required', 'string', 'max:255'],
         ]);
 
         try {
             $coursePrerequisite = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $coursePrerequisite,
-                $validated
-            ) {
+            DB::transaction(function () use ($coursePrerequisite, $validated) {
                 $coursePrerequisite->update($validated);
             });
 
@@ -144,14 +141,14 @@ class CoursePrerequisiteController extends MainController
                 $coursePrerequisite
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui CoursePrerequisite.',
                 [
                     'exception' => $e,
                     'CoursePrerequisite_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -179,14 +176,14 @@ class CoursePrerequisiteController extends MainController
                 'Data CoursePrerequisite berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $coursePrerequisite->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus CoursePrerequisite.',
                 [
                     'exception' => $e,
                     'CoursePrerequisite_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -195,5 +192,5 @@ class CoursePrerequisiteController extends MainController
                 'Data CoursePrerequisite gagal dihapus.'
             );
         }
-    } 
+    }
 }

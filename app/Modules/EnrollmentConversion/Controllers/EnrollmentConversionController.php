@@ -68,7 +68,7 @@ class EnrollmentConversionController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'applicant_id' => ['required', 'integer'],
+            'applicant_id' => ['required', 'integer'],
             'student_id' => ['required', 'integer'],
             'school_id' => ['required', 'integer'],
             'admission_id' => ['required', 'integer'],
@@ -98,7 +98,7 @@ class EnrollmentConversionController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -131,7 +131,7 @@ class EnrollmentConversionController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'applicant_id' => ['required', 'integer'],
+            'applicant_id' => ['required', 'integer'],
             'student_id' => ['required', 'integer'],
             'school_id' => ['required', 'integer'],
             'admission_id' => ['required', 'integer'],
@@ -145,10 +145,7 @@ class EnrollmentConversionController extends MainController
 
         try {
             $enrollmentConversion = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $enrollmentConversion,
-                $validated
-            ) {
+            DB::transaction(function () use ($enrollmentConversion, $validated) {
                 $enrollmentConversion->update($validated);
             });
 
@@ -158,14 +155,14 @@ class EnrollmentConversionController extends MainController
                 $enrollmentConversion
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui EnrollmentConversion.',
                 [
                     'exception' => $e,
                     'EnrollmentConversion_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -193,14 +190,14 @@ class EnrollmentConversionController extends MainController
                 'Data EnrollmentConversion berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $enrollmentConversion->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus EnrollmentConversion.',
                 [
                     'exception' => $e,
                     'EnrollmentConversion_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -209,5 +206,5 @@ class EnrollmentConversionController extends MainController
                 'Data EnrollmentConversion gagal dihapus.'
             );
         }
-    } 
+    }
 }

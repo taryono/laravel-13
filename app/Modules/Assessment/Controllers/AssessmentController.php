@@ -68,7 +68,7 @@ class AssessmentController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'curriculum_structure_id' => ['required', 'integer'],
             'assessment_type_id' => ['required', 'integer'],
             'assessment_method_id' => ['required', 'integer'],
@@ -106,7 +106,7 @@ class AssessmentController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -139,7 +139,7 @@ class AssessmentController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'curriculum_structure_id' => ['required', 'integer'],
             'assessment_type_id' => ['required', 'integer'],
             'assessment_method_id' => ['required', 'integer'],
@@ -161,10 +161,7 @@ class AssessmentController extends MainController
 
         try {
             $assessment = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $assessment,
-                $validated
-            ) {
+            DB::transaction(function () use ($assessment, $validated) {
                 $assessment->update($validated);
             });
 
@@ -174,14 +171,14 @@ class AssessmentController extends MainController
                 $assessment
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui Assessment.',
                 [
                     'exception' => $e,
                     'Assessment_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -209,14 +206,14 @@ class AssessmentController extends MainController
                 'Data Assessment berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $assessment->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus Assessment.',
                 [
                     'exception' => $e,
                     'Assessment_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -225,5 +222,5 @@ class AssessmentController extends MainController
                 'Data Assessment gagal dihapus.'
             );
         }
-    } 
+    }
 }

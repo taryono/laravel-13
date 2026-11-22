@@ -68,7 +68,7 @@ class StudentAttendanceController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'student_id' => ['required', 'integer'],
+            'student_id' => ['required', 'integer'],
             'schedule_id' => ['required', 'integer'],
             'classroom_id' => ['required', 'integer'],
             'date' => ['required', 'date'],
@@ -104,7 +104,7 @@ class StudentAttendanceController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -137,7 +137,7 @@ class StudentAttendanceController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'student_id' => ['required', 'integer'],
+            'student_id' => ['required', 'integer'],
             'schedule_id' => ['required', 'integer'],
             'classroom_id' => ['required', 'integer'],
             'date' => ['required', 'date'],
@@ -157,10 +157,7 @@ class StudentAttendanceController extends MainController
 
         try {
             $studentAttendance = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $studentAttendance,
-                $validated
-            ) {
+            DB::transaction(function () use ($studentAttendance, $validated) {
                 $studentAttendance->update($validated);
             });
 
@@ -170,14 +167,14 @@ class StudentAttendanceController extends MainController
                 $studentAttendance
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui StudentAttendance.',
                 [
                     'exception' => $e,
                     'StudentAttendance_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -205,14 +202,14 @@ class StudentAttendanceController extends MainController
                 'Data StudentAttendance berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $studentAttendance->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus StudentAttendance.',
                 [
                     'exception' => $e,
                     'StudentAttendance_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -221,5 +218,5 @@ class StudentAttendanceController extends MainController
                 'Data StudentAttendance gagal dihapus.'
             );
         }
-    } 
+    }
 }

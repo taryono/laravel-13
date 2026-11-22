@@ -68,17 +68,17 @@ class ParentController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name'       => 'required|string|max:150',
-            'phone'      => 'required|string|max:20',
-            'email'      => 'nullable|email|max:100',
-            'address'    => 'nullable|string',
-            'work'       => 'nullable|string|max:100',
-            'student_ids'          => 'nullable|array',
-            'student_ids.*'        => 'exists:students,id',
-            'relationships'        => 'nullable|array',
-            'relationships.*'      => 'in:FATHER,MOTHER,GUARDIAN',
-            'is_primary'           => 'nullable|array',
-            'is_primary.*'         => 'boolean',
+            'name' => 'required|string|max:150',
+            'phone' => 'required|string|max:20',
+            'email' => 'nullable|email|max:100',
+            'address' => 'nullable|string',
+            'work' => 'nullable|string|max:100',
+            'student_ids' => 'nullable|array',
+            'student_ids.*' => 'exists:students,id',
+            'relationships' => 'nullable|array',
+            'relationships.*' => 'in:FATHER,MOTHER,GUARDIAN',
+            'is_primary' => 'nullable|array',
+            'is_primary.*' => 'boolean',
         ]);
 
         DB::beginTransaction();
@@ -91,13 +91,13 @@ class ParentController extends MainController
             // Simpan data Orang Tua
             $parent = ParentModel::create([
                 'organization_id' => $organizationId,
-                'user_id'         => null, // isi jika ada akun login
-                'name'            => $validated['name'],
-                'phone'           => $validated['phone'],
-                'email'           => $validated['email'],
-                'address'         => $validated['address'],
-                'work'            => $validated['work'],
-                'created_by'      => $user->id,
+                'user_id' => null, // isi jika ada akun login
+                'name' => $validated['name'],
+                'phone' => $validated['phone'],
+                'email' => $validated['email'],
+                'address' => $validated['address'],
+                'work' => $validated['work'],
+                'created_by' => $user->id,
             ]);
 
             // Lampirkan ke Siswa
@@ -113,8 +113,8 @@ class ParentController extends MainController
 
                     $parent->students()->attach($studentId, [
                         'relationship' => $validated['relationships'][$index] ?? null,
-                        'is_primary'   => $isPrimary ? 1 : 0,
-                        'created_by'   => $user->id,
+                        'is_primary' => $isPrimary ? 1 : 0,
+                        'created_by' => $user->id,
                     ]);
                 }
             }
@@ -147,20 +147,20 @@ class ParentController extends MainController
     /**
      * Update the specified resource.
      */
-    public function update(Request $request,  $id)
+    public function update(Request $request, $id)
     {
         $validated = $request->validate([
-            'name'       => 'required|string|max:150',
-            'phone'      => 'required|string|max:20',
-            'email'      => 'nullable|email|max:100',
-            'address'    => 'nullable|string',
-            'work'       => 'nullable|string|max:100',
-            'student_ids'     => 'nullable|array',
-            'student_ids.*'   => 'exists:students,id',
-            'relationships'   => 'nullable|array',
+            'name' => 'required|string|max:150',
+            'phone' => 'required|string|max:20',
+            'email' => 'nullable|email|max:100',
+            'address' => 'nullable|string',
+            'work' => 'nullable|string|max:100',
+            'student_ids' => 'nullable|array',
+            'student_ids.*' => 'exists:students,id',
+            'relationships' => 'nullable|array',
             'relationships.*' => 'in:FATHER,MOTHER,GUARDIAN',
-            'is_primary'      => 'nullable|array',
-            'is_primary.*'    => 'boolean',
+            'is_primary' => 'nullable|array',
+            'is_primary.*' => 'boolean',
         ]);
 
         DB::beginTransaction();
@@ -169,11 +169,11 @@ class ParentController extends MainController
             $parent = $this->model->findOrFail($id);
             // Update data utama
             $parent->update([
-                'name'       => $validated['name'],
-                'phone'      => $validated['phone'],
-                'email'      => $validated['email'],
-                'address'    => $validated['address'],
-                'work'       => $validated['work'],
+                'name' => $validated['name'],
+                'phone' => $validated['phone'],
+                'email' => $validated['email'],
+                'address' => $validated['address'],
+                'work' => $validated['work'],
                 'updated_by' => $user->id,
             ]);
 
@@ -191,8 +191,8 @@ class ParentController extends MainController
 
                     $syncData[$studentId] = [
                         'relationship' => $validated['relationships'][$index] ?? null,
-                        'is_primary'   => $isPrimary ? 1 : 0,
-                        'updated_by'   => $user->id,
+                        'is_primary' => $isPrimary ? 1 : 0,
+                        'updated_by' => $user->id,
                     ];
                 }
             }
@@ -236,7 +236,7 @@ class ParentController extends MainController
                 [
                     'exception' => $e,
                     'Parent_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 

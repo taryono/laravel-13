@@ -40,8 +40,8 @@ class ReferenceTypeController extends MainController
         if ($request->filled('draw')) {
             return $dataTable->ajax();
         }
-         $types = ReferenceType::with('values')->orderBy('name')->get();
-        return $dataTable->render( 'ReferenceType::index', compact('types') );
+        $types = ReferenceType::with('values')->orderBy('name')->get();
+        return $dataTable->render('ReferenceType::index', compact('types'));
     }
 
     /**
@@ -96,7 +96,7 @@ class ReferenceTypeController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -112,7 +112,7 @@ class ReferenceTypeController extends MainController
      */
     public function edit($id): View
     {
-        $referenceType = $this->model->findOrFail($id); 
+        $referenceType = $this->model->findOrFail($id);
         return view(
             'ReferenceType::edit',
             compact('referenceType')
@@ -124,7 +124,7 @@ class ReferenceTypeController extends MainController
         $referenceType = ReferenceType::findOrFail($id);
         $values = $referenceType->values()->orderBy('sort_order')->get();
 
-         return view(
+        return view(
             'ReferenceType::values',
             compact('values')
         );
@@ -136,7 +136,7 @@ class ReferenceTypeController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'code' => ['required', 'string', 'max:255'],
+            'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string', 'max:255'],
             'is_system' => ['required', 'string', 'max:255'],
@@ -145,10 +145,7 @@ class ReferenceTypeController extends MainController
 
         try {
             $referenceType = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $referenceType,
-                $validated
-            ) {
+            DB::transaction(function () use ($referenceType, $validated) {
                 $referenceType->update($validated);
             });
 
@@ -158,14 +155,14 @@ class ReferenceTypeController extends MainController
                 $referenceType
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui ReferenceType.',
                 [
                     'exception' => $e,
                     'ReferenceType_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -193,14 +190,14 @@ class ReferenceTypeController extends MainController
                 'Data ReferenceType berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $referenceType->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus ReferenceType.',
                 [
                     'exception' => $e,
                     'ReferenceType_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -209,5 +206,5 @@ class ReferenceTypeController extends MainController
                 'Data ReferenceType gagal dihapus.'
             );
         }
-    } 
+    }
 }

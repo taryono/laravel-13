@@ -68,7 +68,7 @@ class ApiRateLimitController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'api_key' => ['required', 'string', 'max:255'],
             'endpoint' => ['required', 'string', 'max:255'],
             'requests' => ['required', 'string', 'max:255'],
@@ -96,7 +96,7 @@ class ApiRateLimitController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -129,7 +129,7 @@ class ApiRateLimitController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'api_key' => ['required', 'string', 'max:255'],
             'endpoint' => ['required', 'string', 'max:255'],
             'requests' => ['required', 'string', 'max:255'],
@@ -141,10 +141,7 @@ class ApiRateLimitController extends MainController
 
         try {
             $apiRateLimit = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $apiRateLimit,
-                $validated
-            ) {
+            DB::transaction(function () use ($apiRateLimit, $validated) {
                 $apiRateLimit->update($validated);
             });
 
@@ -154,14 +151,14 @@ class ApiRateLimitController extends MainController
                 $apiRateLimit
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui ApiRateLimit.',
                 [
                     'exception' => $e,
                     'ApiRateLimit_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -189,14 +186,14 @@ class ApiRateLimitController extends MainController
                 'Data ApiRateLimit berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $apiRateLimit->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus ApiRateLimit.',
                 [
                     'exception' => $e,
                     'ApiRateLimit_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -205,5 +202,5 @@ class ApiRateLimitController extends MainController
                 'Data ApiRateLimit gagal dihapus.'
             );
         }
-    } 
+    }
 }

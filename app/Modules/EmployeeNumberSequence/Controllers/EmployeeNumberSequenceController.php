@@ -68,7 +68,7 @@ class EmployeeNumberSequenceController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'last_number' => ['required', 'string', 'max:255'],
         ]);
 
@@ -90,7 +90,7 @@ class EmployeeNumberSequenceController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -123,16 +123,13 @@ class EmployeeNumberSequenceController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'last_number' => ['required', 'string', 'max:255'],
         ]);
 
         try {
             $employeeNumberSequence = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $employeeNumberSequence,
-                $validated
-            ) {
+            DB::transaction(function () use ($employeeNumberSequence, $validated) {
                 $employeeNumberSequence->update($validated);
             });
 
@@ -142,14 +139,14 @@ class EmployeeNumberSequenceController extends MainController
                 $employeeNumberSequence
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui EmployeeNumberSequence.',
                 [
                     'exception' => $e,
                     'EmployeeNumberSequence_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -177,14 +174,14 @@ class EmployeeNumberSequenceController extends MainController
                 'Data EmployeeNumberSequence berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $employeeNumberSequence->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus EmployeeNumberSequence.',
                 [
                     'exception' => $e,
                     'EmployeeNumberSequence_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -193,5 +190,5 @@ class EmployeeNumberSequenceController extends MainController
                 'Data EmployeeNumberSequence gagal dihapus.'
             );
         }
-    } 
+    }
 }

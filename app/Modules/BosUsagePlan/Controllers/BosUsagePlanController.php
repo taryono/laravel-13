@@ -68,7 +68,7 @@ class BosUsagePlanController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'bos_period_id' => ['required', 'integer'],
+            'bos_period_id' => ['required', 'integer'],
             'rkas_document_id' => ['required', 'integer'],
             'rkas_item_id' => ['required', 'integer'],
             'bos_component_id' => ['required', 'integer'],
@@ -102,7 +102,7 @@ class BosUsagePlanController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -135,7 +135,7 @@ class BosUsagePlanController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'bos_period_id' => ['required', 'integer'],
+            'bos_period_id' => ['required', 'integer'],
             'rkas_document_id' => ['required', 'integer'],
             'rkas_item_id' => ['required', 'integer'],
             'bos_component_id' => ['required', 'integer'],
@@ -153,10 +153,7 @@ class BosUsagePlanController extends MainController
 
         try {
             $bosUsagePlan = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $bosUsagePlan,
-                $validated
-            ) {
+            DB::transaction(function () use ($bosUsagePlan, $validated) {
                 $bosUsagePlan->update($validated);
             });
 
@@ -166,14 +163,14 @@ class BosUsagePlanController extends MainController
                 $bosUsagePlan
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui BosUsagePlan.',
                 [
                     'exception' => $e,
                     'BosUsagePlan_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -201,14 +198,14 @@ class BosUsagePlanController extends MainController
                 'Data BosUsagePlan berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $bosUsagePlan->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus BosUsagePlan.',
                 [
                     'exception' => $e,
                     'BosUsagePlan_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -217,5 +214,5 @@ class BosUsagePlanController extends MainController
                 'Data BosUsagePlan gagal dihapus.'
             );
         }
-    } 
+    }
 }

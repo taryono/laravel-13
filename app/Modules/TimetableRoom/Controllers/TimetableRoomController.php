@@ -68,7 +68,7 @@ class TimetableRoomController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'room_code' => ['required', 'string', 'max:255'],
             'room_name' => ['required', 'string', 'max:255'],
             'capacity' => ['required', 'string', 'max:255'],
@@ -97,7 +97,7 @@ class TimetableRoomController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -130,7 +130,7 @@ class TimetableRoomController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'room_code' => ['required', 'string', 'max:255'],
             'room_name' => ['required', 'string', 'max:255'],
             'capacity' => ['required', 'string', 'max:255'],
@@ -143,10 +143,7 @@ class TimetableRoomController extends MainController
 
         try {
             $timetableRoom = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $timetableRoom,
-                $validated
-            ) {
+            DB::transaction(function () use ($timetableRoom, $validated) {
                 $timetableRoom->update($validated);
             });
 
@@ -156,14 +153,14 @@ class TimetableRoomController extends MainController
                 $timetableRoom
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui TimetableRoom.',
                 [
                     'exception' => $e,
                     'TimetableRoom_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -191,14 +188,14 @@ class TimetableRoomController extends MainController
                 'Data TimetableRoom berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $timetableRoom->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus TimetableRoom.',
                 [
                     'exception' => $e,
                     'TimetableRoom_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -207,5 +204,5 @@ class TimetableRoomController extends MainController
                 'Data TimetableRoom gagal dihapus.'
             );
         }
-    } 
+    }
 }

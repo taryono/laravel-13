@@ -68,7 +68,7 @@ class DocumentNumberSequenceController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'school_id' => ['required', 'integer'],
             'document_type' => ['required', 'string', 'max:255'],
             'period_key' => ['required', 'string', 'max:255'],
@@ -97,7 +97,7 @@ class DocumentNumberSequenceController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -130,7 +130,7 @@ class DocumentNumberSequenceController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'school_id' => ['required', 'integer'],
             'document_type' => ['required', 'string', 'max:255'],
             'period_key' => ['required', 'string', 'max:255'],
@@ -143,10 +143,7 @@ class DocumentNumberSequenceController extends MainController
 
         try {
             $documentNumberSequence = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $documentNumberSequence,
-                $validated
-            ) {
+            DB::transaction(function () use ($documentNumberSequence, $validated) {
                 $documentNumberSequence->update($validated);
             });
 
@@ -156,14 +153,14 @@ class DocumentNumberSequenceController extends MainController
                 $documentNumberSequence
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui DocumentNumberSequence.',
                 [
                     'exception' => $e,
                     'DocumentNumberSequence_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -191,14 +188,14 @@ class DocumentNumberSequenceController extends MainController
                 'Data DocumentNumberSequence berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $documentNumberSequence->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus DocumentNumberSequence.',
                 [
                     'exception' => $e,
                     'DocumentNumberSequence_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -207,5 +204,5 @@ class DocumentNumberSequenceController extends MainController
                 'Data DocumentNumberSequence gagal dihapus.'
             );
         }
-    } 
+    }
 }

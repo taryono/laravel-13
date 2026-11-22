@@ -68,7 +68,7 @@ class StudentRubricScoreController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'student_assessment_id' => ['required', 'integer'],
             'criteria_key' => ['required', 'string', 'max:255'],
             'level_key' => ['required', 'string', 'max:255'],
@@ -97,7 +97,7 @@ class StudentRubricScoreController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -130,7 +130,7 @@ class StudentRubricScoreController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'student_assessment_id' => ['required', 'integer'],
             'criteria_key' => ['required', 'string', 'max:255'],
             'level_key' => ['required', 'string', 'max:255'],
@@ -143,10 +143,7 @@ class StudentRubricScoreController extends MainController
 
         try {
             $studentRubricScore = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $studentRubricScore,
-                $validated
-            ) {
+            DB::transaction(function () use ($studentRubricScore, $validated) {
                 $studentRubricScore->update($validated);
             });
 
@@ -156,14 +153,14 @@ class StudentRubricScoreController extends MainController
                 $studentRubricScore
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui StudentRubricScore.',
                 [
                     'exception' => $e,
                     'StudentRubricScore_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -191,14 +188,14 @@ class StudentRubricScoreController extends MainController
                 'Data StudentRubricScore berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $studentRubricScore->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus StudentRubricScore.',
                 [
                     'exception' => $e,
                     'StudentRubricScore_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -207,5 +204,5 @@ class StudentRubricScoreController extends MainController
                 'Data StudentRubricScore gagal dihapus.'
             );
         }
-    } 
+    }
 }

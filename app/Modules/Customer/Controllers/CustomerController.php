@@ -68,7 +68,7 @@ class CustomerController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'phone' => ['required', 'string', 'max:255'],
@@ -99,7 +99,7 @@ class CustomerController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -132,7 +132,7 @@ class CustomerController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'phone' => ['required', 'string', 'max:255'],
@@ -147,10 +147,7 @@ class CustomerController extends MainController
 
         try {
             $customer = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $customer,
-                $validated
-            ) {
+            DB::transaction(function () use ($customer, $validated) {
                 $customer->update($validated);
             });
 
@@ -160,14 +157,14 @@ class CustomerController extends MainController
                 $customer
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui Customer.',
                 [
                     'exception' => $e,
                     'Customer_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -195,14 +192,14 @@ class CustomerController extends MainController
                 'Data Customer berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $customer->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus Customer.',
                 [
                     'exception' => $e,
                     'Customer_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -211,5 +208,5 @@ class CustomerController extends MainController
                 'Data Customer gagal dihapus.'
             );
         }
-    } 
+    }
 }

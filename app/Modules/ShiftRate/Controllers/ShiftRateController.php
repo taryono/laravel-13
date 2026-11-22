@@ -68,20 +68,20 @@ class ShiftRateController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'shift_id'               => 'required|exists:shifts,id',
-            'day_type'               => ['required', 'in:weekday,saturday,sunday,national_holiday,special_holiday'],
-            'base_rate'              => 'required|numeric|min:0',
+            'shift_id' => 'required|exists:shifts,id',
+            'day_type' => ['required', 'in:weekday,saturday,sunday,national_holiday,special_holiday'],
+            'base_rate' => 'required|numeric|min:0',
             'overtime_rate_per_hour' => 'required|numeric|min:0',
-            'overtime_multiplier'    => 'required|numeric|min:1',
-            'night_allowance'        => 'nullable|numeric|min:0',
-            'meal_allowance'         => 'nullable|numeric|min:0',
-            'transport_allowance'    => 'nullable|numeric|min:0',
-            'is_active'              => 'required|boolean',
+            'overtime_multiplier' => 'required|numeric|min:1',
+            'night_allowance' => 'nullable|numeric|min:0',
+            'meal_allowance' => 'nullable|numeric|min:0',
+            'transport_allowance' => 'nullable|numeric|min:0',
+            'is_active' => 'required|boolean',
         ], [
             'shift_id.required' => 'Shift wajib dipilih.',
             'day_type.required' => 'Jenis hari wajib dipilih.',
-            'day_type.in'       => 'Jenis hari tidak valid.',
-            'base_rate.required'=> 'Upah dasar wajib diisi.',
+            'day_type.in' => 'Jenis hari tidak valid.',
+            'base_rate.required' => 'Upah dasar wajib diisi.',
         ]);
 
         // Validasi unik kombinasi shift + day_type
@@ -93,7 +93,7 @@ class ShiftRateController extends MainController
             return back()->withErrors([
                 'day_type' => 'Rate untuk shift dan jenis hari ini sudah ada. Silakan edit data yang sudah ada.'
             ])->withInput();
-        } 
+        }
 
         try {
             $model = DB::transaction(function () use ($validated) {
@@ -113,7 +113,7 @@ class ShiftRateController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -145,20 +145,20 @@ class ShiftRateController extends MainController
      */
     public function update(Request $request, $id)
     {
-        
+
 
         try {
             $shiftRate = $this->model->findOrFail($id);
             $validated = $request->validate([
-                'shift_id'               => 'required|exists:shifts,id',
-                'day_type'               => ['required', 'in:weekday,saturday,sunday,national_holiday,special_holiday'],
-                'base_rate'              => 'required|numeric|min:0',
+                'shift_id' => 'required|exists:shifts,id',
+                'day_type' => ['required', 'in:weekday,saturday,sunday,national_holiday,special_holiday'],
+                'base_rate' => 'required|numeric|min:0',
                 'overtime_rate_per_hour' => 'required|numeric|min:0',
-                'overtime_multiplier'    => 'required|numeric|min:1',
-                'night_allowance'        => 'nullable|numeric|min:0',
-                'meal_allowance'         => 'nullable|numeric|min:0',
-                'transport_allowance'    => 'nullable|numeric|min:0',
-                'is_active'              => 'required|boolean',
+                'overtime_multiplier' => 'required|numeric|min:1',
+                'night_allowance' => 'nullable|numeric|min:0',
+                'meal_allowance' => 'nullable|numeric|min:0',
+                'transport_allowance' => 'nullable|numeric|min:0',
+                'is_active' => 'required|boolean',
             ]);
 
             // Validasi unik (kecuali untuk record yang sedang diedit)
@@ -172,10 +172,7 @@ class ShiftRateController extends MainController
                     'day_type' => 'Rate untuk kombinasi shift dan jenis hari ini sudah ada.'
                 ])->withInput();
             }
-            DB::transaction(function () use (
-                $shiftRate,
-                $validated
-            ) {
+            DB::transaction(function () use ($shiftRate, $validated) {
                 $shiftRate->update($validated);
             });
 
@@ -198,7 +195,7 @@ class ShiftRateController extends MainController
                     'exception' => $e,
                     'ShiftRate_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -235,7 +232,7 @@ class ShiftRateController extends MainController
                 [
                     'exception' => $e,
                     'ShiftRate_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -244,5 +241,5 @@ class ShiftRateController extends MainController
                 'Data ShiftRate gagal dihapus.'
             );
         }
-    } 
+    }
 }

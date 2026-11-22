@@ -68,7 +68,7 @@ class WorkCalendarHolidayController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'work_calendar_id' => ['required', 'integer'],
+            'work_calendar_id' => ['required', 'integer'],
             'holiday_id' => ['required', 'integer'],
         ]);
 
@@ -90,7 +90,7 @@ class WorkCalendarHolidayController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -123,16 +123,13 @@ class WorkCalendarHolidayController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'work_calendar_id' => ['required', 'integer'],
+            'work_calendar_id' => ['required', 'integer'],
             'holiday_id' => ['required', 'integer'],
         ]);
 
         try {
             $workCalendarHoliday = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $workCalendarHoliday,
-                $validated
-            ) {
+            DB::transaction(function () use ($workCalendarHoliday, $validated) {
                 $workCalendarHoliday->update($validated);
             });
 
@@ -142,14 +139,14 @@ class WorkCalendarHolidayController extends MainController
                 $workCalendarHoliday
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui WorkCalendarHoliday.',
                 [
                     'exception' => $e,
                     'WorkCalendarHoliday_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -177,14 +174,14 @@ class WorkCalendarHolidayController extends MainController
                 'Data WorkCalendarHoliday berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $workCalendarHoliday->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus WorkCalendarHoliday.',
                 [
                     'exception' => $e,
                     'WorkCalendarHoliday_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -193,5 +190,5 @@ class WorkCalendarHolidayController extends MainController
                 'Data WorkCalendarHoliday gagal dihapus.'
             );
         }
-    } 
+    }
 }

@@ -68,7 +68,7 @@ class WorkScheduleController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'name' => ['required', 'string', 'max:255'],
             'code' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string', 'max:255'],
@@ -106,7 +106,7 @@ class WorkScheduleController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -139,7 +139,7 @@ class WorkScheduleController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'name' => ['required', 'string', 'max:255'],
             'code' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string', 'max:255'],
@@ -161,10 +161,7 @@ class WorkScheduleController extends MainController
 
         try {
             $workSchedule = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $workSchedule,
-                $validated
-            ) {
+            DB::transaction(function () use ($workSchedule, $validated) {
                 $workSchedule->update($validated);
             });
 
@@ -174,14 +171,14 @@ class WorkScheduleController extends MainController
                 $workSchedule
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui WorkSchedule.',
                 [
                     'exception' => $e,
                     'WorkSchedule_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -209,14 +206,14 @@ class WorkScheduleController extends MainController
                 'Data WorkSchedule berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $workSchedule->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus WorkSchedule.',
                 [
                     'exception' => $e,
                     'WorkSchedule_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -225,5 +222,5 @@ class WorkScheduleController extends MainController
                 'Data WorkSchedule gagal dihapus.'
             );
         }
-    } 
+    }
 }

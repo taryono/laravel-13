@@ -68,7 +68,7 @@ class AuditTrailController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'user_id' => ['required', 'integer'],
             'table_name' => ['required', 'string', 'max:255'],
             'record_id' => ['required', 'integer'],
@@ -97,7 +97,7 @@ class AuditTrailController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -130,7 +130,7 @@ class AuditTrailController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'user_id' => ['required', 'integer'],
             'table_name' => ['required', 'string', 'max:255'],
             'record_id' => ['required', 'integer'],
@@ -143,10 +143,7 @@ class AuditTrailController extends MainController
 
         try {
             $auditTrail = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $auditTrail,
-                $validated
-            ) {
+            DB::transaction(function () use ($auditTrail, $validated) {
                 $auditTrail->update($validated);
             });
 
@@ -156,14 +153,14 @@ class AuditTrailController extends MainController
                 $auditTrail
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui AuditTrail.',
                 [
                     'exception' => $e,
                     'AuditTrail_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -191,14 +188,14 @@ class AuditTrailController extends MainController
                 'Data AuditTrail berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $auditTrail->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus AuditTrail.',
                 [
                     'exception' => $e,
                     'AuditTrail_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -207,5 +204,5 @@ class AuditTrailController extends MainController
                 'Data AuditTrail gagal dihapus.'
             );
         }
-    } 
+    }
 }

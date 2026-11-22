@@ -68,7 +68,7 @@ class StudentRfidCardController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'student_id' => ['required', 'integer'],
             'employee_id' => ['required', 'integer'],
             'card_uid' => ['required', 'string', 'max:255'],
@@ -97,7 +97,7 @@ class StudentRfidCardController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -130,7 +130,7 @@ class StudentRfidCardController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'student_id' => ['required', 'integer'],
             'employee_id' => ['required', 'integer'],
             'card_uid' => ['required', 'string', 'max:255'],
@@ -143,10 +143,7 @@ class StudentRfidCardController extends MainController
 
         try {
             $studentRfidCard = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $studentRfidCard,
-                $validated
-            ) {
+            DB::transaction(function () use ($studentRfidCard, $validated) {
                 $studentRfidCard->update($validated);
             });
 
@@ -156,14 +153,14 @@ class StudentRfidCardController extends MainController
                 $studentRfidCard
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui StudentRfidCard.',
                 [
                     'exception' => $e,
                     'StudentRfidCard_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -191,14 +188,14 @@ class StudentRfidCardController extends MainController
                 'Data StudentRfidCard berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $studentRfidCard->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus StudentRfidCard.',
                 [
                     'exception' => $e,
                     'StudentRfidCard_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -207,5 +204,5 @@ class StudentRfidCardController extends MainController
                 'Data StudentRfidCard gagal dihapus.'
             );
         }
-    } 
+    }
 }

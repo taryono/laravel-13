@@ -68,7 +68,7 @@ class WalletTopupController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'digital_wallet_id' => ['required', 'integer'],
+            'digital_wallet_id' => ['required', 'integer'],
             'amount' => ['required', 'string', 'max:255'],
             'method' => ['required', 'string', 'max:255'],
             'status' => ['required', 'string', 'max:255'],
@@ -97,7 +97,7 @@ class WalletTopupController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -130,7 +130,7 @@ class WalletTopupController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'digital_wallet_id' => ['required', 'integer'],
+            'digital_wallet_id' => ['required', 'integer'],
             'amount' => ['required', 'string', 'max:255'],
             'method' => ['required', 'string', 'max:255'],
             'status' => ['required', 'string', 'max:255'],
@@ -143,10 +143,7 @@ class WalletTopupController extends MainController
 
         try {
             $walletTopup = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $walletTopup,
-                $validated
-            ) {
+            DB::transaction(function () use ($walletTopup, $validated) {
                 $walletTopup->update($validated);
             });
 
@@ -156,14 +153,14 @@ class WalletTopupController extends MainController
                 $walletTopup
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui WalletTopup.',
                 [
                     'exception' => $e,
                     'WalletTopup_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -191,14 +188,14 @@ class WalletTopupController extends MainController
                 'Data WalletTopup berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $walletTopup->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus WalletTopup.',
                 [
                     'exception' => $e,
                     'WalletTopup_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -207,5 +204,5 @@ class WalletTopupController extends MainController
                 'Data WalletTopup gagal dihapus.'
             );
         }
-    } 
+    }
 }

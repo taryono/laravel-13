@@ -68,7 +68,7 @@ class FeeMasterController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'academic_year_id' => ['required', 'integer'],
             'class_level_id' => ['required', 'integer'],
             'fee_category' => ['required', 'string', 'max:255'],
@@ -101,7 +101,7 @@ class FeeMasterController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -134,7 +134,7 @@ class FeeMasterController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'academic_year_id' => ['required', 'integer'],
             'class_level_id' => ['required', 'integer'],
             'fee_category' => ['required', 'string', 'max:255'],
@@ -151,10 +151,7 @@ class FeeMasterController extends MainController
 
         try {
             $feeMaster = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $feeMaster,
-                $validated
-            ) {
+            DB::transaction(function () use ($feeMaster, $validated) {
                 $feeMaster->update($validated);
             });
 
@@ -164,14 +161,14 @@ class FeeMasterController extends MainController
                 $feeMaster
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui FeeMaster.',
                 [
                     'exception' => $e,
                     'FeeMaster_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -199,14 +196,14 @@ class FeeMasterController extends MainController
                 'Data FeeMaster berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $feeMaster->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus FeeMaster.',
                 [
                     'exception' => $e,
                     'FeeMaster_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -215,5 +212,5 @@ class FeeMasterController extends MainController
                 'Data FeeMaster gagal dihapus.'
             );
         }
-    } 
+    }
 }

@@ -93,7 +93,7 @@ class ModuleController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -136,10 +136,7 @@ class ModuleController extends MainController
         try {
             $module = $this->model->findOrFail($id);
 
-            DB::transaction(function () use (
-                $module,
-                $validated
-            ) {
+            DB::transaction(function () use ($module, $validated) {
                 $module->update($validated);
             });
 
@@ -162,7 +159,7 @@ class ModuleController extends MainController
                     'exception' => $e,
                     'Module_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -199,7 +196,7 @@ class ModuleController extends MainController
                 [
                     'exception' => $e,
                     'Module_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -209,5 +206,5 @@ class ModuleController extends MainController
             );
         }
     }
- 
+
 }

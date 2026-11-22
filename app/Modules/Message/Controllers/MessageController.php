@@ -68,7 +68,7 @@ class MessageController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'sender_id' => ['required', 'integer'],
+            'sender_id' => ['required', 'integer'],
             'receiver_id' => ['required', 'integer'],
             'subject' => ['required', 'string', 'max:255'],
             'content' => ['required', 'string', 'max:255'],
@@ -99,7 +99,7 @@ class MessageController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -132,7 +132,7 @@ class MessageController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'sender_id' => ['required', 'integer'],
+            'sender_id' => ['required', 'integer'],
             'receiver_id' => ['required', 'integer'],
             'subject' => ['required', 'string', 'max:255'],
             'content' => ['required', 'string', 'max:255'],
@@ -147,10 +147,7 @@ class MessageController extends MainController
 
         try {
             $message = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $message,
-                $validated
-            ) {
+            DB::transaction(function () use ($message, $validated) {
                 $message->update($validated);
             });
 
@@ -160,14 +157,14 @@ class MessageController extends MainController
                 $message
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui Message.',
                 [
                     'exception' => $e,
                     'Message_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -195,14 +192,14 @@ class MessageController extends MainController
                 'Data Message berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $message->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus Message.',
                 [
                     'exception' => $e,
                     'Message_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -211,5 +208,5 @@ class MessageController extends MainController
                 'Data Message gagal dihapus.'
             );
         }
-    } 
+    }
 }

@@ -69,14 +69,14 @@ class HolidayController extends MainController
      * Store a newly created resource.
      */
     public function store(Request $request)
-    { 
+    {
         $rules = [
-            'start_date'   => 'required|date',
-            'end_date'     => 'nullable|date|after_or_equal:start_date',
-            'name'         => 'required|string|max:255',
-            'type'         => 'required|in:national,special',
+            'start_date' => 'required|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
+            'name' => 'required|string|max:255',
+            'type' => 'required|in:national,special',
             'is_recurring' => 'nullable|boolean',
-            'is_range'     => 'nullable|boolean',
+            'is_range' => 'nullable|boolean',
         ];
 
         $validated = $request->validate($rules, [
@@ -86,9 +86,9 @@ class HolidayController extends MainController
         try {
             $isRange = $request->has('is_range');
             $startDate = Carbon::parse($validated['start_date']);
-            $endDate = $isRange && !empty($validated['end_date']) 
-                    ? Carbon::parse($validated['end_date']) 
-                    : $startDate;
+            $endDate = $isRange && !empty($validated['end_date'])
+                ? Carbon::parse($validated['end_date'])
+                : $startDate;
 
             $isRecurring = $request->has('is_recurring') ? 1 : 0;
             $insertedCount = 0;
@@ -96,7 +96,7 @@ class HolidayController extends MainController
 
             // PERBAIKAN 1: Bungkus SELURUH loop dalam SATU transaksi database
             DB::transaction(function () use ($validated, $startDate, $endDate, $isRecurring, &$insertedCount, &$skippedCount) {
-                
+
                 $period = CarbonPeriod::create($startDate, $endDate);
 
                 foreach ($period as $date) {
@@ -104,14 +104,14 @@ class HolidayController extends MainController
 
                     // Cek apakah kombinasi tanggal + jenis sudah ada
                     $exists = Holiday::where('date', $dateString)
-                                    ->where('type', $validated['type'])
-                                    ->exists();
+                        ->where('type', $validated['type'])
+                        ->exists();
 
                     if (!$exists) {
                         Holiday::create([
-                            'date'         => $dateString,
-                            'name'         => $validated['name'],
-                            'type'         => $validated['type'],
+                            'date' => $dateString,
+                            'name' => $validated['name'],
+                            'type' => $validated['type'],
                             'is_recurring' => $isRecurring,
                         ]);
                         $insertedCount++;
@@ -136,7 +136,7 @@ class HolidayController extends MainController
                 [
                     'exception' => $e->getMessage(),
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -166,20 +166,21 @@ class HolidayController extends MainController
     /**
      * Update the specified resource.
      */
-    public function update(Request $request, $id) 
+    public function update(Request $request, $id)
     {
         $holiday = $this->model->findOrFail($id);
         $validated = $request->validate([
             // UBAH: 'date' menjadi 'start_date' sesuai nama input di form
             'date' => [
-                'required', 
+                'required',
                 'date',
-                Rule::unique('holidays')->where(fn ($query) => 
-                    $query->where('date', $request->date)->where('type', $request->type)
+                Rule::unique('holidays')->where(
+                    fn($query) =>
+                        $query->where('date', $request->date)->where('type', $request->type)
                 )->ignore($holiday->id) // Abaikan record yang sedang diedit
             ],
-            'name'         => 'required|string|max:255',
-            'type'         => 'required|in:national,special',
+            'name' => 'required|string|max:255',
+            'type' => 'required|in:national,special',
             'is_recurring' => 'nullable|boolean',
         ], [
             'date.unique' => 'Kombinasi tanggal dan jenis libur ini sudah ada di sistem.',
@@ -188,15 +189,12 @@ class HolidayController extends MainController
         $validated['is_recurring'] = $request->has('is_recurring') ? 1 : 0;
 
         try {
-            
-            DB::transaction(function () use (
-                $holiday,
-                $validated, $request
-            ) {
+
+            DB::transaction(function () use ($holiday, $validated, $request) {
                 $holiday->update([
-                    'date'         => $validated['date'],
-                    'name'         => $validated['name'],
-                    'type'         => $validated['type'],
+                    'date' => $validated['date'],
+                    'name' => $validated['name'],
+                    'type' => $validated['type'],
                     'is_recurring' => $request->has('is_recurring') ? 1 : 0,
                 ]);
             });
@@ -207,14 +205,14 @@ class HolidayController extends MainController
                 $holiday
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui Holiday.',
                 [
                     'exception' => $e,
                     'Holiday_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -242,14 +240,14 @@ class HolidayController extends MainController
                 'Data Holiday berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $holiday->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus Holiday.',
                 [
                     'exception' => $e,
                     'Holiday_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -258,5 +256,5 @@ class HolidayController extends MainController
                 'Data Holiday gagal dihapus.'
             );
         }
-    } 
+    }
 }

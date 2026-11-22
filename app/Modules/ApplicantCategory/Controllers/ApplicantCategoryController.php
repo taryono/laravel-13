@@ -68,7 +68,7 @@ class ApplicantCategoryController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'admission_id' => ['required', 'integer'],
             'parent_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
@@ -110,7 +110,7 @@ class ApplicantCategoryController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -143,7 +143,7 @@ class ApplicantCategoryController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'admission_id' => ['required', 'integer'],
             'parent_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
@@ -169,10 +169,7 @@ class ApplicantCategoryController extends MainController
 
         try {
             $applicantCategory = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $applicantCategory,
-                $validated
-            ) {
+            DB::transaction(function () use ($applicantCategory, $validated) {
                 $applicantCategory->update($validated);
             });
 
@@ -182,14 +179,14 @@ class ApplicantCategoryController extends MainController
                 $applicantCategory
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui ApplicantCategory.',
                 [
                     'exception' => $e,
                     'ApplicantCategory_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -217,14 +214,14 @@ class ApplicantCategoryController extends MainController
                 'Data ApplicantCategory berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $applicantCategory->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus ApplicantCategory.',
                 [
                     'exception' => $e,
                     'ApplicantCategory_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -233,5 +230,5 @@ class ApplicantCategoryController extends MainController
                 'Data ApplicantCategory gagal dihapus.'
             );
         }
-    } 
+    }
 }

@@ -94,7 +94,7 @@ class StudentController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -130,10 +130,7 @@ class StudentController extends MainController
             : $student->organization_id;
         $validated['updated_by'] = $user->id;
         try {
-            DB::transaction(function () use (
-                $student,
-                $validated
-            ) {
+            DB::transaction(function () use ($student, $validated) {
                 $student->update($validated);
             });
 
@@ -150,7 +147,7 @@ class StudentController extends MainController
                     'exception' => $e,
                     'Student_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -186,7 +183,7 @@ class StudentController extends MainController
                 [
                     'exception' => $e,
                     'Student_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -200,25 +197,25 @@ class StudentController extends MainController
     private function validated($request)
     {
         return [
-            'school_id'          => 'nullable|exists:schools,id',
-            'user_id'            => 'nullable|exists:users,id',
-            'applicant_id'       => 'nullable|exists:applicants,id',
-            'nis'                => 'required|string|max:50|unique:students,nis,NULL,id,organization_id,' . $orgId,
-            'nisn'               => 'nullable|string|max:50|unique:students,nisn,NULL,id,organization_id,' . $orgId,
+            'school_id' => 'nullable|exists:schools,id',
+            'user_id' => 'nullable|exists:users,id',
+            'applicant_id' => 'nullable|exists:applicants,id',
+            'nis' => 'required|string|max:50|unique:students,nis,NULL,id,organization_id,' . $orgId,
+            'nisn' => 'nullable|string|max:50|unique:students,nisn,NULL,id,organization_id,' . $orgId,
             'registration_number' => 'nullable|string|max:50',
-            'name'               => 'required|string|max:150',
-            'birth_place'        => 'nullable|string|max:100',
-            'birth_date'         => 'nullable|date',
-            'gender'             => 'nullable|in:MALE,FEMALE',
-            'address'            => 'nullable|string',
-            'religion'           => 'nullable|string|max:20',
-            'parents_phone'      => 'nullable|string|max:20',
-            'emergency_contact'  => 'nullable|string|max:20',
-            'medical_notes'      => 'nullable|string',
-            'join_date'          => 'nullable|date',
-            'status'             => 'required|in:ACTIVE,GRADUATED,TRANSFERRED,DROPPED,SUSPENDED',
-            'admission_status'   => 'nullable|in:NEW,TRANSFER,RETURNING',
-            'enrollment_year'    => 'nullable|integer|digits:4',
+            'name' => 'required|string|max:150',
+            'birth_place' => 'nullable|string|max:100',
+            'birth_date' => 'nullable|date',
+            'gender' => 'nullable|in:MALE,FEMALE',
+            'address' => 'nullable|string',
+            'religion' => 'nullable|string|max:20',
+            'parents_phone' => 'nullable|string|max:20',
+            'emergency_contact' => 'nullable|string|max:20',
+            'medical_notes' => 'nullable|string',
+            'join_date' => 'nullable|date',
+            'status' => 'required|in:ACTIVE,GRADUATED,TRANSFERRED,DROPPED,SUSPENDED',
+            'admission_status' => 'nullable|in:NEW,TRANSFER,RETURNING',
+            'enrollment_year' => 'nullable|integer|digits:4',
 
         ];
     }

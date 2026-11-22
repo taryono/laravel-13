@@ -68,7 +68,7 @@ class DriverController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'employee_id' => ['required', 'integer'],
             'sim_type' => ['required', 'string', 'max:255'],
             'sim_number' => ['required', 'string', 'max:255'],
@@ -96,7 +96,7 @@ class DriverController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -129,7 +129,7 @@ class DriverController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'employee_id' => ['required', 'integer'],
             'sim_type' => ['required', 'string', 'max:255'],
             'sim_number' => ['required', 'string', 'max:255'],
@@ -141,10 +141,7 @@ class DriverController extends MainController
 
         try {
             $driver = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $driver,
-                $validated
-            ) {
+            DB::transaction(function () use ($driver, $validated) {
                 $driver->update($validated);
             });
 
@@ -154,14 +151,14 @@ class DriverController extends MainController
                 $driver
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui Driver.',
                 [
                     'exception' => $e,
                     'Driver_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -189,14 +186,14 @@ class DriverController extends MainController
                 'Data Driver berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $driver->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus Driver.',
                 [
                     'exception' => $e,
                     'Driver_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -205,5 +202,5 @@ class DriverController extends MainController
                 'Data Driver gagal dihapus.'
             );
         }
-    } 
+    }
 }

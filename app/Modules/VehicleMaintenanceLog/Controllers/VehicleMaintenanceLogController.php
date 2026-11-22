@@ -68,7 +68,7 @@ class VehicleMaintenanceLogController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'vehicle_id' => ['required', 'integer'],
+            'vehicle_id' => ['required', 'integer'],
             'vendor_id' => ['required', 'integer'],
             'service_date' => ['required', 'string', 'max:255'],
             'odometer_reading' => ['required', 'string', 'max:255'],
@@ -98,7 +98,7 @@ class VehicleMaintenanceLogController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -131,7 +131,7 @@ class VehicleMaintenanceLogController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'vehicle_id' => ['required', 'integer'],
+            'vehicle_id' => ['required', 'integer'],
             'vendor_id' => ['required', 'integer'],
             'service_date' => ['required', 'string', 'max:255'],
             'odometer_reading' => ['required', 'string', 'max:255'],
@@ -145,10 +145,7 @@ class VehicleMaintenanceLogController extends MainController
 
         try {
             $vehicleMaintenanceLog = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $vehicleMaintenanceLog,
-                $validated
-            ) {
+            DB::transaction(function () use ($vehicleMaintenanceLog, $validated) {
                 $vehicleMaintenanceLog->update($validated);
             });
 
@@ -158,14 +155,14 @@ class VehicleMaintenanceLogController extends MainController
                 $vehicleMaintenanceLog
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui VehicleMaintenanceLog.',
                 [
                     'exception' => $e,
                     'VehicleMaintenanceLog_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -193,14 +190,14 @@ class VehicleMaintenanceLogController extends MainController
                 'Data VehicleMaintenanceLog berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $vehicleMaintenanceLog->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus VehicleMaintenanceLog.',
                 [
                     'exception' => $e,
                     'VehicleMaintenanceLog_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -209,5 +206,5 @@ class VehicleMaintenanceLogController extends MainController
                 'Data VehicleMaintenanceLog gagal dihapus.'
             );
         }
-    } 
+    }
 }

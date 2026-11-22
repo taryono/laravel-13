@@ -92,7 +92,7 @@ class FacilityCategoryController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -134,10 +134,7 @@ class FacilityCategoryController extends MainController
         try {
             $facility_category = $this->model->findOrFail($id);
 
-            DB::transaction(function () use (
-                $facility_category,
-                $validated
-            ) {
+            DB::transaction(function () use ($facility_category, $validated) {
                 $facility_category->update($validated);
             });
 
@@ -160,7 +157,7 @@ class FacilityCategoryController extends MainController
                     'exception' => $e,
                     'facility_category_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -197,7 +194,7 @@ class FacilityCategoryController extends MainController
                 [
                     'exception' => $e,
                     'facility_category_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -206,5 +203,5 @@ class FacilityCategoryController extends MainController
                 'Data facility_category gagal dihapus.'
             );
         }
-    } 
+    }
 }

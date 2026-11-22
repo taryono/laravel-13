@@ -68,7 +68,7 @@ class LearningMaterialController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'lesson_plan_id' => ['required', 'integer'],
             'subject_id' => ['required', 'integer'],
             'class_level_id' => ['required', 'integer'],
@@ -105,7 +105,7 @@ class LearningMaterialController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -138,7 +138,7 @@ class LearningMaterialController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'lesson_plan_id' => ['required', 'integer'],
             'subject_id' => ['required', 'integer'],
             'class_level_id' => ['required', 'integer'],
@@ -159,10 +159,7 @@ class LearningMaterialController extends MainController
 
         try {
             $learningMaterial = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $learningMaterial,
-                $validated
-            ) {
+            DB::transaction(function () use ($learningMaterial, $validated) {
                 $learningMaterial->update($validated);
             });
 
@@ -172,14 +169,14 @@ class LearningMaterialController extends MainController
                 $learningMaterial
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui LearningMaterial.',
                 [
                     'exception' => $e,
                     'LearningMaterial_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -207,14 +204,14 @@ class LearningMaterialController extends MainController
                 'Data LearningMaterial berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $learningMaterial->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus LearningMaterial.',
                 [
                     'exception' => $e,
                     'LearningMaterial_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -223,5 +220,5 @@ class LearningMaterialController extends MainController
                 'Data LearningMaterial gagal dihapus.'
             );
         }
-    } 
+    }
 }

@@ -101,7 +101,7 @@ class UserController extends MainController
                 [
                     'exception' => $e,
                     'data' => Arr::except($validated, ['password']), // jangan log password meski sudah hashed
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -170,7 +170,7 @@ class UserController extends MainController
                     'exception' => $e,
                     'user_id_target' => $user->getKey(),
                     'data' => Arr::except($validated, ['password']),
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -211,7 +211,7 @@ class UserController extends MainController
                 [
                     'exception' => $e,
                     'User_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 

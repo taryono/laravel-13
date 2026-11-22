@@ -68,7 +68,7 @@ class ExtracurricularScheduleController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'extracurricular_id' => ['required', 'integer'],
+            'extracurricular_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
             'coach_id' => ['required', 'integer'],
             'room_id' => ['required', 'integer'],
@@ -112,7 +112,7 @@ class ExtracurricularScheduleController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -145,7 +145,7 @@ class ExtracurricularScheduleController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'extracurricular_id' => ['required', 'integer'],
+            'extracurricular_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
             'coach_id' => ['required', 'integer'],
             'room_id' => ['required', 'integer'],
@@ -173,10 +173,7 @@ class ExtracurricularScheduleController extends MainController
 
         try {
             $extracurricularSchedule = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $extracurricularSchedule,
-                $validated
-            ) {
+            DB::transaction(function () use ($extracurricularSchedule, $validated) {
                 $extracurricularSchedule->update($validated);
             });
 
@@ -186,14 +183,14 @@ class ExtracurricularScheduleController extends MainController
                 $extracurricularSchedule
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui ExtracurricularSchedule.',
                 [
                     'exception' => $e,
                     'ExtracurricularSchedule_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -221,14 +218,14 @@ class ExtracurricularScheduleController extends MainController
                 'Data ExtracurricularSchedule berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $extracurricularSchedule->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus ExtracurricularSchedule.',
                 [
                     'exception' => $e,
                     'ExtracurricularSchedule_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -237,5 +234,5 @@ class ExtracurricularScheduleController extends MainController
                 'Data ExtracurricularSchedule gagal dihapus.'
             );
         }
-    } 
+    }
 }

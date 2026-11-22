@@ -68,7 +68,7 @@ class ApprovalRequestController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'workflow_definition_id' => ['required', 'integer'],
             'current_step_id' => ['required', 'integer'],
             'requestable_type' => ['required', 'string', 'max:255'],
@@ -99,7 +99,7 @@ class ApprovalRequestController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -132,7 +132,7 @@ class ApprovalRequestController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'workflow_definition_id' => ['required', 'integer'],
             'current_step_id' => ['required', 'integer'],
             'requestable_type' => ['required', 'string', 'max:255'],
@@ -147,10 +147,7 @@ class ApprovalRequestController extends MainController
 
         try {
             $approvalRequest = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $approvalRequest,
-                $validated
-            ) {
+            DB::transaction(function () use ($approvalRequest, $validated) {
                 $approvalRequest->update($validated);
             });
 
@@ -160,14 +157,14 @@ class ApprovalRequestController extends MainController
                 $approvalRequest
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui ApprovalRequest.',
                 [
                     'exception' => $e,
                     'ApprovalRequest_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -195,14 +192,14 @@ class ApprovalRequestController extends MainController
                 'Data ApprovalRequest berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $approvalRequest->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus ApprovalRequest.',
                 [
                     'exception' => $e,
                     'ApprovalRequest_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -211,5 +208,5 @@ class ApprovalRequestController extends MainController
                 'Data ApprovalRequest gagal dihapus.'
             );
         }
-    } 
+    }
 }

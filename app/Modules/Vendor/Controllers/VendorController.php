@@ -68,7 +68,7 @@ class VendorController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
@@ -113,7 +113,7 @@ class VendorController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -146,7 +146,7 @@ class VendorController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
@@ -175,10 +175,7 @@ class VendorController extends MainController
 
         try {
             $vendor = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $vendor,
-                $validated
-            ) {
+            DB::transaction(function () use ($vendor, $validated) {
                 $vendor->update($validated);
             });
 
@@ -188,14 +185,14 @@ class VendorController extends MainController
                 $vendor
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui Vendor.',
                 [
                     'exception' => $e,
                     'Vendor_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -223,14 +220,14 @@ class VendorController extends MainController
                 'Data Vendor berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $vendor->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus Vendor.',
                 [
                     'exception' => $e,
                     'Vendor_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -239,5 +236,5 @@ class VendorController extends MainController
                 'Data Vendor gagal dihapus.'
             );
         }
-    } 
+    }
 }

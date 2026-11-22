@@ -68,7 +68,7 @@ class AssignmentsQuizController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'course_id' => ['required', 'integer'],
+            'course_id' => ['required', 'integer'],
             'lesson_id' => ['required', 'integer'],
             'type' => ['required', 'string', 'max:255'],
             'title' => ['required', 'string', 'max:255'],
@@ -102,7 +102,7 @@ class AssignmentsQuizController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -135,7 +135,7 @@ class AssignmentsQuizController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'course_id' => ['required', 'integer'],
+            'course_id' => ['required', 'integer'],
             'lesson_id' => ['required', 'integer'],
             'type' => ['required', 'string', 'max:255'],
             'title' => ['required', 'string', 'max:255'],
@@ -153,10 +153,7 @@ class AssignmentsQuizController extends MainController
 
         try {
             $assignmentsQuiz = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $assignmentsQuiz,
-                $validated
-            ) {
+            DB::transaction(function () use ($assignmentsQuiz, $validated) {
                 $assignmentsQuiz->update($validated);
             });
 
@@ -166,14 +163,14 @@ class AssignmentsQuizController extends MainController
                 $assignmentsQuiz
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui AssignmentsQuiz.',
                 [
                     'exception' => $e,
                     'AssignmentsQuiz_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -201,14 +198,14 @@ class AssignmentsQuizController extends MainController
                 'Data AssignmentsQuiz berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $assignmentsQuiz->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus AssignmentsQuiz.',
                 [
                     'exception' => $e,
                     'AssignmentsQuiz_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -217,5 +214,5 @@ class AssignmentsQuizController extends MainController
                 'Data AssignmentsQuiz gagal dihapus.'
             );
         }
-    } 
+    }
 }

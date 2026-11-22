@@ -87,7 +87,7 @@ class ExpenseController extends MainController
             }
 
             // Set created_by
-            $validated['created_by'] = auth()->id();
+            $validated['created_by'] = request()->user()?->id;
 
             // Set approved_at jika approved_by diisi
             if (!empty($validated['approved_by'])) {

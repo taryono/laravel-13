@@ -68,7 +68,7 @@ class RkasProgramController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'rkas_document_id' => ['required', 'integer'],
+            'rkas_document_id' => ['required', 'integer'],
             'standard_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
@@ -99,7 +99,7 @@ class RkasProgramController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -132,7 +132,7 @@ class RkasProgramController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'rkas_document_id' => ['required', 'integer'],
+            'rkas_document_id' => ['required', 'integer'],
             'standard_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
@@ -147,10 +147,7 @@ class RkasProgramController extends MainController
 
         try {
             $rkasProgram = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $rkasProgram,
-                $validated
-            ) {
+            DB::transaction(function () use ($rkasProgram, $validated) {
                 $rkasProgram->update($validated);
             });
 
@@ -160,14 +157,14 @@ class RkasProgramController extends MainController
                 $rkasProgram
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui RkasProgram.',
                 [
                     'exception' => $e,
                     'RkasProgram_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -195,14 +192,14 @@ class RkasProgramController extends MainController
                 'Data RkasProgram berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $rkasProgram->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus RkasProgram.',
                 [
                     'exception' => $e,
                     'RkasProgram_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -211,5 +208,5 @@ class RkasProgramController extends MainController
                 'Data RkasProgram gagal dihapus.'
             );
         }
-    } 
+    }
 }

@@ -68,7 +68,7 @@ class DiscussionReplyController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'discussion_id' => ['required', 'integer'],
+            'discussion_id' => ['required', 'integer'],
             'user_id' => ['required', 'integer'],
             'content' => ['required', 'string', 'max:255'],
             'is_solution' => ['required', 'string', 'max:255'],
@@ -96,7 +96,7 @@ class DiscussionReplyController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -129,7 +129,7 @@ class DiscussionReplyController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'discussion_id' => ['required', 'integer'],
+            'discussion_id' => ['required', 'integer'],
             'user_id' => ['required', 'integer'],
             'content' => ['required', 'string', 'max:255'],
             'is_solution' => ['required', 'string', 'max:255'],
@@ -141,10 +141,7 @@ class DiscussionReplyController extends MainController
 
         try {
             $discussionReply = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $discussionReply,
-                $validated
-            ) {
+            DB::transaction(function () use ($discussionReply, $validated) {
                 $discussionReply->update($validated);
             });
 
@@ -154,14 +151,14 @@ class DiscussionReplyController extends MainController
                 $discussionReply
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui DiscussionReply.',
                 [
                     'exception' => $e,
                     'DiscussionReply_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -189,14 +186,14 @@ class DiscussionReplyController extends MainController
                 'Data DiscussionReply berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $discussionReply->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus DiscussionReply.',
                 [
                     'exception' => $e,
                     'DiscussionReply_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -205,5 +202,5 @@ class DiscussionReplyController extends MainController
                 'Data DiscussionReply gagal dihapus.'
             );
         }
-    } 
+    }
 }

@@ -68,7 +68,7 @@ class JournalEntryLineController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'journal_entry_id' => ['required', 'integer'],
+            'journal_entry_id' => ['required', 'integer'],
             'chart_of_account_id' => ['required', 'integer'],
             'line_number' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string', 'max:255'],
@@ -105,7 +105,7 @@ class JournalEntryLineController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -138,7 +138,7 @@ class JournalEntryLineController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'journal_entry_id' => ['required', 'integer'],
+            'journal_entry_id' => ['required', 'integer'],
             'chart_of_account_id' => ['required', 'integer'],
             'line_number' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string', 'max:255'],
@@ -159,10 +159,7 @@ class JournalEntryLineController extends MainController
 
         try {
             $journalEntryLine = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $journalEntryLine,
-                $validated
-            ) {
+            DB::transaction(function () use ($journalEntryLine, $validated) {
                 $journalEntryLine->update($validated);
             });
 
@@ -172,14 +169,14 @@ class JournalEntryLineController extends MainController
                 $journalEntryLine
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui JournalEntryLine.',
                 [
                     'exception' => $e,
                     'JournalEntryLine_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -207,14 +204,14 @@ class JournalEntryLineController extends MainController
                 'Data JournalEntryLine berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $journalEntryLine->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus JournalEntryLine.',
                 [
                     'exception' => $e,
                     'JournalEntryLine_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -223,5 +220,5 @@ class JournalEntryLineController extends MainController
                 'Data JournalEntryLine gagal dihapus.'
             );
         }
-    } 
+    }
 }

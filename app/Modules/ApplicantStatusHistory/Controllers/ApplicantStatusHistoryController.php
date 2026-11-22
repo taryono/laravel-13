@@ -68,7 +68,7 @@ class ApplicantStatusHistoryController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'applicant_id' => ['required', 'integer'],
+            'applicant_id' => ['required', 'integer'],
             'from_status_id' => ['required', 'integer'],
             'to_status_id' => ['required', 'integer'],
             'changed_by' => ['required', 'string', 'max:255'],
@@ -96,7 +96,7 @@ class ApplicantStatusHistoryController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -129,7 +129,7 @@ class ApplicantStatusHistoryController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'applicant_id' => ['required', 'integer'],
+            'applicant_id' => ['required', 'integer'],
             'from_status_id' => ['required', 'integer'],
             'to_status_id' => ['required', 'integer'],
             'changed_by' => ['required', 'string', 'max:255'],
@@ -141,10 +141,7 @@ class ApplicantStatusHistoryController extends MainController
 
         try {
             $applicantStatusHistory = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $applicantStatusHistory,
-                $validated
-            ) {
+            DB::transaction(function () use ($applicantStatusHistory, $validated) {
                 $applicantStatusHistory->update($validated);
             });
 
@@ -154,14 +151,14 @@ class ApplicantStatusHistoryController extends MainController
                 $applicantStatusHistory
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui ApplicantStatusHistory.',
                 [
                     'exception' => $e,
                     'ApplicantStatusHistory_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -189,14 +186,14 @@ class ApplicantStatusHistoryController extends MainController
                 'Data ApplicantStatusHistory berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $applicantStatusHistory->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus ApplicantStatusHistory.',
                 [
                     'exception' => $e,
                     'ApplicantStatusHistory_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -205,5 +202,5 @@ class ApplicantStatusHistoryController extends MainController
                 'Data ApplicantStatusHistory gagal dihapus.'
             );
         }
-    } 
+    }
 }

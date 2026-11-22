@@ -68,7 +68,7 @@ class GradeWeightConfigController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'code' => ['required', 'string', 'max:255'],
+            'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
         ]);
 
@@ -90,7 +90,7 @@ class GradeWeightConfigController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -123,16 +123,13 @@ class GradeWeightConfigController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'code' => ['required', 'string', 'max:255'],
+            'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
         ]);
 
         try {
             $gradeWeightConfig = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $gradeWeightConfig,
-                $validated
-            ) {
+            DB::transaction(function () use ($gradeWeightConfig, $validated) {
                 $gradeWeightConfig->update($validated);
             });
 
@@ -142,14 +139,14 @@ class GradeWeightConfigController extends MainController
                 $gradeWeightConfig
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui GradeWeightConfig.',
                 [
                     'exception' => $e,
                     'GradeWeightConfig_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -177,14 +174,14 @@ class GradeWeightConfigController extends MainController
                 'Data GradeWeightConfig berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $gradeWeightConfig->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus GradeWeightConfig.',
                 [
                     'exception' => $e,
                     'GradeWeightConfig_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -193,5 +190,5 @@ class GradeWeightConfigController extends MainController
                 'Data GradeWeightConfig gagal dihapus.'
             );
         }
-    } 
+    }
 }

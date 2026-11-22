@@ -91,7 +91,7 @@ class FiscalYearController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -132,10 +132,7 @@ class FiscalYearController extends MainController
         try {
             $fiscalYear = $this->model->findOrFail($id);
 
-            DB::transaction(function () use (
-                $fiscalYear,
-                $validated
-            ) {
+            DB::transaction(function () use ($fiscalYear, $validated) {
                 $fiscalYear->update($validated);
             });
 
@@ -158,7 +155,7 @@ class FiscalYearController extends MainController
                     'exception' => $e,
                     'FiscalYear_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -195,7 +192,7 @@ class FiscalYearController extends MainController
                 [
                     'exception' => $e,
                     'FiscalYear_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -204,5 +201,5 @@ class FiscalYearController extends MainController
                 'Data FiscalYear gagal dihapus.'
             );
         }
-    } 
+    }
 }

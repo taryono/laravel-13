@@ -68,7 +68,7 @@ class MasteryTrackingController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'student_id' => ['required', 'integer'],
             'curriculum_objective_id' => ['required', 'integer'],
             'academic_year_id' => ['required', 'integer'],
@@ -98,7 +98,7 @@ class MasteryTrackingController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -131,7 +131,7 @@ class MasteryTrackingController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'student_id' => ['required', 'integer'],
             'curriculum_objective_id' => ['required', 'integer'],
             'academic_year_id' => ['required', 'integer'],
@@ -145,10 +145,7 @@ class MasteryTrackingController extends MainController
 
         try {
             $masteryTracking = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $masteryTracking,
-                $validated
-            ) {
+            DB::transaction(function () use ($masteryTracking, $validated) {
                 $masteryTracking->update($validated);
             });
 
@@ -158,14 +155,14 @@ class MasteryTrackingController extends MainController
                 $masteryTracking
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui MasteryTracking.',
                 [
                     'exception' => $e,
                     'MasteryTracking_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -193,14 +190,14 @@ class MasteryTrackingController extends MainController
                 'Data MasteryTracking berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $masteryTracking->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus MasteryTracking.',
                 [
                     'exception' => $e,
                     'MasteryTracking_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -209,5 +206,5 @@ class MasteryTrackingController extends MainController
                 'Data MasteryTracking gagal dihapus.'
             );
         }
-    } 
+    }
 }

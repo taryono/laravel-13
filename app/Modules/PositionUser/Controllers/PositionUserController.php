@@ -68,7 +68,7 @@ class PositionUserController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'user_id' => ['required', 'integer'],
+            'user_id' => ['required', 'integer'],
             'position_id' => ['required', 'integer'],
         ]);
 
@@ -90,7 +90,7 @@ class PositionUserController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -123,16 +123,13 @@ class PositionUserController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'user_id' => ['required', 'integer'],
+            'user_id' => ['required', 'integer'],
             'position_id' => ['required', 'integer'],
         ]);
 
         try {
             $positionUser = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $positionUser,
-                $validated
-            ) {
+            DB::transaction(function () use ($positionUser, $validated) {
                 $positionUser->update($validated);
             });
 
@@ -142,14 +139,14 @@ class PositionUserController extends MainController
                 $positionUser
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui PositionUser.',
                 [
                     'exception' => $e,
                     'PositionUser_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -177,14 +174,14 @@ class PositionUserController extends MainController
                 'Data PositionUser berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $positionUser->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus PositionUser.',
                 [
                     'exception' => $e,
                     'PositionUser_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -193,5 +190,5 @@ class PositionUserController extends MainController
                 'Data PositionUser gagal dihapus.'
             );
         }
-    } 
+    }
 }

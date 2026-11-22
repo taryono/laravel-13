@@ -11,10 +11,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
-use Throwable; 
+use Throwable;
 use Models\Employee;
 use Models\Department;
-use Models\Position; 
+use Models\Position;
 class EmployeeMutationController extends MainController
 {
     public function __construct()
@@ -151,25 +151,25 @@ class EmployeeMutationController extends MainController
             DB::transaction(function () use ($mutation, $request) {
                 $mutation->update([
                     'status' => 'approved',
-                    'approved_by' => auth()->id(),
+                    'approved_by' => request()->user()?->id,
                     'approved_at' => now(),
                 ]);
 
                 // Apply mutation to employee
                 $employee = $mutation->employee;
-                
+
                 if ($mutation->new_department_id) {
                     $employee->department_id = $mutation->new_department_id;
                 }
-                
+
                 if ($mutation->new_position_id) {
                     $employee->position_id = $mutation->new_position_id;
                 }
-                
+
                 if ($mutation->new_salary) {
                     $employee->base_salary = $mutation->new_salary;
                 }
-                
+
                 $employee->save();
             });
 
@@ -188,7 +188,7 @@ class EmployeeMutationController extends MainController
             DB::transaction(function () use ($mutation) {
                 $mutation->update([
                     'status' => 'rejected',
-                    'approved_by' => auth()->id(),
+                    'approved_by' => request()->user()?->id,
                     'approved_at' => now(),
                 ]);
             });

@@ -68,7 +68,7 @@ class PaymentChannelController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'payment_gateway_id' => ['required', 'integer'],
+            'payment_gateway_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'channel_type' => ['required', 'string', 'max:255'],
@@ -104,7 +104,7 @@ class PaymentChannelController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -137,7 +137,7 @@ class PaymentChannelController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'payment_gateway_id' => ['required', 'integer'],
+            'payment_gateway_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'channel_type' => ['required', 'string', 'max:255'],
@@ -157,10 +157,7 @@ class PaymentChannelController extends MainController
 
         try {
             $paymentChannel = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $paymentChannel,
-                $validated
-            ) {
+            DB::transaction(function () use ($paymentChannel, $validated) {
                 $paymentChannel->update($validated);
             });
 
@@ -170,14 +167,14 @@ class PaymentChannelController extends MainController
                 $paymentChannel
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui PaymentChannel.',
                 [
                     'exception' => $e,
                     'PaymentChannel_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -205,14 +202,14 @@ class PaymentChannelController extends MainController
                 'Data PaymentChannel berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $paymentChannel->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus PaymentChannel.',
                 [
                     'exception' => $e,
                     'PaymentChannel_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -221,5 +218,5 @@ class PaymentChannelController extends MainController
                 'Data PaymentChannel gagal dihapus.'
             );
         }
-    } 
+    }
 }

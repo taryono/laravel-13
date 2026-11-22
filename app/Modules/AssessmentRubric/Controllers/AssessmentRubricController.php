@@ -68,7 +68,7 @@ class AssessmentRubricController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'name' => ['required', 'string', 'max:255'],
             'code' => ['required', 'string', 'max:255'],
             'criteria' => ['required', 'string', 'max:255'],
@@ -97,7 +97,7 @@ class AssessmentRubricController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -130,7 +130,7 @@ class AssessmentRubricController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'name' => ['required', 'string', 'max:255'],
             'code' => ['required', 'string', 'max:255'],
             'criteria' => ['required', 'string', 'max:255'],
@@ -143,10 +143,7 @@ class AssessmentRubricController extends MainController
 
         try {
             $assessmentRubric = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $assessmentRubric,
-                $validated
-            ) {
+            DB::transaction(function () use ($assessmentRubric, $validated) {
                 $assessmentRubric->update($validated);
             });
 
@@ -156,14 +153,14 @@ class AssessmentRubricController extends MainController
                 $assessmentRubric
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui AssessmentRubric.',
                 [
                     'exception' => $e,
                     'AssessmentRubric_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -191,14 +188,14 @@ class AssessmentRubricController extends MainController
                 'Data AssessmentRubric berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $assessmentRubric->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus AssessmentRubric.',
                 [
                     'exception' => $e,
                     'AssessmentRubric_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -207,5 +204,5 @@ class AssessmentRubricController extends MainController
                 'Data AssessmentRubric gagal dihapus.'
             );
         }
-    } 
+    }
 }

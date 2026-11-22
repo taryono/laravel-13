@@ -68,7 +68,7 @@ class StudentKrsController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'student_id' => ['required', 'integer'],
+            'student_id' => ['required', 'integer'],
             'academic_semester_id' => ['required', 'integer'],
             'study_program_id' => ['required', 'integer'],
             'academic_advisor_id' => ['required', 'integer'],
@@ -97,7 +97,7 @@ class StudentKrsController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -130,7 +130,7 @@ class StudentKrsController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'student_id' => ['required', 'integer'],
+            'student_id' => ['required', 'integer'],
             'academic_semester_id' => ['required', 'integer'],
             'study_program_id' => ['required', 'integer'],
             'academic_advisor_id' => ['required', 'integer'],
@@ -143,10 +143,7 @@ class StudentKrsController extends MainController
 
         try {
             $studentKrs = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $studentKrs,
-                $validated
-            ) {
+            DB::transaction(function () use ($studentKrs, $validated) {
                 $studentKrs->update($validated);
             });
 
@@ -156,14 +153,14 @@ class StudentKrsController extends MainController
                 $studentKrs
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui StudentKrs.',
                 [
                     'exception' => $e,
                     'StudentKrs_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -191,14 +188,14 @@ class StudentKrsController extends MainController
                 'Data StudentKrs berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $studentKrs->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus StudentKrs.',
                 [
                     'exception' => $e,
                     'StudentKrs_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -207,5 +204,5 @@ class StudentKrsController extends MainController
                 'Data StudentKrs gagal dihapus.'
             );
         }
-    } 
+    }
 }

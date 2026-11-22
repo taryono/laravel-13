@@ -68,7 +68,7 @@ class RkasSourceController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'source_type' => ['required', 'string', 'max:255'],
@@ -99,7 +99,7 @@ class RkasSourceController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -132,7 +132,7 @@ class RkasSourceController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'source_type' => ['required', 'string', 'max:255'],
@@ -147,10 +147,7 @@ class RkasSourceController extends MainController
 
         try {
             $rkasSource = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $rkasSource,
-                $validated
-            ) {
+            DB::transaction(function () use ($rkasSource, $validated) {
                 $rkasSource->update($validated);
             });
 
@@ -160,14 +157,14 @@ class RkasSourceController extends MainController
                 $rkasSource
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui RkasSource.',
                 [
                     'exception' => $e,
                     'RkasSource_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -195,14 +192,14 @@ class RkasSourceController extends MainController
                 'Data RkasSource berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $rkasSource->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus RkasSource.',
                 [
                     'exception' => $e,
                     'RkasSource_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -211,5 +208,5 @@ class RkasSourceController extends MainController
                 'Data RkasSource gagal dihapus.'
             );
         }
-    } 
+    }
 }

@@ -68,7 +68,7 @@ class MessageThreadController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'created_by' => ['required', 'string', 'max:255'],
             'thread_type' => ['required', 'string', 'max:255'],
             'title' => ['required', 'string', 'max:255'],
@@ -106,7 +106,7 @@ class MessageThreadController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -139,7 +139,7 @@ class MessageThreadController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'created_by' => ['required', 'string', 'max:255'],
             'thread_type' => ['required', 'string', 'max:255'],
             'title' => ['required', 'string', 'max:255'],
@@ -161,10 +161,7 @@ class MessageThreadController extends MainController
 
         try {
             $messageThread = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $messageThread,
-                $validated
-            ) {
+            DB::transaction(function () use ($messageThread, $validated) {
                 $messageThread->update($validated);
             });
 
@@ -174,14 +171,14 @@ class MessageThreadController extends MainController
                 $messageThread
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui MessageThread.',
                 [
                     'exception' => $e,
                     'MessageThread_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -209,14 +206,14 @@ class MessageThreadController extends MainController
                 'Data MessageThread berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $messageThread->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus MessageThread.',
                 [
                     'exception' => $e,
                     'MessageThread_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -225,5 +222,5 @@ class MessageThreadController extends MainController
                 'Data MessageThread gagal dihapus.'
             );
         }
-    } 
+    }
 }

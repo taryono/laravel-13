@@ -16,7 +16,8 @@ use Throwable;
 class PermissionController extends MainController
 {
 
-    public function __construct(){
+    public function __construct()
+    {
         parent::__construct(new Permission());
     }
 
@@ -50,7 +51,7 @@ class PermissionController extends MainController
      * Show the form for creating a new resource.
      */
     public function create(): View
-    {   
+    {
         $permission = new Permission();
         $forms = $this->getForm($permission);
         return view(
@@ -91,7 +92,7 @@ class PermissionController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -106,7 +107,8 @@ class PermissionController extends MainController
      * Show the form for editing the specified resource.
      */
     public function edit($id): View
-    {   $permission = $this->model->findOrFail($id);
+    {
+        $permission = $this->model->findOrFail($id);
         $forms = $this->getForm($permission);
         return view(
             'Permission::edit',
@@ -117,7 +119,8 @@ class PermissionController extends MainController
     /**
      * Update the specified resource.
      */
-    public function update(Request $request,$id) {
+    public function update(Request $request, $id)
+    {
         $validated = $request->validate([
             'name' => [
                 'required',
@@ -128,10 +131,7 @@ class PermissionController extends MainController
 
         try {
             $permission = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $permission,
-                $validated
-            ) {
+            DB::transaction(function () use ($permission, $validated) {
                 $permission->update($validated);
             });
 
@@ -149,7 +149,7 @@ class PermissionController extends MainController
                     'exception' => $e,
                     'Permission_id' => $permission->getKey(),
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -163,9 +163,10 @@ class PermissionController extends MainController
     /**
      * Remove the specified resource.
      */
-    public function destroy(Request $request,$id): JsonResponse|RedirectResponse {
+    public function destroy(Request $request, $id): JsonResponse|RedirectResponse
+    {
         try {
-             $permission = $this->model->findOrFail($id);
+            $permission = $this->model->findOrFail($id);
             DB::transaction(function () use ($permission) {
                 $permission->delete();
             });
@@ -182,7 +183,7 @@ class PermissionController extends MainController
                 [
                     'exception' => $e,
                     'Permission_id' => $permission->getKey(),
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -192,5 +193,5 @@ class PermissionController extends MainController
             );
         }
     }
- 
+
 }

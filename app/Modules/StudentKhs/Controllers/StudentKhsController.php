@@ -68,7 +68,7 @@ class StudentKhsController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'student_id' => ['required', 'integer'],
+            'student_id' => ['required', 'integer'],
             'academic_semester_id' => ['required', 'integer'],
             'sks_semester' => ['required', 'string', 'max:255'],
             'sks_cumulative' => ['required', 'string', 'max:255'],
@@ -97,7 +97,7 @@ class StudentKhsController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -130,7 +130,7 @@ class StudentKhsController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'student_id' => ['required', 'integer'],
+            'student_id' => ['required', 'integer'],
             'academic_semester_id' => ['required', 'integer'],
             'sks_semester' => ['required', 'string', 'max:255'],
             'sks_cumulative' => ['required', 'string', 'max:255'],
@@ -143,10 +143,7 @@ class StudentKhsController extends MainController
 
         try {
             $studentKhs = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $studentKhs,
-                $validated
-            ) {
+            DB::transaction(function () use ($studentKhs, $validated) {
                 $studentKhs->update($validated);
             });
 
@@ -156,14 +153,14 @@ class StudentKhsController extends MainController
                 $studentKhs
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui StudentKhs.',
                 [
                     'exception' => $e,
                     'StudentKhs_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -191,14 +188,14 @@ class StudentKhsController extends MainController
                 'Data StudentKhs berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $studentKhs->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus StudentKhs.',
                 [
                     'exception' => $e,
                     'StudentKhs_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -207,5 +204,5 @@ class StudentKhsController extends MainController
                 'Data StudentKhs gagal dihapus.'
             );
         }
-    } 
+    }
 }

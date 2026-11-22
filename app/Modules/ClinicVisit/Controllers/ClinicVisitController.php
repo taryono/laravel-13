@@ -68,7 +68,7 @@ class ClinicVisitController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'school_id' => ['required', 'integer'],
             'patient_type' => ['required', 'string', 'max:255'],
             'patient_id' => ['required', 'integer'],
@@ -101,7 +101,7 @@ class ClinicVisitController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -134,7 +134,7 @@ class ClinicVisitController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'school_id' => ['required', 'integer'],
             'patient_type' => ['required', 'string', 'max:255'],
             'patient_id' => ['required', 'integer'],
@@ -151,10 +151,7 @@ class ClinicVisitController extends MainController
 
         try {
             $clinicVisit = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $clinicVisit,
-                $validated
-            ) {
+            DB::transaction(function () use ($clinicVisit, $validated) {
                 $clinicVisit->update($validated);
             });
 
@@ -164,14 +161,14 @@ class ClinicVisitController extends MainController
                 $clinicVisit
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui ClinicVisit.',
                 [
                     'exception' => $e,
                     'ClinicVisit_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -199,14 +196,14 @@ class ClinicVisitController extends MainController
                 'Data ClinicVisit berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $clinicVisit->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus ClinicVisit.',
                 [
                     'exception' => $e,
                     'ClinicVisit_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -215,5 +212,5 @@ class ClinicVisitController extends MainController
                 'Data ClinicVisit gagal dihapus.'
             );
         }
-    } 
+    }
 }

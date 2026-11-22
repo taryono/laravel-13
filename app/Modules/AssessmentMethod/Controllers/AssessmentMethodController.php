@@ -68,7 +68,7 @@ class AssessmentMethodController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'name' => ['required', 'string', 'max:255'],
             'code' => ['required', 'string', 'max:255'],
             'scale_type' => ['required', 'string', 'max:255'],
@@ -97,7 +97,7 @@ class AssessmentMethodController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -130,7 +130,7 @@ class AssessmentMethodController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'name' => ['required', 'string', 'max:255'],
             'code' => ['required', 'string', 'max:255'],
             'scale_type' => ['required', 'string', 'max:255'],
@@ -143,10 +143,7 @@ class AssessmentMethodController extends MainController
 
         try {
             $assessmentMethod = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $assessmentMethod,
-                $validated
-            ) {
+            DB::transaction(function () use ($assessmentMethod, $validated) {
                 $assessmentMethod->update($validated);
             });
 
@@ -156,14 +153,14 @@ class AssessmentMethodController extends MainController
                 $assessmentMethod
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui AssessmentMethod.',
                 [
                     'exception' => $e,
                     'AssessmentMethod_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -191,14 +188,14 @@ class AssessmentMethodController extends MainController
                 'Data AssessmentMethod berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $assessmentMethod->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus AssessmentMethod.',
                 [
                     'exception' => $e,
                     'AssessmentMethod_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -207,5 +204,5 @@ class AssessmentMethodController extends MainController
                 'Data AssessmentMethod gagal dihapus.'
             );
         }
-    } 
+    }
 }

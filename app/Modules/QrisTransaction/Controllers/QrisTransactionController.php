@@ -68,7 +68,7 @@ class QrisTransactionController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'payment_transaction_id' => ['required', 'integer'],
             'student_id' => ['required', 'integer'],
             'applicant_id' => ['required', 'integer'],
@@ -104,7 +104,7 @@ class QrisTransactionController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -137,7 +137,7 @@ class QrisTransactionController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'payment_transaction_id' => ['required', 'integer'],
             'student_id' => ['required', 'integer'],
             'applicant_id' => ['required', 'integer'],
@@ -157,10 +157,7 @@ class QrisTransactionController extends MainController
 
         try {
             $qrisTransaction = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $qrisTransaction,
-                $validated
-            ) {
+            DB::transaction(function () use ($qrisTransaction, $validated) {
                 $qrisTransaction->update($validated);
             });
 
@@ -170,14 +167,14 @@ class QrisTransactionController extends MainController
                 $qrisTransaction
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui QrisTransaction.',
                 [
                     'exception' => $e,
                     'QrisTransaction_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -205,14 +202,14 @@ class QrisTransactionController extends MainController
                 'Data QrisTransaction berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $qrisTransaction->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus QrisTransaction.',
                 [
                     'exception' => $e,
                     'QrisTransaction_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -221,5 +218,5 @@ class QrisTransactionController extends MainController
                 'Data QrisTransaction gagal dihapus.'
             );
         }
-    } 
+    }
 }

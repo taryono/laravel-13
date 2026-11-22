@@ -68,7 +68,7 @@ class AttendanceImportBatchController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'batch_code' => ['required', 'string', 'max:255'],
             'file_name' => ['required', 'string', 'max:255'],
             'file_size' => ['required', 'string', 'max:255'],
@@ -104,7 +104,7 @@ class AttendanceImportBatchController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -137,7 +137,7 @@ class AttendanceImportBatchController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'batch_code' => ['required', 'string', 'max:255'],
             'file_name' => ['required', 'string', 'max:255'],
             'file_size' => ['required', 'string', 'max:255'],
@@ -157,10 +157,7 @@ class AttendanceImportBatchController extends MainController
 
         try {
             $attendanceImportBatch = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $attendanceImportBatch,
-                $validated
-            ) {
+            DB::transaction(function () use ($attendanceImportBatch, $validated) {
                 $attendanceImportBatch->update($validated);
             });
 
@@ -170,14 +167,14 @@ class AttendanceImportBatchController extends MainController
                 $attendanceImportBatch
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui AttendanceImportBatch.',
                 [
                     'exception' => $e,
                     'AttendanceImportBatch_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -205,14 +202,14 @@ class AttendanceImportBatchController extends MainController
                 'Data AttendanceImportBatch berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $attendanceImportBatch->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus AttendanceImportBatch.',
                 [
                     'exception' => $e,
                     'AttendanceImportBatch_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -221,5 +218,5 @@ class AttendanceImportBatchController extends MainController
                 'Data AttendanceImportBatch gagal dihapus.'
             );
         }
-    } 
+    }
 }

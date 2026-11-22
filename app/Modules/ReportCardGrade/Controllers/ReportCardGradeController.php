@@ -68,7 +68,7 @@ class ReportCardGradeController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'report_card_id' => ['required', 'integer'],
             'subject_id' => ['required', 'integer'],
             'curriculum_structure_id' => ['required', 'integer'],
@@ -105,7 +105,7 @@ class ReportCardGradeController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -138,7 +138,7 @@ class ReportCardGradeController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'report_card_id' => ['required', 'integer'],
             'subject_id' => ['required', 'integer'],
             'curriculum_structure_id' => ['required', 'integer'],
@@ -159,10 +159,7 @@ class ReportCardGradeController extends MainController
 
         try {
             $reportCardGrade = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $reportCardGrade,
-                $validated
-            ) {
+            DB::transaction(function () use ($reportCardGrade, $validated) {
                 $reportCardGrade->update($validated);
             });
 
@@ -172,14 +169,14 @@ class ReportCardGradeController extends MainController
                 $reportCardGrade
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui ReportCardGrade.',
                 [
                     'exception' => $e,
                     'ReportCardGrade_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -207,14 +204,14 @@ class ReportCardGradeController extends MainController
                 'Data ReportCardGrade berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $reportCardGrade->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus ReportCardGrade.',
                 [
                     'exception' => $e,
                     'ReportCardGrade_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -223,5 +220,5 @@ class ReportCardGradeController extends MainController
                 'Data ReportCardGrade gagal dihapus.'
             );
         }
-    } 
+    }
 }

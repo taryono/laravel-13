@@ -68,7 +68,7 @@ class AttitudeAssessmentController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'code' => ['required', 'string', 'max:255'],
+            'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
         ]);
 
@@ -90,7 +90,7 @@ class AttitudeAssessmentController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -123,16 +123,13 @@ class AttitudeAssessmentController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'code' => ['required', 'string', 'max:255'],
+            'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
         ]);
 
         try {
             $attitudeAssessment = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $attitudeAssessment,
-                $validated
-            ) {
+            DB::transaction(function () use ($attitudeAssessment, $validated) {
                 $attitudeAssessment->update($validated);
             });
 
@@ -142,14 +139,14 @@ class AttitudeAssessmentController extends MainController
                 $attitudeAssessment
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui AttitudeAssessment.',
                 [
                     'exception' => $e,
                     'AttitudeAssessment_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -177,14 +174,14 @@ class AttitudeAssessmentController extends MainController
                 'Data AttitudeAssessment berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $attitudeAssessment->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus AttitudeAssessment.',
                 [
                     'exception' => $e,
                     'AttitudeAssessment_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -193,5 +190,5 @@ class AttitudeAssessmentController extends MainController
                 'Data AttitudeAssessment gagal dihapus.'
             );
         }
-    } 
+    }
 }

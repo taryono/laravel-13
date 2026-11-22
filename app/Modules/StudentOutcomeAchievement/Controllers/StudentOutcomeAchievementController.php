@@ -68,7 +68,7 @@ class StudentOutcomeAchievementController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'student_id' => ['required', 'integer'],
+            'student_id' => ['required', 'integer'],
             'learning_outcome_id' => ['required', 'integer'],
             'period_id' => ['required', 'integer'],
             'subject_id' => ['required', 'integer'],
@@ -102,7 +102,7 @@ class StudentOutcomeAchievementController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -135,7 +135,7 @@ class StudentOutcomeAchievementController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'student_id' => ['required', 'integer'],
+            'student_id' => ['required', 'integer'],
             'learning_outcome_id' => ['required', 'integer'],
             'period_id' => ['required', 'integer'],
             'subject_id' => ['required', 'integer'],
@@ -153,10 +153,7 @@ class StudentOutcomeAchievementController extends MainController
 
         try {
             $studentOutcomeAchievement = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $studentOutcomeAchievement,
-                $validated
-            ) {
+            DB::transaction(function () use ($studentOutcomeAchievement, $validated) {
                 $studentOutcomeAchievement->update($validated);
             });
 
@@ -166,14 +163,14 @@ class StudentOutcomeAchievementController extends MainController
                 $studentOutcomeAchievement
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui StudentOutcomeAchievement.',
                 [
                     'exception' => $e,
                     'StudentOutcomeAchievement_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -201,14 +198,14 @@ class StudentOutcomeAchievementController extends MainController
                 'Data StudentOutcomeAchievement berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $studentOutcomeAchievement->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus StudentOutcomeAchievement.',
                 [
                     'exception' => $e,
                     'StudentOutcomeAchievement_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -217,5 +214,5 @@ class StudentOutcomeAchievementController extends MainController
                 'Data StudentOutcomeAchievement gagal dihapus.'
             );
         }
-    } 
+    }
 }

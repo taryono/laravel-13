@@ -68,7 +68,7 @@ class BosReportController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'bos_period_id' => ['required', 'integer'],
             'fiscal_period_id' => ['required', 'integer'],
             'report_code' => ['required', 'string', 'max:255'],
@@ -112,7 +112,7 @@ class BosReportController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -145,7 +145,7 @@ class BosReportController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'bos_period_id' => ['required', 'integer'],
             'fiscal_period_id' => ['required', 'integer'],
             'report_code' => ['required', 'string', 'max:255'],
@@ -173,10 +173,7 @@ class BosReportController extends MainController
 
         try {
             $bosReport = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $bosReport,
-                $validated
-            ) {
+            DB::transaction(function () use ($bosReport, $validated) {
                 $bosReport->update($validated);
             });
 
@@ -186,14 +183,14 @@ class BosReportController extends MainController
                 $bosReport
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui BosReport.',
                 [
                     'exception' => $e,
                     'BosReport_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -221,14 +218,14 @@ class BosReportController extends MainController
                 'Data BosReport berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $bosReport->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus BosReport.',
                 [
                     'exception' => $e,
                     'BosReport_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -237,5 +234,5 @@ class BosReportController extends MainController
                 'Data BosReport gagal dihapus.'
             );
         }
-    } 
+    }
 }

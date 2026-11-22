@@ -68,7 +68,7 @@ class AdmissionTimelineController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'admission_id' => ['required', 'integer'],
+            'admission_id' => ['required', 'integer'],
             'phase_name' => ['required', 'string', 'max:255'],
             'start_date' => ['required', 'string', 'max:255'],
             'end_date' => ['required', 'string', 'max:255'],
@@ -100,7 +100,7 @@ class AdmissionTimelineController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -133,7 +133,7 @@ class AdmissionTimelineController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'admission_id' => ['required', 'integer'],
+            'admission_id' => ['required', 'integer'],
             'phase_name' => ['required', 'string', 'max:255'],
             'start_date' => ['required', 'string', 'max:255'],
             'end_date' => ['required', 'string', 'max:255'],
@@ -149,10 +149,7 @@ class AdmissionTimelineController extends MainController
 
         try {
             $admissionTimeline = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $admissionTimeline,
-                $validated
-            ) {
+            DB::transaction(function () use ($admissionTimeline, $validated) {
                 $admissionTimeline->update($validated);
             });
 
@@ -162,14 +159,14 @@ class AdmissionTimelineController extends MainController
                 $admissionTimeline
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui AdmissionTimeline.',
                 [
                     'exception' => $e,
                     'AdmissionTimeline_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -197,14 +194,14 @@ class AdmissionTimelineController extends MainController
                 'Data AdmissionTimeline berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $admissionTimeline->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus AdmissionTimeline.',
                 [
                     'exception' => $e,
                     'AdmissionTimeline_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -213,5 +210,5 @@ class AdmissionTimelineController extends MainController
                 'Data AdmissionTimeline gagal dihapus.'
             );
         }
-    } 
+    }
 }

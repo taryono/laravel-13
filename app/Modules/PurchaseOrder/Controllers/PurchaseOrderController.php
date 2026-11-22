@@ -68,7 +68,7 @@ class PurchaseOrderController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'vendor_id' => ['required', 'integer'],
             'purchase_request_id' => ['required', 'integer'],
             'fiscal_period_id' => ['required', 'integer'],
@@ -121,7 +121,7 @@ class PurchaseOrderController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -154,7 +154,7 @@ class PurchaseOrderController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'vendor_id' => ['required', 'integer'],
             'purchase_request_id' => ['required', 'integer'],
             'fiscal_period_id' => ['required', 'integer'],
@@ -191,10 +191,7 @@ class PurchaseOrderController extends MainController
 
         try {
             $purchaseOrder = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $purchaseOrder,
-                $validated
-            ) {
+            DB::transaction(function () use ($purchaseOrder, $validated) {
                 $purchaseOrder->update($validated);
             });
 
@@ -204,14 +201,14 @@ class PurchaseOrderController extends MainController
                 $purchaseOrder
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui PurchaseOrder.',
                 [
                     'exception' => $e,
                     'PurchaseOrder_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -239,14 +236,14 @@ class PurchaseOrderController extends MainController
                 'Data PurchaseOrder berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $purchaseOrder->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus PurchaseOrder.',
                 [
                     'exception' => $e,
                     'PurchaseOrder_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -255,5 +252,5 @@ class PurchaseOrderController extends MainController
                 'Data PurchaseOrder gagal dihapus.'
             );
         }
-    } 
+    }
 }

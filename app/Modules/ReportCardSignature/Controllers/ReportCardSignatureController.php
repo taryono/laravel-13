@@ -68,7 +68,7 @@ class ReportCardSignatureController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'report_card_id' => ['required', 'integer'],
+            'report_card_id' => ['required', 'integer'],
             'role' => ['required', 'string', 'max:255'],
             'user_id' => ['required', 'integer'],
             'signed_at' => ['required', 'string', 'max:255'],
@@ -96,7 +96,7 @@ class ReportCardSignatureController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -129,7 +129,7 @@ class ReportCardSignatureController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'report_card_id' => ['required', 'integer'],
+            'report_card_id' => ['required', 'integer'],
             'role' => ['required', 'string', 'max:255'],
             'user_id' => ['required', 'integer'],
             'signed_at' => ['required', 'string', 'max:255'],
@@ -141,10 +141,7 @@ class ReportCardSignatureController extends MainController
 
         try {
             $reportCardSignature = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $reportCardSignature,
-                $validated
-            ) {
+            DB::transaction(function () use ($reportCardSignature, $validated) {
                 $reportCardSignature->update($validated);
             });
 
@@ -154,14 +151,14 @@ class ReportCardSignatureController extends MainController
                 $reportCardSignature
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui ReportCardSignature.',
                 [
                     'exception' => $e,
                     'ReportCardSignature_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -189,14 +186,14 @@ class ReportCardSignatureController extends MainController
                 'Data ReportCardSignature berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $reportCardSignature->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus ReportCardSignature.',
                 [
                     'exception' => $e,
                     'ReportCardSignature_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -205,5 +202,5 @@ class ReportCardSignatureController extends MainController
                 'Data ReportCardSignature gagal dihapus.'
             );
         }
-    } 
+    }
 }

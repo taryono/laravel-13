@@ -68,7 +68,7 @@ class RkasStandardController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'code' => ['required', 'string', 'max:255'],
+            'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'order_index' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string', 'max:255'],
@@ -95,7 +95,7 @@ class RkasStandardController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -128,7 +128,7 @@ class RkasStandardController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'code' => ['required', 'string', 'max:255'],
+            'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'order_index' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string', 'max:255'],
@@ -139,10 +139,7 @@ class RkasStandardController extends MainController
 
         try {
             $rkasStandard = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $rkasStandard,
-                $validated
-            ) {
+            DB::transaction(function () use ($rkasStandard, $validated) {
                 $rkasStandard->update($validated);
             });
 
@@ -152,14 +149,14 @@ class RkasStandardController extends MainController
                 $rkasStandard
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui RkasStandard.',
                 [
                     'exception' => $e,
                     'RkasStandard_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -187,14 +184,14 @@ class RkasStandardController extends MainController
                 'Data RkasStandard berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $rkasStandard->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus RkasStandard.',
                 [
                     'exception' => $e,
                     'RkasStandard_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -203,5 +200,5 @@ class RkasStandardController extends MainController
                 'Data RkasStandard gagal dihapus.'
             );
         }
-    } 
+    }
 }

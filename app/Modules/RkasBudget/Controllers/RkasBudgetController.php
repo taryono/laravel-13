@@ -68,7 +68,7 @@ class RkasBudgetController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'rkas_item_id' => ['required', 'integer'],
+            'rkas_item_id' => ['required', 'integer'],
             'rkas_source_id' => ['required', 'integer'],
             'amount' => ['required', 'string', 'max:255'],
             'percentage' => ['required', 'string', 'max:255'],
@@ -96,7 +96,7 @@ class RkasBudgetController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -129,7 +129,7 @@ class RkasBudgetController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'rkas_item_id' => ['required', 'integer'],
+            'rkas_item_id' => ['required', 'integer'],
             'rkas_source_id' => ['required', 'integer'],
             'amount' => ['required', 'string', 'max:255'],
             'percentage' => ['required', 'string', 'max:255'],
@@ -141,10 +141,7 @@ class RkasBudgetController extends MainController
 
         try {
             $rkasBudget = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $rkasBudget,
-                $validated
-            ) {
+            DB::transaction(function () use ($rkasBudget, $validated) {
                 $rkasBudget->update($validated);
             });
 
@@ -154,14 +151,14 @@ class RkasBudgetController extends MainController
                 $rkasBudget
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui RkasBudget.',
                 [
                     'exception' => $e,
                     'RkasBudget_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -189,14 +186,14 @@ class RkasBudgetController extends MainController
                 'Data RkasBudget berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $rkasBudget->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus RkasBudget.',
                 [
                     'exception' => $e,
                     'RkasBudget_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -205,5 +202,5 @@ class RkasBudgetController extends MainController
                 'Data RkasBudget gagal dihapus.'
             );
         }
-    } 
+    }
 }

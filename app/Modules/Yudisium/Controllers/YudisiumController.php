@@ -68,7 +68,7 @@ class YudisiumController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'student_id' => ['required', 'integer'],
+            'student_id' => ['required', 'integer'],
             'academic_year_id' => ['required', 'integer'],
             'decree_number' => ['required', 'string', 'max:255'],
             'decree_date' => ['required', 'string', 'max:255'],
@@ -95,7 +95,7 @@ class YudisiumController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -128,7 +128,7 @@ class YudisiumController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'student_id' => ['required', 'integer'],
+            'student_id' => ['required', 'integer'],
             'academic_year_id' => ['required', 'integer'],
             'decree_number' => ['required', 'string', 'max:255'],
             'decree_date' => ['required', 'string', 'max:255'],
@@ -139,10 +139,7 @@ class YudisiumController extends MainController
 
         try {
             $yudisium = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $yudisium,
-                $validated
-            ) {
+            DB::transaction(function () use ($yudisium, $validated) {
                 $yudisium->update($validated);
             });
 
@@ -152,14 +149,14 @@ class YudisiumController extends MainController
                 $yudisium
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui Yudisium.',
                 [
                     'exception' => $e,
                     'Yudisium_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -187,14 +184,14 @@ class YudisiumController extends MainController
                 'Data Yudisium berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $yudisium->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus Yudisium.',
                 [
                     'exception' => $e,
                     'Yudisium_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -203,5 +200,5 @@ class YudisiumController extends MainController
                 'Data Yudisium gagal dihapus.'
             );
         }
-    } 
+    }
 }

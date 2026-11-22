@@ -68,7 +68,7 @@ class CbtFeatureController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'code' => ['required', 'string', 'max:255'],
+            'code' => ['required', 'string', 'max:255'],
             'category' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string', 'max:255'],
@@ -97,7 +97,7 @@ class CbtFeatureController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -130,7 +130,7 @@ class CbtFeatureController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'code' => ['required', 'string', 'max:255'],
+            'code' => ['required', 'string', 'max:255'],
             'category' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string', 'max:255'],
@@ -143,10 +143,7 @@ class CbtFeatureController extends MainController
 
         try {
             $cbtFeature = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $cbtFeature,
-                $validated
-            ) {
+            DB::transaction(function () use ($cbtFeature, $validated) {
                 $cbtFeature->update($validated);
             });
 
@@ -156,14 +153,14 @@ class CbtFeatureController extends MainController
                 $cbtFeature
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui CbtFeature.',
                 [
                     'exception' => $e,
                     'CbtFeature_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -191,14 +188,14 @@ class CbtFeatureController extends MainController
                 'Data CbtFeature berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $cbtFeature->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus CbtFeature.',
                 [
                     'exception' => $e,
                     'CbtFeature_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -207,5 +204,5 @@ class CbtFeatureController extends MainController
                 'Data CbtFeature gagal dihapus.'
             );
         }
-    } 
+    }
 }

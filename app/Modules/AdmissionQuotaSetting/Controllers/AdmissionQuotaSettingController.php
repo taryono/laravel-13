@@ -68,7 +68,7 @@ class AdmissionQuotaSettingController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'admission_id' => ['required', 'integer'],
+            'admission_id' => ['required', 'integer'],
             'admission_path_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
             'study_program_id' => ['required', 'integer'],
@@ -103,7 +103,7 @@ class AdmissionQuotaSettingController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -136,7 +136,7 @@ class AdmissionQuotaSettingController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'admission_id' => ['required', 'integer'],
+            'admission_id' => ['required', 'integer'],
             'admission_path_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
             'study_program_id' => ['required', 'integer'],
@@ -155,10 +155,7 @@ class AdmissionQuotaSettingController extends MainController
 
         try {
             $admissionQuotaSetting = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $admissionQuotaSetting,
-                $validated
-            ) {
+            DB::transaction(function () use ($admissionQuotaSetting, $validated) {
                 $admissionQuotaSetting->update($validated);
             });
 
@@ -168,14 +165,14 @@ class AdmissionQuotaSettingController extends MainController
                 $admissionQuotaSetting
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui AdmissionQuotaSetting.',
                 [
                     'exception' => $e,
                     'AdmissionQuotaSetting_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -203,14 +200,14 @@ class AdmissionQuotaSettingController extends MainController
                 'Data AdmissionQuotaSetting berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $admissionQuotaSetting->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus AdmissionQuotaSetting.',
                 [
                     'exception' => $e,
                     'AdmissionQuotaSetting_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -219,5 +216,5 @@ class AdmissionQuotaSettingController extends MainController
                 'Data AdmissionQuotaSetting gagal dihapus.'
             );
         }
-    } 
+    }
 }

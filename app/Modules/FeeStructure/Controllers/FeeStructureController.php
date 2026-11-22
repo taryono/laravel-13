@@ -68,7 +68,7 @@ class FeeStructureController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'fee_master_id' => ['required', 'integer'],
+            'fee_master_id' => ['required', 'integer'],
             'period_id' => ['required', 'integer'],
             'due_date' => ['required', 'string', 'max:255'],
             'amount' => ['required', 'string', 'max:255'],
@@ -95,7 +95,7 @@ class FeeStructureController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -128,7 +128,7 @@ class FeeStructureController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'fee_master_id' => ['required', 'integer'],
+            'fee_master_id' => ['required', 'integer'],
             'period_id' => ['required', 'integer'],
             'due_date' => ['required', 'string', 'max:255'],
             'amount' => ['required', 'string', 'max:255'],
@@ -139,10 +139,7 @@ class FeeStructureController extends MainController
 
         try {
             $feeStructure = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $feeStructure,
-                $validated
-            ) {
+            DB::transaction(function () use ($feeStructure, $validated) {
                 $feeStructure->update($validated);
             });
 
@@ -152,14 +149,14 @@ class FeeStructureController extends MainController
                 $feeStructure
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui FeeStructure.',
                 [
                     'exception' => $e,
                     'FeeStructure_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -187,14 +184,14 @@ class FeeStructureController extends MainController
                 'Data FeeStructure berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $feeStructure->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus FeeStructure.',
                 [
                     'exception' => $e,
                     'FeeStructure_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -203,5 +200,5 @@ class FeeStructureController extends MainController
                 'Data FeeStructure gagal dihapus.'
             );
         }
-    } 
+    }
 }

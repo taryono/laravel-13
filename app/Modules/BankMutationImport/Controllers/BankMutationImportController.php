@@ -68,7 +68,7 @@ class BankMutationImportController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'bank_account_id' => ['required', 'integer'],
             'file_name' => ['required', 'string', 'max:255'],
             'file_url' => ['required', 'string', 'max:255'],
@@ -104,7 +104,7 @@ class BankMutationImportController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -137,7 +137,7 @@ class BankMutationImportController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'bank_account_id' => ['required', 'integer'],
             'file_name' => ['required', 'string', 'max:255'],
             'file_url' => ['required', 'string', 'max:255'],
@@ -157,10 +157,7 @@ class BankMutationImportController extends MainController
 
         try {
             $bankMutationImport = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $bankMutationImport,
-                $validated
-            ) {
+            DB::transaction(function () use ($bankMutationImport, $validated) {
                 $bankMutationImport->update($validated);
             });
 
@@ -170,14 +167,14 @@ class BankMutationImportController extends MainController
                 $bankMutationImport
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui BankMutationImport.',
                 [
                     'exception' => $e,
                     'BankMutationImport_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -205,14 +202,14 @@ class BankMutationImportController extends MainController
                 'Data BankMutationImport berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $bankMutationImport->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus BankMutationImport.',
                 [
                     'exception' => $e,
                     'BankMutationImport_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -221,5 +218,5 @@ class BankMutationImportController extends MainController
                 'Data BankMutationImport gagal dihapus.'
             );
         }
-    } 
+    }
 }

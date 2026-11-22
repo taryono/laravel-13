@@ -68,7 +68,7 @@ class AnnouncementController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'title' => ['required', 'string', 'max:255'],
             'content' => ['required', 'string', 'max:255'],
             'audience' => ['required', 'string', 'max:255'],
@@ -103,7 +103,7 @@ class AnnouncementController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -136,7 +136,7 @@ class AnnouncementController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'title' => ['required', 'string', 'max:255'],
             'content' => ['required', 'string', 'max:255'],
             'audience' => ['required', 'string', 'max:255'],
@@ -155,10 +155,7 @@ class AnnouncementController extends MainController
 
         try {
             $announcement = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $announcement,
-                $validated
-            ) {
+            DB::transaction(function () use ($announcement, $validated) {
                 $announcement->update($validated);
             });
 
@@ -168,14 +165,14 @@ class AnnouncementController extends MainController
                 $announcement
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui Announcement.',
                 [
                     'exception' => $e,
                     'Announcement_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -203,14 +200,14 @@ class AnnouncementController extends MainController
                 'Data Announcement berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $announcement->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus Announcement.',
                 [
                     'exception' => $e,
                     'Announcement_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -219,5 +216,5 @@ class AnnouncementController extends MainController
                 'Data Announcement gagal dihapus.'
             );
         }
-    } 
+    }
 }

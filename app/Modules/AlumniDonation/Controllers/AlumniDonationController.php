@@ -68,7 +68,7 @@ class AlumniDonationController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'alumni_id' => ['required', 'integer'],
+            'alumni_id' => ['required', 'integer'],
             'donation_number' => ['required', 'string', 'max:255'],
             'campaign_name' => ['required', 'string', 'max:255'],
             'amount' => ['required', 'string', 'max:255'],
@@ -100,7 +100,7 @@ class AlumniDonationController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -133,7 +133,7 @@ class AlumniDonationController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'alumni_id' => ['required', 'integer'],
+            'alumni_id' => ['required', 'integer'],
             'donation_number' => ['required', 'string', 'max:255'],
             'campaign_name' => ['required', 'string', 'max:255'],
             'amount' => ['required', 'string', 'max:255'],
@@ -149,10 +149,7 @@ class AlumniDonationController extends MainController
 
         try {
             $alumniDonation = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $alumniDonation,
-                $validated
-            ) {
+            DB::transaction(function () use ($alumniDonation, $validated) {
                 $alumniDonation->update($validated);
             });
 
@@ -162,14 +159,14 @@ class AlumniDonationController extends MainController
                 $alumniDonation
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui AlumniDonation.',
                 [
                     'exception' => $e,
                     'AlumniDonation_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -197,14 +194,14 @@ class AlumniDonationController extends MainController
                 'Data AlumniDonation berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $alumniDonation->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus AlumniDonation.',
                 [
                     'exception' => $e,
                     'AlumniDonation_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -213,5 +210,5 @@ class AlumniDonationController extends MainController
                 'Data AlumniDonation gagal dihapus.'
             );
         }
-    } 
+    }
 }

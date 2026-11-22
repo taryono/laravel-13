@@ -68,7 +68,7 @@ class ApplicantChoiceController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'applicant_id' => ['required', 'integer'],
+            'applicant_id' => ['required', 'integer'],
             'study_program_id' => ['required', 'integer'],
             'choice_order' => ['required', 'string', 'max:255'],
             'is_accepted' => ['required', 'string', 'max:255'],
@@ -92,7 +92,7 @@ class ApplicantChoiceController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -125,7 +125,7 @@ class ApplicantChoiceController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'applicant_id' => ['required', 'integer'],
+            'applicant_id' => ['required', 'integer'],
             'study_program_id' => ['required', 'integer'],
             'choice_order' => ['required', 'string', 'max:255'],
             'is_accepted' => ['required', 'string', 'max:255'],
@@ -133,10 +133,7 @@ class ApplicantChoiceController extends MainController
 
         try {
             $applicantChoice = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $applicantChoice,
-                $validated
-            ) {
+            DB::transaction(function () use ($applicantChoice, $validated) {
                 $applicantChoice->update($validated);
             });
 
@@ -146,14 +143,14 @@ class ApplicantChoiceController extends MainController
                 $applicantChoice
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui ApplicantChoice.',
                 [
                     'exception' => $e,
                     'ApplicantChoice_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -181,14 +178,14 @@ class ApplicantChoiceController extends MainController
                 'Data ApplicantChoice berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $applicantChoice->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus ApplicantChoice.',
                 [
                     'exception' => $e,
                     'ApplicantChoice_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -197,5 +194,5 @@ class ApplicantChoiceController extends MainController
                 'Data ApplicantChoice gagal dihapus.'
             );
         }
-    } 
+    }
 }

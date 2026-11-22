@@ -68,7 +68,7 @@ class LocationController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
         ]);
 
         try {
@@ -89,7 +89,7 @@ class LocationController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -122,15 +122,12 @@ class LocationController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
         ]);
 
         try {
             $location = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $location,
-                $validated
-            ) {
+            DB::transaction(function () use ($location, $validated) {
                 $location->update($validated);
             });
 
@@ -140,14 +137,14 @@ class LocationController extends MainController
                 $location
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui Location.',
                 [
                     'exception' => $e,
                     'Location_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -175,14 +172,14 @@ class LocationController extends MainController
                 'Data Location berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $location->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus Location.',
                 [
                     'exception' => $e,
                     'Location_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -191,5 +188,5 @@ class LocationController extends MainController
                 'Data Location gagal dihapus.'
             );
         }
-    } 
+    }
 }

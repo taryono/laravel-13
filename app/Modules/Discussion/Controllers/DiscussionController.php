@@ -68,7 +68,7 @@ class DiscussionController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'course_id' => ['required', 'integer'],
+            'course_id' => ['required', 'integer'],
             'user_id' => ['required', 'integer'],
             'title' => ['required', 'string', 'max:255'],
             'content' => ['required', 'string', 'max:255'],
@@ -99,7 +99,7 @@ class DiscussionController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -132,7 +132,7 @@ class DiscussionController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'course_id' => ['required', 'integer'],
+            'course_id' => ['required', 'integer'],
             'user_id' => ['required', 'integer'],
             'title' => ['required', 'string', 'max:255'],
             'content' => ['required', 'string', 'max:255'],
@@ -147,10 +147,7 @@ class DiscussionController extends MainController
 
         try {
             $discussion = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $discussion,
-                $validated
-            ) {
+            DB::transaction(function () use ($discussion, $validated) {
                 $discussion->update($validated);
             });
 
@@ -160,14 +157,14 @@ class DiscussionController extends MainController
                 $discussion
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui Discussion.',
                 [
                     'exception' => $e,
                     'Discussion_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -195,14 +192,14 @@ class DiscussionController extends MainController
                 'Data Discussion berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $discussion->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus Discussion.',
                 [
                     'exception' => $e,
                     'Discussion_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -211,5 +208,5 @@ class DiscussionController extends MainController
                 'Data Discussion gagal dihapus.'
             );
         }
-    } 
+    }
 }

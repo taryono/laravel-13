@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
-use Throwable; 
+use Throwable;
 class PayrollFinanceIntegrationController extends MainController
 {
     protected PayrollFinanceIntegrationService $integrationService;
@@ -74,7 +74,7 @@ class PayrollFinanceIntegrationController extends MainController
             Log::error('Gagal sinkronisasi payroll ke finance.', [
                 'exception' => $e,
                 'payroll_run_id' => $validated['payroll_run_id'],
-                'user_id' => auth()->id(),
+                'user_id' => request()->user()?->id,
             ]);
 
             return $this->errorResponse(
@@ -136,7 +136,7 @@ class PayrollFinanceIntegrationController extends MainController
             Log::error('Gagal sinkronisasi ulang.', [
                 'exception' => $e,
                 'integration_id' => $id,
-                'user_id' => auth()->id(),
+                'user_id' => request()->user()?->id,
             ]);
 
             return $this->errorResponse(
@@ -174,7 +174,7 @@ class PayrollFinanceIntegrationController extends MainController
             Log::error('Gagal membatalkan sinkronisasi.', [
                 'exception' => $e,
                 'integration_id' => $id,
-                'user_id' => auth()->id(),
+                'user_id' => request()->user()?->id,
             ]);
 
             return $this->errorResponse(

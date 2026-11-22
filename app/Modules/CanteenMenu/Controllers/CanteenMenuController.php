@@ -68,7 +68,7 @@ class CanteenMenuController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'canteen_tenant_id' => ['required', 'integer'],
+            'canteen_tenant_id' => ['required', 'integer'],
             'name' => ['required', 'string', 'max:255'],
             'category' => ['required', 'string', 'max:255'],
             'price' => ['required', 'string', 'max:255'],
@@ -95,7 +95,7 @@ class CanteenMenuController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -128,7 +128,7 @@ class CanteenMenuController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'canteen_tenant_id' => ['required', 'integer'],
+            'canteen_tenant_id' => ['required', 'integer'],
             'name' => ['required', 'string', 'max:255'],
             'category' => ['required', 'string', 'max:255'],
             'price' => ['required', 'string', 'max:255'],
@@ -139,10 +139,7 @@ class CanteenMenuController extends MainController
 
         try {
             $canteenMenu = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $canteenMenu,
-                $validated
-            ) {
+            DB::transaction(function () use ($canteenMenu, $validated) {
                 $canteenMenu->update($validated);
             });
 
@@ -152,14 +149,14 @@ class CanteenMenuController extends MainController
                 $canteenMenu
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui CanteenMenu.',
                 [
                     'exception' => $e,
                     'CanteenMenu_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -187,14 +184,14 @@ class CanteenMenuController extends MainController
                 'Data CanteenMenu berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $canteenMenu->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus CanteenMenu.',
                 [
                     'exception' => $e,
                     'CanteenMenu_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -203,5 +200,5 @@ class CanteenMenuController extends MainController
                 'Data CanteenMenu gagal dihapus.'
             );
         }
-    } 
+    }
 }

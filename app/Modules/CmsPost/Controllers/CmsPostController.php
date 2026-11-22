@@ -65,23 +65,23 @@ class CmsPostController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'title'            => ['required', 'string', 'max:255'],
-            'slug'             => ['nullable', 'string', 'max:255', 'unique:cms_posts,slug'],
-            'category_id'      => ['nullable', 'integer', 'exists:cms_categories,id'],
-            'cms_category_id'  => ['nullable', 'integer', 'exists:cms_categories,id'],
-            'user_id'          => ['nullable', 'integer', 'exists:users,id'],
-            'excerpt'          => ['nullable', 'string'],
-            'content'          => ['nullable', 'string'],
-            'featured_image'   => ['nullable'],
-            'status'           => ['nullable', 'string', Rule::in(['draft', 'published', 'scheduled', 'archived'])],
-            'published_at'     => ['nullable', 'date'],
-            'is_featured'      => ['nullable', 'boolean'],
-            'allow_comments'   => ['nullable', 'boolean'],
-            'view_count'       => ['nullable', 'integer', 'min:0'],
-            'meta_title'       => ['nullable', 'string', 'max:255'],
+            'title' => ['required', 'string', 'max:255'],
+            'slug' => ['nullable', 'string', 'max:255', 'unique:cms_posts,slug'],
+            'category_id' => ['nullable', 'integer', 'exists:cms_categories,id'],
+            'cms_category_id' => ['nullable', 'integer', 'exists:cms_categories,id'],
+            'user_id' => ['nullable', 'integer', 'exists:users,id'],
+            'excerpt' => ['nullable', 'string'],
+            'content' => ['nullable', 'string'],
+            'featured_image' => ['nullable'],
+            'status' => ['nullable', 'string', Rule::in(['draft', 'published', 'scheduled', 'archived'])],
+            'published_at' => ['nullable', 'date'],
+            'is_featured' => ['nullable', 'boolean'],
+            'allow_comments' => ['nullable', 'boolean'],
+            'view_count' => ['nullable', 'integer', 'min:0'],
+            'meta_title' => ['nullable', 'string', 'max:255'],
             'meta_description' => ['nullable', 'string', 'max:255'],
-            'meta_keywords'    => ['nullable', 'string', 'max:255'],
-            'tags'             => ['nullable', 'array'],
+            'meta_keywords' => ['nullable', 'string', 'max:255'],
+            'tags' => ['nullable', 'array'],
         ]);
 
         $catId = $request->input('cms_category_id') ?? $request->input('category_id');
@@ -102,7 +102,7 @@ class CmsPostController extends MainController
         }
 
         if (empty($validated['user_id'])) {
-            $validated['user_id'] = auth()->id() ?? User::first()?->id ?? 1;
+            $validated['user_id'] = request()->user()?->id ?? User::first()?->id ?? 1;
         }
 
         if (empty($validated['status'])) {
@@ -143,7 +143,7 @@ class CmsPostController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -178,23 +178,23 @@ class CmsPostController extends MainController
         $cmsPost = $this->model->findOrFail($id);
 
         $validated = $request->validate([
-            'title'            => ['required', 'string', 'max:255'],
-            'slug'             => ['nullable', 'string', 'max:255', Rule::unique('cms_posts', 'slug')->ignore($cmsPost->id)],
-            'category_id'      => ['nullable', 'integer', 'exists:cms_categories,id'],
-            'cms_category_id'  => ['nullable', 'integer', 'exists:cms_categories,id'],
-            'user_id'          => ['nullable', 'integer', 'exists:users,id'],
-            'excerpt'          => ['nullable', 'string'],
-            'content'          => ['nullable', 'string'],
-            'featured_image'   => ['nullable'],
-            'status'           => ['nullable', 'string', Rule::in(['draft', 'published', 'scheduled', 'archived'])],
-            'published_at'     => ['nullable', 'date'],
-            'is_featured'      => ['nullable', 'boolean'],
-            'allow_comments'   => ['nullable', 'boolean'],
-            'view_count'       => ['nullable', 'integer', 'min:0'],
-            'meta_title'       => ['nullable', 'string', 'max:255'],
+            'title' => ['required', 'string', 'max:255'],
+            'slug' => ['nullable', 'string', 'max:255', Rule::unique('cms_posts', 'slug')->ignore($cmsPost->id)],
+            'category_id' => ['nullable', 'integer', 'exists:cms_categories,id'],
+            'cms_category_id' => ['nullable', 'integer', 'exists:cms_categories,id'],
+            'user_id' => ['nullable', 'integer', 'exists:users,id'],
+            'excerpt' => ['nullable', 'string'],
+            'content' => ['nullable', 'string'],
+            'featured_image' => ['nullable'],
+            'status' => ['nullable', 'string', Rule::in(['draft', 'published', 'scheduled', 'archived'])],
+            'published_at' => ['nullable', 'date'],
+            'is_featured' => ['nullable', 'boolean'],
+            'allow_comments' => ['nullable', 'boolean'],
+            'view_count' => ['nullable', 'integer', 'min:0'],
+            'meta_title' => ['nullable', 'string', 'max:255'],
             'meta_description' => ['nullable', 'string', 'max:255'],
-            'meta_keywords'    => ['nullable', 'string', 'max:255'],
-            'tags'             => ['nullable', 'array'],
+            'meta_keywords' => ['nullable', 'string', 'max:255'],
+            'tags' => ['nullable', 'array'],
         ]);
 
         $catId = $request->input('cms_category_id') ?? $request->input('category_id');
@@ -236,14 +236,14 @@ class CmsPostController extends MainController
                 $cmsPost
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui CmsPost.',
                 [
                     'exception' => $e,
                     'CmsPost_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -301,7 +301,7 @@ class CmsPostController extends MainController
 
         return response()->json([
             'success' => true,
-            'data'    => $results,
+            'data' => $results,
         ]);
     }
 
@@ -322,13 +322,13 @@ class CmsPostController extends MainController
                 'Data CmsPost berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal menghapus CmsPost.',
                 [
                     'exception' => $e,
                     'CmsPost_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -337,5 +337,5 @@ class CmsPostController extends MainController
                 'Data CmsPost gagal dihapus.'
             );
         }
-    } 
+    }
 }

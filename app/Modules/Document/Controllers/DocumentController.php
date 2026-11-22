@@ -68,7 +68,7 @@ class DocumentController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
         ]);
 
         try {
@@ -89,7 +89,7 @@ class DocumentController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -122,15 +122,12 @@ class DocumentController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
         ]);
 
         try {
             $document = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $document,
-                $validated
-            ) {
+            DB::transaction(function () use ($document, $validated) {
                 $document->update($validated);
             });
 
@@ -140,14 +137,14 @@ class DocumentController extends MainController
                 $document
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui Document.',
                 [
                     'exception' => $e,
                     'Document_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -175,14 +172,14 @@ class DocumentController extends MainController
                 'Data Document berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $document->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus Document.',
                 [
                     'exception' => $e,
                     'Document_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -191,5 +188,5 @@ class DocumentController extends MainController
                 'Data Document gagal dihapus.'
             );
         }
-    } 
+    }
 }

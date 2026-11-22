@@ -68,7 +68,7 @@ class CmsCommentController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'post_id' => ['required', 'integer'],
+            'post_id' => ['required', 'integer'],
             'user_id' => ['required', 'integer'],
             'parent_id' => ['required', 'integer'],
             'name' => ['required', 'string', 'max:255'],
@@ -97,7 +97,7 @@ class CmsCommentController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -130,7 +130,7 @@ class CmsCommentController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'post_id' => ['required', 'integer'],
+            'post_id' => ['required', 'integer'],
             'user_id' => ['required', 'integer'],
             'parent_id' => ['required', 'integer'],
             'name' => ['required', 'string', 'max:255'],
@@ -143,10 +143,7 @@ class CmsCommentController extends MainController
 
         try {
             $cmsComment = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $cmsComment,
-                $validated
-            ) {
+            DB::transaction(function () use ($cmsComment, $validated) {
                 $cmsComment->update($validated);
             });
 
@@ -156,14 +153,14 @@ class CmsCommentController extends MainController
                 $cmsComment
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui CmsComment.',
                 [
                     'exception' => $e,
                     'CmsComment_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -191,14 +188,14 @@ class CmsCommentController extends MainController
                 'Data CmsComment berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $cmsComment->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus CmsComment.',
                 [
                     'exception' => $e,
                     'CmsComment_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -207,5 +204,5 @@ class CmsCommentController extends MainController
                 'Data CmsComment gagal dihapus.'
             );
         }
-    } 
+    }
 }

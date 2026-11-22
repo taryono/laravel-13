@@ -68,7 +68,7 @@ class GradeBoundaryController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'curriculum_id' => ['required', 'integer'],
             'assessment_id' => ['required', 'integer'],
             'academic_year_id' => ['required', 'integer'],
@@ -99,7 +99,7 @@ class GradeBoundaryController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -132,7 +132,7 @@ class GradeBoundaryController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'curriculum_id' => ['required', 'integer'],
             'assessment_id' => ['required', 'integer'],
             'academic_year_id' => ['required', 'integer'],
@@ -147,10 +147,7 @@ class GradeBoundaryController extends MainController
 
         try {
             $gradeBoundary = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $gradeBoundary,
-                $validated
-            ) {
+            DB::transaction(function () use ($gradeBoundary, $validated) {
                 $gradeBoundary->update($validated);
             });
 
@@ -160,14 +157,14 @@ class GradeBoundaryController extends MainController
                 $gradeBoundary
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui GradeBoundary.',
                 [
                     'exception' => $e,
                     'GradeBoundary_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -195,14 +192,14 @@ class GradeBoundaryController extends MainController
                 'Data GradeBoundary berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $gradeBoundary->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus GradeBoundary.',
                 [
                     'exception' => $e,
                     'GradeBoundary_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -211,5 +208,5 @@ class GradeBoundaryController extends MainController
                 'Data GradeBoundary gagal dihapus.'
             );
         }
-    } 
+    }
 }

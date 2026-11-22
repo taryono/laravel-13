@@ -68,7 +68,7 @@ class PurchaseRequestItemController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'purchase_request_id' => ['required', 'integer'],
+            'purchase_request_id' => ['required', 'integer'],
             'rkas_item_id' => ['required', 'integer'],
             'account_id' => ['required', 'integer'],
             'name' => ['required', 'string', 'max:255'],
@@ -102,7 +102,7 @@ class PurchaseRequestItemController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -135,7 +135,7 @@ class PurchaseRequestItemController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'purchase_request_id' => ['required', 'integer'],
+            'purchase_request_id' => ['required', 'integer'],
             'rkas_item_id' => ['required', 'integer'],
             'account_id' => ['required', 'integer'],
             'name' => ['required', 'string', 'max:255'],
@@ -153,10 +153,7 @@ class PurchaseRequestItemController extends MainController
 
         try {
             $purchaseRequestItem = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $purchaseRequestItem,
-                $validated
-            ) {
+            DB::transaction(function () use ($purchaseRequestItem, $validated) {
                 $purchaseRequestItem->update($validated);
             });
 
@@ -166,14 +163,14 @@ class PurchaseRequestItemController extends MainController
                 $purchaseRequestItem
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui PurchaseRequestItem.',
                 [
                     'exception' => $e,
                     'PurchaseRequestItem_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -201,14 +198,14 @@ class PurchaseRequestItemController extends MainController
                 'Data PurchaseRequestItem berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $purchaseRequestItem->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus PurchaseRequestItem.',
                 [
                     'exception' => $e,
                     'PurchaseRequestItem_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -217,5 +214,5 @@ class PurchaseRequestItemController extends MainController
                 'Data PurchaseRequestItem gagal dihapus.'
             );
         }
-    } 
+    }
 }

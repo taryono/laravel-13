@@ -68,7 +68,7 @@ class LibraryVisitController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'library_membership_id' => ['required', 'integer'],
+            'library_membership_id' => ['required', 'integer'],
             'user_id' => ['required', 'integer'],
             'student_id' => ['required', 'integer'],
             'employee_id' => ['required', 'integer'],
@@ -108,7 +108,7 @@ class LibraryVisitController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -141,7 +141,7 @@ class LibraryVisitController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'library_membership_id' => ['required', 'integer'],
+            'library_membership_id' => ['required', 'integer'],
             'user_id' => ['required', 'integer'],
             'student_id' => ['required', 'integer'],
             'employee_id' => ['required', 'integer'],
@@ -165,10 +165,7 @@ class LibraryVisitController extends MainController
 
         try {
             $libraryVisit = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $libraryVisit,
-                $validated
-            ) {
+            DB::transaction(function () use ($libraryVisit, $validated) {
                 $libraryVisit->update($validated);
             });
 
@@ -178,14 +175,14 @@ class LibraryVisitController extends MainController
                 $libraryVisit
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui LibraryVisit.',
                 [
                     'exception' => $e,
                     'LibraryVisit_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -213,14 +210,14 @@ class LibraryVisitController extends MainController
                 'Data LibraryVisit berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $libraryVisit->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus LibraryVisit.',
                 [
                     'exception' => $e,
                     'LibraryVisit_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -229,5 +226,5 @@ class LibraryVisitController extends MainController
                 'Data LibraryVisit gagal dihapus.'
             );
         }
-    } 
+    }
 }

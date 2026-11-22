@@ -68,7 +68,7 @@ class StudentParentController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'student_id' => ['required', 'integer'],
+            'student_id' => ['required', 'integer'],
             'parent_id' => ['required', 'integer'],
             'is_primary' => ['required', 'string', 'max:255'],
             'created_at' => ['required', 'string', 'max:255'],
@@ -96,7 +96,7 @@ class StudentParentController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -129,7 +129,7 @@ class StudentParentController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'student_id' => ['required', 'integer'],
+            'student_id' => ['required', 'integer'],
             'parent_id' => ['required', 'integer'],
             'is_primary' => ['required', 'string', 'max:255'],
             'created_at' => ['required', 'string', 'max:255'],
@@ -141,10 +141,7 @@ class StudentParentController extends MainController
 
         try {
             $studentParent = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $studentParent,
-                $validated
-            ) {
+            DB::transaction(function () use ($studentParent, $validated) {
                 $studentParent->update($validated);
             });
 
@@ -154,14 +151,14 @@ class StudentParentController extends MainController
                 $studentParent
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui StudentParent.',
                 [
                     'exception' => $e,
                     'StudentParent_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -189,14 +186,14 @@ class StudentParentController extends MainController
                 'Data StudentParent berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $studentParent->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus StudentParent.',
                 [
                     'exception' => $e,
                     'StudentParent_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -205,5 +202,5 @@ class StudentParentController extends MainController
                 'Data StudentParent gagal dihapus.'
             );
         }
-    } 
+    }
 }

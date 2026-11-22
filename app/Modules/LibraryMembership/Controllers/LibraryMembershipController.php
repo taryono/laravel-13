@@ -68,7 +68,7 @@ class LibraryMembershipController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'school_id' => ['required', 'integer'],
             'member_type' => ['required', 'string', 'max:255'],
             'member_id' => ['required', 'integer'],
@@ -97,7 +97,7 @@ class LibraryMembershipController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -130,7 +130,7 @@ class LibraryMembershipController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'school_id' => ['required', 'integer'],
             'member_type' => ['required', 'string', 'max:255'],
             'member_id' => ['required', 'integer'],
@@ -143,10 +143,7 @@ class LibraryMembershipController extends MainController
 
         try {
             $libraryMembership = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $libraryMembership,
-                $validated
-            ) {
+            DB::transaction(function () use ($libraryMembership, $validated) {
                 $libraryMembership->update($validated);
             });
 
@@ -156,14 +153,14 @@ class LibraryMembershipController extends MainController
                 $libraryMembership
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui LibraryMembership.',
                 [
                     'exception' => $e,
                     'LibraryMembership_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -191,14 +188,14 @@ class LibraryMembershipController extends MainController
                 'Data LibraryMembership berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $libraryMembership->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus LibraryMembership.',
                 [
                     'exception' => $e,
                     'LibraryMembership_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -207,5 +204,5 @@ class LibraryMembershipController extends MainController
                 'Data LibraryMembership gagal dihapus.'
             );
         }
-    } 
+    }
 }

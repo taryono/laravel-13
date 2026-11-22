@@ -16,7 +16,7 @@ use Throwable;
 class AttendanceImportController extends MainController
 {
 
- protected FingerprintImporter $importer;
+    protected FingerprintImporter $importer;
     protected AttendanceProcessor $processor;
 
     public function __construct(
@@ -97,7 +97,7 @@ class AttendanceImportController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -136,10 +136,7 @@ class AttendanceImportController extends MainController
         try {
             $attendanceImport = $this->model->findOrFail($id);
 
-            DB::transaction(function () use (
-                $attendanceImport,
-                $validated
-            ) {
+            DB::transaction(function () use ($attendanceImport, $validated) {
                 $attendanceImport->update($validated);
             });
 
@@ -162,7 +159,7 @@ class AttendanceImportController extends MainController
                     'exception' => $e,
                     'AttendanceImport_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -208,7 +205,7 @@ class AttendanceImportController extends MainController
                 [
                     'exception' => $e,
                     'AttendanceImport_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -217,7 +214,7 @@ class AttendanceImportController extends MainController
                 'Data AttendanceImport gagal dihapus.'
             );
         }
-    } 
+    }
 
     /**
      * Import fingerprint data
@@ -232,10 +229,10 @@ class AttendanceImportController extends MainController
         try {
             // Validate file first
             $validation = $this->importer->validateFile($request->file('file'));
-            
+
             if (!$validation['valid']) {
                 return redirect()->back()
-                    ->with('error', 'File tidak valid. Field yang hilang: ' . 
+                    ->with('error', 'File tidak valid. Field yang hilang: ' .
                         implode(', ', $validation['missing_fields'] ?? ['unknown']))
                     ->withInput();
             }
@@ -253,7 +250,7 @@ class AttendanceImportController extends MainController
                     'machine_source' => $request->machine_id ?? $validation['format'] ?? 'unknown',
                     'total_records' => $validation['total_rows'] ?? 0,
                     'status' => 'uploaded',
-                    'imported_by' => auth()->id(),
+                    'imported_by' => request()->user()?->id,
                 ]);
             });
 
@@ -263,13 +260,13 @@ class AttendanceImportController extends MainController
             // Process attendance if there were successful imports
             if ($result['processed'] > 0) {
                 $processResult = $this->processor->processBatch();
-                
+
                 $message = "Berhasil mengimport {$result['processed']} data absensi. " .
-                          "Gagal: {$result['failed']} data. " .
-                          "Berhasil memproses {$processResult['processed']} data absensi.";
+                    "Gagal: {$result['failed']} data. " .
+                    "Berhasil memproses {$processResult['processed']} data absensi.";
             } else {
                 $message = "Import selesai. Tidak ada data yang berhasil diimport. " .
-                          "Gagal: {$result['failed']} data.";
+                    "Gagal: {$result['failed']} data.";
             }
 
             return redirect()->route('attendance.import.index')
@@ -278,7 +275,7 @@ class AttendanceImportController extends MainController
         } catch (\Throwable $e) {
             Log::error('Gagal import absensi.', [
                 'exception' => $e,
-                'user_id' => auth()->id(),
+                'user_id' => request()->user()?->id,
             ]);
 
             return redirect()->back()
@@ -314,13 +311,13 @@ class AttendanceImportController extends MainController
         }
     }
 
-     /**
+    /**
      * Get batch details
      */
     public function show($id)
     {
         $batch = AttendanceImportBatch::with(['importedBy'])->findOrFail($id);
-        
+
         // Get logs for this batch
         $logs = \App\Modules\Attendance\Models\AttendanceLog::where('import_batch', $batch->batch_code)
             ->with(['employee'])

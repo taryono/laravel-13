@@ -68,7 +68,7 @@ class IdentityTypeController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'code' => ['required', 'string', 'max:255'],
+            'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'max_length' => ['required', 'string', 'max:255'],
             'is_required' => ['required', 'string', 'max:255'],
@@ -96,7 +96,7 @@ class IdentityTypeController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -129,7 +129,7 @@ class IdentityTypeController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'code' => ['required', 'string', 'max:255'],
+            'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'max_length' => ['required', 'string', 'max:255'],
             'is_required' => ['required', 'string', 'max:255'],
@@ -141,10 +141,7 @@ class IdentityTypeController extends MainController
 
         try {
             $identityType = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $identityType,
-                $validated
-            ) {
+            DB::transaction(function () use ($identityType, $validated) {
                 $identityType->update($validated);
             });
 
@@ -154,14 +151,14 @@ class IdentityTypeController extends MainController
                 $identityType
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui IdentityType.',
                 [
                     'exception' => $e,
                     'IdentityType_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -189,14 +186,14 @@ class IdentityTypeController extends MainController
                 'Data IdentityType berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $identityType->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus IdentityType.',
                 [
                     'exception' => $e,
                     'IdentityType_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -205,5 +202,5 @@ class IdentityTypeController extends MainController
                 'Data IdentityType gagal dihapus.'
             );
         }
-    } 
+    }
 }

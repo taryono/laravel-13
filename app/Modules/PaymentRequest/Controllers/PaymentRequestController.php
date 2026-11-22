@@ -57,7 +57,7 @@ class PaymentRequestController extends MainController
 
         try {
             $paymentRequest = DB::transaction(function () use ($validated) {
-                $validated['requested_by'] = auth()->id();
+                $validated['requested_by'] = request()->user()?->id;
                 return PaymentRequest::create($validated);
             });
 
@@ -146,7 +146,7 @@ class PaymentRequestController extends MainController
             DB::transaction(function () use ($paymentRequest, $request) {
                 $paymentRequest->update([
                     'status' => 'approved',
-                    'approved_by' => auth()->id(),
+                    'approved_by' => request()->user()?->id,
                     'approved_at' => now(),
                 ]);
             });
@@ -166,7 +166,7 @@ class PaymentRequestController extends MainController
             DB::transaction(function () use ($paymentRequest) {
                 $paymentRequest->update([
                     'status' => 'rejected',
-                    'approved_by' => auth()->id(),
+                    'approved_by' => request()->user()?->id,
                     'approved_at' => now(),
                 ]);
             });

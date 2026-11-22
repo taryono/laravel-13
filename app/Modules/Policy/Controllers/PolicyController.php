@@ -16,7 +16,8 @@ use Throwable;
 class PolicyController extends MainController
 {
 
-    public function __construct(){
+    public function __construct()
+    {
         parent::__construct(new Policy());
     }
 
@@ -50,7 +51,7 @@ class PolicyController extends MainController
      * Show the form for creating a new resource.
      */
     public function create(): View
-    {   
+    {
         $policy = new Policy();
         $forms = $this->getForm($policy);
         return view(
@@ -91,7 +92,7 @@ class PolicyController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -106,7 +107,8 @@ class PolicyController extends MainController
      * Show the form for editing the specified resource.
      */
     public function edit($id): View
-    {   $policy = $this->model->findOrFail($id);
+    {
+        $policy = $this->model->findOrFail($id);
         $forms = $this->getForm($policy);
         return view(
             'Policy::edit',
@@ -117,7 +119,8 @@ class PolicyController extends MainController
     /**
      * Update the specified resource.
      */
-    public function update(Request $request,$id) {
+    public function update(Request $request, $id)
+    {
         $validated = $request->validate([
             'name' => [
                 'required',
@@ -128,10 +131,7 @@ class PolicyController extends MainController
 
         try {
             $policy = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $policy,
-                $validated
-            ) {
+            DB::transaction(function () use ($policy, $validated) {
                 $policy->update($validated);
             });
 
@@ -149,7 +149,7 @@ class PolicyController extends MainController
                     'exception' => $e,
                     'Policy_id' => $policy->getKey(),
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -163,9 +163,10 @@ class PolicyController extends MainController
     /**
      * Remove the specified resource.
      */
-    public function destroy(Request $request,$id): JsonResponse|RedirectResponse {
+    public function destroy(Request $request, $id): JsonResponse|RedirectResponse
+    {
         try {
-             $policy = $this->model->findOrFail($id);
+            $policy = $this->model->findOrFail($id);
             DB::transaction(function () use ($policy) {
                 $policy->delete();
             });
@@ -182,7 +183,7 @@ class PolicyController extends MainController
                 [
                     'exception' => $e,
                     'Policy_id' => $policy->getKey(),
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -191,5 +192,5 @@ class PolicyController extends MainController
                 'Data Policy gagal dihapus.'
             );
         }
-    } 
+    }
 }

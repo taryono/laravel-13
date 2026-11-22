@@ -68,7 +68,7 @@ class CanteenTenantController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'school_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
@@ -101,7 +101,7 @@ class CanteenTenantController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -134,7 +134,7 @@ class CanteenTenantController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'school_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
@@ -151,10 +151,7 @@ class CanteenTenantController extends MainController
 
         try {
             $canteenTenant = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $canteenTenant,
-                $validated
-            ) {
+            DB::transaction(function () use ($canteenTenant, $validated) {
                 $canteenTenant->update($validated);
             });
 
@@ -164,14 +161,14 @@ class CanteenTenantController extends MainController
                 $canteenTenant
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui CanteenTenant.',
                 [
                     'exception' => $e,
                     'CanteenTenant_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -199,14 +196,14 @@ class CanteenTenantController extends MainController
                 'Data CanteenTenant berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $canteenTenant->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus CanteenTenant.',
                 [
                     'exception' => $e,
                     'CanteenTenant_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -215,5 +212,5 @@ class CanteenTenantController extends MainController
                 'Data CanteenTenant gagal dihapus.'
             );
         }
-    } 
+    }
 }

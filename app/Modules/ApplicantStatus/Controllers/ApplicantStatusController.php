@@ -68,7 +68,7 @@ class ApplicantStatusController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'slug' => ['required', 'string', 'max:255'],
@@ -114,7 +114,7 @@ class ApplicantStatusController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -147,7 +147,7 @@ class ApplicantStatusController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'slug' => ['required', 'string', 'max:255'],
@@ -177,10 +177,7 @@ class ApplicantStatusController extends MainController
 
         try {
             $applicantStatus = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $applicantStatus,
-                $validated
-            ) {
+            DB::transaction(function () use ($applicantStatus, $validated) {
                 $applicantStatus->update($validated);
             });
 
@@ -190,14 +187,14 @@ class ApplicantStatusController extends MainController
                 $applicantStatus
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui ApplicantStatus.',
                 [
                     'exception' => $e,
                     'ApplicantStatus_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -225,14 +222,14 @@ class ApplicantStatusController extends MainController
                 'Data ApplicantStatus berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $applicantStatus->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus ApplicantStatus.',
                 [
                     'exception' => $e,
                     'ApplicantStatus_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -241,5 +238,5 @@ class ApplicantStatusController extends MainController
                 'Data ApplicantStatus gagal dihapus.'
             );
         }
-    } 
+    }
 }

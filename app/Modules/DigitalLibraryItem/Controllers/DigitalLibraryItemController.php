@@ -68,7 +68,7 @@ class DigitalLibraryItemController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'library_book_id' => ['required', 'integer'],
             'book_category_id' => ['required', 'integer'],
             'book_publisher_id' => ['required', 'integer'],
@@ -138,7 +138,7 @@ class DigitalLibraryItemController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -171,7 +171,7 @@ class DigitalLibraryItemController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'organization_id' => ['required', 'integer'],
+            'organization_id' => ['required', 'integer'],
             'library_book_id' => ['required', 'integer'],
             'book_category_id' => ['required', 'integer'],
             'book_publisher_id' => ['required', 'integer'],
@@ -225,10 +225,7 @@ class DigitalLibraryItemController extends MainController
 
         try {
             $digitalLibraryItem = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $digitalLibraryItem,
-                $validated
-            ) {
+            DB::transaction(function () use ($digitalLibraryItem, $validated) {
                 $digitalLibraryItem->update($validated);
             });
 
@@ -238,14 +235,14 @@ class DigitalLibraryItemController extends MainController
                 $digitalLibraryItem
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui DigitalLibraryItem.',
                 [
                     'exception' => $e,
                     'DigitalLibraryItem_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -273,14 +270,14 @@ class DigitalLibraryItemController extends MainController
                 'Data DigitalLibraryItem berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $digitalLibraryItem->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus DigitalLibraryItem.',
                 [
                     'exception' => $e,
                     'DigitalLibraryItem_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -289,5 +286,5 @@ class DigitalLibraryItemController extends MainController
                 'Data DigitalLibraryItem gagal dihapus.'
             );
         }
-    } 
+    }
 }

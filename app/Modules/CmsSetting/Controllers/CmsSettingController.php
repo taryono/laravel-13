@@ -68,7 +68,7 @@ class CmsSettingController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'group' => ['required', 'string', 'max:255'],
+            'group' => ['required', 'string', 'max:255'],
             'key' => ['required', 'string', 'max:255'],
             'value' => ['required', 'string', 'max:255'],
             'type' => ['required', 'string', 'max:255'],
@@ -92,7 +92,7 @@ class CmsSettingController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -125,7 +125,7 @@ class CmsSettingController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'group' => ['required', 'string', 'max:255'],
+            'group' => ['required', 'string', 'max:255'],
             'key' => ['required', 'string', 'max:255'],
             'value' => ['required', 'string', 'max:255'],
             'type' => ['required', 'string', 'max:255'],
@@ -133,10 +133,7 @@ class CmsSettingController extends MainController
 
         try {
             $cmsSetting = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $cmsSetting,
-                $validated
-            ) {
+            DB::transaction(function () use ($cmsSetting, $validated) {
                 $cmsSetting->update($validated);
             });
 
@@ -146,14 +143,14 @@ class CmsSettingController extends MainController
                 $cmsSetting
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui CmsSetting.',
                 [
                     'exception' => $e,
                     'CmsSetting_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -181,14 +178,14 @@ class CmsSettingController extends MainController
                 'Data CmsSetting berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $cmsSetting->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus CmsSetting.',
                 [
                     'exception' => $e,
                     'CmsSetting_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -197,5 +194,5 @@ class CmsSettingController extends MainController
                 'Data CmsSetting gagal dihapus.'
             );
         }
-    } 
+    }
 }

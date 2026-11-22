@@ -94,7 +94,7 @@ class BuildingController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -138,10 +138,7 @@ class BuildingController extends MainController
         try {
             $building = $this->model->findOrFail($id);
 
-            DB::transaction(function () use (
-                $building,
-                $validated
-            ) {
+            DB::transaction(function () use ($building, $validated) {
                 $building->update($validated);
             });
 
@@ -164,7 +161,7 @@ class BuildingController extends MainController
                     'exception' => $e,
                     'Building_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -201,7 +198,7 @@ class BuildingController extends MainController
                 [
                     'exception' => $e,
                     'Building_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -210,5 +207,5 @@ class BuildingController extends MainController
                 'Data Building gagal dihapus.'
             );
         }
-    } 
+    }
 }

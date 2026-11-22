@@ -68,7 +68,7 @@ class ExtracurricularCoachController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'extracurricular_id' => ['required', 'integer'],
+            'extracurricular_id' => ['required', 'integer'],
             'employee_id' => ['required', 'integer'],
             'user_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
@@ -109,7 +109,7 @@ class ExtracurricularCoachController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -142,7 +142,7 @@ class ExtracurricularCoachController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'extracurricular_id' => ['required', 'integer'],
+            'extracurricular_id' => ['required', 'integer'],
             'employee_id' => ['required', 'integer'],
             'user_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
@@ -167,10 +167,7 @@ class ExtracurricularCoachController extends MainController
 
         try {
             $extracurricularCoach = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $extracurricularCoach,
-                $validated
-            ) {
+            DB::transaction(function () use ($extracurricularCoach, $validated) {
                 $extracurricularCoach->update($validated);
             });
 
@@ -180,14 +177,14 @@ class ExtracurricularCoachController extends MainController
                 $extracurricularCoach
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui ExtracurricularCoach.',
                 [
                     'exception' => $e,
                     'ExtracurricularCoach_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -215,14 +212,14 @@ class ExtracurricularCoachController extends MainController
                 'Data ExtracurricularCoach berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $extracurricularCoach->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus ExtracurricularCoach.',
                 [
                     'exception' => $e,
                     'ExtracurricularCoach_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -231,5 +228,5 @@ class ExtracurricularCoachController extends MainController
                 'Data ExtracurricularCoach gagal dihapus.'
             );
         }
-    } 
+    }
 }

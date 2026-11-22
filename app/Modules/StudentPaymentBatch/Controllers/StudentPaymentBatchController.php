@@ -68,7 +68,7 @@ class StudentPaymentBatchController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'batch_number' => ['required', 'string', 'max:255'],
             'academic_year_id' => ['required', 'integer'],
             'period_id' => ['required', 'integer'],
@@ -105,7 +105,7 @@ class StudentPaymentBatchController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -138,7 +138,7 @@ class StudentPaymentBatchController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'batch_number' => ['required', 'string', 'max:255'],
             'academic_year_id' => ['required', 'integer'],
             'period_id' => ['required', 'integer'],
@@ -159,10 +159,7 @@ class StudentPaymentBatchController extends MainController
 
         try {
             $studentPaymentBatch = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $studentPaymentBatch,
-                $validated
-            ) {
+            DB::transaction(function () use ($studentPaymentBatch, $validated) {
                 $studentPaymentBatch->update($validated);
             });
 
@@ -172,14 +169,14 @@ class StudentPaymentBatchController extends MainController
                 $studentPaymentBatch
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui StudentPaymentBatch.',
                 [
                     'exception' => $e,
                     'StudentPaymentBatch_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -207,14 +204,14 @@ class StudentPaymentBatchController extends MainController
                 'Data StudentPaymentBatch berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $studentPaymentBatch->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus StudentPaymentBatch.',
                 [
                     'exception' => $e,
                     'StudentPaymentBatch_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -223,5 +220,5 @@ class StudentPaymentBatchController extends MainController
                 'Data StudentPaymentBatch gagal dihapus.'
             );
         }
-    } 
+    }
 }

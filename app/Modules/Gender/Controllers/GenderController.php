@@ -68,7 +68,7 @@ class GenderController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'code' => ['required', 'string', 'max:255'],
+            'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'is_active' => ['required', 'string', 'max:255'],
             'sort_order' => ['required', 'string', 'max:255'],
@@ -94,7 +94,7 @@ class GenderController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -127,7 +127,7 @@ class GenderController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'code' => ['required', 'string', 'max:255'],
+            'code' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'is_active' => ['required', 'string', 'max:255'],
             'sort_order' => ['required', 'string', 'max:255'],
@@ -137,10 +137,7 @@ class GenderController extends MainController
 
         try {
             $gender = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $gender,
-                $validated
-            ) {
+            DB::transaction(function () use ($gender, $validated) {
                 $gender->update($validated);
             });
 
@@ -150,14 +147,14 @@ class GenderController extends MainController
                 $gender
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui Gender.',
                 [
                     'exception' => $e,
                     'Gender_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -185,14 +182,14 @@ class GenderController extends MainController
                 'Data Gender berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $gender->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus Gender.',
                 [
                     'exception' => $e,
                     'Gender_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -201,5 +198,5 @@ class GenderController extends MainController
                 'Data Gender gagal dihapus.'
             );
         }
-    } 
+    }
 }

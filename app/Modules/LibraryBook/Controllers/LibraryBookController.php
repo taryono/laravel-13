@@ -68,7 +68,7 @@ class LibraryBookController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'isbn' => ['required', 'string', 'max:255'],
             'code' => ['required', 'string', 'max:255'],
             'title' => ['required', 'string', 'max:255'],
@@ -104,7 +104,7 @@ class LibraryBookController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -137,7 +137,7 @@ class LibraryBookController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'isbn' => ['required', 'string', 'max:255'],
             'code' => ['required', 'string', 'max:255'],
             'title' => ['required', 'string', 'max:255'],
@@ -157,10 +157,7 @@ class LibraryBookController extends MainController
 
         try {
             $libraryBook = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $libraryBook,
-                $validated
-            ) {
+            DB::transaction(function () use ($libraryBook, $validated) {
                 $libraryBook->update($validated);
             });
 
@@ -170,14 +167,14 @@ class LibraryBookController extends MainController
                 $libraryBook
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui LibraryBook.',
                 [
                     'exception' => $e,
                     'LibraryBook_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -205,14 +202,14 @@ class LibraryBookController extends MainController
                 'Data LibraryBook berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $libraryBook->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus LibraryBook.',
                 [
                     'exception' => $e,
                     'LibraryBook_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -221,5 +218,5 @@ class LibraryBookController extends MainController
                 'Data LibraryBook gagal dihapus.'
             );
         }
-    } 
+    }
 }

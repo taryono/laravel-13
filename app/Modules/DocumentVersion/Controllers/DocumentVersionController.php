@@ -68,7 +68,7 @@ class DocumentVersionController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'document_id' => ['required', 'integer'],
+            'document_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
             'version_number' => ['required', 'string', 'max:255'],
             'version_label' => ['required', 'string', 'max:255'],
@@ -105,7 +105,7 @@ class DocumentVersionController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -138,7 +138,7 @@ class DocumentVersionController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'document_id' => ['required', 'integer'],
+            'document_id' => ['required', 'integer'],
             'organization_id' => ['required', 'integer'],
             'version_number' => ['required', 'string', 'max:255'],
             'version_label' => ['required', 'string', 'max:255'],
@@ -159,10 +159,7 @@ class DocumentVersionController extends MainController
 
         try {
             $documentVersion = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $documentVersion,
-                $validated
-            ) {
+            DB::transaction(function () use ($documentVersion, $validated) {
                 $documentVersion->update($validated);
             });
 
@@ -172,14 +169,14 @@ class DocumentVersionController extends MainController
                 $documentVersion
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui DocumentVersion.',
                 [
                     'exception' => $e,
                     'DocumentVersion_id' => $id,
                     'data' => $validated,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -207,14 +204,14 @@ class DocumentVersionController extends MainController
                 'Data DocumentVersion berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $documentVersion->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus DocumentVersion.',
                 [
                     'exception' => $e,
                     'DocumentVersion_id' => $id,
-                    'user_id' => auth()->id(),
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -223,5 +220,5 @@ class DocumentVersionController extends MainController
                 'Data DocumentVersion gagal dihapus.'
             );
         }
-    } 
+    }
 }
