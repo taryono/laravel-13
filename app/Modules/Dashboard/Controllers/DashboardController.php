@@ -291,7 +291,133 @@ class DashboardController extends MainController
 
     private function ppdbView($request)
     {
-        return view('Dashboard::dashboard.ppdb.index');
+        // 1. Admissions & Quota
+        $activeAdmission = Schema::hasTable('admissions')
+            ? DB::table('admissions')->where('is_active', 1)->first()
+            : null;
+
+        $totalQuota = $activeAdmission?->quota
+            ?? (Schema::hasTable('admission_quota_settings') ? (int) DB::table('admission_quota_settings')->sum('quota') : 360)
+            ?: 360;
+
+        // 2. Applicants metrics
+        $hasApplicants = Schema::hasTable('applicants');
+        $totalApplicants = $hasApplicants ? DB::table('applicants')->whereNull('deleted_at')->count() : 0;
+        $verifiedApplicants = $hasApplicants ? DB::table('applicants')->whereNull('deleted_at')->whereIn('status', ['VERIFIED', 'verified', 'ACCEPTED', 'accepted'])->count() : 0;
+        $pendingApplicants = $hasApplicants ? DB::table('applicants')->whereNull('deleted_at')->whereIn('status', ['PENDING', 'pending', 'SUBMITTED', 'submitted', 'REGISTERED', 'registered'])->count() : 0;
+        $rejectedApplicants = $hasApplicants ? DB::table('applicants')->whereNull('deleted_at')->whereIn('status', ['REJECTED', 'rejected'])->count() : 0;
+
+        // Percentage verified
+        $verifiedPercentage = $totalApplicants > 0 ? round(($verifiedApplicants / $totalApplicants) * 100, 1) : 0;
+
+        // Pending document verifications count
+        $pendingVerificationsCount = Schema::hasTable('admission_document_verifications')
+            ? DB::table('admission_document_verifications')->whereIn('verification_status', ['pending', 'revision_required'])->count()
+            : $pendingApplicants;
+
+        // Accepted / Filled quota
+        $acceptedCount = $verifiedApplicants;
+        $remainingQuota = max(0, $totalQuota - $acceptedCount);
+
+        // 3. Admission Paths (Jalur Masuk)
+        $paths = Schema::hasTable('admission_paths')
+            ? DB::table('admission_paths')
+                ->where('is_active', 1)
+                ->orderBy('sort_order')
+                ->get()
+            : collect();
+
+        // Count per path
+        $pathCounts = [];
+        if ($hasApplicants) {
+            $pathCounts = DB::table('applicants')
+                ->whereNull('deleted_at')
+                ->select('admission_path_id', DB::raw('count(*) as total'))
+                ->groupBy('admission_path_id')
+                ->pluck('total', 'admission_path_id')
+                ->toArray();
+        }
+
+        // 4. Applicants List (Latest / Filtered)
+        $selectedPath = $request->input('path');
+        $searchQuery = $request->input('search');
+
+        $applicantsQuery = DB::table('applicants')
+            ->leftJoin('admission_paths', 'applicants.admission_path_id', '=', 'admission_paths.id')
+            ->leftJoin('admissions', 'applicants.admission_id', '=', 'admissions.id')
+            ->whereNull('applicants.deleted_at')
+            ->select(
+                'applicants.*',
+                'admission_paths.name as path_name',
+                'admission_paths.code as path_code',
+                'admissions.name as admission_name'
+            );
+
+        if ($selectedPath && $selectedPath !== 'all') {
+            $applicantsQuery->where(function ($q) use ($selectedPath) {
+                $q->where('admission_paths.code', $selectedPath)
+                    ->orWhere('applicants.admission_path_id', $selectedPath);
+            });
+        }
+
+        if ($searchQuery) {
+            $applicantsQuery->where(function ($q) use ($searchQuery) {
+                $q->where('applicants.name', 'like', "%{$searchQuery}%")
+                    ->orWhere('applicants.registration_number', 'like', "%{$searchQuery}%")
+                    ->orWhere('applicants.nisn', 'like', "%{$searchQuery}%")
+                    ->orWhere('applicants.previous_school', 'like', "%{$searchQuery}%");
+            });
+        }
+
+        $applicants = $applicantsQuery
+            ->orderByDesc('applicants.id')
+            ->paginate(10);
+
+        // 5. Timelines
+        $timelines = Schema::hasTable('admission_timelines')
+            ? DB::table('admission_timelines')
+                ->where('is_active', 1)
+                ->orderBy('order_number')
+                ->orderBy('start_date')
+                ->get()
+            : collect();
+
+        // 6. Documents related (Juknis PDF / Panduan)
+        $guideDocument = Schema::hasTable('documents')
+            ? DB::table('documents')
+                ->where('file_extension', 'pdf')
+                ->where(function ($q) {
+                    $q->where('notes', 'like', '%juknis%')
+                        ->orWhere('notes', 'like', '%panduan%')
+                        ->orWhere('file_name', 'like', '%juknis%')
+                        ->orWhere('file_name', 'like', '%ppdb%');
+                })
+                ->first()
+            : null;
+
+        if (!$guideDocument && Schema::hasTable('documents')) {
+            $guideDocument = DB::table('documents')->first();
+        }
+
+        return view('Dashboard::dashboard.ppdb.index', compact(
+            'activeAdmission',
+            'totalQuota',
+            'totalApplicants',
+            'verifiedApplicants',
+            'pendingApplicants',
+            'rejectedApplicants',
+            'verifiedPercentage',
+            'pendingVerificationsCount',
+            'acceptedCount',
+            'remainingQuota',
+            'paths',
+            'pathCounts',
+            'applicants',
+            'timelines',
+            'guideDocument',
+            'selectedPath',
+            'searchQuery'
+        ));
     }
 
     private function recruitmentView($request)

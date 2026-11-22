@@ -205,7 +205,8 @@ class ScheduleController extends MainController
     protected function successResponse(
         Request $request,
         string $message,
-        $data = null
+        $data = null,
+        ?string $redirectTo = null
     ): JsonResponse|RedirectResponse {
 
         if ($this->isAjaxRequest($request)) {
