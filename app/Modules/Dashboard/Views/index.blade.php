@@ -134,7 +134,7 @@
                                 class="btn btn-sm btn-outline-edu d-inline-flex align-items-center gap-1 rounded-pill px-3 py-1.5"
                                 id="btn-menu-prev"
                                 style="{{ $menuPagination->currentPage() <= 1 ? 'display: none !important;' : '' }}"
-                                data-page="{{ $menuPagination->currentPage() - 1 }}">
+                                data-page="{{ $menuPagination->currentPage()_1 }}">
                                 <span class="material-symbols-outlined icon-18">arrow_back</span>
                                 <span>Sebelumnya</span>
                             </button>
@@ -266,7 +266,7 @@
 
                                 // Update tombol Sebelumnya (Prev)
                                 if (btnPrev) {
-                                    btnPrev.setAttribute('data-page', p.current_page - 1);
+                                    btnPrev.setAttribute('data-page', p.current_page_1);
                                     if (p.has_prev) {
                                         btnPrev.style.removeProperty('display');
                                     } else {

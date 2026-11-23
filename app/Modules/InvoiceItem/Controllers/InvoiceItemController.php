@@ -11,8 +11,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
-use Models\Invoice; 
-use Throwable; 
+use Models\Invoice;
+use Throwable;
 
 class InvoiceItemController extends MainController
 {
@@ -61,7 +61,8 @@ class InvoiceItemController extends MainController
                 // Update invoice totals
                 $invoice = $item->invoice;
                 $invoice->subtotal += $item->total_price;
-                $invoice->total_amount = $invoice->subtotal + $invoice->tax - $invoice->discount;
+                $invoice->total_amount = $invoice->subtotal + $invoice->tax_
+                $invoice->discount;
                 $invoice->save();
 
                 return $item;
@@ -109,7 +110,8 @@ class InvoiceItemController extends MainController
                 // Update invoice totals (remove old)
                 $invoice = $item->invoice;
                 $invoice->subtotal -= $item->total_price;
-                $invoice->total_amount = $invoice->subtotal + $invoice->tax - $invoice->discount;
+                $invoice->total_amount = $invoice->subtotal + $invoice->tax_
+                $invoice->discount;
                 $invoice->save();
 
                 // Update item
@@ -117,7 +119,8 @@ class InvoiceItemController extends MainController
 
                 // Update invoice totals (add new)
                 $invoice->subtotal += $item->total_price;
-                $invoice->total_amount = $invoice->subtotal + $invoice->tax - $invoice->discount;
+                $invoice->total_amount = $invoice->subtotal + $invoice->tax_
+                $invoice->discount;
                 $invoice->save();
             });
 
@@ -140,7 +143,8 @@ class InvoiceItemController extends MainController
             DB::transaction(function () use ($item) {
                 $invoice = $item->invoice;
                 $invoice->subtotal -= $item->total_price;
-                $invoice->total_amount = $invoice->subtotal + $invoice->tax - $invoice->discount;
+                $invoice->total_amount = $invoice->subtotal + $invoice->tax_
+                $invoice->discount;
                 $invoice->save();
 
                 $item->delete();

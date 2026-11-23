@@ -1,4 +1,4 @@
-{{ Form::model($file - upload, ['method' => 'PUT', 'route' => ['file_upload.update', $file - upload->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($file_upload, ['method' => 'PUT', 'route' => ['file_upload.update', $file_upload->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     @forelse ($forms as $key => $form)
         <div class="col-md-6 mb-3">

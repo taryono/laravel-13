@@ -26,8 +26,8 @@ class SliderController extends MainController
      * Display a listing of the resource.
      *
      * Handles both:
-     * - Normal page request
-     * - Yajra DataTables AJAX request
+     *_Normal page request
+     *_Yajra DataTables AJAX request
      */
     public function index(
         Request $request,
@@ -123,15 +123,13 @@ class SliderController extends MainController
             $slider = $this->model->findOrFail($id);
 
             if ($validated['type'] === 'image' && $request->hasFile('image')) {
-                if ($slider->image_path) Storage::disk('public')->delete($slider->image_path);
+                if ($slider->image_path)
+                    Storage::disk('public')->delete($slider->image_path);
                 $validated['image_path'] = $request->file('image')->store('sliders', 'public');
             }
 
 
-            DB::transaction(function () use (
-                $slider,
-                $validated
-            ) {
+            DB::transaction(function () use ($slider, $validated) {
                 $slider->update($validated);
             });
 
@@ -195,23 +193,23 @@ class SliderController extends MainController
     private function validated(Request $request): array
     {
         $data = $request->validate([
-            'title'        => 'nullable|string|max:255',
-            'type'         => 'required|in:image,html',
-            'image'        => 'nullable|image|max:4096',
-            'blade_view'   => 'nullable|string|max:255',
+            'title' => 'nullable|string|max:255',
+            'type' => 'required|in:image,html',
+            'image' => 'nullable|image|max:4096',
+            'blade_view' => 'nullable|string|max:255',
             'html_content' => 'nullable|string',
-            'alt_text'     => 'nullable|string|max:255',
-            'link_url'     => 'nullable|string|max:500',
-            'link_target'  => 'nullable|in:_self,_blank',
-            'order'        => 'nullable|integer',
-            'is_active'    => 'boolean',
-            'start_at'     => 'nullable|date',
-            'end_at'       => 'nullable|date|after_or_equal:start_at',
-            'settings'     => 'nullable|array',
+            'alt_text' => 'nullable|string|max:255',
+            'link_url' => 'nullable|string|max:500',
+            'link_target' => 'nullable|in:_self,_blank',
+            'order' => 'nullable|integer',
+            'is_active' => 'boolean',
+            'start_at' => 'nullable|date',
+            'end_at' => 'nullable|date|after_or_equal:start_at',
+            'settings' => 'nullable|array',
         ]);
 
         $data['is_active'] = $request->boolean('is_active');
-        $data['order']     = $request->input('order', 0);
+        $data['order'] = $request->input('order', 0);
         $data['link_target'] = $request->input('link_target', '_self');
 
         return $data;

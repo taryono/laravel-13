@@ -39,7 +39,7 @@ class AccountMappingController extends MainController
             ->where('account_type', 'detail')
             ->orderBy('code')
             ->get()
-            ->mapWithKeys(fn($acc) => [$acc->id => ($acc->code ? $acc->code . ' - ' : '') . $acc->name]);
+            ->mapWithKeys(fn($acc) => [$acc->id => ($acc->code ? $acc->code . '_' : '') . $acc->name]);
 
         return view('AccountMapping::create', compact('account_mapping', 'accounts', 'organizations'));
     }
@@ -76,7 +76,7 @@ class AccountMappingController extends MainController
             ->where('account_type', 'detail')
             ->orderBy('code')
             ->get()
-            ->mapWithKeys(fn($acc) => [$acc->id => ($acc->code ? $acc->code . ' - ' : '') . $acc->name]);
+            ->mapWithKeys(fn($acc) => [$acc->id => ($acc->code ? $acc->code . '_' : '') . $acc->name]);
 
         return view('AccountMapping::edit', compact('account_mapping', 'accounts', 'organizations'));
     }

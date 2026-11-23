@@ -1,4 +1,4 @@
-{{ Form::model($transport - stop, ['method' => 'PUT', 'route' => ['transport_stop.update', $transport - stop->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($transport_stop, ['method' => 'PUT', 'route' => ['transport_stop.update', $transport_stop->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     @forelse ($forms as $key => $form)
         <div class="col-md-6 mb-3">

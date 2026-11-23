@@ -68,7 +68,7 @@
              @foreach ($categories as $category)
                  <option value="{{ $category->id }}"
                      {{ old('expense_category_id', $expense->expense_category_id ?? '') == $category->id ? 'selected' : '' }}>
-                     {{ $category->code }} - {{ $category->name }}
+                     {{ $category->code }}_{{ $category->name }}
                  </option>
              @endforeach
          </select>
@@ -198,7 +198,7 @@
              @foreach ($journalEntries as $journal)
                  <option value="{{ $journal->id }}"
                      {{ old('journal_entry_id', $expense->journal_entry_id ?? '') == $journal->id ? 'selected' : '' }}>
-                     {{ $journal->journal_number }} - {{ $journal->description }}
+                     {{ $journal->journal_number }}_{{ $journal->description }}
                  </option>
              @endforeach
          </select>
@@ -378,7 +378,7 @@
                                  const select = document.querySelector('[name="expense_category_id"]');
                                  const option = document.createElement('option');
                                  option.value = data.category.id;
-                                 option.textContent = data.category.code + ' - ' + data.category.name;
+                                 option.textContent = data.category.code + '_' + data.category.name;
                                  select.appendChild(option);
                                  select.value = data.category.id;
 

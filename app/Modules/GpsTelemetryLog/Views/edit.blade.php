@@ -1,4 +1,4 @@
-{{ Form::model($gps - telemetry - log, ['method' => 'PUT', 'route' => ['gps_telemetry_log.update', $gps - telemetry - log->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($gps_telemetry_log, ['method' => 'PUT', 'route' => ['gps_telemetry_log.update', $gps_telemetry_log->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     @forelse ($forms as $key => $form)
         <div class="col-md-6 mb-3">

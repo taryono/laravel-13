@@ -1,4 +1,4 @@
-{{ Form::model($sorogan - schedule, ['method' => 'PUT', 'route' => ['sorogan_schedule.update', $sorogan - schedule->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($sorogan_schedule, ['method' => 'PUT', 'route' => ['sorogan_schedule.update', $sorogan_schedule->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     @forelse ($forms as $key => $form)
         <div class="col-md-6 mb-3">

@@ -44,7 +44,7 @@
                     <span class="bpill bg-secondary-container-40 tc-on-secondary-fixed-variant border-soft">
                         <span class="bg-secondary-c rounded-circle" style="width:8px;height:8px;"></span>
                         <span>Perpustakaan Buka</span>
-                        <span class="tc-outline">• Jam 07:30 - 16:30</span>
+                        <span class="tc-outline">• Jam 07:30_16:30</span>
                     </span>
                     <span class="tc-primary fw-bold d-flex align-items-center fs-11">
                         <span class="material-symbols-outlined me-1" style="font-size:16px;">verified</span>

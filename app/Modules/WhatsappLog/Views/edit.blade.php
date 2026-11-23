@@ -1,4 +1,4 @@
-{{ Form::model($whatsapp - log, ['method' => 'PUT', 'route' => ['whatsapp_log.update', $whatsapp - log->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($whatsapp_log, ['method' => 'PUT', 'route' => ['whatsapp_log.update', $whatsapp_log->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     @forelse ($forms as $key => $form)
         <div class="col-md-6 mb-3">

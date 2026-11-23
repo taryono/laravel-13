@@ -1,4 +1,4 @@
-{{ Form::model($curriculum - objective, ['method' => 'PUT', 'route' => ['curriculum_objective.update', $curriculum - objective->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($curriculum_objective, ['method' => 'PUT', 'route' => ['curriculum_objective.update', $curriculum_objective->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     @forelse ($forms as $key => $form)
         <div class="col-md-6 mb-3">

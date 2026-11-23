@@ -26,8 +26,8 @@ class LeaveTypeController extends MainController
      * Display a listing of the resource.
      *
      * Handles both:
-     * - Normal page request
-     * - Yajra DataTables AJAX request
+     *_Normal page request
+     *_Yajra DataTables AJAX request
      */
     public function index(
         Request $request,
@@ -128,10 +128,7 @@ class LeaveTypeController extends MainController
 
         $leaveType = $this->model->findOrFail($id);
         try {
-            DB::transaction(function () use (
-                $leaveType,
-                $validated
-            ) {
+            DB::transaction(function () use ($leaveType, $validated) {
                 $leaveType->update($validated);
             });
 

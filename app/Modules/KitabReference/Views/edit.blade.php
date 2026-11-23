@@ -1,4 +1,4 @@
-{{ Form::model($kitab - reference, ['method' => 'PUT', 'route' => ['kitab_reference.update', $kitab - reference->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($kitab_reference, ['method' => 'PUT', 'route' => ['kitab_reference.update', $kitab_reference->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     @forelse ($forms as $key => $form)
         <div class="col-md-6 mb-3">

@@ -77,22 +77,27 @@
                         </div>
                         <div :class="catKey === 'blocks' ? 'grid grid-cols-2 gap-2' : 'space-y-1.5'">
                             <template x-for="item in items" :key="item.id || item.type">
-                                <div :class="catKey === 'blocks' 
-                                    ? 'palette-item bg-blue-50/70 border border-blue-200 rounded p-2 text-center text-xs hover:bg-blue-100 hover:shadow-sm' 
-                                    : 'palette-item bg-green-50/70 border border-green-200 rounded p-2 text-xs hover:bg-green-100 hover:shadow-sm flex items-center gap-2'"
-                                    draggable="true" 
-                                    @dragstart="startDragComponent($event, item)"
-                                    @click="addComponent(item)"
-                                    :title="item.description || ('Tambahkan ' + item.name)">
-                                    <div :class="catKey === 'blocks' ? 'text-lg mb-0.5' : 'text-base'" x-text="item.icon || '📄'"></div>
+                                <div :class="catKey === 'blocks'
+                                    ?
+                                    'palette-item bg-blue-50/70 border border-blue-200 rounded p-2 text-center text-xs hover:bg-blue-100 hover:shadow-sm' :
+                                    'palette-item bg-green-50/70 border border-green-200 rounded p-2 text-xs hover:bg-green-100 hover:shadow-sm flex items-center gap-2'"
+                                    draggable="true" @dragstart="startDragComponent($event, item)"
+                                    @click="addComponent(item)" :title="item.description || ('Tambahkan ' + item.name)">
+                                    <div :class="catKey === 'blocks' ? 'text-lg mb-0.5' : 'text-base'"
+                                        x-text="item.icon || '📄'"></div>
                                     <div class="flex-1 min-w-0">
                                         <div class="font-medium text-gray-700 truncate" x-text="item.name"></div>
-                                        <div class="flex items-center gap-1 mt-0.5" :class="catKey === 'blocks' ? 'justify-center' : 'justify-start'">
+                                        <div class="flex items-center gap-1 mt-0.5"
+                                            :class="catKey === 'blocks' ? 'justify-center' : 'justify-start'">
                                             <template x-if="item.curriculum">
-                                                <span class="text-[9px] bg-purple-100 text-purple-700 font-mono px-1 rounded" x-text="item.curriculum.code"></span>
+                                                <span
+                                                    class="text-[9px] bg-purple-100 text-purple-700 font-mono px-1 rounded"
+                                                    x-text="item.curriculum.code"></span>
                                             </template>
                                             <template x-if="item.academic_year">
-                                                <span class="text-[9px] bg-amber-100 text-amber-700 font-mono px-1 rounded" x-text="item.academic_year.start_year + '/' + item.academic_year.end_year"></span>
+                                                <span
+                                                    class="text-[9px] bg-amber-100 text-amber-700 font-mono px-1 rounded"
+                                                    x-text="item.academic_year.start_year + '/' + item.academic_year.end_year"></span>
                                             </template>
                                         </div>
                                     </div>
@@ -115,15 +120,18 @@
                             <span>+</span> TTD
                         </button>
                     </div>
-                    <input type="file" x-ref="fileInput" class="hidden" @change="handleUpload($event)" accept="image/*">
+                    <input type="file" x-ref="fileInput" class="hidden" @change="handleUpload($event)"
+                        accept="image/*">
                     <div class="mt-2 grid grid-cols-3 gap-1.5">
                         <template x-for="asset in assets" :key="asset.id">
-                            <div class="group relative border rounded p-1 bg-gray-50 hover:bg-white hover:shadow-sm transition">
+                            <div
+                                class="group relative border rounded p-1 bg-gray-50 hover:bg-white hover:shadow-sm transition">
                                 <img :src="asset.url" :alt="asset.name"
-                                    class="w-full h-12 object-contain cursor-pointer"
-                                    draggable="true" @dragstart="startDragAsset($event, asset)"
-                                    @click="insertAssetAsImage(asset)" :title="asset.name">
-                                <div class="text-[9px] text-gray-500 truncate text-center mt-0.5" x-text="asset.name"></div>
+                                    class="w-full h-12 object-contain cursor-pointer" draggable="true"
+                                    @dragstart="startDragAsset($event, asset)" @click="insertAssetAsImage(asset)"
+                                    :title="asset.name">
+                                <div class="text-[9px] text-gray-500 truncate text-center mt-0.5" x-text="asset.name">
+                                </div>
                             </div>
                         </template>
                     </div>
@@ -138,7 +146,8 @@
                                 class="px-1.5 py-0.5 bg-white border border-gray-300 rounded text-xs hover:bg-gray-100">↑</button>
                             <button @click="moveSection(1)" title="Pindah ke Bawah"
                                 class="px-1.5 py-0.5 bg-white border border-gray-300 rounded text-xs hover:bg-gray-100">↓</button>
-                            <span class="text-[10px] text-gray-500 font-mono" x-text="'#' + (selectedElement?.order || 0)"></span>
+                            <span class="text-[10px] text-gray-500 font-mono"
+                                x-text="'#' + (selectedElement?.order || 0)"></span>
                         </div>
                     </div>
 
@@ -153,9 +162,11 @@
                                     <div>
                                         <label class="block text-gray-600 font-semibold mb-1">Text Content</label>
                                         <textarea x-model="selectedElement.content" @input.debounce.250ms="refreshCanvas()" rows="3"
-                                            class="w-full border rounded p-1.5 text-xs focus:ring-1 focus:ring-blue-400 outline-none" placeholder="Tulis teks atau binding..."></textarea>
+                                            class="w-full border rounded p-1.5 text-xs focus:ring-1 focus:ring-blue-400 outline-none"
+                                            placeholder="Tulis teks atau binding..."></textarea>
                                         <p class="text-[10px] text-gray-400 mt-1">
-                                            Gunakan <code class="bg-gray-100 px-1 rounded">[[ field ]]</code> untuk dynamic binding.
+                                            Gunakan <code class="bg-gray-100 px-1 rounded">[[ field ]]</code> untuk
+                                            dynamic binding.
                                         </p>
                                     </div>
                                     <div>
@@ -166,7 +177,8 @@
                                             <template x-for="(fields, model) in bindings" :key="model">
                                                 <optgroup :label="model">
                                                     <template x-for="f in fields" :key="f">
-                                                        <option :value="model + '.' + f" x-text="model + '.' + f"></option>
+                                                        <option :value="model + '.' + f" x-text="model + '.' + f">
+                                                        </option>
                                                     </template>
                                                 </optgroup>
                                             </template>
@@ -195,10 +207,15 @@
                                     <div>
                                         <label class="block text-gray-600 mb-1">Alignment</label>
                                         <div class="flex gap-1">
-                                            <template x-for="align in ['left', 'center', 'right']" :key="align">
-                                                <button @click="selectedElement.style.textAlign = align; refreshCanvas()"
-                                                    :class="{ 'bg-blue-600 text-white': selectedElement.style.textAlign === align, 'bg-white text-gray-700': selectedElement.style.textAlign !== align }"
-                                                    class="flex-1 border rounded py-1 text-xs capitalize" x-text="align"></button>
+                                            <template x-for="align in ['left', 'center', 'right']"
+                                                :key="align">
+                                                <button
+                                                    @click="selectedElement.style.textAlign = align; refreshCanvas()"
+                                                    :class="{ 'bg-blue-600 text-white': selectedElement.style.textAlign ===
+                                                            align, 'bg-white text-gray-700': selectedElement.style
+                                                            .textAlign !== align }"
+                                                    class="flex-1 border rounded py-1 text-xs capitalize"
+                                                    x-text="align"></button>
                                             </template>
                                         </div>
                                     </div>
@@ -213,23 +230,32 @@
                             {{-- ============================== --}}
                             {{-- KEYVALUE (IDENTITY) PROPERTIES --}}
                             {{-- ============================== --}}
-                            <template x-if="selectedElement.type === 'keyvalue' || selectedElement.type === 'identity'">
+                            <template
+                                x-if="selectedElement.type === 'keyvalue' || selectedElement.type === 'identity'">
                                 <div class="space-y-2">
                                     <div class="flex justify-between items-center">
                                         <label class="block text-gray-600 font-semibold">Baris Identitas</label>
-                                        <button @click="addField()" class="text-xs bg-blue-50 text-blue-600 border border-blue-200 px-2 py-0.5 rounded hover:bg-blue-100">+ Tambah</button>
+                                        <button @click="addField()"
+                                            class="text-xs bg-blue-50 text-blue-600 border border-blue-200 px-2 py-0.5 rounded hover:bg-blue-100">+
+                                            Tambah</button>
                                     </div>
                                     <div class="space-y-1.5 max-h-48 overflow-y-auto pr-1">
-                                        <template x-for="(f, idx) in (selectedElement.fields || [])" :key="idx">
+                                        <template x-for="(f, idx) in (selectedElement.fields || [])"
+                                            :key="idx">
                                             <div class="p-1.5 bg-white border rounded space-y-1 relative">
                                                 <div class="flex items-center gap-1">
                                                     <input type="text" x-model="f.label" @input="refreshCanvas()"
-                                                        placeholder="Label (e.g. Nama)" class="flex-1 border rounded px-1.5 py-0.5 text-xs">
-                                                    <button @click="removeField(idx)" class="text-red-500 hover:text-red-700 px-1 font-bold" title="Hapus field">✕</button>
+                                                        placeholder="Label (e.g. Nama)"
+                                                        class="flex-1 border rounded px-1.5 py-0.5 text-xs">
+                                                    <button @click="removeField(idx)"
+                                                        class="text-red-500 hover:text-red-700 px-1 font-bold"
+                                                        title="Hapus field">✕</button>
                                                 </div>
                                                 <div class="flex items-center gap-1">
-                                                    <input type="text" x-model="f.binding" @input="refreshCanvas()"
-                                                        placeholder="Binding (e.g. student.full_name)" class="flex-1 border rounded px-1.5 py-0.5 text-xs text-blue-600 font-mono">
+                                                    <input type="text" x-model="f.binding"
+                                                        @input="refreshCanvas()"
+                                                        placeholder="Binding (e.g. student.full_name)"
+                                                        class="flex-1 border rounded px-1.5 py-0.5 text-xs text-blue-600 font-mono">
                                                 </div>
                                             </div>
                                         </template>
@@ -244,8 +270,8 @@
                                 <div class="space-y-2">
                                     <div>
                                         <label class="block text-gray-600 mb-1">Judul Tabel</label>
-                                        <input type="text" x-model="selectedElement.title" @input="refreshCanvas()"
-                                            class="w-full border rounded p-1 text-xs">
+                                        <input type="text" x-model="selectedElement.title"
+                                            @input="refreshCanvas()" class="w-full border rounded p-1 text-xs">
                                     </div>
                                     <div>
                                         <label class="block text-gray-600 mb-1">Data Source</label>
@@ -261,22 +287,30 @@
                                     <div class="border-t pt-2">
                                         <div class="flex justify-between items-center mb-1">
                                             <label class="block text-gray-600 font-semibold">Kolom Tabel</label>
-                                            <button @click="addColumn()" class="text-xs bg-blue-50 text-blue-600 border border-blue-200 px-2 py-0.5 rounded hover:bg-blue-100">+ Kolom</button>
+                                            <button @click="addColumn()"
+                                                class="text-xs bg-blue-50 text-blue-600 border border-blue-200 px-2 py-0.5 rounded hover:bg-blue-100">+
+                                                Kolom</button>
                                         </div>
                                         <div class="space-y-1.5 max-h-48 overflow-y-auto pr-1">
-                                            <template x-for="(col, cIdx) in (selectedElement.columns || [])" :key="cIdx">
+                                            <template x-for="(col, cIdx) in (selectedElement.columns || [])"
+                                                :key="cIdx">
                                                 <div class="p-1.5 bg-white border rounded space-y-1">
                                                     <div class="flex items-center gap-1">
-                                                        <input type="text" x-model="col.header" @input="refreshCanvas()"
-                                                            placeholder="Header" class="w-1/2 border rounded px-1.5 py-0.5 text-xs">
-                                                        <input type="text" x-model="col.field" @input="refreshCanvas()"
-                                                            placeholder="Field" class="w-1/2 border rounded px-1.5 py-0.5 text-xs font-mono text-blue-600">
-                                                        <button @click="removeColumn(cIdx)" class="text-red-500 hover:text-red-700 px-1 font-bold">✕</button>
+                                                        <input type="text" x-model="col.header"
+                                                            @input="refreshCanvas()" placeholder="Header"
+                                                            class="w-1/2 border rounded px-1.5 py-0.5 text-xs">
+                                                        <input type="text" x-model="col.field"
+                                                            @input="refreshCanvas()" placeholder="Field"
+                                                            class="w-1/2 border rounded px-1.5 py-0.5 text-xs font-mono text-blue-600">
+                                                        <button @click="removeColumn(cIdx)"
+                                                            class="text-red-500 hover:text-red-700 px-1 font-bold">✕</button>
                                                     </div>
                                                     <div class="flex items-center gap-1">
-                                                        <input type="text" x-model="col.width" @input="refreshCanvas()"
-                                                            placeholder="Width (e.g. 20%)" class="w-1/2 border rounded px-1.5 py-0.5 text-xs">
-                                                        <select x-model="col.align" @change="refreshCanvas()" class="w-1/2 border rounded p-0.5 text-xs bg-white">
+                                                        <input type="text" x-model="col.width"
+                                                            @input="refreshCanvas()" placeholder="Width (e.g. 20%)"
+                                                            class="w-1/2 border rounded px-1.5 py-0.5 text-xs">
+                                                        <select x-model="col.align" @change="refreshCanvas()"
+                                                            class="w-1/2 border rounded p-0.5 text-xs bg-white">
                                                             <option value="left">Left</option>
                                                             <option value="center">Center</option>
                                                             <option value="right">Right</option>
@@ -289,7 +323,8 @@
 
                                     <div class="border-t pt-2 space-y-1.5">
                                         <label class="flex items-center gap-1.5 cursor-pointer">
-                                            <input type="checkbox" x-model="selectedElement.showFooter" @change="refreshCanvas()" class="rounded">
+                                            <input type="checkbox" x-model="selectedElement.showFooter"
+                                                @change="refreshCanvas()" class="rounded">
                                             <span class="text-gray-700 font-medium">Tampilkan Footer / Rata-rata</span>
                                         </label>
                                         <template x-if="selectedElement.showFooter">
@@ -297,20 +332,29 @@
                                                 <div class="grid grid-cols-2 gap-1.5">
                                                     <div>
                                                         <label class="text-[10px] text-gray-500 block">Label</label>
-                                                        <input type="text" x-model="selectedElement.footerLabel" @input="refreshCanvas()"
-                                                            placeholder="Average" class="w-full border rounded p-1 text-xs">
+                                                        <input type="text" x-model="selectedElement.footerLabel"
+                                                            @input="refreshCanvas()" placeholder="Average"
+                                                            class="w-full border rounded p-1 text-xs">
                                                     </div>
                                                     <div>
-                                                        <label class="text-[10px] text-gray-500 block">Field Binding</label>
-                                                        <input type="text" x-model="selectedElement.footerField" @input="refreshCanvas()"
-                                                            placeholder="average_score" class="w-full border rounded p-1 text-xs font-mono">
+                                                        <label class="text-[10px] text-gray-500 block">Field
+                                                            Binding</label>
+                                                        <input type="text" x-model="selectedElement.footerField"
+                                                            @input="refreshCanvas()" placeholder="average_score"
+                                                            class="w-full border rounded p-1 text-xs font-mono">
                                                     </div>
                                                 </div>
                                                 <div>
-                                                    <label class="text-[10px] text-gray-500 block">Sejajarkan Nilai di Kolom</label>
-                                                    <select x-model.number="selectedElement.footerTargetIndex" @change="refreshCanvas()" class="w-full border rounded p-1 text-xs bg-white">
-                                                        <template x-for="(col, idx) in (selectedElement.columns || [])" :key="idx">
-                                                            <option :value="idx" x-text="'Kolom ' + (idx + 1) + ': ' + (col.header || col.field)"></option>
+                                                    <label class="text-[10px] text-gray-500 block">Sejajarkan Nilai di
+                                                        Kolom</label>
+                                                    <select x-model.number="selectedElement.footerTargetIndex"
+                                                        @change="refreshCanvas()"
+                                                        class="w-full border rounded p-1 text-xs bg-white">
+                                                        <template x-for="(col, idx) in (selectedElement.columns || [])"
+                                                            :key="idx">
+                                                            <option :value="idx"
+                                                                x-text="'Kolom ' + (idx + 1) + ': ' + (col.header || col.field)">
+                                                            </option>
                                                         </template>
                                                     </select>
                                                 </div>
@@ -327,8 +371,8 @@
                                 <div class="space-y-2">
                                     <div>
                                         <label class="block text-gray-600 mb-1">Judul Catatan</label>
-                                        <input type="text" x-model="selectedElement.title" @input="refreshCanvas()"
-                                            class="w-full border rounded p-1 text-xs">
+                                        <input type="text" x-model="selectedElement.title"
+                                            @input="refreshCanvas()" class="w-full border rounded p-1 text-xs">
                                     </div>
                                     <div>
                                         <label class="block text-gray-600 mb-1">Data Binding</label>
@@ -338,7 +382,8 @@
                                             <template x-for="(fields, model) in bindings" :key="model">
                                                 <optgroup :label="model">
                                                     <template x-for="f in fields" :key="f">
-                                                        <option :value="model + '.' + f" x-text="model + '.' + f"></option>
+                                                        <option :value="model + '.' + f" x-text="model + '.' + f">
+                                                        </option>
                                                     </template>
                                                 </optgroup>
                                             </template>
@@ -354,29 +399,37 @@
                                 <div class="space-y-2">
                                     <div class="flex justify-between items-center">
                                         <label class="block text-gray-600 font-semibold">Kolom Tanda Tangan</label>
-                                        <button @click="addSignatureColumn()" class="text-xs bg-blue-50 text-blue-600 border border-blue-200 px-2 py-0.5 rounded hover:bg-blue-100">+ TTD</button>
+                                        <button @click="addSignatureColumn()"
+                                            class="text-xs bg-blue-50 text-blue-600 border border-blue-200 px-2 py-0.5 rounded hover:bg-blue-100">+
+                                            TTD</button>
                                     </div>
                                     <div class="space-y-1.5 max-h-48 overflow-y-auto pr-1">
-                                        <template x-for="(sig, sIdx) in (selectedElement.columns || [])" :key="sIdx">
+                                        <template x-for="(sig, sIdx) in (selectedElement.columns || [])"
+                                            :key="sIdx">
                                             <div class="p-1.5 bg-white border rounded space-y-1">
                                                 <div class="flex items-center gap-1">
-                                                    <input type="text" x-model="sig.label" @input="refreshCanvas()"
-                                                        placeholder="Label (e.g. Wali Kelas)" class="w-1/2 border rounded px-1.5 py-0.5 text-xs">
-                                                    <select x-model="sig.role" @change="refreshCanvas()" class="w-1/2 border rounded p-0.5 text-xs bg-white font-mono">
+                                                    <input type="text" x-model="sig.label"
+                                                        @input="refreshCanvas()" placeholder="Label (e.g. Wali Kelas)"
+                                                        class="w-1/2 border rounded px-1.5 py-0.5 text-xs">
+                                                    <select x-model="sig.role" @change="refreshCanvas()"
+                                                        class="w-1/2 border rounded p-0.5 text-xs bg-white font-mono">
                                                         <option value="homeroom_teacher">homeroom_teacher</option>
                                                         <option value="headmaster">headmaster</option>
                                                         <option value="official">official</option>
                                                         <option value="parent">parent</option>
                                                     </select>
-                                                    <button @click="removeSignatureColumn(sIdx)" class="text-red-500 hover:text-red-700 px-1 font-bold">✕</button>
+                                                    <button @click="removeSignatureColumn(sIdx)"
+                                                        class="text-red-500 hover:text-red-700 px-1 font-bold">✕</button>
                                                 </div>
                                                 <div class="flex items-center gap-3 pt-1 text-[11px]">
                                                     <label class="flex items-center gap-1 cursor-pointer">
-                                                        <input type="checkbox" x-model="sig.showImage" @change="refreshCanvas()" class="rounded">
+                                                        <input type="checkbox" x-model="sig.showImage"
+                                                            @change="refreshCanvas()" class="rounded">
                                                         <span>Gambar TTD</span>
                                                     </label>
                                                     <label class="flex items-center gap-1 cursor-pointer">
-                                                        <input type="checkbox" x-model="sig.showEmployeeNumber" @change="refreshCanvas()" class="rounded">
+                                                        <input type="checkbox" x-model="sig.showEmployeeNumber"
+                                                            @change="refreshCanvas()" class="rounded">
                                                         <span>Tampilkan NIP</span>
                                                     </label>
                                                 </div>
@@ -416,7 +469,8 @@
                                         <div>
                                             <label class="block text-gray-600 mb-1">Color</label>
                                             <input type="color" x-model="selectedElement.style.color"
-                                                @input="refreshCanvas()" class="w-full h-7 border rounded cursor-pointer p-0.5">
+                                                @input="refreshCanvas()"
+                                                class="w-full h-7 border rounded cursor-pointer p-0.5">
                                         </div>
                                     </div>
 
@@ -435,9 +489,12 @@
                                     <div>
                                         <label class="block text-gray-600 mb-1">Alignment</label>
                                         <div class="flex gap-1">
-                                            <template x-for="a in ['left','center','right','justify']" :key="a">
+                                            <template x-for="a in ['left','center','right','justify']"
+                                                :key="a">
                                                 <button @click="selectedElement.style.textAlign = a; refreshCanvas()"
-                                                    :class="{ 'bg-blue-600 text-white': selectedElement.style.textAlign === a, 'bg-white text-gray-700': selectedElement.style.textAlign !== a }"
+                                                    :class="{ 'bg-blue-600 text-white': selectedElement.style.textAlign ===
+                                                        a, 'bg-white text-gray-700': selectedElement.style.textAlign !==
+                                                            a }"
                                                     class="flex-1 border rounded py-1 text-xs"
                                                     x-text="a.charAt(0).toUpperCase()"></button>
                                             </template>
@@ -480,7 +537,7 @@
                 <div class="flex flex-wrap items-center gap-2">
                     <input type="text" x-model="form.name" placeholder="Nama Template"
                         class="border rounded px-2.5 py-1 text-sm w-48 lg:w-56 font-medium focus:ring-1 focus:ring-blue-400 outline-none">
-                    
+
                     <select x-model="form.type" class="border rounded px-2 py-1 text-sm bg-white">
                         <option value="academic">Academic</option>
                         <option value="religious">Religious</option>
@@ -489,17 +546,22 @@
                         <option value="combined">Combined</option>
                     </select>
 
-                    <select x-model="form.curriculum_id" class="border rounded px-2 py-1 text-sm bg-white text-gray-700 font-medium" title="Asosiasi & Filter Kurikulum">
+                    <select x-model="form.curriculum_id"
+                        class="border rounded px-2 py-1 text-sm bg-white text-gray-700 font-medium"
+                        title="Asosiasi & Filter Kurikulum">
                         <option value="">🌐 Semua Kurikulum (Universal)</option>
                         @foreach ($curriculums ?? [] as $c)
                             <option value="{{ $c->id }}">{{ $c->name }} ({{ $c->code }})</option>
                         @endforeach
                     </select>
 
-                    <select x-model="form.academic_year_id" class="border rounded px-2 py-1 text-sm bg-white text-gray-700 font-medium" title="Asosiasi & Filter Tahun Ajaran">
+                    <select x-model="form.academic_year_id"
+                        class="border rounded px-2 py-1 text-sm bg-white text-gray-700 font-medium"
+                        title="Asosiasi & Filter Tahun Ajaran">
                         <option value="">📅 Semua Thn Ajaran</option>
                         @foreach ($academicYears ?? [] as $ay)
-                            <option value="{{ $ay->id }}">{{ $ay->formatted_name ?? ($ay->start_year . '/' . $ay->end_year) }}</option>
+                            <option value="{{ $ay->id }}">
+                                {{ $ay->formatted_name ?? $ay->start_year . '/' . $ay->end_year }}</option>
                         @endforeach
                     </select>
 
@@ -531,15 +593,20 @@
                     </select>
 
                     {{-- Margin Controls (Top, Right, Bottom, Left in cm) --}}
-                    <div class="flex items-center gap-1 border rounded px-2 py-1 text-xs bg-gray-50" title="Margin Halaman: Atas, Kanan, Bawah, Kiri (cm)">
+                    <div class="flex items-center gap-1 border rounded px-2 py-1 text-xs bg-gray-50"
+                        title="Margin Halaman: Atas, Kanan, Bawah, Kiri (cm)">
                         <span class="text-gray-500 font-medium">Margin:</span>
-                        <input type="number" step="0.1" min="0" max="10" x-model.number="form.margin_top" @input="refreshCanvas()"
+                        <input type="number" step="0.1" min="0" max="10"
+                            x-model.number="form.margin_top" @input="refreshCanvas()"
                             class="w-10 border rounded px-1 text-center text-xs" title="Top (cm)">
-                        <input type="number" step="0.1" min="0" max="10" x-model.number="form.margin_right" @input="refreshCanvas()"
+                        <input type="number" step="0.1" min="0" max="10"
+                            x-model.number="form.margin_right" @input="refreshCanvas()"
                             class="w-10 border rounded px-1 text-center text-xs" title="Right (cm)">
-                        <input type="number" step="0.1" min="0" max="10" x-model.number="form.margin_bottom" @input="refreshCanvas()"
+                        <input type="number" step="0.1" min="0" max="10"
+                            x-model.number="form.margin_bottom" @input="refreshCanvas()"
                             class="w-10 border rounded px-1 text-center text-xs" title="Bottom (cm)">
-                        <input type="number" step="0.1" min="0" max="10" x-model.number="form.margin_left" @input="refreshCanvas()"
+                        <input type="number" step="0.1" min="0" max="10"
+                            x-model.number="form.margin_left" @input="refreshCanvas()"
                             class="w-10 border rounded px-1 text-center text-xs" title="Left (cm)">
                         <span class="text-[10px] text-gray-400">cm</span>
                     </div>
@@ -574,7 +641,8 @@
                     <div class="flex items-center gap-2">
                         <span class="text-lg">👁️</span>
                         <h3 class="font-bold text-gray-800">Preview Laporan</h3>
-                        <span class="text-xs text-gray-500" x-text="'(' + form.paper_size + ' - ' + form.orientation + ')'"></span>
+                        <span class="text-xs text-gray-500"
+                            x-text="'(' + form.paper_size + '_' + form.orientation + ')'"></span>
                     </div>
                     <div class="flex items-center gap-2">
                         <template x-if="form.id">
@@ -583,10 +651,12 @@
                                 <span>📄</span> Cetak PDF
                             </a>
                         </template>
-                        <button @click="reloadPreview()" class="text-xs bg-gray-200 hover:bg-gray-300 px-3 py-1.5 rounded font-medium transition flex items-center gap-1">
+                        <button @click="reloadPreview()"
+                            class="text-xs bg-gray-200 hover:bg-gray-300 px-3 py-1.5 rounded font-medium transition flex items-center gap-1">
                             <span>🔄</span> Refresh
                         </button>
-                        <button @click="previewOpen = false" class="text-xs bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded font-medium transition flex items-center gap-1">
+                        <button @click="previewOpen = false"
+                            class="text-xs bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded font-medium transition flex items-center gap-1">
                             <span>✕</span> Tutup
                         </button>
                     </div>
@@ -608,8 +678,8 @@
                     id: {{ $template?->id ?? 'null' }},
                     name: @json($template?->name ?? 'New Template'),
                     type: @json($template?->type ?? 'academic'),
-                    curriculum_id: @json($currentCurriculumId ? (string)$currentCurriculumId : ''),
-                    academic_year_id: @json($currentAcademicYearId ? (string)$currentAcademicYearId : ''),
+                    curriculum_id: @json($currentCurriculumId ? (string) $currentCurriculumId : ''),
+                    academic_year_id: @json($currentAcademicYearId ? (string) $currentAcademicYearId : ''),
                     paper_size: @json($template?->paper_size ?? 'A4'),
                     custom_paper_width: {{ $template?->custom_paper_width ?? 210 }},
                     custom_paper_height: {{ $template?->custom_paper_height ?? 297 }},
@@ -632,7 +702,9 @@
                 // INIT (Otomatis dipanggil oleh Alpine.js)
                 // ============================================================
                 init() {
-                    if (!this.configuration) this.configuration = { sections: [] };
+                    if (!this.configuration) this.configuration = {
+                        sections: []
+                    };
                     if (!this.configuration.sections) this.configuration.sections = [];
                     this.renderCanvas();
                 },
@@ -687,7 +759,10 @@
                         h = Number(this.form.custom_paper_height) || 297;
                     } else {
                         const sizes = this.paperSizes[this.form.paper_size] ||
-                            this.paperSizes.A4 || { width: 210, height: 297 };
+                            this.paperSizes.A4 || {
+                                width: 210,
+                                height: 297
+                            };
                         w = sizes.width;
                         h = sizes.height;
                     }
@@ -721,7 +796,9 @@
                 },
 
                 syncPageConfig() {
-                    if (!this.configuration) this.configuration = { sections: [] };
+                    if (!this.configuration) this.configuration = {
+                        sections: []
+                    };
                     if (!this.configuration.page) this.configuration.page = {};
                     this.configuration.page.size = this.form.paper_size;
                     this.configuration.page.orientation = this.form.orientation;
@@ -851,11 +928,22 @@
                             id,
                             type: 'keyvalue',
                             order,
-                            fields: [
-                                { label: 'Student Name', binding: 'student.full_name' },
-                                { label: 'Student Number', binding: 'student.student_number' },
-                                { label: 'Classroom', binding: 'classroom.name' },
-                                { label: 'Dormitory', binding: 'dormitory.name' },
+                            fields: [{
+                                    label: 'Student Name',
+                                    binding: 'student.full_name'
+                                },
+                                {
+                                    label: 'Student Number',
+                                    binding: 'student.student_number'
+                                },
+                                {
+                                    label: 'Classroom',
+                                    binding: 'classroom.name'
+                                },
+                                {
+                                    label: 'Dormitory',
+                                    binding: 'dormitory.name'
+                                },
                             ],
                             style: {
                                 fontSize: 12,
@@ -871,11 +959,30 @@
                             order,
                             title: 'A. ACADEMIC SCORES',
                             dataSource: 'academic_scores',
-                            columns: [
-                                { header: 'No', field: 'index', width: '5%', align: 'center' },
-                                { header: 'Subject', field: 'subject.name', width: '45%', align: 'left' },
-                                { header: 'Score', field: 'numeric_score', width: '20%', align: 'center' },
-                                { header: 'Predicate', field: 'predicate', width: '30%', align: 'center' },
+                            columns: [{
+                                    header: 'No',
+                                    field: 'index',
+                                    width: '5%',
+                                    align: 'center'
+                                },
+                                {
+                                    header: 'Subject',
+                                    field: 'subject.name',
+                                    width: '45%',
+                                    align: 'left'
+                                },
+                                {
+                                    header: 'Score',
+                                    field: 'numeric_score',
+                                    width: '20%',
+                                    align: 'center'
+                                },
+                                {
+                                    header: 'Predicate',
+                                    field: 'predicate',
+                                    width: '30%',
+                                    align: 'center'
+                                },
                             ],
                             style: {
                                 fontSize: 10,
@@ -907,8 +1014,7 @@
                             id,
                             type: 'signature',
                             order,
-                            columns: [
-                                {
+                            columns: [{
                                     role: 'homeroom_teacher',
                                     label: 'Homeroom Teacher',
                                     source: 'automatic',
@@ -987,7 +1093,7 @@
                     const selectedId = this.selectedElement?.id;
                     canvas.innerHTML = '';
 
-                    const sections = [...this.configuration.sections].sort((a, b) => (a.order || 0) - (b.order || 0));
+                    const sections = [...this.configuration.sections].sort((a, b) => (a.order || 0) _(b.order || 0));
 
                     sections.forEach(sec => {
                         const el = document.createElement('div');
@@ -1067,281 +1173,291 @@
                                     let targetIdx = sec.footerTargetIndex !== undefined ? parseInt(sec.footerTargetIndex) : null;
                                     if (targetIdx === null || isNaN(targetIdx) || targetIdx >= colCount) {
                                         const found = cols.findIndex(c => ['numeric_score', 'final_score', 'score'].includes(c.field));
-                                        targetIdx = found !== -1 ? found : Math.max(0, colCount - 2);
+                                        targetIdx = found !== -1 ? found : Math.max(0, colCount_2);
                                     }
                                     const beforeSpan = targetIdx;
-                                    const afterSpan = colCount - targetIdx - 1;
+                                    const afterSpan = colCount_targetIdx_1;
                                     let html = '<tfoot><tr>';
                                     if (beforeSpan > 0) {
-                                        html += `<td ${beforeSpan > 1 ? `colspan="${beforeSpan}"` : ''} style="border:1px solid #000;padding:4px;text-align:right;background:#f5f5f5;font-weight:bold;">${this.escapeHtml(sec.footerLabel || 'Average')}</td>`;
-                                    }
-                                    html += `<td style="border:1px solid #000;padding:4px;text-align:center;background:#f5f5f5;font-weight:bold;color:#2563eb;">[[ ${this.escapeHtml(sec.footerField || 'average_score')} ]]</td>`;
-                                    if (afterSpan > 0) {
-                                        html += `<td ${afterSpan > 1 ? `colspan="${afterSpan}"` : ''} style="border:1px solid #000;background:#f5f5f5;"></td>`;
-                                    }
-                                    html += '</tr></tfoot>';
-                                    return html;
-                                })()}
-                            </table>`;
+                                        html += ` < td $ {
+                                beforeSpan > 1 ? `colspan="${beforeSpan}"` : ''
+                            }
+                            style =
+                                "border:1px solid #000;padding:4px;text-align:right;background:#f5f5f5;font-weight:bold;" >
+                                $ {
+                                    this.escapeHtml(sec.footerLabel || 'Average')
+                                } < /td>`;
+                }
+                html +=
+                    `<td style="border:1px solid #000;padding:4px;text-align:center;background:#f5f5f5;font-weight:bold;color:#2563eb;">[[ ${this.escapeHtml(sec.footerField || 'average_score')} ]]</td>`;
+                if (afterSpan > 0) {
+                    html +=
+                        `<td ${afterSpan > 1 ? `colspan="${afterSpan}"` : ''} style="border:1px solid #000;background:#f5f5f5;"></td>`;
+                }
+                html += '</tr></tfoot>';
+                return html;
+            })()
+    } <
+    /table>`;
 
-                        case 'text-block':
-                            return `<div style="font-weight:bold;font-size:${sec.style?.fontSize || 12}pt;font-family:${sec.style?.fontFamily || 'inherit'};margin-bottom:4px;">${this.escapeHtml(sec.title || '')}</div>
+        case 'text-block':
+        return `<div style="font-weight:bold;font-size:${sec.style?.fontSize || 12}pt;font-family:${sec.style?.fontFamily || 'inherit'};margin-bottom:4px;">${this.escapeHtml(sec.title || '')}</div>
                             <div style="border:1px solid #cbd5e1;padding:8px;font-style:italic;min-height:50px;color:#2563eb;font-size:${sec.style?.fontSize || 12}pt;font-family:${sec.style?.fontFamily || 'inherit'};border-radius:4px;background:#f8fafc;">
                                 [[ ${this.escapeHtml(sec.binding || 'content')} ]]
                             </div>`;
 
-                        case 'signature':
-                            const cols = sec.columns || [];
-                            const colWidth = cols.length > 0 ? Math.floor(100 / cols.length) : 50;
-                            return `<div style="display:flex;justify-content:space-around;font-size:${sec.style?.fontSize || 11}pt;font-family:${sec.style?.fontFamily || 'inherit'};margin-top:15px;">
+        case 'signature':
+        const cols = sec.columns || [];
+        const colWidth = cols.length > 0 ? Math.floor(100 / cols.length) : 50;
+        return `<div style="display:flex;justify-content:space-around;font-size:${sec.style?.fontSize || 11}pt;font-family:${sec.style?.fontFamily || 'inherit'};margin-top:15px;">
                                 ${cols.map(c => `<div style="text-align:center;width:${colWidth}%;padding:0 8px;">
-                                    <div>${this.escapeHtml(c.label || '')},</div>
-                                    <div style="height:50px;"></div>
-                                    <div style="font-weight:bold;text-decoration:underline;color:#2563eb;">[[ signatures.${this.escapeHtml(c.role)}.name ]]</div>
-                                    ${c.showEmployeeNumber ? `<div style="font-size:9pt;color:#666;">NIP: [[ signatures.${this.escapeHtml(c.role)}.employee_number ]]</div>` : ''}
-                                </div>`).join('')}
+                                        <div>${this.escapeHtml(c.label || '')},</div>
+                                        <div style="height:50px;"></div>
+                                        <div style="font-weight:bold;text-decoration:underline;color:#2563eb;">[[ signatures.${this.escapeHtml(c.role)}.name ]]</div>
+                                        ${c.showEmployeeNumber ? `<div style="font-size:9pt;color:#666;">NIP: [[ signatures.${this.escapeHtml(c.role)}.employee_number ]]</div>` : ''}
+                                    </div>`).join('')}
                             </div>`;
 
-                        case 'divider':
-                            return '<hr style="border:none;border-top:1px solid #ccc;margin:12px 0;">';
+        case 'divider':
+        return '<hr style="border:none;border-top:1px solid #ccc;margin:12px 0;">';
 
-                        case 'pagebreak':
-                            return '<div style="border:1px dashed #94a3b8;padding:6px;text-align:center;font-size:11px;color:#64748b;background:#f1f5f9;border-radius:4px;">— Page Break —</div>';
+        case 'pagebreak':
+        return '<div style="border:1px dashed #94a3b8;padding:6px;text-align:center;font-size:11px;color:#64748b;background:#f1f5f9;border-radius:4px;">— Page Break —</div>';
 
-                        default:
-                            return `<div class="p-2 bg-gray-50 border rounded text-xs text-gray-500 italic">[${this.escapeHtml(sec.type)}] ${this.escapeHtml(sec.title || sec.content || 'Custom Section')}</div>`;
-                    }
-                },
+        default:
+        return `<div class="p-2 bg-gray-50 border rounded text-xs text-gray-500 italic">[${this.escapeHtml(sec.type)}] ${this.escapeHtml(sec.title || sec.content || 'Custom Section')}</div>`;
+        }
+        },
 
-                renderTextElHtml(el) {
-                    const s = el.style || {};
-                    const style = [
-                        s.fontSize ? `font-size:${s.fontSize}pt` : '',
-                        s.fontFamily ? `font-family:${s.fontFamily}` : '',
-                        s.fontWeight ? `font-weight:${s.fontWeight}` : '',
-                        s.fontStyle ? `font-style:${s.fontStyle}` : '',
-                        s.textDecoration ? `text-decoration:${s.textDecoration}` : '',
-                        s.color ? `color:${s.color}` : '',
-                        s.textAlign ? `text-align:${s.textAlign}` : 'text-align:left',
-                        s.marginTop ? `margin-top:${s.marginTop}px` : '',
-                        s.marginBottom ? `margin-bottom:${s.marginBottom}px` : '',
-                        'white-space:pre-wrap',
-                        'word-break:break-word',
-                    ].filter(Boolean).join(';');
+        renderTextElHtml(el) {
+                const s = el.style || {};
+                const style = [
+                    s.fontSize ? `font-size:${s.fontSize}pt` : '',
+                    s.fontFamily ? `font-family:${s.fontFamily}` : '',
+                    s.fontWeight ? `font-weight:${s.fontWeight}` : '',
+                    s.fontStyle ? `font-style:${s.fontStyle}` : '',
+                    s.textDecoration ? `text-decoration:${s.textDecoration}` : '',
+                    s.color ? `color:${s.color}` : '',
+                    s.textAlign ? `text-align:${s.textAlign}` : 'text-align:left',
+                    s.marginTop ? `margin-top:${s.marginTop}px` : '',
+                    s.marginBottom ? `margin-bottom:${s.marginBottom}px` : '',
+                    'white-space:pre-wrap',
+                    'word-break:break-word',
+                ].filter(Boolean).join(';');
 
-                    const content = el.content ?
-                        this.escapeHtml(el.content) :
-                        '<span class="text-xs text-gray-400 italic">(Empty text)</span>';
-                    return `<div style="${style}">${content}</div>`;
-                },
+                const content = el.content ?
+                    this.escapeHtml(el.content) :
+                    '<span class="text-xs text-gray-400 italic">(Empty text)</span>';
+                return `<div style="${style}">${content}</div>`;
+            },
 
-                escapeHtml(str) {
-                    if (str === null || str === undefined) return '';
-                    return String(str)
-                        .replace(/&/g, '&amp;')
-                        .replace(/</g, '&lt;')
-                        .replace(/>/g, '&gt;')
-                        .replace(/"/g, '&quot;')
-                        .replace(/'/g, '&#039;');
-                },
+            escapeHtml(str) {
+                if (str === null || str === undefined) return '';
+                return String(str)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
+            },
 
-                // ============================================================
-                // SELECTION
-                // ============================================================
-                selectSection(id) {
-                    const sec = this.configuration.sections.find(s => s.id === id);
-                    if (!sec) return;
+            // ============================================================
+            // SELECTION
+            // ============================================================
+            selectSection(id) {
+                const sec = this.configuration.sections.find(s => s.id === id);
+                if (!sec) return;
 
-                    // Pastikan style object selalu lengkap agar tidak melempar undefined error
-                    if (!sec.style) sec.style = {};
-                    if (!sec.style.fontFamily) sec.style.fontFamily = 'Times New Roman';
-                    if (!sec.style.fontSize) sec.style.fontSize = 12;
-                    if (!sec.style.color) sec.style.color = '#000000';
-                    if (!sec.style.textAlign) sec.style.textAlign = 'left';
+                // Pastikan style object selalu lengkap agar tidak melempar undefined error
+                if (!sec.style) sec.style = {};
+                if (!sec.style.fontFamily) sec.style.fontFamily = 'Times New Roman';
+                if (!sec.style.fontSize) sec.style.fontSize = 12;
+                if (!sec.style.color) sec.style.color = '#000000';
+                if (!sec.style.textAlign) sec.style.textAlign = 'left';
 
-                    this.selectedElement = sec;
+                this.selectedElement = sec;
 
-                    document.querySelectorAll('.section-block').forEach(e => e.classList.remove('selected'));
-                    const el = document.querySelector(`[data-id="${id}"]`);
-                    if (el) el.classList.add('selected');
-                },
+                document.querySelectorAll('.section-block').forEach(e => e.classList.remove('selected'));
+                const el = document.querySelector(`[data-id="${id}"]`);
+                if (el) el.classList.add('selected');
+            },
 
-                deselect() {
-                    this.selectedElement = null;
-                    document.querySelectorAll('.section-block').forEach(e => e.classList.remove('selected'));
-                },
+            deselect() {
+                this.selectedElement = null;
+                document.querySelectorAll('.section-block').forEach(e => e.classList.remove('selected'));
+            },
 
-                // ============================================================
-                // STYLE HELPERS
-                // ============================================================
-                hasTextStyle(el) {
-                    if (!el) return false;
-                    return ['text', 'text-block', 'keyvalue', 'identity', 'table', 'signature'].includes(el.type);
-                },
+            // ============================================================
+            // STYLE HELPERS
+            // ============================================================
+            hasTextStyle(el) {
+                if (!el) return false;
+                return ['text', 'text-block', 'keyvalue', 'identity', 'table', 'signature'].includes(el.type);
+            },
 
-                ensureStyle() {
-                    if (!this.selectedElement.style) {
-                        this.selectedElement.style = {};
-                    }
-                    return this.selectedElement.style;
-                },
+            ensureStyle() {
+                if (!this.selectedElement.style) {
+                    this.selectedElement.style = {};
+                }
+                return this.selectedElement.style;
+            },
 
-                toggleBold() {
-                    if (!this.selectedElement) return;
-                    const s = this.ensureStyle();
-                    s.fontWeight = s.fontWeight === 'bold' ? 'normal' : 'bold';
-                    this.refreshCanvas();
-                },
+            toggleBold() {
+                if (!this.selectedElement) return;
+                const s = this.ensureStyle();
+                s.fontWeight = s.fontWeight === 'bold' ? 'normal' : 'bold';
+                this.refreshCanvas();
+            },
 
-                toggleItalic() {
-                    if (!this.selectedElement) return;
-                    const s = this.ensureStyle();
-                    s.fontStyle = s.fontStyle === 'italic' ? 'normal' : 'italic';
-                    this.refreshCanvas();
-                },
+            toggleItalic() {
+                if (!this.selectedElement) return;
+                const s = this.ensureStyle();
+                s.fontStyle = s.fontStyle === 'italic' ? 'normal' : 'italic';
+                this.refreshCanvas();
+            },
 
-                toggleUnderline() {
-                    if (!this.selectedElement) return;
-                    const s = this.ensureStyle();
-                    s.textDecoration = s.textDecoration === 'underline' ? 'none' : 'underline';
-                    this.refreshCanvas();
-                },
+            toggleUnderline() {
+                if (!this.selectedElement) return;
+                const s = this.ensureStyle();
+                s.textDecoration = s.textDecoration === 'underline' ? 'none' : 'underline';
+                this.refreshCanvas();
+            },
 
-                // ============================================================
-                // BINDING INSERTER
-                // ============================================================
-                insertBinding(binding) {
-                    if (!binding || !this.selectedElement) return;
-                    const placeholder = `[[ ${binding} ]]`;
+            // ============================================================
+            // BINDING INSERTER
+            // ============================================================
+            insertBinding(binding) {
+                if (!binding || !this.selectedElement) return;
+                const placeholder = `[[ ${binding} ]]`;
 
-                    if (this.selectedElement.type === 'text') {
-                        this.selectedElement.content = (this.selectedElement.content || '') + placeholder;
-                    } else if (this.selectedElement.type === 'text-block') {
-                        this.selectedElement.binding = binding;
-                    }
+                if (this.selectedElement.type === 'text') {
+                    this.selectedElement.content = (this.selectedElement.content || '') + placeholder;
+                } else if (this.selectedElement.type === 'text-block') {
+                    this.selectedElement.binding = binding;
+                }
 
-                    this.refreshCanvas();
-                },
+                this.refreshCanvas();
+            },
 
-                // ============================================================
-                // FIELD MANAGEMENT (keyvalue / identity)
-                // ============================================================
-                addField() {
-                    if (!this.selectedElement) return;
-                    if (!['keyvalue', 'identity'].includes(this.selectedElement.type)) return;
-                    if (!this.selectedElement.fields) this.selectedElement.fields = [];
-                    this.selectedElement.fields.push({
-                        label: 'New Field',
-                        binding: 'student.full_name'
-                    });
-                    this.refreshCanvas();
-                },
+            // ============================================================
+            // FIELD MANAGEMENT (keyvalue / identity)
+            // ============================================================
+            addField() {
+                if (!this.selectedElement) return;
+                if (!['keyvalue', 'identity'].includes(this.selectedElement.type)) return;
+                if (!this.selectedElement.fields) this.selectedElement.fields = [];
+                this.selectedElement.fields.push({
+                    label: 'New Field',
+                    binding: 'student.full_name'
+                });
+                this.refreshCanvas();
+            },
 
-                removeField(idx) {
-                    if (!this.selectedElement) return;
-                    if (!['keyvalue', 'identity'].includes(this.selectedElement.type)) return;
-                    this.selectedElement.fields.splice(idx, 1);
-                    this.refreshCanvas();
-                },
+            removeField(idx) {
+                if (!this.selectedElement) return;
+                if (!['keyvalue', 'identity'].includes(this.selectedElement.type)) return;
+                this.selectedElement.fields.splice(idx, 1);
+                this.refreshCanvas();
+            },
 
-                // ============================================================
-                // COLUMN MANAGEMENT (table)
-                // ============================================================
-                addColumn() {
-                    if (this.selectedElement?.type !== 'table') return;
-                    if (!this.selectedElement.columns) this.selectedElement.columns = [];
-                    this.selectedElement.columns.push({
-                        header: 'New Column',
-                        field: '',
-                        width: '15%',
-                        align: 'center',
-                    });
-                    this.refreshCanvas();
-                },
+            // ============================================================
+            // COLUMN MANAGEMENT (table)
+            // ============================================================
+            addColumn() {
+                if (this.selectedElement?.type !== 'table') return;
+                if (!this.selectedElement.columns) this.selectedElement.columns = [];
+                this.selectedElement.columns.push({
+                    header: 'New Column',
+                    field: '',
+                    width: '15%',
+                    align: 'center',
+                });
+                this.refreshCanvas();
+            },
 
-                removeColumn(idx) {
-                    if (this.selectedElement?.type !== 'table') return;
-                    this.selectedElement.columns.splice(idx, 1);
-                    this.refreshCanvas();
-                },
+            removeColumn(idx) {
+                if (this.selectedElement?.type !== 'table') return;
+                this.selectedElement.columns.splice(idx, 1);
+                this.refreshCanvas();
+            },
 
-                // ============================================================
-                // SIGNATURE COLUMN MANAGEMENT
-                // ============================================================
-                addSignatureColumn() {
-                    if (this.selectedElement?.type !== 'signature') return;
-                    if (!this.selectedElement.columns) this.selectedElement.columns = [];
-                    this.selectedElement.columns.push({
-                        role: 'official',
-                        label: 'Official',
-                        source: 'automatic',
-                        showImage: false,
-                        showEmployeeNumber: false,
-                    });
-                    this.refreshCanvas();
-                },
+            // ============================================================
+            // SIGNATURE COLUMN MANAGEMENT
+            // ============================================================
+            addSignatureColumn() {
+                if (this.selectedElement?.type !== 'signature') return;
+                if (!this.selectedElement.columns) this.selectedElement.columns = [];
+                this.selectedElement.columns.push({
+                    role: 'official',
+                    label: 'Official',
+                    source: 'automatic',
+                    showImage: false,
+                    showEmployeeNumber: false,
+                });
+                this.refreshCanvas();
+            },
 
-                removeSignatureColumn(idx) {
-                    if (this.selectedElement?.type !== 'signature') return;
-                    this.selectedElement.columns.splice(idx, 1);
-                    this.refreshCanvas();
-                },
+            removeSignatureColumn(idx) {
+                if (this.selectedElement?.type !== 'signature') return;
+                this.selectedElement.columns.splice(idx, 1);
+                this.refreshCanvas();
+            },
 
-                // ============================================================
-                // ORDER MANAGEMENT
-                // ============================================================
-                moveSection(direction) {
-                    if (!this.selectedElement) return;
-                    const sections = this.configuration.sections;
-                    const currentIndex = sections.findIndex(s => s.id === this.selectedElement.id);
-                    if (currentIndex === -1) return;
+            // ============================================================
+            // ORDER MANAGEMENT
+            // ============================================================
+            moveSection(direction) {
+                if (!this.selectedElement) return;
+                const sections = this.configuration.sections;
+                const currentIndex = sections.findIndex(s => s.id === this.selectedElement.id);
+                if (currentIndex === -1) return;
 
-                    const targetIndex = currentIndex + direction;
-                    if (targetIndex < 0 || targetIndex >= sections.length) return;
+                const targetIndex = currentIndex + direction;
+                if (targetIndex < 0 || targetIndex >= sections.length) return;
 
-                    // Swap
-                    const temp = sections[currentIndex];
-                    sections[currentIndex] = sections[targetIndex];
-                    sections[targetIndex] = temp;
+                // Swap
+                const temp = sections[currentIndex];
+                sections[currentIndex] = sections[targetIndex];
+                sections[targetIndex] = temp;
 
-                    // Re-assign order numbers
-                    sections.forEach((s, idx) => s.order = idx + 1);
+                // Re-assign order numbers
+                sections.forEach((s, idx) => s.order = idx + 1);
 
-                    this.renderCanvas();
-                    this.selectSection(temp.id);
-                },
+                this.renderCanvas();
+                this.selectSection(temp.id);
+            },
 
-                // ============================================================
-                // DELETE SECTION
-                // ============================================================
-                deleteSelected() {
-                    if (!this.selectedElement) return;
-                    if (!confirm('Hapus section ini dari template?')) return;
+            // ============================================================
+            // DELETE SECTION
+            // ============================================================
+            deleteSelected() {
+                if (!this.selectedElement) return;
+                if (!confirm('Hapus section ini dari template?')) return;
 
-                    this.configuration.sections = this.configuration.sections
-                        .filter(s => s.id !== this.selectedElement.id);
+                this.configuration.sections = this.configuration.sections
+                    .filter(s => s.id !== this.selectedElement.id);
 
-                    this.configuration.sections
-                        .sort((a, b) => (a.order || 0) - (b.order || 0))
-                        .forEach((s, idx) => s.order = idx + 1);
+                this.configuration.sections
+                    .sort((a, b) => (a.order || 0) _(b.order || 0))
+                    .forEach((s, idx) => s.order = idx + 1);
 
-                    this.selectedElement = null;
-                    this.renderCanvas();
-                },
+                this.selectedElement = null;
+                this.renderCanvas();
+            },
 
-                refreshCanvas() {
-                    this.renderCanvas();
-                },
+            refreshCanvas() {
+                this.renderCanvas();
+            },
 
-                // ============================================================
-                // ASSET UPLOAD
-                // ============================================================
-                triggerUpload(type) {
-                    this.uploadType = type;
-                    this.$refs.fileInput.click();
-                },
+            // ============================================================
+            // ASSET UPLOAD
+            // ============================================================
+            triggerUpload(type) {
+                this.uploadType = type;
+                this.$refs.fileInput.click();
+            },
 
-                async handleUpload(evt) {
+            async handleUpload(evt) {
                     const file = evt.target.files[0];
                     if (!file) return;
 
@@ -1374,98 +1490,99 @@
                 // PREVIEW MODAL
                 // ============================================================
                 async showPreview() {
-                    this.previewOpen = true;
-                    await this.$nextTick();
-                    await this.reloadPreview();
-                },
+                        this.previewOpen = true;
+                        await this.$nextTick();
+                        await this.reloadPreview();
+                    },
 
-                async reloadPreview() {
-                    this.syncPageConfig();
-                    try {
-                        const res = await fetch('{{ route('admin.report-builder.preview') }}', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
-                                'Accept': 'text/html',
-                            },
-                            body: JSON.stringify({
-                                configuration: this.configuration,
-                                paper_size: this.form.paper_size,
-                                custom_paper_width: this.form.custom_paper_width,
-                                custom_paper_height: this.form.custom_paper_height,
-                                orientation: this.form.orientation,
-                                margin_top: this.form.margin_top,
-                                margin_bottom: this.form.margin_bottom,
-                                margin_left: this.form.margin_left,
-                                margin_right: this.form.margin_right,
-                            }),
-                        });
+                    async reloadPreview() {
+                            this.syncPageConfig();
+                            try {
+                                const res = await fetch('{{ route('admin.report-builder.preview') }}', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+                                        'Accept': 'text/html',
+                                    },
+                                    body: JSON.stringify({
+                                        configuration: this.configuration,
+                                        paper_size: this.form.paper_size,
+                                        custom_paper_width: this.form.custom_paper_width,
+                                        custom_paper_height: this.form.custom_paper_height,
+                                        orientation: this.form.orientation,
+                                        margin_top: this.form.margin_top,
+                                        margin_bottom: this.form.margin_bottom,
+                                        margin_left: this.form.margin_left,
+                                        margin_right: this.form.margin_right,
+                                    }),
+                                });
 
-                        if (!res.ok) {
-                            const txt = await res.text();
-                            console.error('Preview error:', txt);
-                            alert('Preview error: HTTP ' + res.status);
-                            return;
-                        }
+                                if (!res.ok) {
+                                    const txt = await res.text();
+                                    console.error('Preview error:', txt);
+                                    alert('Preview error: HTTP ' + res.status);
+                                    return;
+                                }
 
-                        const html = await res.text();
-                        if (this.$refs.previewFrame) {
-                            this.$refs.previewFrame.srcdoc = html;
-                        }
-                    } catch (err) {
-                        console.error('Preview error:', err);
-                        alert('Preview error: ' + err.message);
-                    }
-                },
-
-                // ============================================================
-                // SAVE TEMPLATE
-                // ============================================================
-                async save() {
-                    if (!this.form.name.trim()) {
-                        alert('Silakan masukkan nama template terlebih dahulu.');
-                        return;
-                    }
-
-                    this.saving = true;
-                    this.syncPageConfig();
-
-                    try {
-                        const payload = {
-                            ...this.form,
-                            configuration: this.configuration,
-                        };
-
-                        const res = await fetch('{{ route('admin.report-builder.store') }}', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
-                                'Accept': 'application/json',
-                            },
-                            body: JSON.stringify(payload),
-                        });
-
-                        const json = await res.json();
-
-                        if (json.success) {
-                            alert('✅ ' + json.message);
-                            if (json.template_id && !this.form.id) {
-                                window.location.href = '{{ url('admin/report-builder/builder') }}/' + json.template_id;
-                            } else {
-                                this.form.id = json.template_id || this.form.id;
+                                const html = await res.text();
+                                if (this.$refs.previewFrame) {
+                                    this.$refs.previewFrame.srcdoc = html;
+                                }
+                            } catch (err) {
+                                console.error('Preview error:', err);
+                                alert('Preview error: ' + err.message);
                             }
-                        } else {
-                            alert('❌ ' + (json.message || 'Gagal menyimpan template'));
-                        }
-                    } catch (err) {
-                        alert('Save error: ' + err.message);
-                    } finally {
-                        this.saving = false;
-                    }
-                },
-            }
+                        },
+
+                        // ============================================================
+                        // SAVE TEMPLATE
+                        // ============================================================
+                        async save() {
+                            if (!this.form.name.trim()) {
+                                alert('Silakan masukkan nama template terlebih dahulu.');
+                                return;
+                            }
+
+                            this.saving = true;
+                            this.syncPageConfig();
+
+                            try {
+                                const payload = {
+                                    ...this.form,
+                                    configuration: this.configuration,
+                                };
+
+                                const res = await fetch('{{ route('admin.report-builder.store') }}', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+                                        'Accept': 'application/json',
+                                    },
+                                    body: JSON.stringify(payload),
+                                });
+
+                                const json = await res.json();
+
+                                if (json.success) {
+                                    alert('✅ ' + json.message);
+                                    if (json.template_id && !this.form.id) {
+                                        window.location.href = '{{ url('admin/report-builder/builder') }}/' + json
+                                            .template_id;
+                                    } else {
+                                        this.form.id = json.template_id || this.form.id;
+                                    }
+                                } else {
+                                    alert('❌ ' + (json.message || 'Gagal menyimpan template'));
+                                }
+                            } catch (err) {
+                                alert('Save error: ' + err.message);
+                            } finally {
+                                this.saving = false;
+                            }
+                        },
+        }
         }
     </script>
 

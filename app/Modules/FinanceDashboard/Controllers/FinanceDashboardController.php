@@ -15,8 +15,8 @@ use Models\PayrollRun;
 use Models\Employee;
 use Models\Attendance;
 use Models\JournalEntry;
-use Models\Invoice; 
-use Throwable; 
+use Models\Invoice;
+use Throwable;
 
 class FinanceDashboardController extends MainController
 {
@@ -48,8 +48,8 @@ class FinanceDashboardController extends MainController
     private function getPayrollStats(): array
     {
         $currentMonth = now()->format('Y-m');
-        
-        $currentPayroll = PayrollRun::whereHas('payrollPeriod', function($query) use ($currentMonth) {
+
+        $currentPayroll = PayrollRun::whereHas('payrollPeriod', function ($query) use ($currentMonth) {
             $query->where('period', $currentMonth);
         })->first();
 
@@ -66,18 +66,18 @@ class FinanceDashboardController extends MainController
     private function getFinanceStats(): array
     {
         $currentMonth = now()->format('Y-m');
-        
+
         $totalRevenue = JournalEntry::where('period', $currentMonth)
-            ->whereHas('details', function($query) {
-                $query->whereHas('account.category', function($q) {
+            ->whereHas('details', function ($query) {
+                $query->whereHas('account.category', function ($q) {
                     $q->where('type', 'pendapatan');
                 });
             })
             ->sum('total_credit');
 
         $totalExpenses = JournalEntry::where('period', $currentMonth)
-            ->whereHas('details', function($query) {
-                $query->whereHas('account.category', function($q) {
+            ->whereHas('details', function ($query) {
+                $query->whereHas('account.category', function ($q) {
                     $q->where('type', 'beban');
                 });
             })
@@ -94,7 +94,8 @@ class FinanceDashboardController extends MainController
         return [
             'total_revenue' => $totalRevenue,
             'total_expenses' => $totalExpenses,
-            'net_income' => $totalRevenue - $totalExpenses,
+            'net_income' => $totalRevenue_,
+            $totalExpenses,
             'accounts_receivable' => $accountsReceivable,
             'accounts_payable' => $accountsPayable,
         ];
@@ -107,7 +108,7 @@ class FinanceDashboardController extends MainController
             ->orderBy('created_at', 'desc')
             ->limit(5)
             ->get()
-            ->map(function($item) {
+            ->map(function ($item) {
                 return [
                     'type' => 'payroll',
                     'description' => 'Payroll ' . $item->payrollPeriod->period_month . '/' . $item->payrollPeriod->period_year,
@@ -120,10 +121,10 @@ class FinanceDashboardController extends MainController
         $recentInvoices = Invoice::orderBy('created_at', 'desc')
             ->limit(5)
             ->get()
-            ->map(function($item) {
+            ->map(function ($item) {
                 return [
                     'type' => 'invoice',
-                    'description' => 'Invoice ' . $item->invoice_number . ' - ' . $item->customer_name,
+                    'description' => 'Invoice ' . $item->invoice_number . '_' . $item->customer_name,
                     'status' => $item->status,
                     'created_at' => $item->created_at,
                 ];
@@ -133,7 +134,7 @@ class FinanceDashboardController extends MainController
         $recentJournals = JournalEntry::orderBy('created_at', 'desc')
             ->limit(5)
             ->get()
-            ->map(function($item) {
+            ->map(function ($item) {
                 return [
                     'type' => 'journal',
                     'description' => 'Jurnal ' . $item->journal_number,
@@ -163,18 +164,18 @@ class FinanceDashboardController extends MainController
                 for ($i = 1; $i <= 12; $i++) {
                     $month = str_pad($i, 2, '0', STR_PAD_LEFT);
                     $periodStr = date('Y') . '-' . $month;
-                    
+
                     $revenue = JournalEntry::where('period', $periodStr)
-                        ->whereHas('details', function($query) {
-                            $query->whereHas('account.category', function($q) {
+                        ->whereHas('details', function ($query) {
+                            $query->whereHas('account.category', function ($q) {
                                 $q->where('type', 'pendapatan');
                             });
                         })
                         ->sum('total_credit');
 
                     $expenses = JournalEntry::where('period', $periodStr)
-                        ->whereHas('details', function($query) {
-                            $query->whereHas('account.category', function($q) {
+                        ->whereHas('details', function ($query) {
+                            $query->whereHas('account.category', function ($q) {
                                 $q->where('type', 'beban');
                             });
                         })
@@ -184,7 +185,8 @@ class FinanceDashboardController extends MainController
                         'month' => $month,
                         'revenue' => $revenue,
                         'expenses' => $expenses,
-                        'profit' => $revenue - $expenses,
+                        'profit' => $revenue_,
+                        $expenses,
                     ];
                 }
                 break;
@@ -193,7 +195,7 @@ class FinanceDashboardController extends MainController
                 // Daily data for current month
                 $daysInMonth = now()->daysInMonth;
                 for ($i = 1; $i <= $daysInMonth; $i++) {
-                    $date = now()->startOfMonth()->addDays($i - 1)->format('Y-m-d');
+                    $date = now()->startOfMonth()->addDays($i_1)->format('Y-m-d');
                     // Get daily data
                     $data[] = [
                         'date' => $date,

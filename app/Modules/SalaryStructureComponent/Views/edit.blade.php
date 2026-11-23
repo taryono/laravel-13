@@ -1,4 +1,4 @@
-{{ Form::model($salary - structure - component, ['method' => 'PUT', 'route' => ['salary_structure_component.update', $salary - structure - component->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($salary_structure_component, ['method' => 'PUT', 'route' => ['salary_structure_component.update', $salary_structure_component->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     <div class="col-md-6 mb-3">
         @forelse ($forms as $key => $form)

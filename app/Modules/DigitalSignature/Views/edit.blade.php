@@ -1,4 +1,4 @@
-{{ Form::model($digital - signature, ['method' => 'PUT', 'route' => ['digital_signature.update', $digital - signature->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($digital_signature, ['method' => 'PUT', 'route' => ['digital_signature.update', $digital_signature->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     @forelse ($forms as $key => $form)
         <div class="col-md-6 mb-3">

@@ -243,7 +243,7 @@
                         <div class="ibox-lg bg-container tc-primary fw-bold fs-13">02</div>
                         <div class="min-w-0">
                             <div class="d-flex align-items-center gap-2">
-                                <h3 class="fs-13 fw-bold tc-on-surface mb-0 truncate-1">Kedai Bu Ani - Jus &amp; Buah</h3>
+                                <h3 class="fs-13 fw-bold tc-on-surface mb-0 truncate-1">Kedai Bu Ani_Jus &amp; Buah</h3>
                                 <span class="bg-secondary-c rounded-circle flex-shrink-0"
                                     style="width:8px;height:8px;"></span>
                             </div>

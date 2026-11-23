@@ -27,8 +27,8 @@ class ExtracurricularAttendanceController extends MainController
      * Display a listing of the resource.
      *
      * Handles both:
-     * - Normal page request
-     * - Yajra DataTables AJAX request
+     *_Normal page request
+     *_Yajra DataTables AJAX request
      */
     public function index(
         Request $request,
@@ -195,7 +195,7 @@ class ExtracurricularAttendanceController extends MainController
                 return [
                     'id' => $day->id,
                     'label' => "{$day->day_of_week} " .
-                        ($day->start_time ? "({$day->start_time} - {$day->end_time})" : '') .
+                        ($day->start_time ? "({$day->start_time}_{$day->end_time})" : '') .
                         ($day->location ? " — {$day->location}" : ''),
                 ];
             });

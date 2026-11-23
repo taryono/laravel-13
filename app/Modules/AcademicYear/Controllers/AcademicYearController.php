@@ -25,8 +25,8 @@ class AcademicYearController extends MainController
      * Display a listing of the resource.
      *
      * Handles both:
-     * - Normal page request
-     * - Yajra DataTables AJAX request
+     *_Normal page request
+     *_Yajra DataTables AJAX request
      */
     public function index(
         Request $request,
@@ -66,7 +66,7 @@ class AcademicYearController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'name' => ['required', 'string', 'max:255'],
             'code' => ['required', 'string', 'max:255'],
             'start_date' => ['required', 'string', 'max:255'],
@@ -135,7 +135,7 @@ class AcademicYearController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'name' => ['required', 'string', 'max:255'],
             'code' => ['required', 'string', 'max:255'],
             'start_date' => ['required', 'string', 'max:255'],
@@ -155,10 +155,7 @@ class AcademicYearController extends MainController
 
         try {
             $academic_year = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $academic_year,
-                $validated
-            ) {
+            DB::transaction(function () use ($academic_year, $validated) {
                 $academic_year->update($validated);
             });
 
@@ -168,7 +165,7 @@ class AcademicYearController extends MainController
                 $academic_year
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui Tahun Ajaran.',
                 [
@@ -203,7 +200,7 @@ class AcademicYearController extends MainController
                 'Data Tahun Ajaran berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $academic_year->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus Tahun Ajaran.',
@@ -219,14 +216,14 @@ class AcademicYearController extends MainController
                 'Data Tahun Ajaran gagal dihapus.'
             );
         }
-    } 
+    }
 
     public function updateRegistrationOpen(Request $request, $academic_year, $is_registration_open): JsonResponse
     {
         try {
             $academic_year = $this->model->where('academic_year', $academic_year)->first();
             $academic_year->update(['is_registration_open' => $is_registration_open]);
-            
+
             return $this->successResponse(
                 $request,
                 'Data Tahun Ajaran berhasil diperbarui.',
@@ -255,7 +252,7 @@ class AcademicYearController extends MainController
         try {
             $academic_year = $this->model->where('academic_year', $academic_year)->first();
             $academic_year->update(['is_active' => $is_active]);
-            
+
             return $this->successResponse(
                 $request,
                 'Data Tahun Ajaran berhasil diperbarui.',
@@ -284,7 +281,7 @@ class AcademicYearController extends MainController
         try {
             $academic_year = $this->model->where('academic_year', $academic_year)->first();
             $academic_year->update(['is_current' => $is_current]);
-            
+
             return $this->successResponse(
                 $request,
                 'Data Tahun Ajaran berhasil diperbarui.',

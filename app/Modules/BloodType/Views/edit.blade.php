@@ -1,4 +1,4 @@
-{{ Form::model($blood - type, ['method' => 'PUT', 'route' => ['blood_type.update', $blood - type->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($blood_type, ['method' => 'PUT', 'route' => ['blood_type.update', $blood_type->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     <div class="col-md-6 mb-3">
         @forelse ($forms as $key => $form)

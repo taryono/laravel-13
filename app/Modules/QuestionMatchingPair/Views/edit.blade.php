@@ -1,4 +1,4 @@
-{{ Form::model($question - matching - pair, ['method' => 'PUT', 'route' => ['question_matching_pair.update', $question - matching - pair->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($question_matching_pair, ['method' => 'PUT', 'route' => ['question_matching_pair.update', $question_matching_pair->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     @forelse ($forms as $key => $form)
         <div class="col-md-6 mb-3">

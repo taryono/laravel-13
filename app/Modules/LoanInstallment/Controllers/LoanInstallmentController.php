@@ -11,9 +11,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
-use Throwable;  
+use Throwable;
 use Models\Loan;
-use Models\PayrollPeriod; 
+use Models\PayrollPeriod;
 
 class LoanInstallmentController extends MainController
 {
@@ -106,7 +106,7 @@ class LoanInstallmentController extends MainController
                 // Update remaining installments in loan
                 if ($validated['status'] === 'paid') {
                     $loan = $installment->loan;
-                    $loan->remaining_installments = max(0, $loan->remaining_installments - 1);
+                    $loan->remaining_installments = max(0, $loan->remaining_installments_1);
                     $loan->save();
                 }
             });
@@ -156,7 +156,7 @@ class LoanInstallmentController extends MainController
 
                 // Update remaining installments
                 $loan = $installment->loan;
-                $loan->remaining_installments = max(0, $loan->remaining_installments - 1);
+                $loan->remaining_installments = max(0, $loan->remaining_installments_1);
                 $loan->save();
             });
 
@@ -188,7 +188,7 @@ class LoanInstallmentController extends MainController
                     ]);
 
                     $loan = $installment->loan;
-                    $loan->remaining_installments = max(0, $loan->remaining_installments - 1);
+                    $loan->remaining_installments = max(0, $loan->remaining_installments_1);
                     $loan->save();
                 }
             });

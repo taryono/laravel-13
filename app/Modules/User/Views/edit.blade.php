@@ -156,7 +156,7 @@
                 console.warn('⚠️ Validator belum siap, custom rule password tidak terpasang.');
                 return;
             }
-            setTimeout(() => whenValidatorReady(retries - 1), 50);
+            setTimeout(() => whenValidatorReady(retries_1), 50);
         })();
     })();
 </script>

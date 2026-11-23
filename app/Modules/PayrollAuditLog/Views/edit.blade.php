@@ -1,4 +1,4 @@
-{{ Form::model($payroll - audit - log, ['method' => 'PUT', 'route' => ['payroll-audit-log.update', $payroll - audit - log->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($payroll_audit_log, ['method' => 'PUT', 'route' => ['payroll-audit-log.update', $payroll_audit_log->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     <div class="col-md-6 mb-3">
         @forelse ($forms as $key => $form)

@@ -140,7 +140,7 @@ class ExpenseController extends MainController
             'chart_of_account_id' => $accountExpense->id,
             'debit' => $expense->total_amount,
             'credit' => 0,
-            'description' => 'Beban ' . $expense->expense_category . ' - ' . $expense->description,
+            'description' => 'Beban ' . $expense->expense_category . '_' . $expense->description,
         ];
 
         // Credit: Kas
@@ -153,7 +153,7 @@ class ExpenseController extends MainController
 
         $journal = $this->journalService->createJournal([
             'journal_date' => $expense->expense_date,
-            'description' => 'Pengeluaran ' . $expense->expense_number . ' - ' . $expense->expense_category,
+            'description' => 'Pengeluaran ' . $expense->expense_number . '_' . $expense->expense_category,
             'reference_number' => $expense->expense_number,
             'items' => $journalItems,
             'notes' => 'Pengeluaran #' . $expense->expense_number,

@@ -1,4 +1,4 @@
-{{ Form::model($permission - request, ['method' => 'PUT', 'route' => ['permission_request.update', $permission - request->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($permission_request, ['method' => 'PUT', 'route' => ['permission_request.update', $permission_request->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     @forelse ($forms as $key => $form)
         <div class="col-md-6 mb-3">

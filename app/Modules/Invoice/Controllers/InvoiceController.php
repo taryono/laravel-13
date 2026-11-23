@@ -79,7 +79,8 @@ class InvoiceController extends MainController
                 // Create invoice items
                 if (!empty($validated['items'])) {
                     foreach ($validated['items'] as $item) {
-                        $item['total_price'] = ($item['quantity'] * $item['unit_price']) - ($item['discount'] ?? 0);
+                        $item['total_price'] = ($item['quantity'] * $item['unit_price'])
+                        _($item['discount'] ?? 0);
                         $invoice->items()->create($item);
                     }
                 }
@@ -136,7 +137,7 @@ class InvoiceController extends MainController
 
         $journal = $this->journalService->createJournal([
             'journal_date' => $invoice->invoice_date,
-            'description' => 'Invoice ' . $invoice->invoice_number . ' - ' . $invoice->customer_name,
+            'description' => 'Invoice ' . $invoice->invoice_number . '_' . $invoice->customer_name,
             'reference_number' => $invoice->invoice_number,
             'items' => $journalItems,
             'notes' => 'Dibuat dari invoice #' . $invoice->invoice_number,
@@ -197,7 +198,8 @@ class InvoiceController extends MainController
                 $existingIds = [];
                 if (!empty($validated['items'])) {
                     foreach ($validated['items'] as $item) {
-                        $item['total_price'] = ($item['quantity'] * $item['unit_price']) - ($item['discount'] ?? 0);
+                        $item['total_price'] = ($item['quantity'] * $item['unit_price'])
+                        _($item['discount'] ?? 0);
 
                         if (isset($item['id'])) {
                             $invoiceItem = InvoiceItem::find($item['id']);
@@ -310,7 +312,7 @@ class InvoiceController extends MainController
 
         $this->journalService->createJournal([
             'journal_date' => now()->format('Y-m-d'),
-            'description' => 'Pembayaran Invoice ' . $invoice->invoice_number . ' - ' . $invoice->customer_name,
+            'description' => 'Pembayaran Invoice ' . $invoice->invoice_number . '_' . $invoice->customer_name,
             'reference_number' => 'PAY-' . $invoice->invoice_number,
             'items' => $journalItems,
             'notes' => 'Pembayaran invoice #' . $invoice->invoice_number,

@@ -30,8 +30,8 @@ class QuestionBankController extends MainController
      * Display a listing of the resource.
      *
      * Handles both:
-     * - Normal page request
-     * - Yajra DataTables AJAX request
+     *_Normal page request
+     *_Yajra DataTables AJAX request
      */
     public function index(
         Request $request,
@@ -180,11 +180,11 @@ class QuestionBankController extends MainController
     private function formData(): array
     {
         return [
-            'subjects'         => Subject::select('id', 'name')->get(),
-            'questionTypes'    => QuestionType::select('id', 'name', 'code')->get(),
+            'subjects' => Subject::select('id', 'name')->get(),
+            'questionTypes' => QuestionType::select('id', 'name', 'code')->get(),
             'difficultyLevels' => DifficultyLevel::select('id', 'name')->get(),
-            'cognitiveLevels'  => CognitiveLevel::select('id', 'name', 'code')->get(),
-            'stimuli'          => QuestionStimuli::select('id', 'title')->get(),
+            'cognitiveLevels' => CognitiveLevel::select('id', 'name', 'code')->get(),
+            'stimuli' => QuestionStimuli::select('id', 'title')->get(),
         ];
     }
 
@@ -198,47 +198,47 @@ class QuestionBankController extends MainController
 
         // ---- Validasi dasar (berlaku semua tipe) ----
         $validated = $request->validate([
-            'subject_id'          => ['required', 'exists:subjects,id'],
-            'question_type_id'    => ['required', 'exists:question_types,id'],
+            'subject_id' => ['required', 'exists:subjects,id'],
+            'question_type_id' => ['required', 'exists:question_types,id'],
             'difficulty_level_id' => ['required', 'exists:difficulty_levels,id'],
-            'cognitive_level_id'  => ['required', 'exists:cognitive_levels,id'],
-            'question_text'       => ['required', 'string'],
-            'points'               => ['required', 'integer', 'min:1'],
-            'explanation'          => ['nullable', 'string'],
-            'scoring_type'         => ['required', 'in:auto,manual'],
-            'stimulus_id'          => ['nullable', 'exists:question_stimuli,id'],
-            'tags_input'           => ['nullable', 'string'],
-            'question_media.*'     => ['nullable', 'file', 'max:10240'],
+            'cognitive_level_id' => ['required', 'exists:cognitive_levels,id'],
+            'question_text' => ['required', 'string'],
+            'points' => ['required', 'integer', 'min:1'],
+            'explanation' => ['nullable', 'string'],
+            'scoring_type' => ['required', 'in:auto,manual'],
+            'stimulus_id' => ['nullable', 'exists:question_stimuli,id'],
+            'tags_input' => ['nullable', 'string'],
+            'question_media.*' => ['nullable', 'file', 'max:10240'],
         ]);
 
         // ---- Validasi tambahan sesuai tipe soal ----
         match ($typeCode) {
             'single_choice', 'true_false' => $request->validate([
-                'options'                    => ['required', 'array', 'min:2'],
-                'options.*.text'             => ['required', 'string'],
-                'options.*.is_correct'       => ['required'],
+                'options' => ['required', 'array', 'min:2'],
+                'options.*.text' => ['required', 'string'],
+                'options.*.is_correct' => ['required'],
             ]) && $this->assertExactlyOneCorrect($request->options),
 
             'multi_choice' => $request->validate([
-                'options'               => ['required', 'array', 'min:2'],
-                'options.*.text'        => ['required', 'string'],
-                'options.*.is_correct'  => ['required'],
+                'options' => ['required', 'array', 'min:2'],
+                'options.*.text' => ['required', 'string'],
+                'options.*.is_correct' => ['required'],
             ]) && $this->assertAtLeastOneCorrect($request->options),
 
             'ordering' => $request->validate([
-                'options'         => ['required', 'array', 'min:2'],
-                'options.*.text'  => ['required', 'string'],
+                'options' => ['required', 'array', 'min:2'],
+                'options.*.text' => ['required', 'string'],
             ]),
 
             'matching' => $request->validate([
-                'pairs'          => ['required', 'array', 'min:2'],
-                'pairs.*.left'   => ['required', 'string'],
-                'pairs.*.right'  => ['required', 'string'],
+                'pairs' => ['required', 'array', 'min:2'],
+                'pairs.*.left' => ['required', 'string'],
+                'pairs.*.right' => ['required', 'string'],
             ]),
 
             'short_answer' => $request->validate([
-                'aliases'    => ['required', 'array', 'min:1'],
-                'aliases.*'  => ['required', 'string'],
+                'aliases' => ['required', 'array', 'min:1'],
+                'aliases.*' => ['required', 'string'],
             ]),
 
             'essay' => [], // tidak ada kunci jawaban otomatis
@@ -253,29 +253,29 @@ class QuestionBankController extends MainController
                 : null;
 
             $data = [
-                'school_id'            => Auth::user()->school_id,
-                'subject_id'           => $validated['subject_id'],
-                'question_type_id'     => $validated['question_type_id'],
-                'difficulty_level_id'  => $validated['difficulty_level_id'],
-                'cognitive_level_id'   => $validated['cognitive_level_id'],
-                'stimulus_id'          => $request->boolean('use_stimulus') ? $validated['stimulus_id'] : null,
-                'question_text'        => $validated['question_text'],
-                'explanation'          => $typeCode === 'essay' ? $request->essay_rubric : $validated['explanation'],
-                'tags'                 => $tags,
-                'points'               => $validated['points'],
-                'partial_scoring'      => $request->boolean('partial_scoring'),
-                'scoring_type'         => $validated['scoring_type'],
-                'is_public'            => $request->boolean('is_public'),
-                'is_active'            => $request->boolean('is_active'),
-                'correct_answer_text'  => $typeCode === 'short_answer' ? array_values($request->aliases) : null,
-                'updated_by'           => Auth::id(),
+                'school_id' => Auth::user()->school_id,
+                'subject_id' => $validated['subject_id'],
+                'question_type_id' => $validated['question_type_id'],
+                'difficulty_level_id' => $validated['difficulty_level_id'],
+                'cognitive_level_id' => $validated['cognitive_level_id'],
+                'stimulus_id' => $request->boolean('use_stimulus') ? $validated['stimulus_id'] : null,
+                'question_text' => $validated['question_text'],
+                'explanation' => $typeCode === 'essay' ? $request->essay_rubric : $validated['explanation'],
+                'tags' => $tags,
+                'points' => $validated['points'],
+                'partial_scoring' => $request->boolean('partial_scoring'),
+                'scoring_type' => $validated['scoring_type'],
+                'is_public' => $request->boolean('is_public'),
+                'is_active' => $request->boolean('is_active'),
+                'correct_answer_text' => $typeCode === 'short_answer' ? array_values($request->aliases) : null,
+                'updated_by' => Auth::id(),
             ];
 
             if ($questionBank) {
                 // simpan versi lama sebelum diupdate (audit trail)
                 $questionBank->versions()->create([
                     'version_number' => $questionBank->versions()->count() + 1,
-                    'snapshot_data'  => $questionBank->only([
+                    'snapshot_data' => $questionBank->only([
                         'question_text',
                         'correct_answer_text',
                         'explanation',
@@ -296,9 +296,9 @@ class QuestionBankController extends MainController
                 foreach ($request->options as $i => $opt) {
                     $questionBank->options()->create([
                         'option_label' => $opt['label'] ?? null,
-                        'option_text'  => $opt['text'],
-                        'is_correct'   => $opt['is_correct'] ?? false,
-                        'order_index'  => $opt['order_index'] ?? $i,
+                        'option_text' => $opt['text'],
+                        'is_correct' => $opt['is_correct'] ?? false,
+                        'order_index' => $opt['order_index'] ?? $i,
                     ]);
                 }
             }
@@ -307,9 +307,9 @@ class QuestionBankController extends MainController
             if ($typeCode === 'matching') {
                 foreach ($request->pairs as $i => $pair) {
                     $questionBank->matchingPairs()->create([
-                        'left_item'   => $pair['left'],
-                        'right_item'  => $pair['right'],
-                        'pair_key'    => (string) ($i + 1),
+                        'left_item' => $pair['left'],
+                        'right_item' => $pair['right'],
+                        'pair_key' => (string) ($i + 1),
                         'order_index' => $i,
                     ]);
                 }
@@ -321,7 +321,7 @@ class QuestionBankController extends MainController
                     $path = $file->store('question-media', 'public');
                     $questionBank->media()->create([
                         'media_type' => str($file->getMimeType())->before('/')->toString(),
-                        'file_path'  => $path,
+                        'file_path' => $path,
                     ]);
                 }
             }

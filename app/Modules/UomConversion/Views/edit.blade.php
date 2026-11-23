@@ -1,4 +1,4 @@
-{{ Form::model($uom - conversion, ['method' => 'PUT', 'route' => ['uom_conversion.update', $uom - conversion->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($uom_conversion, ['method' => 'PUT', 'route' => ['uom_conversion.update', $uom_conversion->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     @forelse ($forms as $key => $form)
         <div class="col-md-6 mb-3">

@@ -1,4 +1,4 @@
-{{ Form::model($student - rfid - card, ['method' => 'PUT', 'route' => ['student_rfid_card.update', $student - rfid - card->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($student_rfid_card, ['method' => 'PUT', 'route' => ['student_rfid_card.update', $student_rfid_card->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     @forelse ($forms as $key => $form)
         <div class="col-md-6 mb-3">

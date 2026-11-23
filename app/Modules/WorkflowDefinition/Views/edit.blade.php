@@ -1,4 +1,4 @@
-{{ Form::model($workflow - definition, ['method' => 'PUT', 'route' => ['workflow_definition.update', $workflow - definition->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($workflow_definition, ['method' => 'PUT', 'route' => ['workflow_definition.update', $workflow_definition->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     @forelse ($forms as $key => $form)
         <div class="col-md-6 mb-3">

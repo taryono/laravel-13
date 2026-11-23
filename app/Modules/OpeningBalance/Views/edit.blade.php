@@ -1,4 +1,4 @@
-{{ Form::model($opening - balance, ['method' => 'PUT', 'route' => ['opening_balance.update', $opening - balance->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($opening_balance, ['method' => 'PUT', 'route' => ['opening_balance.update', $opening_balance->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     @forelse ($forms as $key => $form)
         <div class="col-md-6 mb-3">

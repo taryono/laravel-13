@@ -242,7 +242,7 @@
                                     Terverifikasi Auditor
                                 </span>
                             </div>
-                            <div class="text-title-sm text-on-surface">Penerimaan SPP Kas Masuk - Kelas X &amp;
+                            <div class="text-title-sm text-on-surface">Penerimaan SPP Kas Masuk_Kelas X &amp;
                                 XI</div>
                             <p class="text-body-sm text-on-surface-variant mb-0">Pembayaran berkala via Virtual
                                 Account Bank BNI (320 Siswa)</p>

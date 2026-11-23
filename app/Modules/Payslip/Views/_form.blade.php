@@ -1,5 +1,5 @@
 @php
-    $errors = $errors ?? session('errors') ?? new \Illuminate\Support\ViewErrorBag();
+    $errors = $errors ?? (session('errors') ?? new \Illuminate\Support\ViewErrorBag());
     $model = $payslip ?? null;
     $selectedEmployee = old('employee_id', $model->employee_id ?? null);
     $selectedPeriod = old('payroll_period_id', $model->payroll_period_id ?? null);
@@ -11,11 +11,22 @@
     $netSalary = old('net_salary', $model->net_salary ?? 0);
     $currency = old('currency', $model->currency ?? 'IDR');
     $status = old('status', $model->status ?? 'draft');
-    $generatedAt = old('generated_at', isset($model->generated_at) ? \Carbon\Carbon::parse($model->generated_at)->format('Y-m-d\TH:i') : now()->format('Y-m-d\TH:i'));
+    $generatedAt = old(
+        'generated_at',
+        isset($model->generated_at)
+            ? \Carbon\Carbon::parse($model->generated_at)->format('Y-m-d\TH:i')
+            : now()->format('Y-m-d\TH:i'),
+    );
     $isSent = old('is_sent', $model->is_sent ?? false);
-    $sentAt = old('sent_at', isset($model->sent_at) ? \Carbon\Carbon::parse($model->sent_at)->format('Y-m-d\TH:i') : null);
+    $sentAt = old(
+        'sent_at',
+        isset($model->sent_at) ? \Carbon\Carbon::parse($model->sent_at)->format('Y-m-d\TH:i') : null,
+    );
     $isDownloaded = old('is_downloaded', $model->is_downloaded ?? false);
-    $downloadedAt = old('downloaded_at', isset($model->downloaded_at) ? \Carbon\Carbon::parse($model->downloaded_at)->format('Y-m-d\TH:i') : null);
+    $downloadedAt = old(
+        'downloaded_at',
+        isset($model->downloaded_at) ? \Carbon\Carbon::parse($model->downloaded_at)->format('Y-m-d\TH:i') : null,
+    );
 @endphp
 
 <div class="row g-3">
@@ -82,7 +93,8 @@
                 'class' => 'form-select select2' . ($errors->has('payroll_detail_id') ? ' is-invalid' : ''),
                 'placeholder' => '-- Pilih Payroll Detail (Opsional, otomatis digenerate jika kosong) --',
             ]) }}
-            <small class="form-text text-muted">Jika dibiarkan kosong, sistem akan otomatis mengaitkan atau membuat detail payroll untuk karyawan dan periode terkait.</small>
+            <small class="form-text text-muted">Jika dibiarkan kosong, sistem akan otomatis mengaitkan atau membuat
+                detail payroll untuk karyawan dan periode terkait.</small>
             @error('payroll_detail_id')
                 <div class="invalid-feedback">{{ $message }}</div>
             @enderror
@@ -171,16 +183,21 @@
     <div class="col-md-6">
         <div class="form-group">
             {{ Form::label('status', 'Status Slip Gaji *', ['class' => 'form-label fw-semibold']) }}
-            {{ Form::select('status', [
-                'draft'      => 'Draft (Konsep)',
-                'generated'  => 'Generated (Siap Kirim)',
-                'sent'       => 'Sent (Terkirim)',
-                'downloaded' => 'Downloaded (Telah Diunduh)',
-                'void'       => 'Void (Dibatalkan)',
-            ], $status, [
-                'class' => 'form-select' . ($errors->has('status') ? ' is-invalid' : ''),
-                'required' => true,
-            ]) }}
+            {{ Form::select(
+                'status',
+                [
+                    'draft' => 'Draft (Konsep)',
+                    'generated' => 'Generated (Siap Kirim)',
+                    'sent' => 'Sent (Terkirim)',
+                    'downloaded' => 'Downloaded (Telah Diunduh)',
+                    'void' => 'Void (Dibatalkan)',
+                ],
+                $status,
+                [
+                    'class' => 'form-select' . ($errors->has('status') ? ' is-invalid' : ''),
+                    'required' => true,
+                ],
+            ) }}
             @error('status')
                 <div class="invalid-feedback">{{ $message }}</div>
             @enderror
@@ -231,7 +248,7 @@
             var gross = parseFloat(document.getElementById('gross_salary')?.value) || 0;
             var allowance = parseFloat(document.getElementById('total_allowance')?.value) || 0;
             var deduction = parseFloat(document.getElementById('total_deduction')?.value) || 0;
-            var net = Math.max(0, (gross + allowance) - deduction);
+            var net = Math.max(0, (gross + allowance) _deduction);
             var netEl = document.getElementById('net_salary');
             if (netEl && (!netEl.value || netEl.dataset.autocalc !== 'false')) {
                 netEl.value = net.toFixed(2);

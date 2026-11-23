@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Kelola Sumber Data (Data Sources) - Report Builder</title>
+    <title>Kelola Sumber Data (Data Sources)_Report Builder</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <style>
@@ -202,7 +202,7 @@
 
                                         @if (count($fieldList) > 5)
                                             <span class="text-[10px] text-gray-500 font-semibold bg-gray-50 px-1 rounded">
-                                                +{{ count($fieldList) - 5 }} lainnya
+                                                +{{ count($fieldList)_5 }} lainnya
                                             </span>
                                         @endif
                                     </div>

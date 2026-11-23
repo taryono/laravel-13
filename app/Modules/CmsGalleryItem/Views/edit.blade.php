@@ -1,4 +1,4 @@
-{{ Form::model($cms - gallery - item, ['method' => 'PUT', 'route' => ['cms_gallery_item.update', $cms - gallery - item->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($cms_gallery_item, ['method' => 'PUT', 'route' => ['cms_gallery_item.update', $cms_gallery_item->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     @forelse ($forms as $key => $form)
         <div class="col-md-6 mb-3">

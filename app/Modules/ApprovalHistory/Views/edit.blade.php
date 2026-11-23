@@ -1,4 +1,4 @@
-{{ Form::model($approval - history, ['method' => 'PUT', 'route' => ['approval_history.update', $approval - history->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($approval_history, ['method' => 'PUT', 'route' => ['approval_history.update', $approval_history->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     @forelse ($forms as $key => $form)
         <div class="col-md-6 mb-3">

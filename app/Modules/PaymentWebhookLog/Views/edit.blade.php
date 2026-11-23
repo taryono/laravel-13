@@ -1,4 +1,4 @@
-{{ Form::model($payment - webhook - log, ['method' => 'PUT', 'route' => ['payment_webhook_log.update', $payment - webhook - log->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($payment_webhook_log, ['method' => 'PUT', 'route' => ['payment_webhook_log.update', $payment_webhook_log->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     @forelse ($forms as $key => $form)
         <div class="col-md-6 mb-3">

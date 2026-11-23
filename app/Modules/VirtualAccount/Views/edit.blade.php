@@ -1,4 +1,4 @@
-{{ Form::model($virtual - account, ['method' => 'PUT', 'route' => ['virtual_account.update', $virtual - account->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($virtual_account, ['method' => 'PUT', 'route' => ['virtual_account.update', $virtual_account->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     @forelse ($forms as $key => $form)
         <div class="col-md-6 mb-3">

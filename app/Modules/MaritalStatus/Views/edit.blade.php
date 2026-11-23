@@ -1,4 +1,4 @@
-{{ Form::model($marital - status, ['method' => 'PUT', 'route' => ['marital_status.update', $marital - status->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($marital_status, ['method' => 'PUT', 'route' => ['marital_status.update', $marital_status->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     <div class="col-md-6 mb-3">
         @forelse ($forms as $key => $form)

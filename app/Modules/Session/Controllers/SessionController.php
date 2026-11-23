@@ -24,8 +24,8 @@ class SessionController extends MainController
      * Display a listing of the resource.
      *
      * Handles both:
-     * - Normal page request
-     * - Yajra DataTables AJAX request
+     *_Normal page request
+     *_Yajra DataTables AJAX request
      */
     public function index(
         Request $request,
@@ -68,7 +68,7 @@ class SessionController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'user_id' => ['required', 'integer'],
+            'user_id' => ['required', 'integer'],
             'ip_address' => ['required', 'string', 'max:255'],
             'user_agent' => ['required', 'string', 'max:255'],
             'payload' => ['required', 'string', 'max:255'],
@@ -126,7 +126,7 @@ class SessionController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'user_id' => ['required', 'integer'],
+            'user_id' => ['required', 'integer'],
             'ip_address' => ['required', 'string', 'max:255'],
             'user_agent' => ['required', 'string', 'max:255'],
             'payload' => ['required', 'string', 'max:255'],
@@ -135,10 +135,7 @@ class SessionController extends MainController
 
         try {
             $session = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $session,
-                $validated
-            ) {
+            DB::transaction(function () use ($session, $validated) {
                 $session->update($validated);
             });
 
@@ -148,7 +145,7 @@ class SessionController extends MainController
                 $session
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui Session.',
                 [
@@ -183,7 +180,7 @@ class SessionController extends MainController
                 'Data Session berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $session->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus Session.',
@@ -199,5 +196,5 @@ class SessionController extends MainController
                 'Data Session gagal dihapus.'
             );
         }
-    } 
+    }
 }

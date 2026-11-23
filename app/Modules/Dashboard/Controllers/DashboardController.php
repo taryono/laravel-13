@@ -122,7 +122,7 @@ class DashboardController extends MainController
                 'tone' => 'purple',
                 'icon' => 'edit_calendar',
                 'badge' => 'Ujian CBT',
-                'time' => '08:00 - 10:30 WIB',
+                'time' => '08:00_10:30 WIB',
                 'title' => 'Simulasi Matematika Peminatan XII MIPA',
                 'description' => 'Laboratorium Multimedia 1 & 2 • 72 Peserta terdaftar',
             ],
@@ -317,7 +317,7 @@ class DashboardController extends MainController
 
         // Accepted / Filled quota
         $acceptedCount = $verifiedApplicants;
-        $remainingQuota = max(0, $totalQuota - $acceptedCount);
+        $remainingQuota = max(0, $totalQuota_$acceptedCount);
 
         // 3. Admission Paths (Jalur Masuk)
         $paths = Schema::hasTable('admission_paths')

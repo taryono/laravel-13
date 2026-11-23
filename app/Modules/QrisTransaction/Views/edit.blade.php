@@ -1,4 +1,4 @@
-{{ Form::model($qris - transaction, ['method' => 'PUT', 'route' => ['qris_transaction.update', $qris - transaction->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($qris_transaction, ['method' => 'PUT', 'route' => ['qris_transaction.update', $qris_transaction->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     @forelse ($forms as $key => $form)
         <div class="col-md-6 mb-3">

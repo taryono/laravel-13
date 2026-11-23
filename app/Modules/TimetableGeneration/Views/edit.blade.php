@@ -1,4 +1,4 @@
-{{ Form::model($timetable - generation, ['method' => 'PUT', 'route' => ['timetable_generation.update', $timetable - generation->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($timetable_generation, ['method' => 'PUT', 'route' => ['timetable_generation.update', $timetable_generation->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     @forelse ($forms as $key => $form)
         <div class="col-md-6 mb-3">

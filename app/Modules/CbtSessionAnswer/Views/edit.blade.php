@@ -1,4 +1,4 @@
-{{ Form::model($cbt - session - answer, ['method' => 'PUT', 'route' => ['cbt_session_answer.update', $cbt - session - answer->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($cbt_session_answer, ['method' => 'PUT', 'route' => ['cbt_session_answer.update', $cbt_session_answer->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     <div class="col-md-6 mb-3">
         @forelse ($forms as $key => $form)

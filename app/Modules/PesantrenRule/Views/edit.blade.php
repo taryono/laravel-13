@@ -1,4 +1,4 @@
-{{ Form::model($pesantren - rule, ['method' => 'PUT', 'route' => ['pesantren_rule.update', $pesantren - rule->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($pesantren_rule, ['method' => 'PUT', 'route' => ['pesantren_rule.update', $pesantren_rule->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     @forelse ($forms as $key => $form)
         <div class="col-md-6 mb-3">

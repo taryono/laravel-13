@@ -25,7 +25,7 @@
                         <i class="fa fa-arrow-up"></i>
                     </button>
                     <button type="button" class="btn btn-sm btn-outline-secondary" @click="moveOption(i, 1)"
-                        :disabled="i === options.length - 1">
+                        :disabled="i === options.length_1">
                         <i class="fa fa-arrow-down"></i>
                     </button>
                     <button type="button" class="btn btn-sm btn-outline-danger" @click="removeOption(i)">

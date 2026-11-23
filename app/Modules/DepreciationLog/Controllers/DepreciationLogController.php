@@ -107,7 +107,7 @@ class DepreciationLogController extends MainController
 
         $journal = $this->journalService->createJournal([
             'journal_date' => $log->depreciation_date,
-            'description' => 'Penyusutan Aset ' . $asset->asset_name . ' - ' . $log->period,
+            'description' => 'Penyusutan Aset ' . $asset->asset_name . '_' . $log->period,
             'reference_number' => 'DEP-' . $asset->asset_code,
             'items' => $journalItems,
             'notes' => 'Penyusutan aset #' . $asset->asset_code,
@@ -242,7 +242,8 @@ class DepreciationLogController extends MainController
                     $depreciationAmount = $this->calculateDepreciationAmount($asset);
 
                     if ($depreciationAmount > 0 && $asset->book_value > $asset->salvage_value) {
-                        $newBookValue = $asset->book_value - $depreciationAmount;
+                        $newBookValue = $asset->book_value_
+                        $depreciationAmount;
                         $newAccumulated = $asset->accumulated_depreciation + $depreciationAmount;
 
                         // Create depreciation log

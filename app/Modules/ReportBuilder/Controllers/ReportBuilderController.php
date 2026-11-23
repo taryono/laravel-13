@@ -202,11 +202,11 @@ class ReportBuilderController extends MainController
                     ReportTemplateCurriculum::updateOrCreate(
                         ['report_template_id' => $template->id],
                         [
-                            'curriculum_id'    => $data['curriculum_id'],
+                            'curriculum_id' => $data['curriculum_id'],
                             'academic_year_id' => $data['academic_year_id'] ?: null,
-                            'is_active'        => true,
-                            'created_by'         => Auth::id(),
-                            'updated_by'       => Auth::id(),
+                            'is_active' => true,
+                            'created_by' => Auth::id(),
+                            'updated_by' => Auth::id(),
                         ]
                     );
                 } else {
@@ -686,7 +686,7 @@ class ReportBuilderController extends MainController
                 ['index' => 2, 'book' => ['title' => 'Safinatun Najah'], 'reading_score' => 90, 'translation_score' => 88, 'comprehension_score' => 89],
             ],
             'memorization' => [
-                ['index' => 1, 'type' => 'Quran Juz 30', 'portion' => 'An-Naba - An-Nas', 'fluency_score' => 92, 'tajweed_score' => 90, 'etiquette_score' => 95],
+                ['index' => 1, 'type' => 'Quran Juz 30', 'portion' => 'An-Naba_An-Nas', 'fluency_score' => 92, 'tajweed_score' => 90, 'etiquette_score' => 95],
             ],
             'pesantren_scores' => [
                 ['index' => 1, 'aspect' => 'Akhlak & Adab Keseharian', 'score' => 95, 'predicate' => 'Mumtaz'],

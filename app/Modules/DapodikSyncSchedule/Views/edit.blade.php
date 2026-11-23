@@ -1,4 +1,4 @@
-{{ Form::model($dapodik - sync - schedule, ['method' => 'PUT', 'route' => ['dapodik_sync_schedule.update', $dapodik - sync - schedule->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($dapodik_sync_schedule, ['method' => 'PUT', 'route' => ['dapodik_sync_schedule.update', $dapodik_sync_schedule->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     @forelse ($forms as $key => $form)
         <div class="col-md-6 mb-3">

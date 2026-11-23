@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>EduPortal - Live Proctoring CBT</title>
+    <title>EduPortal_Live Proctoring CBT</title>
 
     <!-- Bootstrap 5.3 CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
@@ -980,7 +980,7 @@
     <div class="container-fluid pt-3 px-3" style="max-width:1280px;margin:0 auto;">
         @include('Dashboard::partials.ep_subnav', [
             'title' => 'Live Proctoring & Monitoring',
-            'badge' => 'Ujian Berlangsung - Sesi 1',
+            'badge' => 'Ujian Berlangsung_Sesi 1',
             'subtitle' => 'Simulasi Matematika Peminatan XII MIPA • Lab Multimedia 1 & 2',
             'metaIcon' => 'timer',
             'metaLabel' => 'Sisa Waktu',
@@ -1004,7 +1004,7 @@
                         <span style="color:var(--outline-variant);">•</span>
                         <div class="status-pill-danger">
                             <span class="rounded-circle" style="width:8px;height:8px;background:var(--error);"></span>
-                            <span>Ujian Berlangsung - Sesi 1</span>
+                            <span>Ujian Berlangsung_Sesi 1</span>
                         </div>
                         <div class="status-pill-neutral d-none d-sm-inline-flex">
                             <span class="material-symbols-outlined" style="font-size:14px;">timer</span>

@@ -1,4 +1,4 @@
-{{ Form::model($question - media - annotation, ['method' => 'PUT', 'route' => ['question_media_annotation.update', $question - media - annotation->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($question_media_annotation, ['method' => 'PUT', 'route' => ['question_media_annotation.update', $question_media_annotation->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     @forelse ($forms as $key => $form)
         <div class="col-md-6 mb-3">

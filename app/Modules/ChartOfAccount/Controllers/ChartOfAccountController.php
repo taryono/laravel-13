@@ -40,15 +40,15 @@ class ChartOfAccountController extends MainController
     public function create()
     {
         return view('ChartOfAccount::create', [
-            'action'         => 'account.store',
-            'method'         => 'POST',
-            'account'        => new ChartOfAccount(),
-            'categories'     => AccountCategory::orderBy('name')->get(),
+            'action' => 'account.store',
+            'method' => 'POST',
+            'account' => new ChartOfAccount(),
+            'categories' => AccountCategory::orderBy('name')->get(),
             'parentAccounts' => ChartOfAccount::where('account_type', 'header')
                 ->orWhere('account_type', 'detail')
                 ->orderBy('code')
                 ->get(['id', 'code', 'name']),
-            'currencies'     => ['IDR', 'USD', 'SGD', 'EUR'],
+            'currencies' => ['IDR', 'USD', 'SGD', 'EUR'],
         ]);
     }
 
@@ -57,7 +57,7 @@ class ChartOfAccountController extends MainController
         $validated = $this->validateAccount($request);
 
         try {
-            $coa =  DB::transaction(function () use ($validated) {
+            $coa = DB::transaction(function () use ($validated) {
                 // Saldo terkini = saldo awal saat pembuatan
                 $validated['current_balance'] = $validated['opening_balance'];
                 return ChartOfAccount::create($validated);
@@ -73,14 +73,14 @@ class ChartOfAccountController extends MainController
     {
         $account = ChartOfAccount::find($id);
         return view('ChartOfAccount::edit', [
-            'action'         =>  ["account.edit", $id],
-            'method'         => 'PUT',
-            'account'        => $account,
-            'categories'     => AccountCategory::orderBy('name')->get(),
+            'action' => ["account.edit", $id],
+            'method' => 'PUT',
+            'account' => $account,
+            'categories' => AccountCategory::orderBy('name')->get(),
             'parentAccounts' => ChartOfAccount::where('id', '!=', $account->id)
                 ->orderBy('code')
                 ->get(['id', 'code', 'name']),
-            'currencies'     => ['IDR', 'USD', 'SGD', 'EUR'],
+            'currencies' => ['IDR', 'USD', 'SGD', 'EUR'],
         ]);
     }
 
@@ -109,15 +109,15 @@ class ChartOfAccountController extends MainController
     protected function validateAccount(Request $request, $ignoreId = null): array
     {
         $rules = [
-            'code'                  => 'required|string|max:50|unique:accounts,code,' . $ignoreId,
-            'name'                  => 'required|string|max:255',
-            'account_category_id'   => 'required|exists:account_categories,id',
-            'parent_id'             => 'nullable|exists:accounts,id',
-            'account_type'          => 'required|in:header,detail',
-            'normal_balance'        => 'required|in:debit,kredit',
-            'currency_code'         => 'nullable|string|max:10',
-            'description'           => 'nullable|string',
-            'is_active'             => 'boolean',
+            'code' => 'required|string|max:50|unique:accounts,code,' . $ignoreId,
+            'name' => 'required|string|max:255',
+            'account_category_id' => 'required|exists:account_categories,id',
+            'parent_id' => 'nullable|exists:accounts,id',
+            'account_type' => 'required|in:header,detail',
+            'normal_balance' => 'required|in:debit,kredit',
+            'currency_code' => 'nullable|string|max:10',
+            'description' => 'nullable|string',
+            'is_active' => 'boolean',
         ];
 
         // Saldo awal hanya wajib saat create
@@ -213,9 +213,12 @@ class ChartOfAccountController extends MainController
 
     public function getTreeData(Request $request)
     {
-        $accounts = ChartOfAccount::with(['children' => function ($query) {
-            $query->where('is_active', true)->orderBy('code');
-        }, 'account_category'])
+        $accounts = ChartOfAccount::with([
+            'children' => function ($query) {
+                $query->where('is_active', true)->orderBy('code');
+            },
+            'account_category'
+        ])
             ->whereNull('parent_id')
             ->orderBy('code')
             ->get();
@@ -229,7 +232,7 @@ class ChartOfAccountController extends MainController
         foreach ($accounts as $account) {
             $node = [
                 'id' => (string) $account->id, // ✅ Wajib string!
-                'text' => $account->code . ' - ' . $account->name,
+                'text' => $account->code . '_' . $account->name,
                 'code' => $account->code,
                 'name' => $account->name,
                 'type' => $account->account_type, // header atau detail

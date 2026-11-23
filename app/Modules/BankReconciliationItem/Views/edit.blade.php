@@ -1,4 +1,4 @@
-{{ Form::model($bank - reconciliation - item, ['method' => 'PUT', 'route' => ['bank_reconciliation_item.update', $bank - reconciliation - item->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($bank_reconciliation_item, ['method' => 'PUT', 'route' => ['bank_reconciliation_item.update', $bank_reconciliation_item->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     @forelse ($forms as $key => $form)
         <div class="col-md-6 mb-3">

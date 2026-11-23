@@ -17,7 +17,7 @@
                  <option value="{{ $shift->id }}" data-start="{{ $shift->start_time }}"
                      data-end="{{ $shift->end_time }}"
                      {{ old('shift_id', $shiftRate->shift_id) == $shift->id ? 'selected' : '' }}>
-                     {{ $shift->code }} - {{ $shift->name }}
+                     {{ $shift->code }}_{{ $shift->name }}
                      ({{ \Carbon\Carbon::parse($shift->start_time)->format('H:i') }} -
                      {{ \Carbon\Carbon::parse($shift->end_time)->format('H:i') }})
                  </option>

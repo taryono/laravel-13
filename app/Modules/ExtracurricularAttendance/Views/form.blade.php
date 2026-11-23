@@ -104,7 +104,7 @@
              'min' => 0,
              'max' => 100,
              'step' => '0.01',
-             'placeholder' => '0 - 100',
+             'placeholder' => '0_100',
          ]) }}
          <small class="text-muted">Opsional: isikan nilai prestasi/partisipasi</small>
          @error('score')

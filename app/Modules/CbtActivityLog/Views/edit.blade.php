@@ -1,4 +1,4 @@
-{{ Form::model($cbt - activity - log, ['method' => 'PUT', 'route' => ['cbt_activity_log.update', $cbt - activity - log->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($cbt_activity_log, ['method' => 'PUT', 'route' => ['cbt_activity_log.update', $cbt_activity_log->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     <div class="col-md-6 mb-3">
         @forelse ($forms as $key => $form)

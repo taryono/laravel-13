@@ -25,8 +25,8 @@ class GradeScaleController extends MainController
      * Display a listing of the resource.
      *
      * Handles both:
-     * - Normal page request
-     * - Yajra DataTables AJAX request
+     *_Normal page request
+     *_Yajra DataTables AJAX request
      */
     public function index(
         Request $request,
@@ -69,7 +69,7 @@ class GradeScaleController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'curriculum_id' => ['required', 'integer'],
             'name' => ['required', 'string', 'max:255'],
             'code' => ['required', 'string', 'max:255'],
@@ -135,7 +135,7 @@ class GradeScaleController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'school_id' => ['required', 'integer'],
+            'school_id' => ['required', 'integer'],
             'curriculum_id' => ['required', 'integer'],
             'name' => ['required', 'string', 'max:255'],
             'code' => ['required', 'string', 'max:255'],
@@ -152,10 +152,7 @@ class GradeScaleController extends MainController
 
         try {
             $gradeScale = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $gradeScale,
-                $validated
-            ) {
+            DB::transaction(function () use ($gradeScale, $validated) {
                 $gradeScale->update($validated);
             });
 
@@ -165,7 +162,7 @@ class GradeScaleController extends MainController
                 $gradeScale
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui GradeScale.',
                 [
@@ -200,7 +197,7 @@ class GradeScaleController extends MainController
                 'Data GradeScale berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $gradeScale->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus GradeScale.',
@@ -216,5 +213,5 @@ class GradeScaleController extends MainController
                 'Data GradeScale gagal dihapus.'
             );
         }
-    } 
+    }
 }

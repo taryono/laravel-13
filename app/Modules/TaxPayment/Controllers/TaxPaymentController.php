@@ -189,7 +189,7 @@ class TaxPaymentController extends MainController
 
         $journal = $this->journalService->createJournal([
             'journal_date' => $tax->payment_date,
-            'description' => 'Pembayaran Pajak ' . $tax->tax_type . ' - ' . $tax->tax_period,
+            'description' => 'Pembayaran Pajak ' . $tax->tax_type . '_' . $tax->tax_period,
             'reference_number' => $tax->tax_code,
             'items' => $journalItems,
             'notes' => 'Pembayaran pajak #' . $tax->tax_code,

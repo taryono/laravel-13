@@ -1,4 +1,4 @@
-{{ Form::model($lesson - progress, ['method' => 'PUT', 'route' => ['lesson_progress.update', $lesson - progress->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($lesson_progress, ['method' => 'PUT', 'route' => ['lesson_progress.update', $lesson_progress->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     @forelse ($forms as $key => $form)
         <div class="col-md-6 mb-3">

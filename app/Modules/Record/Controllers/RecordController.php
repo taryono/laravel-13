@@ -24,8 +24,8 @@ class RecordController extends MainController
      * Display a listing of the resource.
      *
      * Handles both:
-     * - Normal page request
-     * - Yajra DataTables AJAX request
+     *_Normal page request
+     *_Yajra DataTables AJAX request
      */
     public function index(
         Request $request,
@@ -92,7 +92,7 @@ class RecordController extends MainController
                 [
                     'exception' => $e,
                     'data' => $validated,
-                    'user_id' =>request()->user()?->id,
+                    'user_id' => request()->user()?->id,
                 ]
             );
 
@@ -150,7 +150,7 @@ class RecordController extends MainController
                     'exception' => $e,
                     'Record_id' => $id,
                     'data' => $validated,
-                    'user_id' =>request()->user()?->id
+                    'user_id' => request()->user()?->id
                 ]
             );
 
@@ -185,7 +185,7 @@ class RecordController extends MainController
                 [
                     'exception' => $e,
                     'Record_id' => $id,
-                    'user_id' =>request()->user()?->id,
+                    'user_id' => request()->user()?->id,
                 ]
             );
 

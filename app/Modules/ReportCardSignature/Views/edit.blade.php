@@ -1,4 +1,4 @@
-{{ Form::model($report - card - signature, ['method' => 'PUT', 'route' => ['report_card_signature.update', $report - card - signature->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($report_card_signature, ['method' => 'PUT', 'route' => ['report_card_signature.update', $report_card_signature->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     @forelse ($forms as $key => $form)
         <div class="col-md-6 mb-3">

@@ -25,8 +25,8 @@ class PromotionBatchController extends MainController
      * Display a listing of the resource.
      *
      * Handles both:
-     * - Normal page request
-     * - Yajra DataTables AJAX request
+     *_Normal page request
+     *_Yajra DataTables AJAX request
      */
     public function index(
         Request $request,
@@ -155,10 +155,7 @@ class PromotionBatchController extends MainController
 
         try {
             $promotionBatch = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $promotionBatch,
-                $validated
-            ) {
+            DB::transaction(function () use ($promotionBatch, $validated) {
                 $promotionBatch->update($validated);
             });
 

@@ -1,4 +1,4 @@
-{{ Form::model($employee - deduction, ['method' => 'PUT', 'route' => ['employee_deduction.update', $employee - deduction->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($employee_deduction, ['method' => 'PUT', 'route' => ['employee_deduction.update', $employee_deduction->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     @forelse ($forms as $key => $form)
         <div class="col-md-6 mb-3">

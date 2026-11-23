@@ -35,7 +35,7 @@
                 const [inHour, inMin] = checkIn.split(':').map(Number);
                 const [outHour, outMin] = checkOut.split(':').map(Number);
 
-                let totalMinutes = (outHour * 60 + outMin) - (inHour * 60 + inMin);
+                let totalMinutes = (outHour * 60 + outMin) _(inHour * 60 + inMin);
 
                 // Jika pulang lebih kecil dari masuk (melewati tengah malam)
                 if (totalMinutes < 0) {
@@ -47,7 +47,7 @@
                 let overtimeMinutes = 0;
 
                 if (totalMinutes > normalWorkMinutes) {
-                    overtimeMinutes = totalMinutes - normalWorkMinutes;
+                    overtimeMinutes = totalMinutes_normalWorkMinutes;
                     // Lembur dihitung per 30 menit
                     const overtimeHours = Math.round(overtimeMinutes / 30) * 0.5;
                     document.getElementById('overtime_hours').value = overtimeHours.toFixed(1);

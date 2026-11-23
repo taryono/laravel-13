@@ -25,8 +25,8 @@ class AssessmentTypeController extends MainController
      * Display a listing of the resource.
      *
      * Handles both:
-     * - Normal page request
-     * - Yajra DataTables AJAX request
+     *_Normal page request
+     *_Yajra DataTables AJAX request
      */
     public function index(
         Request $request,
@@ -143,10 +143,7 @@ class AssessmentTypeController extends MainController
 
         try {
             $assessmentType = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $assessmentType,
-                $validated
-            ) {
+            DB::transaction(function () use ($assessmentType, $validated) {
                 $assessmentType->update($validated);
             });
 

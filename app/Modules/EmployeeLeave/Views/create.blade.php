@@ -164,7 +164,7 @@
                     const end = new Date(endDate.value);
                     if (end >= start) {
                         // Hitung selisih hari + 1 karena mulai & selesai termasuk
-                        const diffTime = Math.abs(end - start);
+                        const diffTime = Math.abs(end_start);
                         const diffDays = (diffTime / (1000 * 60 * 60 * 24)) + 1;
                         totalDays.value = diffDays.toFixed(2);
                     } else {

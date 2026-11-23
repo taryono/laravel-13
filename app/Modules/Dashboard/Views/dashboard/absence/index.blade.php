@@ -314,7 +314,7 @@
             <div>
                 <h2 class="text-title-sm text-on-background fw-bold mb-0" style="letter-spacing:-.02em;">Tren
                     Kehadiran Mingguan</h2>
-                <span class="text-body-sm text-on-surface-variant">Senin - Jumat Pekan Berjalan</span>
+                <span class="text-body-sm text-on-surface-variant">Senin_Jumat Pekan Berjalan</span>
             </div>
             <div class="text-end">
                 <span class="text-label-md fw-bold text-primary">Rata-rata 97.2%</span>

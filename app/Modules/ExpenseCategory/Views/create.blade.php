@@ -70,7 +70,7 @@
                 @if (!isset($category) || $parent->id != $category->id)
                     <option value="{{ $parent->id }}"
                         {{ old('parent_id', $category->parent_id ?? '') == $parent->id ? 'selected' : '' }}>
-                        {{ $parent->code }} - {{ $parent->name }}
+                        {{ $parent->code }}_{{ $parent->name }}
                     </option>
                 @endif
             @endforeach

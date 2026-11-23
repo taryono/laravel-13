@@ -31,8 +31,8 @@ class ReportCardController extends MainController
      * Display a listing of the resource.
      *
      * Handles both:
-     * - Normal page request
-     * - Yajra DataTables AJAX request
+     *_Normal page request
+     *_Yajra DataTables AJAX request
      */
     public function index(
         Request $request,
@@ -129,10 +129,7 @@ class ReportCardController extends MainController
 
         try {
             $reportCard = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $reportCard,
-                $validated
-            ) {
+            DB::transaction(function () use ($reportCard, $validated) {
                 $reportCard->update($validated);
             });
 
@@ -196,8 +193,8 @@ class ReportCardController extends MainController
     public function generate(Request $request)
     {
         $validated = $request->validate([
-            'student_id'  => 'required|exists:students,id',
-            'period_id'   => 'required|exists:report_periods,id',
+            'student_id' => 'required|exists:students,id',
+            'period_id' => 'required|exists:report_periods,id',
             'template_id' => 'nullable|exists:report_card_templates,id',
         ]);
 
@@ -208,9 +205,9 @@ class ReportCardController extends MainController
         );
 
         return response()->json([
-            'success'   => true,
+            'success' => true,
             'report_id' => $report->id,
-            'pdf_url'   => Storage::disk('public')->url($report->pdf_path),
+            'pdf_url' => Storage::disk('public')->url($report->pdf_path),
         ]);
     }
 
@@ -218,7 +215,7 @@ class ReportCardController extends MainController
     {
         $validated = $request->validate([
             'class_level_id' => 'required|exists:class_levels,id',
-            'period_id'      => 'required|exists:report_periods,id',
+            'period_id' => 'required|exists:report_periods,id',
         ]);
 
         $studentIds = Student::where('class_level_id', $validated['class_level_id'])
@@ -230,8 +227,8 @@ class ReportCardController extends MainController
 
         return response()->json([
             'success' => true,
-            'total'   => count($reports),
-            'failed'  => count(array_filter($reports, fn($r) => $r === null)),
+            'total' => count($reports),
+            'failed' => count(array_filter($reports, fn($r) => $r === null)),
         ]);
     }
 
@@ -250,7 +247,7 @@ class ReportCardController extends MainController
         $report = GeneratedReport::find($id);
         abort_unless($report->pdf_path, 404);
         return Storage::disk('public')->response($report->pdf_path, null, [
-            'Content-Type'        => 'application/pdf',
+            'Content-Type' => 'application/pdf',
             'Content-Disposition' => 'inline',
         ]);
     }
@@ -263,7 +260,7 @@ class ReportCardController extends MainController
 
         return view('report_cards.preview', [
             'template' => $template,
-            'data'     => $report->report_data,
+            'data' => $report->report_data,
         ]);
     }
 }

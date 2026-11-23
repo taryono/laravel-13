@@ -1,4 +1,4 @@
-{{ Form::model($thesis - supervision, ['method' => 'PUT', 'route' => ['thesis_supervision.update', $thesis - supervision->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($thesis_supervision, ['method' => 'PUT', 'route' => ['thesis_supervision.update', $thesis_supervision->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     @forelse ($forms as $key => $form)
         <div class="col-md-6 mb-3">

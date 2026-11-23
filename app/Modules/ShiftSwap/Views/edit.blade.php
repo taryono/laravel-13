@@ -56,7 +56,7 @@
                     @foreach ($shifts as $s)
                         <option value="{{ $s->id }}"
                             {{ old('target_shift_a', $swap->target_shift_a ?? '') == $s->id ? 'selected' : '' }}>
-                            {{ $s->code }} - {{ $s->name }} ({{ $s->start_time }} s/d {{ $s->end_time }})
+                            {{ $s->code }}_{{ $s->name }} ({{ $s->start_time }} s/d {{ $s->end_time }})
                         </option>
                     @endforeach
                 </select>
@@ -91,7 +91,7 @@
                     @foreach ($shifts as $s)
                         <option value="{{ $s->id }}"
                             {{ old('target_shift_b', $swap->target_shift_b ?? '') == $s->id ? 'selected' : '' }}>
-                            {{ $s->code }} - {{ $s->name }} ({{ $s->start_time }} s/d {{ $s->end_time }})
+                            {{ $s->code }}_{{ $s->name }} ({{ $s->start_time }} s/d {{ $s->end_time }})
                         </option>
                     @endforeach
                 </select>
@@ -120,7 +120,7 @@
                 if (shiftId && shifts[shiftId]) {
                     let s = shifts[shiftId];
                     shiftInput.innerHTML =
-                        `<option value="${s.id}" selected>${s.code} - ${s.name} (${s.start_time} s/d ${s.end_time})</option>`;
+                        `<option value="${s.id}" selected>${s.code}_${s.name} (${s.start_time} s/d ${s.end_time})</option>`;
                 }
             });
             empSelect.dispatchEvent(new Event('change'));

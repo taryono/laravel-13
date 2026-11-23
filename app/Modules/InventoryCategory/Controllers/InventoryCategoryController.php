@@ -25,8 +25,8 @@ class InventoryCategoryController extends MainController
      * Display a listing of the resource.
      *
      * Handles both:
-     * - Normal page request
-     * - Yajra DataTables AJAX request
+     *_Normal page request
+     *_Yajra DataTables AJAX request
      */
     public function index(
         Request $request,
@@ -141,10 +141,7 @@ class InventoryCategoryController extends MainController
 
         try {
             $inventoryCategory = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $inventoryCategory,
-                $validated
-            ) {
+            DB::transaction(function () use ($inventoryCategory, $validated) {
                 $inventoryCategory->update($validated);
             });
 

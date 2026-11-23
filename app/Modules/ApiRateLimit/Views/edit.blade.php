@@ -1,4 +1,4 @@
-{{ Form::model($api - rate - limit, ['method' => 'PUT', 'route' => ['api_rate_limit.update', $api - rate - limit->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($api_rate_limit, ['method' => 'PUT', 'route' => ['api_rate_limit.update', $api_rate_limit->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     <div class="col-md-6 mb-3">
         @forelse ($forms as $key => $form)

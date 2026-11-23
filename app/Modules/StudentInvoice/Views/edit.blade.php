@@ -1,4 +1,4 @@
-{{ Form::model($student - invoice, ['method' => 'PUT', 'route' => ['student_invoice.update', $student - invoice->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($student_invoice, ['method' => 'PUT', 'route' => ['student_invoice.update', $student_invoice->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     @forelse ($forms as $key => $form)
         <div class="col-md-6 mb-3">

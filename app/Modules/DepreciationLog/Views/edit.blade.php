@@ -1,4 +1,4 @@
-{{ Form::model($depreciation - log, ['method' => 'PUT', 'route' => ['depreciation-log.update', $depreciation - log->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($depreciation_log, ['method' => 'PUT', 'route' => ['depreciation-log.update', $depreciation_log->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     <div class="col-md-6 mb-3">
         @forelse ($forms as $key => $form)

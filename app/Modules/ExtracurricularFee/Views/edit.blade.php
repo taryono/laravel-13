@@ -1,4 +1,4 @@
-{{ Form::model($extracurricular - fee, ['method' => 'PUT', 'route' => ['extracurricular_fee.update', $extracurricular - fee->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($extracurricular_fee, ['method' => 'PUT', 'route' => ['extracurricular_fee.update', $extracurricular_fee->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     @forelse ($forms as $key => $form)
         <div class="col-md-6 mb-3">

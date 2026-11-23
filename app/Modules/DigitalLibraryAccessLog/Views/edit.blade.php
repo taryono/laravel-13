@@ -1,4 +1,4 @@
-{{ Form::model($digital - library - access - log, ['method' => 'PUT', 'route' => ['digital_library_access_log.update', $digital - library - access - log->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($digital_library_access_log, ['method' => 'PUT', 'route' => ['digital_library_access_log.update', $digital_library_access_log->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     @forelse ($forms as $key => $form)
         <div class="col-md-6 mb-3">

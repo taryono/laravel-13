@@ -1,4 +1,4 @@
-{{ Form::model($clinic - medicine, ['method' => 'PUT', 'route' => ['clinic_medicine.update', $clinic - medicine->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($clinic_medicine, ['method' => 'PUT', 'route' => ['clinic_medicine.update', $clinic_medicine->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     @forelse ($forms as $key => $form)
         <div class="col-md-6 mb-3">

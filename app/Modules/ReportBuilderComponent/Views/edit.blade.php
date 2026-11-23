@@ -1,4 +1,4 @@
-{{ Form::model($report - builder - component, ['method' => 'PUT', 'route' => ['report_builder_component.update', $report - builder - component->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($report_builder_component, ['method' => 'PUT', 'route' => ['report_builder_component.update', $report_builder_component->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     @forelse ($forms as $key => $form)
         <div class="col-md-6 mb-3">

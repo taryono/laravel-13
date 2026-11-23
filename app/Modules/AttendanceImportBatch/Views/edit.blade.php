@@ -1,4 +1,4 @@
-{{ Form::model($attendance - import - batch, ['method' => 'PUT', 'route' => ['attendance_import_batch.update', $attendance - import - batch->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($attendance_import_batch, ['method' => 'PUT', 'route' => ['attendance_import_batch.update', $attendance_import_batch->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     @forelse ($forms as $key => $form)
         <div class="col-md-6 mb-3">

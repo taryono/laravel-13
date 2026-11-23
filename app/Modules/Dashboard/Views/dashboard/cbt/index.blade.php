@@ -127,7 +127,7 @@
             <div class="meta-box">
                 <div class="meta-item">
                     <span class="material-symbols-outlined text-outline" style="font-size:14px;">schedule</span>
-                    <span>08:00 - 10:30 WIB</span>
+                    <span>08:00_10:30 WIB</span>
                 </div>
                 <div class="meta-item">
                     <span class="material-symbols-outlined text-outline" style="font-size:14px;">person_check</span>

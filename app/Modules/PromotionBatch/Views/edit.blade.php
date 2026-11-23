@@ -1,4 +1,4 @@
-{{ Form::model($promotion - batch, ['method' => 'PUT', 'route' => ['promotion_batch.update', $promotion - batch->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($promotion_batch, ['method' => 'PUT', 'route' => ['promotion_batch.update', $promotion_batch->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     <div class="col-md-6 mb-3">
         @forelse ($forms as $key => $form)

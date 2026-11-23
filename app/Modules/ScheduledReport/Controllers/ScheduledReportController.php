@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
-use Throwable; 
+use Throwable;
 class ScheduledReportController extends MainController
 {
     public function __construct()
@@ -72,7 +72,7 @@ class ScheduledReportController extends MainController
     private function calculateNextRun($schedule)
     {
         $now = now();
-        
+
         switch ($schedule['frequency']) {
             case 'daily':
                 return $now->setTimeFromTimeString($schedule['time'])->addDay();
@@ -81,7 +81,7 @@ class ScheduledReportController extends MainController
                 return $now->next($this->getDayName($dayOfWeek))->setTimeFromTimeString($schedule['time']);
             case 'monthly':
                 $dayOfMonth = $schedule['day_of_month'] ?? 1;
-                return $now->startOfMonth()->addDays($dayOfMonth - 1)->setTimeFromTimeString($schedule['time']);
+                return $now->startOfMonth()->addDays($dayOfMonth_1)->setTimeFromTimeString($schedule['time']);
             case 'quarterly':
                 return $now->addMonths(3)->setTimeFromTimeString($schedule['time']);
             case 'yearly':
@@ -94,7 +94,7 @@ class ScheduledReportController extends MainController
     private function getDayName($day)
     {
         $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-        return $days[$day - 1] ?? 'Monday';
+        return $days[$day_1] ?? 'Monday';
     }
 
     public function edit($id): View
@@ -161,7 +161,7 @@ class ScheduledReportController extends MainController
         try {
             $schedule = $this->model->findOrFail($id);
             $newStatus = !$schedule->is_active;
-            
+
             $schedule->update([
                 'is_active' => $newStatus,
                 'next_run_at' => $newStatus ? $this->calculateNextRun($schedule) : null,
@@ -182,7 +182,7 @@ class ScheduledReportController extends MainController
     {
         try {
             $schedule = $this->model->findOrFail($id);
-            
+
             // Execute report generation
             // $this->reportService->generateAndSend($schedule);
 

@@ -1,4 +1,4 @@
-{{ Form::model($dormitory - movement, ['method' => 'PUT', 'route' => ['dormitory_movement.update', $dormitory - movement->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($dormitory_movement, ['method' => 'PUT', 'route' => ['dormitory_movement.update', $dormitory_movement->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     @forelse ($forms as $key => $form)
         <div class="col-md-6 mb-3">

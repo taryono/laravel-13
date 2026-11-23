@@ -1,4 +1,4 @@
-{{ Form::model($grade - weight - config, ['method' => 'PUT', 'route' => ['grade_weight_config.update', $grade - weight - config->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($grade_weight_config, ['method' => 'PUT', 'route' => ['grade_weight_config.update', $grade_weight_config->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     <div class="col-md-6 mb-3">
         @forelse ($forms as $key => $form)

@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'PPDB - Penerimaan Peserta Didik Baru')
+@section('title', 'PPDB_Penerimaan Peserta Didik Baru')
 @push('styles')
     <link rel="stylesheet" href="{{ asset('assets/css/dashboard.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/ep-subnav.css') }}">
@@ -62,7 +62,8 @@
                             <div class="d-flex align-items-center gap-1 mt-1 text-body-sm text-on-surface-variant">
                                 <span class="material-symbols-outlined text-secondary"
                                     style="font-size:14px;">trending_up</span>
-                                <span class="text-secondary fw-bold">{{ $totalApplicants }} Pendaftar</span> terdata di sistem
+                                <span class="text-secondary fw-bold">{{ $totalApplicants }} Pendaftar</span> terdata di
+                                sistem
                             </div>
                         </div>
                     </div>
@@ -155,7 +156,8 @@
                             <span class="material-symbols-outlined" style="font-size:24px;">fact_check</span>
                         </div>
                         <span class="text-title-sm text-primary">Verifikasi Berkas</span>
-                        <span class="text-body-sm text-on-surface-variant mt-1">{{ $pendingVerificationsCount }} berkas antre</span>
+                        <span class="text-body-sm text-on-surface-variant mt-1">{{ $pendingVerificationsCount }} berkas
+                            antre</span>
                     </a>
                 </div>
                 <div class="col-6 col-md-3">
@@ -201,14 +203,17 @@
                     <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
                         <div>
                             <h2 class="text-title-sm text-primary mb-0">Daftar Calon Peserta Didik Terbaru</h2>
-                            <p class="text-body-sm text-on-surface-variant mb-0">Update live sinkronisasi berkas dokumen online</p>
+                            <p class="text-body-sm text-on-surface-variant mb-0">Update live sinkronisasi berkas dokumen
+                                online</p>
                         </div>
-                        <form method="GET" action="{{ url('/dashboard') }}" class="search-wrap" style="min-width:224px;">
-                            @if(request()->has('path'))
+                        <form method="GET" action="{{ url('/dashboard') }}" class="search-wrap"
+                            style="min-width:224px;">
+                            @if (request()->has('path'))
                                 <input type="hidden" name="path" value="{{ request('path') }}">
                             @endif
                             <span class="material-symbols-outlined search-icon">search</span>
-                            <input type="text" name="search" value="{{ $searchQuery }}" class="search-input" placeholder="Cari NISN / Nama / No. Reg..." />
+                            <input type="text" name="search" value="{{ $searchQuery }}" class="search-input"
+                                placeholder="Cari NISN / Nama / No. Reg..." />
                         </form>
                     </div>
 
@@ -268,16 +273,20 @@
                                             <span class="{{ $badgeClass }}">{{ $statusLabel }}</span>
                                         </div>
                                         <div class="text-body-sm text-on-surface-variant mt-1 d-flex flex-wrap gap-3">
-                                            <span>No. Reg: <strong class="text-on-surface">{{ $appItem->registration_number ?? '-' }}</strong></span>
-                                            <span>SMP Asal: <strong class="text-on-surface">{{ $appItem->previous_school ?? '-' }}</strong></span>
+                                            <span>No. Reg: <strong
+                                                    class="text-on-surface">{{ $appItem->registration_number ?? '-' }}</strong></span>
+                                            <span>SMP Asal: <strong
+                                                    class="text-on-surface">{{ $appItem->previous_school ?? '-' }}</strong></span>
                                             <span class="d-inline-flex align-items-center gap-1 text-secondary fw-bold">
-                                                <span class="material-symbols-outlined" style="font-size:12px;">{{ $pathIcon }}</span>
+                                                <span class="material-symbols-outlined"
+                                                    style="font-size:12px;">{{ $pathIcon }}</span>
                                                 {{ $pathName }}
                                             </span>
                                         </div>
                                         @if (!empty($appItem->notes))
                                             <div class="mt-1 text-body-sm text-error d-flex align-items-center gap-1">
-                                                <span class="material-symbols-outlined" style="font-size:14px;">info</span>
+                                                <span class="material-symbols-outlined"
+                                                    style="font-size:14px;">info</span>
                                                 <span>{{ $appItem->notes }}</span>
                                             </div>
                                         @endif
@@ -305,7 +314,8 @@
                         <div class="d-flex align-items-center justify-content-between pt-3 border-top"
                             style="border-color:var(--surface-container)!important;">
                             <span class="text-body-sm text-on-surface-variant">
-                                Menampilkan {{ $applicants->firstItem() }} - {{ $applicants->lastItem() }} dari {{ $applicants->total() }} data
+                                Menampilkan {{ $applicants->firstItem() }}_{{ $applicants->lastItem() }} dari
+                                {{ $applicants->total() }} data
                             </span>
                             <div>
                                 {{ $applicants->withQueryString()->links('pagination::bootstrap-5') }}
@@ -344,17 +354,24 @@
                             @php
                                 $today = \Carbon\Carbon::now()->format('Y-m-d');
                                 $isPast = $timeline->end_date && $timeline->end_date < $today;
-                                $isActive = ($timeline->start_date <= $today) && (!$timeline->end_date || $timeline->end_date >= $today);
+                                $isActive =
+                                    $timeline->start_date <= $today &&
+                                    (!$timeline->end_date || $timeline->end_date >= $today);
                                 $dotClass = $isPast ? 'done' : ($isActive ? 'active' : 'pending');
-                                $startDateFormatted = \Carbon\Carbon::parse($timeline->start_date)->translatedFormat('d M');
-                                $endDateFormatted = $timeline->end_date ? \Carbon\Carbon::parse($timeline->end_date)->translatedFormat('d M Y') : '';
+                                $startDateFormatted = \Carbon\Carbon::parse($timeline->start_date)->translatedFormat(
+                                    'd M',
+                                );
+                                $endDateFormatted = $timeline->end_date
+                                    ? \Carbon\Carbon::parse($timeline->end_date)->translatedFormat('d M Y')
+                                    : '';
                             @endphp
                             <div class="timeline-item">
                                 <div class="timeline-dot {{ $dotClass }}"></div>
                                 <div class="d-flex align-items-center gap-2">
-                                    <span class="text-label-sm {{ $isPast ? 'text-secondary' : ($isActive ? 'text-primary' : 'text-on-surface-variant') }} fw-bold text-uppercase"
+                                    <span
+                                        class="text-label-sm {{ $isPast ? 'text-secondary' : ($isActive ? 'text-primary' : 'text-on-surface-variant') }} fw-bold text-uppercase"
                                         style="letter-spacing:.05em;">
-                                        {{ $isPast ? 'Selesai • ' : ($isActive ? 'Aktif • ' : '') }}{{ $startDateFormatted }}{{ $endDateFormatted ? ' - ' . $endDateFormatted : '' }}
+                                        {{ $isPast ? 'Selesai • ' : ($isActive ? 'Aktif • ' : '') }}{{ $startDateFormatted }}{{ $endDateFormatted ? '_' . $endDateFormatted : '' }}
                                     </span>
                                     @if ($isActive)
                                         <span class="badge-soft"
@@ -446,7 +463,8 @@
             <span class="material-symbols-outlined" style="font-size:24px;">dashboard</span>
             <span class="text-label-sm mt-1">Beranda</span>
         </a>
-        <a href="{{ Route::has('admission_quota_setting.index') ? route('admission_quota_setting.index') : '#' }}" class="bottom-nav-item">
+        <a href="{{ Route::has('admission_quota_setting.index') ? route('admission_quota_setting.index') : '#' }}"
+            class="bottom-nav-item">
             <span class="material-symbols-outlined" style="font-size:24px;">settings</span>
             <span class="text-label-sm mt-1">Kuota</span>
         </a>
@@ -454,7 +472,8 @@
             <span class="material-symbols-outlined icon-fill" style="font-size:24px;">how_to_reg</span>
             <span class="text-label-sm fw-bold mt-1">PPDB</span>
         </a>
-        <a href="{{ Route::has('admission_document_verification.index') ? route('admission_document_verification.index') : '#' }}" class="bottom-nav-item">
+        <a href="{{ Route::has('admission_document_verification.index') ? route('admission_document_verification.index') : '#' }}"
+            class="bottom-nav-item">
             <span class="material-symbols-outlined" style="font-size:24px;">fact_check</span>
             <span class="text-label-sm mt-1">Verifikasi</span>
         </a>

@@ -1,4 +1,4 @@
-{{ Form::model($applicant - notification, ['method' => 'PUT', 'route' => ['applicant_notification.update', $applicant - notification->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($applicant_notification, ['method' => 'PUT', 'route' => ['applicant_notification.update', $applicant_notification->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     @forelse ($forms as $key => $form)
         <div class="col-md-6 mb-3">

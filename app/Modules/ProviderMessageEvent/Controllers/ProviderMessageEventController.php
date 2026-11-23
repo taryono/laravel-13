@@ -24,8 +24,8 @@ class ProviderMessageEventController extends MainController
      * Display a listing of the resource.
      *
      * Handles both:
-     * - Normal page request
-     * - Yajra DataTables AJAX request
+     *_Normal page request
+     *_Yajra DataTables AJAX request
      */
     public function index(
         Request $request,
@@ -68,7 +68,7 @@ class ProviderMessageEventController extends MainController
     public function store(Request $request)
     {
         $validated = $request->validate([
-                            'sms_log_id' => ['required', 'integer'],
+            'sms_log_id' => ['required', 'integer'],
             'status' => ['required', 'string', 'max:255'],
             'payload' => ['required', 'string', 'max:255'],
         ]);
@@ -124,17 +124,14 @@ class ProviderMessageEventController extends MainController
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-                        'sms_log_id' => ['required', 'integer'],
+            'sms_log_id' => ['required', 'integer'],
             'status' => ['required', 'string', 'max:255'],
             'payload' => ['required', 'string', 'max:255'],
         ]);
 
         try {
             $providerMessageEvent = $this->model->findOrFail($id);
-            DB::transaction(function () use (
-                $providerMessageEvent,
-                $validated
-            ) {
+            DB::transaction(function () use ($providerMessageEvent, $validated) {
                 $providerMessageEvent->update($validated);
             });
 
@@ -144,7 +141,7 @@ class ProviderMessageEventController extends MainController
                 $providerMessageEvent
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             Log::error(
                 'Gagal memperbarui ProviderMessageEvent.',
                 [
@@ -179,7 +176,7 @@ class ProviderMessageEventController extends MainController
                 'Data ProviderMessageEvent berhasil dihapus.'
             );
 
-        } catch (Throwable $e) { 
+        } catch (Throwable $e) {
             // $providerMessageEvent->getKey() yang bisa undefined.
             Log::error(
                 'Gagal menghapus ProviderMessageEvent.',
@@ -195,5 +192,5 @@ class ProviderMessageEventController extends MainController
                 'Data ProviderMessageEvent gagal dihapus.'
             );
         }
-    } 
+    }
 }

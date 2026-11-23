@@ -1,4 +1,4 @@
-{{ Form::model($student - outcome - achievement, ['method' => 'PUT', 'route' => ['student_outcome_achievement.update', $student - outcome - achievement->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($student_outcome_achievement, ['method' => 'PUT', 'route' => ['student_outcome_achievement.update', $student_outcome_achievement->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     @forelse ($forms as $key => $form)
         <div class="col-md-6 mb-3">

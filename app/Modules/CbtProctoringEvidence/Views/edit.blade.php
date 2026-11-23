@@ -1,4 +1,4 @@
-{{ Form::model($cbt - proctoring - evidence, ['method' => 'PUT', 'route' => ['cbt_proctoring_evidence.update', $cbt - proctoring - evidence->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($cbt_proctoring_evidence, ['method' => 'PUT', 'route' => ['cbt_proctoring_evidence.update', $cbt_proctoring_evidence->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     @forelse ($forms as $key => $form)
         <div class="col-md-6 mb-3">

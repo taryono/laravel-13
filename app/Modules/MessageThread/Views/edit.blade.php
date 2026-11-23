@@ -1,4 +1,4 @@
-{{ Form::model($message - thread, ['method' => 'PUT', 'route' => ['message_thread.update', $message - thread->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($message_thread, ['method' => 'PUT', 'route' => ['message_thread.update', $message_thread->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     @forelse ($forms as $key => $form)
         <div class="col-md-6 mb-3">

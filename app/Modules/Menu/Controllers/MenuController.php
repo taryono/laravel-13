@@ -27,8 +27,8 @@ class MenuController extends MainController
      * Display a listing of the resource.
      *
      * Handles both:
-     * - Normal page request
-     * - Yajra DataTables AJAX request
+     *_Normal page request
+     *_Yajra DataTables AJAX request
      */
     public function index(
         Request $request,
@@ -60,7 +60,7 @@ class MenuController extends MainController
     {
         $model = new Menu();
         $items = (new MenuRepository())->allForAdmin();
-        $tree  = (new MenuTreeBuilder())->build($items);
+        $tree = (new MenuTreeBuilder())->build($items);
         $roles = Role::orderBy('name')->get(['id', 'name', 'display_name']);
 
         $parentOptions = $this->flattenForSelect($tree);
@@ -118,7 +118,7 @@ class MenuController extends MainController
     {
         $menu = Menu::find($id);
         $items = (new MenuRepository())->allForAdmin();
-        $tree  = (new MenuTreeBuilder())->build($items);
+        $tree = (new MenuTreeBuilder())->build($items);
         $roles = Role::orderBy('name')->get(['id', 'name', 'display_name']);
 
         $parentOptions = $this->flattenForSelect($tree);
@@ -146,10 +146,7 @@ class MenuController extends MainController
 
         try {
 
-            DB::transaction(function () use (
-                $menu,
-                $validated
-            ) {
+            DB::transaction(function () use ($menu, $validated) {
                 $menu->update($validated);
             });
 

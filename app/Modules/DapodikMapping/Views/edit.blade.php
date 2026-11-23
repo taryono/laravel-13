@@ -1,4 +1,4 @@
-{{ Form::model($dapodik - mapping, ['method' => 'PUT', 'route' => ['dapodik_mapping.update', $dapodik - mapping->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($dapodik_mapping, ['method' => 'PUT', 'route' => ['dapodik_mapping.update', $dapodik_mapping->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     @forelse ($forms as $key => $form)
         <div class="col-md-6 mb-3">

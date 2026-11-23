@@ -1,4 +1,4 @@
-{{ Form::model($rkas - component, ['method' => 'PUT', 'route' => ['rkas_component.update', $rkas - component->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($rkas_component, ['method' => 'PUT', 'route' => ['rkas_component.update', $rkas_component->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     @forelse ($forms as $key => $form)
         <div class="col-md-6 mb-3">

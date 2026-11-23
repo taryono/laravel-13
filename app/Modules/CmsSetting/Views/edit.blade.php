@@ -1,4 +1,4 @@
-{{ Form::model($cms - setting, ['method' => 'PUT', 'route' => ['cms_setting.update', $cms - setting->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($cms_setting, ['method' => 'PUT', 'route' => ['cms_setting.update', $cms_setting->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     @forelse ($forms as $key => $form)
         <div class="col-md-6 mb-3">

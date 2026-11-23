@@ -197,7 +197,7 @@
                     let min1 = h1 * 60 + m1,
                         min2 = h2 * 60 + m2;
                     if (min2 < min1) min2 += 24 * 60;
-                    breakDur.value = min2 - min1;
+                    breakDur.value = min2_min1;
                 } else {
                     breakDur.value = 0;
                 }

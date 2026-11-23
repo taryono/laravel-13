@@ -1,4 +1,4 @@
-{{ Form::model($stock - movement, ['method' => 'PUT', 'route' => ['stock_movement.update', $stock - movement->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($stock_movement, ['method' => 'PUT', 'route' => ['stock_movement.update', $stock_movement->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     @forelse ($forms as $key => $form)
         <div class="col-md-6 mb-3">

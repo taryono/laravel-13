@@ -1,4 +1,4 @@
-{{ Form::model($room - constraint, ['method' => 'PUT', 'route' => ['room_constraint.update', $room - constraint->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($room_constraint, ['method' => 'PUT', 'route' => ['room_constraint.update', $room_constraint->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     @forelse ($forms as $key => $form)
         <div class="col-md-6 mb-3">
