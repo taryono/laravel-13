@@ -65,23 +65,16 @@ class AttendanceController extends MainController
         }
         $validated['payroll_period_id'] = $period->id;
 
+        // Analisis shift dan keterlambatan
+        $analysis = $this->calculateAttendance(
+            $validated['employee_id'],
+            $validated['attendance_date'],
+            $validated['actual_check_in'] ?? null,
+            $validated['actual_check_out'] ?? null
+        );
 
         try {
-            $attendance = DB::transaction(function () use ($validated) {
-
-                // ✅ === TAMBAHKAN BARIS INI ===
-                $analysis = $this->calculateAttendance(
-                    $validated['employee_id'],
-                    $validated['attendance_date'],
-                    $validated['actual_check_in'] ?? null,
-                    $validated['actual_check_out'] ?? null
-                );
-
-                // Opsional: Jika ingin menolak simpan jika tidak ada jadwal
-                // if (!$analysis['success']) {
-                //     throw new \Exception($analysis['message']);
-                // }
-                // ✅ === AKHIR PENAMBAHAN ===
+            $attendance = DB::transaction(function () use ($validated, $analysis) {
 
                 // =============================================
                 // LANGKAH 1: Simpan/Update ke attendance_daily
@@ -132,11 +125,17 @@ class AttendanceController extends MainController
                 return $attendance;
             });
 
+            $noteMessage = '';
+            if (!empty($analysis['is_swap'])) {
+                $noteMessage .= ' ⚠️ Menggunakan shift hasil pertukaran.';
+            }
+            if (!empty($analysis['is_late'])) {
+                $noteMessage .= ' Karyawan terlambat ' . ($analysis['minutes_late'] ?? 0) . ' menit.';
+            }
+
             return $this->successResponse(
                 $request,
-                'Catatan absensi berhasil ditambahkan. ' .
-                ($analysis['is_swap'] ? ' ⚠️ Menggunakan shift hasil pertukaran.' : '') .
-                ($analysis['is_late'] ? ' Karyawan terlambat ' . $analysis['minutes_late'] . ' menit.' : ''),
+                'Catatan absensi berhasil ditambahkan.' . $noteMessage,
                 $attendance
             );
         } catch (Throwable $e) {
@@ -186,17 +185,16 @@ class AttendanceController extends MainController
         }
         $validated['payroll_period_id'] = $period->id;
 
+        // Analisis shift dan keterlambatan sebelum transaksi DB
+        $analysis = $this->calculateAttendance(
+            $validated['employee_id'],
+            $validated['attendance_date'],
+            $validated['actual_check_in'] ?? null,
+            $validated['actual_check_out'] ?? null
+        );
+
         try {
             $attendance = DB::transaction(function () use ($attendance, $validated) {
-
-                // ✅ === TAMBAHKAN BARIS INI ===
-                $analysis = $this->calculateAttendance(
-                    $validated['employee_id'],
-                    $validated['attendance_date'],
-                    $validated['actual_check_in'] ?? null,
-                    $validated['actual_check_out'] ?? null
-                );
-                // ✅ === AKHIR PENAMBAHAN ===
                 // =============================================
                 // ✅ LANGKAH 1: Cari/buat data attendance_daily
                 // =============================================
@@ -253,11 +251,17 @@ class AttendanceController extends MainController
                 return $attendance;
             });
 
+            $noteMessage = '';
+            if (!empty($analysis['is_swap'])) {
+                $noteMessage .= ' ⚠️ Menggunakan shift hasil pertukaran.';
+            }
+            if (!empty($analysis['is_late'])) {
+                $noteMessage .= ' Karyawan terlambat ' . ($analysis['minutes_late'] ?? 0) . ' menit.';
+            }
+
             return $this->successResponse(
                 $request,
-                'Catatan absensi berhasil diperbarui.. ' .
-                ($analysis['is_swap'] ? ' ⚠️ Menggunakan shift hasil pertukaran.' : '') .
-                ($analysis['is_late'] ? ' Karyawan terlambat ' . $analysis['minutes_late'] . ' menit.' : ''),
+                'Catatan absensi berhasil diperbarui.' . $noteMessage,
                 $attendance
             );
         } catch (Throwable $e) {
@@ -409,7 +413,12 @@ class AttendanceController extends MainController
             return [
                 'success' => false,
                 'message' => 'Tidak ada jadwal shift untuk tanggal ini',
-                'data' => null
+                'data' => null,
+                'is_late' => false,
+                'minutes_late' => 0,
+                'is_early_leave' => false,
+                'minutes_early' => 0,
+                'is_swap' => false,
             ];
         }
 

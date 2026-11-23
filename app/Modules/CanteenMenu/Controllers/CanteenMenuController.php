@@ -10,6 +10,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use Throwable;
 
@@ -51,14 +52,12 @@ class CanteenMenuController extends MainController
      */
     public function create(): View
     {
-        $canteenMenu = new CanteenMenu();
-        $result = $this->getForm($canteenMenu);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
+        $canteen_menu = new CanteenMenu();
+        $tenants = \Models\CanteenTenant::orderBy('name')->pluck('name', 'id');
 
         return view(
             'CanteenMenu::create',
-            compact('canteenMenu', 'forms', 'groupedForms')
+            compact('canteen_menu', 'tenants')
         );
     }
 
@@ -76,6 +75,11 @@ class CanteenMenuController extends MainController
             'photo_url' => ['required', 'string', 'max:255'],
             'is_available' => ['required', 'string', 'max:255'],
         ]);
+
+        if ($request->hasFile('photo')) {
+            $path = $request->file('photo')->store('canteen_menus', 'public');
+            $validated['photo_url'] = Storage::disk('public')->url($path);
+        }
 
         try {
             $model = DB::transaction(function () use ($validated) {
@@ -111,14 +115,11 @@ class CanteenMenuController extends MainController
      */
     public function edit($id): View
     {
-        $canteenMenu = $this->model->findOrFail($id);
-        $result = $this->getForm($canteenMenu);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
-
+        $canteen_menu = $this->model->findOrFail($id);
+        $tenants = \Models\CanteenTenant::orderBy('name')->pluck('name', 'id');
         return view(
             'CanteenMenu::edit',
-            compact('canteenMenu', 'forms', 'groupedForms')
+            compact('canteen_menu', 'tenants')
         );
     }
 
@@ -137,8 +138,19 @@ class CanteenMenuController extends MainController
             'is_available' => ['required', 'string', 'max:255'],
         ]);
 
+
+
+
         try {
             $canteenMenu = $this->model->findOrFail($id);
+            if ($request->hasFile('photo')) {
+                $this->deletePhoto($canteenMenu->photo_url);
+                $path = $request->file('photo')->store('canteen_menus', 'public');
+                $validated['photo_url'] = Storage::disk('public')->url($path);
+            } elseif ($request->boolean('remove_photo')) {
+                $this->deletePhoto($canteenMenu->photo_url);
+                $validated['photo_url'] = null;
+            }
             DB::transaction(function () use ($canteenMenu, $validated) {
                 $canteenMenu->update($validated);
             });
@@ -200,5 +212,15 @@ class CanteenMenuController extends MainController
                 'Data CanteenMenu gagal dihapus.'
             );
         }
+    }
+
+    private function deletePhoto(?string $url): void
+    {
+        if (!$url) {
+            return;
+        }
+
+        $relative = ltrim(str_replace(Storage::disk('public')->url(''), '', $url), '/');
+        Storage::disk('public')->delete($relative);
     }
 }
