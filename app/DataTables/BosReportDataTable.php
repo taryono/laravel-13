@@ -17,7 +17,7 @@ class BosReportDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['school_id', 'bos_period_id', 'fiscal_period_id', 'report_code', 'report_name', 'report_type', 'period_number', 'start_date', 'end_date', 'total_allocation', 'total_received', 'total_used', 'total_remaining', 'percentage', 'file_url', 'report_data', 'status', 'submitted_at', 'submitted_by', 'verified_at', 'verified_by', 'is_active', 'created_by', 'updated_by'];
+    protected array $columns = ['school.name', 'bos_period.name', 'fiscal_period.name', 'report_code', 'report_name', 'report_type', 'period_number', 'start_date', 'end_date', 'total_allocation', 'total_received', 'total_used', 'total_remaining', 'percentage', 'file_url', 'report_data', 'status', 'submitted_at', 'submitted_by', 'verified_at', 'verified_by', 'is_active'];
 
     /**
      * Build DataTable response.
@@ -48,19 +48,19 @@ class BosReportDataTable extends DataTable
      */
     protected function renderActionButtons($row): string
     {
-        $title = e('Detail BosReport ' . $row->name);
+        $title = e('Detail Bos Report ' . $row->name);
 
         $context = htmlspecialchars(
             json_encode([
                 'executeDraw' => true,
-                'tableId'     => 'bos-report-table',
+                'tableId' => 'bos-report-table',
                 'reloadDelay' => 500,
             ]),
             ENT_QUOTES,
             'UTF-8'
         );
 
-        $editUrl   = e(route('bos_report.edit', $row));
+        $editUrl = e(route('bos_report.edit', $row));
         $deleteUrl = e(route('bos_report.destroy', $row));
 
         return <<<HTML
@@ -100,7 +100,7 @@ class BosReportDataTable extends DataTable
      */
     public function query(BosReport $model): QueryBuilder
     {
-        return $model->newQuery();
+        return $model->newQuery()->with(['school:id,name', 'bos_period:id,name', 'fiscal_period:id,name']);
     }
 
     /**
@@ -139,13 +139,13 @@ class BosReportDataTable extends DataTable
                  */
                 'dom' =>
                     '<"row mb-3"' .
-                        '<"col-md-6 d-flex align-items-center"B>' .
-                        '<"col-md-6"f>' .
+                    '<"col-md-6 d-flex align-items-center"B>' .
+                    '<"col-md-6"f>' .
                     '>' .
                     'rt' .
                     '<"row mt-3"' .
-                        '<"col-md-6"i>' .
-                        '<"col-md-6 d-flex justify-content-md-end"p>' .
+                    '<"col-md-6"i>' .
+                    '<"col-md-6 d-flex justify-content-md-end"p>' .
                     '>',
 
                 /*
@@ -264,12 +264,12 @@ class BosReportDataTable extends DataTable
      * explode() dari string literal seperti versi lama, yang rapuh
      * terhadap karakter khusus pada nama kolom.
      */
-     
+
     protected function getColumns(): array
     {
         return collect($this->columns)
-            ->map(fn (string $kolom) => Column::make($kolom)
-                ->title(ucwords(str_replace(['_',"."], [' ',' '], $kolom))))
+            ->map(fn(string $kolom) => Column::make($kolom)
+                ->title(ucwords(str_replace(['_', "."], [' ', ' '], $kolom))))
             // 1. PREPEND: Masukkan kolom No di posisi PALING AWAL (indeks 0)
             ->prepend(
                 Column::make('DT_RowIndex')

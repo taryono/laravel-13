@@ -17,7 +17,7 @@ class StudentDisciplineDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['student_id', 'school_id', 'category', 'description', 'points', 'action_taken', 'incident_date', 'reported_by', 'witness', 'attachment_url', 'parent_notified', 'parent_notified_at', 'is_active', 'created_by', 'updated_by'];
+    protected array $columns = ['student.name', 'school.name', 'category', 'description', 'points', 'action_taken', 'incident_date', 'reported_by', 'witness', 'attachment_url', 'parent_notified', 'parent_notified_at', 'is_active', 'created_by', 'updated_by'];
 
     /**
      * Build DataTable response.
@@ -53,14 +53,14 @@ class StudentDisciplineDataTable extends DataTable
         $context = htmlspecialchars(
             json_encode([
                 'executeDraw' => true,
-                'tableId'     => 'student-discipline-table',
+                'tableId' => 'student-discipline-table',
                 'reloadDelay' => 500,
             ]),
             ENT_QUOTES,
             'UTF-8'
         );
 
-        $editUrl   = e(route('student_discipline.edit', $row));
+        $editUrl = e(route('student_discipline.edit', $row));
         $deleteUrl = e(route('student_discipline.destroy', $row));
 
         return <<<HTML
@@ -100,7 +100,7 @@ class StudentDisciplineDataTable extends DataTable
      */
     public function query(StudentDiscipline $model): QueryBuilder
     {
-        return $model->newQuery();
+        return $model->newQuery()->with(['student:id,name', 'school:id,name']);
     }
 
     /**
@@ -138,7 +138,7 @@ class StudentDisciplineDataTable extends DataTable
                  * Custom Bootstrap 5 layout.
                  */
                 'dom' =>
-                '<"row mb-3"' .
+                    '<"row mb-3"' .
                     '<"col-md-6 d-flex align-items-center"B>' .
                     '<"col-md-6"f>' .
                     '>' .

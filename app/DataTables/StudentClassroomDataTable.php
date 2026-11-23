@@ -17,7 +17,7 @@ class StudentClassroomDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['student_id', 'classroom_id', 'academic_year_id', 'enrollment_date', 'status', 'created_by', 'updated_by'];
+    protected array $columns = ['student.name', 'classroom.name', 'academic_year.name', 'enrollment_date', 'status', 'created_by', 'updated_by'];
 
     /**
      * Build DataTable response.
@@ -53,14 +53,14 @@ class StudentClassroomDataTable extends DataTable
         $context = htmlspecialchars(
             json_encode([
                 'executeDraw' => true,
-                'tableId'     => 'student-classroom-table',
+                'tableId' => 'student-classroom-table',
                 'reloadDelay' => 500,
             ]),
             ENT_QUOTES,
             'UTF-8'
         );
 
-        $editUrl   = e(route('student_classroom.edit', $row));
+        $editUrl = e(route('student_classroom.edit', $row));
         $deleteUrl = e(route('student_classroom.destroy', $row));
 
         return <<<HTML
@@ -100,7 +100,7 @@ class StudentClassroomDataTable extends DataTable
      */
     public function query(StudentClassroom $model): QueryBuilder
     {
-        return $model->newQuery();
+        return $model->newQuery()->with(['student:id,name', 'classroom:id,name', 'academic_year:id,name']);
     }
 
     /**
@@ -138,7 +138,7 @@ class StudentClassroomDataTable extends DataTable
                  * Custom Bootstrap 5 layout.
                  */
                 'dom' =>
-                '<"row mb-3"' .
+                    '<"row mb-3"' .
                     '<"col-md-6 d-flex align-items-center"B>' .
                     '<"col-md-6"f>' .
                     '>' .

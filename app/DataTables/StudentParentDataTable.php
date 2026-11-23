@@ -17,7 +17,7 @@ class StudentParentDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['student.name', 'name', 'is_primary'];
+    protected array $columns = ['student.name', 'parent.name', 'is_primary'];
 
     /**
      * Build DataTable response.
@@ -25,11 +25,13 @@ class StudentParentDataTable extends DataTable
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
+            ->addIndexColumn()
+            ->editColumn('relationship', fn($r) => ucfirst(strtolower($r->relationship ?? '-')))
+
             ->addColumn('action', function ($row) {
                 return $this->renderActionButtons($row);
             })
-            ->addIndexColumn()
-            ->rawColumns(['action']) // ✅ Tetap wajib ada!
+            ->rawColumns(['is_primary', 'action'])
             ->setRowId('id');
     }
 
@@ -53,14 +55,14 @@ class StudentParentDataTable extends DataTable
         $context = htmlspecialchars(
             json_encode([
                 'executeDraw' => true,
-                'tableId'     => 'student-parent-table',
+                'tableId' => 'student-parent-table',
                 'reloadDelay' => 500,
             ]),
             ENT_QUOTES,
             'UTF-8'
         );
 
-        $editUrl   = e(route('student_parent.edit', $row));
+        $editUrl = e(route('student_parent.edit', $row));
         $deleteUrl = e(route('student_parent.destroy', $row));
 
         return <<<HTML
@@ -138,7 +140,7 @@ class StudentParentDataTable extends DataTable
                  * Custom Bootstrap 5 layout.
                  */
                 'dom' =>
-                '<"row mb-3"' .
+                    '<"row mb-3"' .
                     '<"col-md-6 d-flex align-items-center"B>' .
                     '<"col-md-6"f>' .
                     '>' .
