@@ -53,12 +53,14 @@ class ClassLevelController extends MainController
     public function create(): View
     {
         $class_level = new ClassLevel();
+        $organization_id = session()->get('');
         $organizations = \Models\Organization::active()->pluck('name', 'id')->toArray();
         $schools = \Models\School::active()->pluck('name', 'id')->toArray();
-
+        $optionsOrg = \Models\Organization::active()->pluck('name', 'id');
+        $optionsSchool = $organization_id ? \Models\School::where('organization_id', $organization_id)->active()->pluck('name', 'id') : [];
         return view(
             'ClassLevel::create',
-            compact('class_level', 'organizations', 'schools')
+            compact('class_level', 'organizations', 'schools', 'optionsOrg', 'optionsSchool')
         );
     }
 

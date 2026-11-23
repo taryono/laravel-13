@@ -435,15 +435,15 @@ class AttendanceController extends MainController
         if ($actualCheckIn) {
             $clockInTime = strtotime($actualCheckIn);
             $isLate = $clockInTime > $lateThreshold;
-            $minutesLate = $isLate ? round(($clockInTime_$lateThreshold) / 60) : 0;
+            $minutesLate = $isLate ? round(($clockInTime - $lateThreshold) / 60) : 0;
         }
 
         // Analisis jam pulang
         if ($actualCheckOut) {
             $clockOutTime = strtotime($actualCheckOut);
-            $earlyThreshold = $endTime_($shift->grace_period_end * 60);
+            $earlyThreshold = $endTime - ($shift->grace_period_end * 60);
             $isEarlyLeave = $clockOutTime < $earlyThreshold;
-            $minutesEarly = $isEarlyLeave ? round(($earlyThreshold_$clockOutTime) / 60) : 0;
+            $minutesEarly = $isEarlyLeave ? round(($earlyThreshold - $clockOutTime) / 60) : 0;
         }
 
         // ⚠️ Deteksi apakah ini hasil pertukaran shift

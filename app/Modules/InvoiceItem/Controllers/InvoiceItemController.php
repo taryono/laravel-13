@@ -61,8 +61,7 @@ class InvoiceItemController extends MainController
                 // Update invoice totals
                 $invoice = $item->invoice;
                 $invoice->subtotal += $item->total_price;
-                $invoice->total_amount = $invoice->subtotal + $invoice->tax_
-                $invoice->discount;
+                $invoice->total_amount = $invoice->subtotal + $invoice->tax - $invoice->discount;
                 $invoice->save();
 
                 return $item;
@@ -110,8 +109,7 @@ class InvoiceItemController extends MainController
                 // Update invoice totals (remove old)
                 $invoice = $item->invoice;
                 $invoice->subtotal -= $item->total_price;
-                $invoice->total_amount = $invoice->subtotal + $invoice->tax_
-                $invoice->discount;
+                $invoice->total_amount = $invoice->subtotal + $invoice->tax - $invoice->discount;
                 $invoice->save();
 
                 // Update item
@@ -119,8 +117,7 @@ class InvoiceItemController extends MainController
 
                 // Update invoice totals (add new)
                 $invoice->subtotal += $item->total_price;
-                $invoice->total_amount = $invoice->subtotal + $invoice->tax_
-                $invoice->discount;
+                $invoice->total_amount = $invoice->subtotal + $invoice->tax - $invoice->discount;
                 $invoice->save();
             });
 
@@ -143,8 +140,7 @@ class InvoiceItemController extends MainController
             DB::transaction(function () use ($item) {
                 $invoice = $item->invoice;
                 $invoice->subtotal -= $item->total_price;
-                $invoice->total_amount = $invoice->subtotal + $invoice->tax_
-                $invoice->discount;
+                $invoice->total_amount = $invoice->subtotal + $invoice->tax - $invoice->discount;
                 $invoice->save();
 
                 $item->delete();

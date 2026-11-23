@@ -51,7 +51,7 @@ class DashboardController extends MainController
             'absent' => 12,
         ];
 
-        $authUser = auth()->user();
+        $authUser = request()->user();
         $organizationId = session('active_organization_id')
             ?? $authUser?->active_organization_id
             ?? $authUser?->current_organization_id;
@@ -317,7 +317,7 @@ class DashboardController extends MainController
 
         // Accepted / Filled quota
         $acceptedCount = $verifiedApplicants;
-        $remainingQuota = max(0, $totalQuota_$acceptedCount);
+        $remainingQuota = max(0, $totalQuota - $acceptedCount);
 
         // 3. Admission Paths (Jalur Masuk)
         $paths = Schema::hasTable('admission_paths')

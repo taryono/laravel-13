@@ -242,8 +242,7 @@ class DepreciationLogController extends MainController
                     $depreciationAmount = $this->calculateDepreciationAmount($asset);
 
                     if ($depreciationAmount > 0 && $asset->book_value > $asset->salvage_value) {
-                        $newBookValue = $asset->book_value_
-                        $depreciationAmount;
+                        $newBookValue = $asset->book_value - $depreciationAmount;
                         $newAccumulated = $asset->accumulated_depreciation + $depreciationAmount;
 
                         // Create depreciation log
@@ -274,5 +273,10 @@ class DepreciationLogController extends MainController
             Log::error('Gagal melakukan penyusutan massal.', ['exception' => $e, 'data' => $validated]);
             return $this->errorResponse($request, 'Gagal melakukan penyusutan massal.');
         }
+    }
+
+
+    private function calculateDepreciationAmount()
+    {
     }
 }

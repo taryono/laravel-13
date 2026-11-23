@@ -79,8 +79,7 @@ class InvoiceController extends MainController
                 // Create invoice items
                 if (!empty($validated['items'])) {
                     foreach ($validated['items'] as $item) {
-                        $item['total_price'] = ($item['quantity'] * $item['unit_price'])
-                        _($item['discount'] ?? 0);
+                        $item['total_price'] = ($item['quantity'] * $item['unit_price']) - ($item['discount'] ?? 0);
                         $invoice->items()->create($item);
                     }
                 }
@@ -198,8 +197,7 @@ class InvoiceController extends MainController
                 $existingIds = [];
                 if (!empty($validated['items'])) {
                     foreach ($validated['items'] as $item) {
-                        $item['total_price'] = ($item['quantity'] * $item['unit_price'])
-                        _($item['discount'] ?? 0);
+                        $item['total_price'] = ($item['quantity'] * $item['unit_price']) - ($item['discount'] ?? 0);
 
                         if (isset($item['id'])) {
                             $invoiceItem = InvoiceItem::find($item['id']);

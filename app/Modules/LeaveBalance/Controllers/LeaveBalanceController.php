@@ -56,8 +56,7 @@ class LeaveBalanceController extends MainController
 
         try {
             $balance = DB::transaction(function () use ($validated) {
-                $validated['remaining'] = $validated['quota']
-                _($validated['used'] ?? 0);
+                $validated['remaining'] = $validated['quota'] - ($validated['used'] ?? 0);
                 return LeaveBalance::create($validated);
             });
 
@@ -96,8 +95,7 @@ class LeaveBalanceController extends MainController
 
         try {
             DB::transaction(function () use ($balance, $validated) {
-                $validated['remaining'] = $validated['quota']
-                _($validated['used'] ?? 0);
+                $validated['remaining'] = $validated['quota'] - ($validated['used'] ?? 0);
                 $balance->update($validated);
             });
 

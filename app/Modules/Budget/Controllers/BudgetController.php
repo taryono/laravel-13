@@ -183,8 +183,7 @@ class BudgetController extends MainController
 
             // Calculate actual amount based on journal entries
             $actualAmount = $this->getActualAmount($budget);
-            $variance = $budget->amount_
-            $actualAmount;
+            $variance = $budget->amount - $actualAmount;
 
             return response()->json([
                 'success' => true,
