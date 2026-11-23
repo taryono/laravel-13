@@ -1,4 +1,4 @@
-{{ Form::open(['method' => 'POST', 'route' => ['curriculum.store'], 'class' => 'form-horizontal', 'id' => 'formCurriculum']) }}
+{{ Form::open(['method' => 'POST', 'route' => ['curriculum.store'], 'class' => 'form-horizontal form-validation', 'id' => 'formCurriculum']) }}
 
 <div class="row g-3">
 

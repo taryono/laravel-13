@@ -1,4 +1,4 @@
-{{ Form::model($sorogan-evaluation, ['method' => 'PUT', 'route' => ['sorogan_evaluation.update', $sorogan-evaluation->id], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($sorogan - evaluation, ['method' => 'PUT', 'route' => ['sorogan_evaluation.update', $sorogan - evaluation->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     @forelse ($forms as $key => $form)
         <div class="col-md-6 mb-3">
@@ -11,4 +11,4 @@
         <p>{{ say('Data Tidak Ditemukan') }}</p>
     @endforelse
 </div>
-{{ Form::close() }} 
+{{ Form::close() }}

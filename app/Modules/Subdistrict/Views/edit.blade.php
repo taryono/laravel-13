@@ -1,4 +1,4 @@
-{{ Form::model($subdistrict, ['method' => 'PUT', 'route' => ['subdistrict.update', $subdistrict->id], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($subdistrict, ['method' => 'PUT', 'route' => ['subdistrict.update', $subdistrict->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 
 <div class="row mb-3">
     <label class="col-sm-4 col-form-label">Kode</label>

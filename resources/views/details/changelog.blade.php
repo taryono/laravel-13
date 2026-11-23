@@ -1,7 +1,7 @@
 @extends('layouts.front')
 
 @section('content')
-    <div class="px-4 px-4 mt-3">
+    <div class="px-4 px-4 p-3">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="/#bantuan">Pusat Bantuan</a></li>

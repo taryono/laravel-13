@@ -2,7 +2,7 @@
     <div class="container">
         <div class="card shadow-sm">
             <div class="card-body">
-                {{ Form::model($taxSetting, ['method' => 'PUT', 'route' => ['tax_setting.update', $taxSetting->id], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
+                {{ Form::model($taxSetting, ['method' => 'PUT', 'route' => ['tax_setting.update', $taxSetting->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 
                 {{-- Organisasi --}}
                 <div class="mb-3">

@@ -1,4 +1,4 @@
-{{ Form::model($leave_type, ['method' => 'PUT', 'route' => ['leave_type.update', $leave_type->id], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($leave_type, ['method' => 'PUT', 'route' => ['leave_type.update', $leave_type->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     {{-- Organization ID --}}
     <div class="col-md-6 mb-3">

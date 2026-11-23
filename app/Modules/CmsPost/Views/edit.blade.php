@@ -1,4 +1,4 @@
-{{ Form::model($cmsPost, ['method' => 'PUT', 'route' => ['cms_post.update', $cmsPost->id], 'class' => 'form-horizontal', 'id' => 'formCmsPost', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($cmsPost, ['method' => 'PUT', 'route' => ['cms_post.update', $cmsPost->id], 'class' => 'form-horizontal form-validation', 'id' => 'formCmsPost', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     @forelse ($forms as $key => $form)
         <div class="col-md-6 mb-3">
@@ -11,4 +11,4 @@
         <p>{{ say('Data Tidak Ditemukan') }}</p>
     @endforelse
 </div>
-{{ Form::close() }} 
+{{ Form::close() }}

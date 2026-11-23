@@ -75,7 +75,7 @@
                          </select>
                      </div>
                      <div class="col-md-6">
-                         <label class="form-label">Menu Categories</label>
+                         <label class="form-label">Menu Categories (Shortcut Menu)</label>
                          <select class="form-select" name="menu_categories" id="menu_category_id">
                              <option value="">— Tidak ada (root) —</option>
                              @foreach ($menuCategories ?? [] as $menu)

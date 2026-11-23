@@ -1,4 +1,4 @@
-{{ Form::model($finance_dashboard, ['method' => 'PUT', 'route' => ['finance_dashboard.update', $finance_dashboard->id], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($finance_dashboard, ['method' => 'PUT', 'route' => ['finance_dashboard.update', $finance_dashboard->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     <div class="col-md-6 mb-3">
         @forelse ($forms as $key => $form)

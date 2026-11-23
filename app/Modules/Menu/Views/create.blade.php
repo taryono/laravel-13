@@ -1,4 +1,4 @@
-{{ Form::open(['method' => 'POST', 'route' => ['menu.store'], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
+{{ Form::open(['method' => 'POST', 'route' => ['menu.store'], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <input type="hidden" name="id" id="menu_id">
 <div class="row">
     <div class="col-md-6">

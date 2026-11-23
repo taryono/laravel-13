@@ -3,9 +3,9 @@
  {{-- ============================================================ --}}
 
  @if (isset($expense))
-     {{ Form::model($expense, ['method' => 'PUT', 'route' => ['expense.update', $expense->id], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data', 'id' => 'expenseForm']) }}
+     {{ Form::model($expense, ['method' => 'PUT', 'route' => ['expense.update', $expense->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data', 'id' => 'expenseForm']) }}
  @else
-     {{ Form::open(['route' => 'expense.store', 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data', 'id' => 'expenseForm']) }}
+     {{ Form::open(['route' => 'expense.store', 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data', 'id' => 'expenseForm']) }}
  @endif
 
  @csrf

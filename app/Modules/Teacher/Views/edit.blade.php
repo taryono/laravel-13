@@ -1,4 +1,4 @@
-{{ Form::model($teacher, ['method' => 'PUT', 'route' => ['teacher.update', $teacher->id], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($teacher, ['method' => 'PUT', 'route' => ['teacher.update', $teacher->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 
 <div class="row">
     {{-- Organisasi --}}

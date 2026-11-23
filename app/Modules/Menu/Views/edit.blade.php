@@ -1,4 +1,4 @@
-{{ Form::model($menu, ['method' => 'PUT', 'route' => ['menu.update', $menu->id], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($menu, ['method' => 'PUT', 'route' => ['menu.update', $menu->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <input type="hidden" name="id" id="menu_id">
 
 <div class="col-md-6">

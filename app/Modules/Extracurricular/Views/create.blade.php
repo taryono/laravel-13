@@ -1,4 +1,4 @@
-{{ Form::open(['method' => 'POST', 'route' => ['extracurricular.store'], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
+{{ Form::open(['method' => 'POST', 'route' => ['extracurricular.store'], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 @include('Extracurricular::form-2')
 {{ Form::close() }}
 {{-- Toggle tampilan jadwal --}}

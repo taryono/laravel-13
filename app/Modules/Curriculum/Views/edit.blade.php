@@ -1,4 +1,4 @@
-{{ Form::open(['method' => 'POST', 'route' => ['curriculum.update', $curriculum->id], 'class' => 'form-horizontal', 'id' => 'formCurriculum']) }}
+{{ Form::open(['method' => 'POST', 'route' => ['curriculum.update', $curriculum->id], 'class' => 'form-horizontal form-validation', 'id' => 'formCurriculum']) }}
 @method('PUT')
 
 <div class="row g-3">

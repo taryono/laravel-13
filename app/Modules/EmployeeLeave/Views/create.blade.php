@@ -1,4 +1,4 @@
-{{ Form::open(['method' => 'POST', 'route' => ['employee_leave.store'], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
+{{ Form::open(['method' => 'POST', 'route' => ['employee_leave.store'], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     {{-- Karyawan --}}
     <div class="col-md-6 mb-3">

@@ -3,6 +3,6 @@
         otomatis membuat entri untuk <strong>setiap hari</strong> dalam rentang tersebut.</small>
 </div>
 
-{{ Form::open(['method' => 'POST', 'route' => ['holiday.store'], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data', 'id' => 'formHoliday']) }}
+{{ Form::open(['method' => 'POST', 'route' => ['holiday.store'], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data', 'id' => 'formHoliday']) }}
 @include('Holiday::_form')
 {{ Form::close() }}

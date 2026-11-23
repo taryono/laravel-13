@@ -4,6 +4,6 @@
   @else
       <strong>Mode Edit:</strong> Anda sedang mengedit 1 tanggal spesifik.
   @endif
-  {{ Form::model($holiday, ['method' => 'PUT', 'route' => ['holiday.update', $holiday->id], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data', 'id' => 'formHoliday']) }}
+  {{ Form::model($holiday, ['method' => 'PUT', 'route' => ['holiday.update', $holiday->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data', 'id' => 'formHoliday']) }}
   @include('Holiday::_form')
   {{ Form::close() }}

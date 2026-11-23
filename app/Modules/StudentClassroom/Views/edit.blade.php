@@ -1,4 +1,4 @@
- {{ Form::model($studentClassroom, ['method' => 'PUT', 'route' => ['student_classroom.update', $studentClassroom->id], 'class' => 'form-horizontal']) }}
+ {{ Form::model($studentClassroom, ['method' => 'PUT', 'route' => ['student_classroom.update', $studentClassroom->id], 'class' => 'form-horizontal form-validation']) }}
 
  <div class="mb-6">
      {{ Form::label('student_id', 'Nama Siswa', ['class' => 'form-label']) }}

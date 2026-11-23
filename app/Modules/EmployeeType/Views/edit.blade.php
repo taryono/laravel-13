@@ -1,4 +1,4 @@
-{{ Form::model($employee_leave, ['method' => 'POST', 'route' => ['employee_leave.update', $employee_leave->id], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($employee_leave, ['method' => 'POST', 'route' => ['employee_leave.update', $employee_leave->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     {{-- Code --}}
     <div class="col-md-6 mb-3">

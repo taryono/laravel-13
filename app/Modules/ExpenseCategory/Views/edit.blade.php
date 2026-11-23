@@ -3,9 +3,9 @@
 {{-- ============================================================ --}}
 
 @if (isset($category))
-    {{ Form::model($category, ['method' => 'PUT', 'route' => ['expense-category.update', $category->id], 'class' => 'form-horizontal', 'id' => 'categoryForm']) }}
+    {{ Form::model($category, ['method' => 'PUT', 'route' => ['expense-category.update', $category->id], 'class' => 'form-horizontal form-validation', 'id' => 'categoryForm']) }}
 @else
-    {{ Form::open(['route' => 'expense-category.store', 'class' => 'form-horizontal', 'id' => 'categoryForm']) }}
+    {{ Form::open(['route' => 'expense-category.store', 'class' => 'form-horizontal form-validation', 'id' => 'categoryForm']) }}
 @endif
 
 @csrf

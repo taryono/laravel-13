@@ -1,4 +1,4 @@
-{{ Form::model($region, ['method' => 'PUT', 'route' => ['region.update', $region->id], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($region, ['method' => 'PUT', 'route' => ['region.update', $region->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 
 <div class="row mb-3">
     <label class="col-sm-3 col-form-label">Kode</label>

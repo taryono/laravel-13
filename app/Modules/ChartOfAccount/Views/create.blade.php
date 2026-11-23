@@ -1,7 +1,7 @@
 {{ Form::open([
     'method' => $method ?? 'POST',
     'route' => $action ?? 'account.store',
-    'class' => 'form-horizontal',
+    'class' => 'form-horizontal form-validation',
     'id' => 'formAccount',
 ]) }}
 @csrf

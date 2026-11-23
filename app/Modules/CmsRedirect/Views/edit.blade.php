@@ -1,4 +1,4 @@
-{{ Form::model($cms_redirect, ['method' => 'PUT', 'route' => ['cms_redirect.update', $cms_redirect->id], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($cms_redirect, ['method' => 'PUT', 'route' => ['cms_redirect.update', $cms_redirect->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="card">
     <div class="card-body">
         <div class="mb-3">

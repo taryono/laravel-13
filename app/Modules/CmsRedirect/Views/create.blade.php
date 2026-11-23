@@ -1,4 +1,4 @@
-{{ Form::open(['method' => 'POST', 'route' => ['cms_redirect.store'], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
+{{ Form::open(['method' => 'POST', 'route' => ['cms_redirect.store'], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="card">
     <div class="card-body">
         <div class="mb-3">

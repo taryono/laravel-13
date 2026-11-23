@@ -17,7 +17,7 @@
         </div>
 
         <!-- Form -->
-        {{ Form::model($attendance, ['method' => 'PUT', 'route' => ['attendance.update', $attendance->id], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data', 'id' => 'formAttendance']) }}
+        {{ Form::model($attendance, ['method' => 'PUT', 'route' => ['attendance.update', $attendance->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data', 'id' => 'formAttendance']) }}
         @include('Attendance::_form')
         {{ Form::close() }}
     </div>

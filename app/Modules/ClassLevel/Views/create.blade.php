@@ -2,7 +2,7 @@
 $optionsOrg = App\Models\Organization::active()->pluck('name', 'id');
 $optionsSchool = $organization_id ? App\Models\School::where('organization_id', $organization_id)->active()->pluck('name', 'id') : [];
 ?>
-{{ Form::open(['method' => 'POST', 'route' => ['class_level.store'], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
+{{ Form::open(['method' => 'POST', 'route' => ['class_level.store'], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     {{-- Organisasi --}}
     <div class="col-md-6 mb-3">

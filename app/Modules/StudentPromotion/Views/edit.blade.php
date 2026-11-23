@@ -18,7 +18,7 @@
         </div>
     </div>
 </div>
-{{ Form::model($student_promotion, ['method' => 'PUT', 'route' => ['student_promotion.update', $student_promotion->id], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($student_promotion, ['method' => 'PUT', 'route' => ['student_promotion.update', $student_promotion->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row g-3">
     <div class="col-md-6">
         <label class="form-label">Keputusan <span class="text-danger">*</span></label>

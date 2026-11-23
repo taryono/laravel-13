@@ -11,7 +11,7 @@
                     'route' => isset($employee->id) ? ['employee.update', $employee->id] : ['employee.store'],
                     'method' => isset($employee->id) ? 'PUT' : 'POST',
                     'id' => 'employee-form',
-                    'class' => 'form-horizontal',
+                    'class' => 'form-horizontal form-validation',
                     'files' => true,
                 ]) }}
 

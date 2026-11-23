@@ -1,4 +1,4 @@
-{{ Form::model($referenceValue, ['method' => 'PUT', 'route' => ['reference_value.update', $referenceValue->id], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($referenceValue, ['method' => 'PUT', 'route' => ['reference_value.update', $referenceValue->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     <div class="col-md-12 mb-3">
         <label class="form-label">Reference Type</label>

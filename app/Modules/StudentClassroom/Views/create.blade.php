@@ -1,7 +1,7 @@
  @use('Kkxdev\HtmlCompat\Facades\Form')
 
-<div class="row">
-     {{ Form::open(['method' => 'POST', 'route' => ['student_classroom.store'], 'class' => 'form-horizontal']) }}
+ <div class="row">
+     {{ Form::open(['method' => 'POST', 'route' => ['student_classroom.store'], 'class' => 'form-horizontal form-validation']) }}
 
      <div class="mb-6">
          {{ Form::label('student_id', 'Nama Siswa', ['class' => 'form-label']) }}

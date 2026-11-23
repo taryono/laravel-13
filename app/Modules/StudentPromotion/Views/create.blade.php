@@ -1,4 +1,4 @@
-{{ Form::open(['method' => 'POST', 'route' => ['student_promotion.store'], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
+{{ Form::open(['method' => 'POST', 'route' => ['student_promotion.store'], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row g-3">
     <div class="col-md-6">
         <label class="form-label">Kode Batch <span class="text-danger">*</span></label>

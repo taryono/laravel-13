@@ -2,7 +2,7 @@
     <div class="container">
         <div class="card shadow-sm">
             <div class="card-body">
-                {{ Form::open(['method' => 'POST', 'route' => ['tax_setting.store'], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
+                {{ Form::open(['method' => 'POST', 'route' => ['tax_setting.store'], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
                 {{-- Organisasi --}}
                 <div class="mb-3">
                     <label for="organization_id" class="form-label">Organisasi <span class="text-danger">*</span></label>

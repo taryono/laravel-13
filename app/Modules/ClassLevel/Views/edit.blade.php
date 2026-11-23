@@ -1,4 +1,4 @@
-{{ Form::model($class_level, ['method' => 'PUT', 'route' => ['class_level.update', $class_level->id], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($class_level, ['method' => 'PUT', 'route' => ['class_level.update', $class_level->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     {{-- Organisasi --}}
     <div class="col-md-6 mb-3">

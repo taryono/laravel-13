@@ -1,4 +1,4 @@
-{{ Form::model($extracurricular, ['method' => 'PUT', 'route' => ['extracurricular.update', $extracurricular->id], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($extracurricular, ['method' => 'PUT', 'route' => ['extracurricular.update', $extracurricular->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 @include('Extracurricular::form')
 {{ Form::close() }}
 {{-- Toggle tampilan jadwal --}}

@@ -1,4 +1,4 @@
-{{ Form::open(['method' => 'POST', 'route' => ['city.store'], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
+{{ Form::open(['method' => 'POST', 'route' => ['city.store'], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 
 <div class="row mb-3">
     <label class="col-sm-3 col-form-label">Kode</label>

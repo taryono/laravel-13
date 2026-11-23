@@ -1,4 +1,4 @@
-{{ Form::model($subject, ['method' => 'PUT', 'route' => ['subject.update', $subject->id], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($subject, ['method' => 'PUT', 'route' => ['subject.update', $subject->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 @php
     // Helper: tambahkan is-invalid bila field punya error
     $cls = fn($field, $base = 'form-control') => $base . ($errors->has($field) ? ' is-invalid' : '');

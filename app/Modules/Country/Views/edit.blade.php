@@ -1,4 +1,4 @@
-{{ Form::model($country, ['method' => 'PUT', 'route' => ['country.update', $country->id], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($country, ['method' => 'PUT', 'route' => ['country.update', $country->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 
 <div class="row mb-3">
     <label class="col-sm-3 col-form-label">Kode ISO <span class="text-danger">*</span></label>

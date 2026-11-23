@@ -1,4 +1,4 @@
-{{ Form::model($extracurricular - attendance, ['method' => 'PUT', 'route' => ['extracurricular_attendance.update', $extracurricular - attendance->id], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($extracurricular - attendance, ['method' => 'PUT', 'route' => ['extracurricular_attendance.update', $extracurricular - attendance->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 @include('ExtracurricularAttendance::form')
 {{ Form::close() }}
 

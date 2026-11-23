@@ -1,7 +1,7 @@
 @extends('layouts.front')
 
 @section('content')
-    <div class="py-2 px-2">
+    <div class="px-4 px-4 p-3">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="/">Beranda</a></li>
@@ -10,8 +10,9 @@
             </ol>
         </nav>
         <header class="py-4 mb-4">
-            <div class="ep-icon mb-4" style="width:64px;height:64px;font-size:1.75rem;background:#2563eb;color:#fff"><i
-                    class="bi bi-people"></i></div>
+            <div class="ep-icon mb-4 ps-3 pt-2 rounded"
+                style="width:64px;height:64px;font-size:1.75rem;background:#2563eb;color:#fff"><i class="bi bi-people"></i>
+            </div>
             <h1 class="display-5 mb-3">Kesiswaan</h1>
             <p class="lead text-secondary col-lg-8 px-0">PPDB Online, profil lengkap siswa, hingga manajemen alumni dan
                 prestasi.</p>

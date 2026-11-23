@@ -1,4 +1,4 @@
-{{ Form::model($shift - rate, ['method' => 'PUT', 'route' => ['shift_rate.update', $shift - rate->id], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($shift - rate, ['method' => 'PUT', 'route' => ['shift_rate.update', $shift - rate->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 @include('ShiftRate::_form')
 {{ Form::close() }}
 <!-- /.row -->

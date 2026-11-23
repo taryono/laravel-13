@@ -1,4 +1,4 @@
-{{ Form::open(['method' => 'POST', 'route' => ['shift_rate.store'], 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data']) }}
+{{ Form::open(['method' => 'POST', 'route' => ['shift_rate.store'], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
 @include('ShiftRate::_form')
 {{ Form::close() }}
 
