@@ -1,18 +1,16 @@
 <?php
-
 namespace App\Modules\PromotionBatch\Controllers;
-
 use App\DataTables\PromotionBatchDataTable;
 use App\Http\Controllers\MainController;
-use Models\PromotionBatch;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\RedirectResponse;
+use App\Http\Requests\PromotionBatchRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
+use Models\AcademicYear;
+use Models\PromotionBatch;
 use Throwable;
-use Illuminate\Support\Facades\Auth;
 
 class PromotionBatchController extends MainController
 {
@@ -36,7 +34,7 @@ class PromotionBatchController extends MainController
          * Yajra DataTables request contains "draw".
          *
          * Example:
-         * /promotion-batch?draw=1&start=0&length=10
+         * /promotion-approval?draw=1&start=0&length=10
          */
         if ($request->filled('draw')) {
             return $dataTable->ajax();
@@ -47,172 +45,96 @@ class PromotionBatchController extends MainController
         );
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create(): View
     {
-        $promotionBatch = new PromotionBatch();
-        $result = $this->getForm($promotionBatch);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
-
-        return view(
-            'PromotionBatch::create',
-            compact('promotionBatch', 'forms', 'groupedForms')
-        );
+        return view('PromotionBatch::create', $this->formOptions());
     }
 
-    /**
-     * Store a newly created resource.
-     */
-    public function store(Request $request)
+    public function store(PromotionBatchRequest $request)
     {
-        $validated = $request->validate([
-            'code' => ['required', 'string', 'max:255'],
-            'name' => ['required', 'string', 'max:255'],
-            'from_academic_year_id' => ['required', 'integer'],
-            'to_academic_year_id' => ['required', 'integer'],
-            'total_students' => ['required', 'string', 'max:255'],
-            'processed_count' => ['required', 'string', 'max:255'],
-            'promoted_count' => ['required', 'string', 'max:255'],
-            'retained_count' => ['required', 'string', 'max:255'],
-            'graduated_count' => ['required', 'string', 'max:255'],
-            'status' => ['required', 'string', 'max:255'],
-            'started_at' => ['required', 'string', 'max:255'],
-            'completed_at' => ['required', 'string', 'max:255'],
-            'created_by' => ['required', 'string', 'max:255'],
-            'created_at' => ['required', 'string', 'max:255'],
-            'updated_at' => ['required', 'string', 'max:255'],
-        ]);
+        $data = $request->validated();
 
         try {
-            $model = DB::transaction(function () use ($validated) {
-                return PromotionBatch::create($validated);
+            $model = DB::transaction(function () use ($data) {
+                return PromotionBatch::create($data + [
+                    'status' => PromotionBatch::STATUS_DRAFT, // batch baru selalu draft
+                    'created_by' => Auth::id(),
+                ]);
             });
 
-            return $this->successResponse(
-                $request,
-                'Data PromotionBatch berhasil ditambahkan.',
-                $model
-            );
+            return $this->successResponse($request, 'Batch kenaikan kelas berhasil ditambahkan.', $model);
         } catch (Throwable $e) {
+            Log::error('Gagal menambahkan PromotionBatch.', [
+                'exception' => $e,
+                'data' => $data,
+                'user_id' => $request->user()?->id,
+            ]);
 
-            Log::error(
-                'Gagal menambahkan PromotionBatch.',
-                [
-                    'exception' => $e,
-                    'data' => $validated,
-                    'user_id' => Auth::id(),
-                ]
-            );
-
-            return $this->errorResponse(
-                $request,
-                'Data PromotionBatch gagal ditambahkan.'
-            );
+            return $this->errorResponse($request, 'Batch kenaikan kelas gagal ditambahkan.');
         }
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit($id): View
+    public function edit(PromotionBatch $promotion_batch): View
     {
-        $promotionBatch = $this->model->findOrFail($id);
-        $result = $this->getForm($promotionBatch);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
+        $this->ensureDraft($promotion_batch);
 
-        return view(
-            'PromotionBatch::edit',
-            compact('promotionBatch', 'forms', 'groupedForms')
-        );
+        return view('PromotionBatch::edit', ['promotion_batch' => $promotion_batch] + $this->formOptions());
     }
 
-    /**
-     * Update the specified resource.
-     */
-    public function update(Request $request, $id)
+    public function update(PromotionBatchRequest $request, PromotionBatch $promotion_batch)
     {
-        $validated = $request->validate([
-            'code' => ['required', 'string', 'max:255'],
-            'name' => ['required', 'string', 'max:255'],
-            'from_academic_year_id' => ['required', 'integer'],
-            'to_academic_year_id' => ['required', 'integer'],
-            'total_students' => ['required', 'string', 'max:255'],
-            'processed_count' => ['required', 'string', 'max:255'],
-            'promoted_count' => ['required', 'string', 'max:255'],
-            'retained_count' => ['required', 'string', 'max:255'],
-            'graduated_count' => ['required', 'string', 'max:255'],
-            'status' => ['required', 'string', 'max:255'],
-            'started_at' => ['required', 'string', 'max:255'],
-            'completed_at' => ['required', 'string', 'max:255'],
-            'created_by' => ['required', 'string', 'max:255'],
-            'created_at' => ['required', 'string', 'max:255'],
-            'updated_at' => ['required', 'string', 'max:255'],
-        ]);
+        $this->ensureDraft($promotion_batch);
+
+        $data = $request->validated();
 
         try {
-            $promotionBatch = $this->model->findOrFail($id);
-            DB::transaction(function () use ($promotionBatch, $validated) {
-                $promotionBatch->update($validated);
-            });
+            DB::transaction(fn() => $promotion_batch->update($data));
 
-            return $this->successResponse(
-                $request,
-                'Data PromotionBatch berhasil diperbarui.',
-                $promotionBatch
-            );
+            return $this->successResponse($request, 'Batch kenaikan kelas berhasil diperbarui.', $promotion_batch);
         } catch (Throwable $e) {
-            Log::error(
-                'Gagal memperbarui PromotionBatch.',
-                [
-                    'exception' => $e,
-                    'PromotionBatch_id' => $id,
-                    'data' => $validated,
-                    'user_id' => Auth::id(),
-                ]
-            );
+            Log::error('Gagal memperbarui PromotionBatch.', [
+                'exception' => $e,
+                'promotion_batch_id' => $promotion_batch->id,
+                'data' => $data,
+                'user_id' => $request->user()?->id,
+            ]);
 
-            return $this->errorResponse(
-                $request,
-                'Data PromotionBatch gagal diperbarui.'
-            );
+            return $this->errorResponse($request, 'Batch kenaikan kelas gagal diperbarui.');
         }
     }
 
-    /**
-     * Remove the specified resource.
-     */
-    public function destroy(Request $request, $id): JsonResponse|RedirectResponse
+    public function destroy(Request $request, PromotionBatch $promotion_batch)
     {
+        $this->ensureDraft($promotion_batch);
+
         try {
-            $promotionBatch = $this->model->findOrFail($id);
+            DB::transaction(fn() => $promotion_batch->delete());
 
-            DB::transaction(function () use ($promotionBatch) {
-                $promotionBatch->delete();
-            });
-
-            return $this->successResponse(
-                $request,
-                'Data PromotionBatch berhasil dihapus.'
-            );
+            return $this->successResponse($request, 'Batch kenaikan kelas berhasil dihapus.', null);
         } catch (Throwable $e) {
-            // $promotionBatch->getKey() yang bisa undefined.
-            Log::error(
-                'Gagal menghapus PromotionBatch.',
-                [
-                    'exception' => $e,
-                    'PromotionBatch_id' => $id,
-                    'user_id' => Auth::id(),
-                ]
-            );
+            Log::error('Gagal menghapus PromotionBatch.', [
+                'exception' => $e,
+                'promotion_batch_id' => $promotion_batch->id,
+                'user_id' => $request->user()?->id,
+            ]);
 
-            return $this->errorResponse(
-                $request,
-                'Data PromotionBatch gagal dihapus.'
-            );
+            return $this->errorResponse($request, 'Batch kenaikan kelas gagal dihapus.');
         }
+    }
+
+    /* ---------- helpers ---------- */
+
+    private function formOptions(): array
+    {
+        return [
+            // sesuaikan kolom 'name' dengan kolom tampilan di tabel academic_years
+            'academicYears' => AcademicYear::orderByDesc('id')->pluck('name', 'id')->toArray(),
+        ];
+    }
+
+    /** Hanya batch berstatus draft yang boleh diubah / dihapus. */
+    private function ensureDraft(PromotionBatch $batch): void
+    {
+        abort_unless($batch->isDraft(), 403, 'Hanya batch berstatus draft yang dapat diubah atau dihapus.');
     }
 }

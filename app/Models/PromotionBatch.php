@@ -8,6 +8,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PromotionBatch extends SoftDeletableModel
 {
+    public const STATUS_DRAFT = 'draft';
+    public const STATUS_PROCESSING = 'processing';
+    public const STATUS_COMPLETED = 'completed';
+    public const STATUS_CANCELLED = 'cancelled';
     protected $fillable = [
         'code',
         'name',
@@ -129,5 +133,17 @@ class PromotionBatch extends SoftDeletableModel
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
+    }
+
+    public function isDraft(): bool
+    {
+        return $this->status === self::STATUS_DRAFT;
+    }
+
+    public function getProgressAttribute(): int
+    {
+        $total = (int) $this->total_students;
+
+        return $total > 0 ? (int) round(($this->processed_count / $total) * 100) : 0;
     }
 }

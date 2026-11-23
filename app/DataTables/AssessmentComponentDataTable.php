@@ -17,7 +17,7 @@ class AssessmentComponentDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['assessment_id', 'name', 'weight', 'max_score', 'order', 'is_active', 'created_by', 'updated_by'];
+    protected array $columns = ['assessment.name', 'name', 'weight', 'max_score', 'order', 'is_active', 'created_by', 'updated_by'];
 
     /**
      * Build DataTable response.
@@ -53,14 +53,14 @@ class AssessmentComponentDataTable extends DataTable
         $context = htmlspecialchars(
             json_encode([
                 'executeDraw' => true,
-                'tableId'     => 'assessment-component-table',
+                'tableId' => 'assessment-component-table',
                 'reloadDelay' => 500,
             ]),
             ENT_QUOTES,
             'UTF-8'
         );
 
-        $editUrl   = e(route('assessment_component.edit', $row));
+        $editUrl = e(route('assessment_component.edit', $row));
         $deleteUrl = e(route('assessment_component.destroy', $row));
 
         return <<<HTML
@@ -100,7 +100,7 @@ class AssessmentComponentDataTable extends DataTable
      */
     public function query(AssessmentComponent $model): QueryBuilder
     {
-        return $model->newQuery();
+        return $model->newQuery()->with(['assessment:id,name']);
     }
 
     /**
@@ -139,13 +139,13 @@ class AssessmentComponentDataTable extends DataTable
                  */
                 'dom' =>
                     '<"row mb-3"' .
-                        '<"col-md-6 d-flex align-items-center"B>' .
-                        '<"col-md-6"f>' .
+                    '<"col-md-6 d-flex align-items-center"B>' .
+                    '<"col-md-6"f>' .
                     '>' .
                     'rt' .
                     '<"row mt-3"' .
-                        '<"col-md-6"i>' .
-                        '<"col-md-6 d-flex justify-content-md-end"p>' .
+                    '<"col-md-6"i>' .
+                    '<"col-md-6 d-flex justify-content-md-end"p>' .
                     '>',
 
                 /*
@@ -264,12 +264,12 @@ class AssessmentComponentDataTable extends DataTable
      * explode() dari string literal seperti versi lama, yang rapuh
      * terhadap karakter khusus pada nama kolom.
      */
-     
+
     protected function getColumns(): array
     {
         return collect($this->columns)
-            ->map(fn (string $kolom) => Column::make($kolom)
-                ->title(ucwords(str_replace(['_',"."], [' ',' '], $kolom))))
+            ->map(fn(string $kolom) => Column::make($kolom)
+                ->title(ucwords(str_replace(['_', "."], [' ', ' '], $kolom))))
             // 1. PREPEND: Masukkan kolom No di posisi PALING AWAL (indeks 0)
             ->prepend(
                 Column::make('DT_RowIndex')

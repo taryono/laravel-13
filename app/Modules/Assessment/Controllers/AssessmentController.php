@@ -51,15 +51,13 @@ class AssessmentController extends MainController
      */
     public function create(): View
     {
-        $assessment = new Assessment();
-        $result = $this->getForm($assessment);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
-
-        return view(
-            'Assessment::create',
-            compact('assessment', 'forms', 'groupedForms')
-        );
+        return view('Assessment::create', [
+            'curriculumStructures' => \Models\CurriculumStructure::where('school_id', auth()->user()->school_id)->get(['id', 'name']),
+            'assessmentTypes' => \Models\AssessmentType::get(['id', 'name']),
+            'assessmentMethods' => \Models\AssessmentMethod::get(['id', 'name']),
+            'assessmentRubrics' => \Models\AssessmentRubric::get(['id', 'name']),
+            'academicYears' => \Models\AcademicYear::get(['id', 'name']),
+        ]);
     }
 
     /**
@@ -123,14 +121,13 @@ class AssessmentController extends MainController
     public function edit($id): View
     {
         $assessment = $this->model->findOrFail($id);
-        $result = $this->getForm($assessment);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
-
-        return view(
-            'Assessment::edit',
-            compact('assessment', 'forms', 'groupedForms')
-        );
+        return view('Assessment::edit', compact('assessment'))->with([
+            'curriculumStructures' => \Models\CurriculumStructure::where('school_id', $assessment->school_id)->get(['id', 'name']),
+            'assessmentTypes' => \Models\AssessmentType::get(['id', 'name']),
+            'assessmentMethods' => \Models\AssessmentMethod::get(['id', 'name']),
+            'assessmentRubrics' => \Models\AssessmentRubric::get(['id', 'name']),
+            'academicYears' => \Models\AcademicYear::get(['id', 'name']),
+        ]);
     }
 
     /**
