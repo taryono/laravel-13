@@ -145,10 +145,10 @@
                     data-icon="chevron_right">chevron_right</span>
             </button>
         </div>
-        <div class="d-flex flex-column gap-3">
+        <div class="d-flex flex-row gap-3">
             <!-- Item 1: Lab Komputer Multimedia 1 -->
             <div
-                class="bg-surface-container-lowest p-3 rounded-4 border border-outline-variant border-opacity-25 shadow-card shadow-card-hover transition-all">
+                class="bg-surface-container-lowest p-3 rounded-4 border border-outline-variant border-opacity-25 shadow-card shadow-card-hover transition-all w-25">
                 <div class="d-flex align-items-start justify-content-between gap-2 mb-2">
                     <div class="d-flex align-items-center gap-3">
                         <div class="icon-box" style="background-color: rgba(0, 106, 97, 0.1); color: var(--secondary);">
@@ -184,7 +184,7 @@
 
             <!-- Item 2: Lab IPA & Kimia -->
             <div
-                class="bg-surface-container-lowest p-3 rounded-4 border border-outline-variant border-opacity-25 shadow-card shadow-card-hover transition-all">
+                class="bg-surface-container-lowest p-3 rounded-4 border border-outline-variant border-opacity-25 shadow-card shadow-card-hover transition-all w-25">
                 <div class="d-flex align-items-start justify-content-between gap-2 mb-2">
                     <div class="d-flex align-items-center gap-3">
                         <div class="icon-box" style="background-color: rgba(2, 16, 100, 0.1); color: var(--primary);">
@@ -218,7 +218,7 @@
 
             <!-- Item 3: Aula Utama -->
             <div
-                class="bg-surface-container-lowest p-3 rounded-4 border border-outline-variant border-opacity-25 shadow-card shadow-card-hover transition-all">
+                class="bg-surface-container-lowest p-3 rounded-4 border border-outline-variant border-opacity-25 shadow-card shadow-card-hover transition-all w-25">
                 <div class="d-flex align-items-start justify-content-between gap-2 mb-2">
                     <div class="d-flex align-items-center gap-3">
                         <div class="icon-box bg-surface-container text-primary-container">
@@ -252,7 +252,7 @@
 
             <!-- Item 4: Lapangan Indoor -->
             <div
-                class="bg-surface-container-lowest p-3 rounded-4 border border-outline-variant border-opacity-25 shadow-card shadow-card-hover transition-all">
+                class="bg-surface-container-lowest p-3 rounded-4 border border-outline-variant border-opacity-25 shadow-card shadow-card-hover transition-all w-25">
                 <div class="d-flex align-items-start justify-content-between gap-2 mb-2">
                     <div class="d-flex align-items-center gap-3">
                         <div class="icon-box" style="background-color: rgba(254, 243, 199, 0.4); color: #B45309;">
@@ -296,7 +296,7 @@
             <span class="fs-label-sm text-primary fw-bold px-3 py-1 rounded-pill bg-primary-fixed-50">2
                 Aktif</span>
         </div>
-        <div class="d-flex flex-column gap-3">
+        <div class="d-flex flex-row gap-3">
             <!-- Tiket 1 -->
             <div
                 class="bg-surface-container-lowest p-3 rounded-4 border border-outline-variant border-opacity-25 shadow-card position-relative">
