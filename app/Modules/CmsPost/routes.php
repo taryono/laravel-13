@@ -23,5 +23,5 @@ Route::group(['prefix' => 'cms-post', 'namespace' => 'App\Modules\CmsPost\Contro
     Route::get('/edit/{id}', ['as' => 'cms_post.edit', 'uses' => 'CmsPostController@edit']);
     Route::put('/update/{id}', ['as' => 'cms_post.update', 'uses' => 'CmsPostController@update']);
     Route::delete('/delete/{id}', ['as' => 'cms_post.destroy', 'uses' => 'CmsPostController@destroy']);
-    
+    Route::post('/upload-image', ['as' => 'cms_post.upload_image', 'uses' => 'CmsPostController@uploadImage']);
 });

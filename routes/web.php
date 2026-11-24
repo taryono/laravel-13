@@ -5,6 +5,9 @@ use App\Http\Controllers\WelcomeController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LocaleController;
 use App\Modules\Dashboard\Controllers\DashboardController;
+use App\Http\Controllers\Public\NewsController;
+use App\Http\Controllers\Public\NewsCommentController;
+
 
 Route::get('/', [WelcomeController::class, 'index'])->name('welcome.index');
 Route::middleware('auth')->group(function () {
@@ -76,3 +79,13 @@ Route::get('/keuangan', function () {
 Route::get('/parent-portal', function () {
     return view('details.parent-portal');
 })->name('parent-portal')->middleware(['guest']);
+
+
+Route::post('/berita/{slug}/komentar', [NewsCommentController::class, 'store'])
+    ->middleware('throttle:5,1')
+    ->name('public.news.comments.store');
+
+Route::prefix('berita')->name('public.news.')->group(function () {
+    Route::get('/', [NewsController::class, 'index'])->name('index');
+    Route::get('/{slug}', [NewsController::class, 'show'])->name('show');
+});

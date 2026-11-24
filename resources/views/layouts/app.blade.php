@@ -198,7 +198,26 @@
             });
         @endif
     </script>
+    <!-- CSS & JS Summernote BS5 -->
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-bs5.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-bs5.min.js"></script>
 
+    <script>
+        $(function() {
+            $('#content').summernote({
+                height: 300,
+                placeholder: 'Tulis isi artikel di sini...',
+                toolbar: [
+                    ['style', ['style']],
+                    ['font', ['bold', 'italic', 'underline', 'clear']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['table', ['table']],
+                    ['insert', ['link', 'picture']],
+                    ['view', ['codeview']]
+                ]
+            });
+        });
+    </script>
     @stack('scripts')
 </body>
 

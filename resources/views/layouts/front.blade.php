@@ -34,6 +34,8 @@
                     <li class="nav-item"><a class="nav-link" href="#modules">Finance &amp; Admin</a></li>
                     <li class="nav-item"><a class="nav-link" href="#modules">Features</a></li>
                     <li class="nav-item"><a class="nav-link" href="#pricing">Pricing</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/berita">Berita</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/ppdb">PPDB</a></li>
                 </ul>
                 <div class="d-flex align-items-center gap-3">
                     <button id="themeToggle" class="btn nav-link p-0 border-0 bg-transparent" title="Ubah Tema">
