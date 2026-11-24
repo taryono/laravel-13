@@ -49,15 +49,15 @@ class SubjectDataTable extends DataTable
         $context = htmlspecialchars(
             json_encode([
                 'executeDraw' => true,
-                'tableId'     => 'subject-table',
+                'tableId' => 'subject-table',
                 'reloadDelay' => 500,
             ]),
             ENT_QUOTES,
             'UTF-8'
         );
 
-        $editUrl   = e(route('subject.edit', $row));
-        $deleteUrl = e(route('subject.destroy', $row));
+        $editUrl = e(route('subject.edit', $row->id));
+        $deleteUrl = e(route('subject.destroy', $row->id));
 
         return <<<HTML
             <div class="d-flex justify-content-center gap-1">
@@ -134,7 +134,7 @@ class SubjectDataTable extends DataTable
                  * Custom Bootstrap 5 layout.
                  */
                 'dom' =>
-                '<"row mb-3"' .
+                    '<"row mb-3"' .
                     '<"col-md-6 d-flex align-items-center"B>' .
                     '<"col-md-6"f>' .
                     '>' .

@@ -60,8 +60,8 @@ class DifficultyLevelDataTable extends DataTable
             'UTF-8'
         );
 
-        $editUrl = e(route('difficulty_level.edit', $row));
-        $deleteUrl = e(route('difficulty_level.destroy', $row));
+        $editUrl = e(route('difficulty_level.edit', $row->id));
+        $deleteUrl = e(route('difficulty_level.destroy', $row->id));
 
         return <<<HTML
             <div class="d-flex justify-content-center gap-1">

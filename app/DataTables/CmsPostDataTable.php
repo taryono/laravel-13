@@ -32,11 +32,11 @@ class CmsPostDataTable extends DataTable
                 return $row->category->name ?? '-';
             })
             ->editColumn('status', function ($row) {
-                $color = match($row->status) {
+                $color = match ($row->status) {
                     'published' => 'success',
                     'scheduled' => 'info',
-                    'archived'  => 'secondary',
-                    default     => 'warning'
+                    'archived' => 'secondary',
+                    default => 'warning'
                 };
                 return '<span class="badge bg-' . $color . '">' . ucfirst($row->status ?? 'draft') . '</span>';
             })
@@ -68,15 +68,15 @@ class CmsPostDataTable extends DataTable
         $context = htmlspecialchars(
             json_encode([
                 'executeDraw' => true,
-                'tableId'     => 'cms-post-table',
+                'tableId' => 'cms-post-table',
                 'reloadDelay' => 500,
             ]),
             ENT_QUOTES,
             'UTF-8'
         );
 
-        $editUrl   = e(route('cms_post.edit', $row));
-        $deleteUrl = e(route('cms_post.destroy', $row));
+        $editUrl = e(route('cms_post.edit', $row->id));
+        $deleteUrl = e(route('cms_post.destroy', $row->id));
 
         return <<<HTML
             <div class="d-flex justify-content-center gap-1">
@@ -154,13 +154,13 @@ class CmsPostDataTable extends DataTable
                  */
                 'dom' =>
                     '<"row mb-3"' .
-                        '<"col-md-6 d-flex align-items-center"B>' .
-                        '<"col-md-6"f>' .
+                    '<"col-md-6 d-flex align-items-center"B>' .
+                    '<"col-md-6"f>' .
                     '>' .
                     'rt' .
                     '<"row mt-3"' .
-                        '<"col-md-6"i>' .
-                        '<"col-md-6 d-flex justify-content-md-end"p>' .
+                    '<"col-md-6"i>' .
+                    '<"col-md-6 d-flex justify-content-md-end"p>' .
                     '>',
 
                 /*
@@ -279,12 +279,12 @@ class CmsPostDataTable extends DataTable
      * explode() dari string literal seperti versi lama, yang rapuh
      * terhadap karakter khusus pada nama kolom.
      */
-     
+
     protected function getColumns(): array
     {
         return collect($this->columns)
-            ->map(fn (string $kolom) => Column::make($kolom)
-                ->title(ucwords(str_replace(['_',"."], [' ',' '], $kolom))))
+            ->map(fn(string $kolom) => Column::make($kolom)
+                ->title(ucwords(str_replace(['_', "."], [' ', ' '], $kolom))))
             // 1. PREPEND: Masukkan kolom No di posisi PALING AWAL (indeks 0)
             ->prepend(
                 Column::make('DT_RowIndex')

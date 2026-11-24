@@ -53,15 +53,15 @@ class ApplicationDocumentDataTable extends DataTable
         $context = htmlspecialchars(
             json_encode([
                 'executeDraw' => true,
-                'tableId'     => 'application-document-table',
+                'tableId' => 'application-document-table',
                 'reloadDelay' => 500,
             ]),
             ENT_QUOTES,
             'UTF-8'
         );
 
-        $editUrl   = e(route('application_document.edit', $row));
-        $deleteUrl = e(route('application_document.destroy', $row));
+        $editUrl = e(route('application_document.edit', $row->id));
+        $deleteUrl = e(route('application_document.destroy', $row->id));
 
         return <<<HTML
             <div class="d-flex justify-content-center gap-1">
@@ -138,7 +138,7 @@ class ApplicationDocumentDataTable extends DataTable
                  * Custom Bootstrap 5 layout.
                  */
                 'dom' =>
-                '<"row mb-3"' .
+                    '<"row mb-3"' .
                     '<"col-md-6 d-flex align-items-center"B>' .
                     '<"col-md-6"f>' .
                     '>' .

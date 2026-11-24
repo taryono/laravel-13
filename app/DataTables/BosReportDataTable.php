@@ -60,8 +60,8 @@ class BosReportDataTable extends DataTable
             'UTF-8'
         );
 
-        $editUrl = e(route('bos_report.edit', $row));
-        $deleteUrl = e(route('bos_report.destroy', $row));
+        $editUrl = e(route('bos_report.edit', $row->id));
+        $deleteUrl = e(route('bos_report.destroy', $row->id));
 
         return <<<HTML
             <div class="d-flex justify-content-center gap-1">

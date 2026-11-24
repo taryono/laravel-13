@@ -50,6 +50,7 @@
             margin-left: 0 !important;
             min-height: 100dvh;
         }
+
         .bottom-nav {
             background: rgba(255, 255, 255, 0.92);
             backdrop-filter: blur(12px);
@@ -59,6 +60,7 @@
             border-top: 1px solid rgba(198, 197, 211, .4);
             padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
         }
+
         body.dark-mode .bottom-nav {
             background: rgba(30, 30, 30, 0.92);
             border-top-color: rgba(255, 255, 255, 0.1);
@@ -76,7 +78,7 @@
     <nav class="bnsp-topnav" id="bnspTopnav">
         <div class="bnsp-topnav-brand">
             <span class="material-symbols-outlined">workspace_premium</span>
-            <span>BNSP Portal</span>
+            <span>EduPulse</span>
         </div>
 
         {{-- Flash Messages Container --}}
@@ -90,13 +92,15 @@
         <x-topbar />
 
         {{-- Main content with ID for dynamic loading --}}
-        <main class="flex-grow-1 p-3 p-md-4 mx-auto w-100 main-content pb-5 mb-5 pb-lg-4 mb-lg-0" id="mainContent" style="max-width:1440px;">
+        <main class="flex-grow-1 p-3 p-md-4 mx-auto w-100 main-content pb-5 mb-5 pb-lg-4 mb-lg-0" id="mainContent"
+            style="max-width:1440px;">
             @yield('content')
         </main>
 
         {{-- ========== BOTTOM NAV (Mobile only) ========== --}}
         @if (isset($navItems))
-            <nav class="bottom-nav fixed-bottom w-100 d-flex d-lg-none justify-content-around align-items-center px-2 py-2">
+            <nav
+                class="bottom-nav fixed-bottom w-100 d-flex d-lg-none justify-content-around align-items-center px-2 py-2">
                 @foreach ($navItems as $item)
                     <a href="{{ $item->url }}"
                         class="nav-item-edu d-flex flex-column align-items-center justify-content-center {{ $item->active ? 'active' : '' }}"

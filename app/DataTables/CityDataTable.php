@@ -60,8 +60,8 @@ class CityDataTable extends DataTable
             'UTF-8'
         );
 
-        $editUrl = e(route('city.edit', $row));
-        $deleteUrl = e(route('city.destroy', $row));
+        $editUrl = e(route('city.edit', $row->id));
+        $deleteUrl = e(route('city.destroy', $row->id));
 
         return <<<HTML
             <div class="d-flex justify-content-center gap-1">

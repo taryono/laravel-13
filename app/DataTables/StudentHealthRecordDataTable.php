@@ -53,15 +53,15 @@ class StudentHealthRecordDataTable extends DataTable
         $context = htmlspecialchars(
             json_encode([
                 'executeDraw' => true,
-                'tableId'     => 'student-health-record-table',
+                'tableId' => 'student-health-record-table',
                 'reloadDelay' => 500,
             ]),
             ENT_QUOTES,
             'UTF-8'
         );
 
-        $editUrl   = e(route('student_health_record.edit', $row));
-        $deleteUrl = e(route('student_health_record.destroy', $row));
+        $editUrl = e(route('student_health_record.edit', $row->id));
+        $deleteUrl = e(route('student_health_record.destroy', $row->id));
 
         return <<<HTML
             <div class="d-flex justify-content-center gap-1">
@@ -138,7 +138,7 @@ class StudentHealthRecordDataTable extends DataTable
                  * Custom Bootstrap 5 layout.
                  */
                 'dom' =>
-                '<"row mb-3"' .
+                    '<"row mb-3"' .
                     '<"col-md-6 d-flex align-items-center"B>' .
                     '<"col-md-6"f>' .
                     '>' .

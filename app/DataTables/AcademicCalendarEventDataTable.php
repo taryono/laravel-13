@@ -62,15 +62,15 @@ class AcademicCalendarEventDataTable extends DataTable
         $context = htmlspecialchars(
             json_encode([
                 'executeDraw' => true,
-                'tableId'     => 'academic-calendar-event-table',
+                'tableId' => 'academic-calendar-event-table',
                 'reloadDelay' => 500,
             ]),
             ENT_QUOTES,
             'UTF-8'
         );
 
-        $editUrl   = e(route('academic_calendar_event.edit', $row));
-        $deleteUrl = e(route('academic_calendar_event.destroy', $row));
+        $editUrl = e(route('academic_calendar_event.edit', $row->id));
+        $deleteUrl = e(route('academic_calendar_event.destroy', $row->id));
 
         return <<<HTML
             <div class="d-flex justify-content-center gap-1">
@@ -147,7 +147,7 @@ class AcademicCalendarEventDataTable extends DataTable
                  * Custom Bootstrap 5 layout.
                  */
                 'dom' =>
-                '<"row mb-3"' .
+                    '<"row mb-3"' .
                     '<"col-md-6 d-flex align-items-center"B>' .
                     '<"col-md-6"f>' .
                     '>' .

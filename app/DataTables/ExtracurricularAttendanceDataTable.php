@@ -94,8 +94,8 @@ class ExtracurricularAttendanceDataTable extends DataTable
             'UTF-8'
         );
 
-        $editUrl = e(route('extracurricular_attendance.edit', $row));
-        $deleteUrl = e(route('extracurricular_attendance.destroy', $row));
+        $editUrl = e(route('extracurricular_attendance.edit', $row->id));
+        $deleteUrl = e(route('extracurricular_attendance.destroy', $row->id));
 
         return <<<HTML
             <div class="d-flex justify-content-center gap-1">

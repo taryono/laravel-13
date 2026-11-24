@@ -17,7 +17,7 @@ class AccountMappingDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['organization.name','source_type', 'source_code', 'debit_account.name', 'credit_account.name', 'description', 'status'];
+    protected array $columns = ['organization.name', 'source_type', 'source_code', 'debit_account.name', 'credit_account.name', 'description', 'status'];
 
     /**
      * Build DataTable response.
@@ -28,7 +28,7 @@ class AccountMappingDataTable extends DataTable
             ->addColumn('action', function ($row) {
                 return $this->renderActionButtons($row);
             })->addColumn('status', function ($row) {
-                return $row->is_active ? '<span class="badge bg-success">Aktif</span>':'<span class="badge bg-danger">TIdak Aktif</span>';
+                return $row->is_active ? '<span class="badge bg-success">Aktif</span>' : '<span class="badge bg-danger">TIdak Aktif</span>';
             })
             ->addIndexColumn()
             ->rawColumns(['action', 'status']) // ✅ Tetap wajib ada!
@@ -55,15 +55,15 @@ class AccountMappingDataTable extends DataTable
         $context = htmlspecialchars(
             json_encode([
                 'executeDraw' => true,
-                'tableId'     => 'account_mapping-table',
+                'tableId' => 'account_mapping-table',
                 'reloadDelay' => 500,
             ]),
             ENT_QUOTES,
             'UTF-8'
         );
 
-        $editUrl   = e(route('account_mapping.edit', $row));
-        $deleteUrl = e(route('account_mapping.destroy', $row));
+        $editUrl = e(route('account_mapping.edit', $row->id));
+        $deleteUrl = e(route('account_mapping.destroy', $row->id));
 
         return <<<HTML
             <div class="d-flex justify-content-center gap-1">
@@ -141,13 +141,13 @@ class AccountMappingDataTable extends DataTable
                  */
                 'dom' =>
                     '<"row mb-3"' .
-                        '<"col-md-6 d-flex align-items-center"B>' .
-                        '<"col-md-6"f>' .
+                    '<"col-md-6 d-flex align-items-center"B>' .
+                    '<"col-md-6"f>' .
                     '>' .
                     'rt' .
                     '<"row mt-3"' .
-                        '<"col-md-6"i>' .
-                        '<"col-md-6 d-flex justify-content-md-end"p>' .
+                    '<"col-md-6"i>' .
+                    '<"col-md-6 d-flex justify-content-md-end"p>' .
                     '>',
 
                 /*
@@ -269,8 +269,8 @@ class AccountMappingDataTable extends DataTable
     protected function getColumns(): array
     {
         $daftarKolom = collect($this->columns)
-            ->map(fn (string $kolom) => Column::make($kolom)
-                ->title(ucwords(str_replace(['_',"."], [' ',' '], $kolom))))
+            ->map(fn(string $kolom) => Column::make($kolom)
+                ->title(ucwords(str_replace(['_', "."], [' ', ' '], $kolom))))
             ->all();
 
         $daftarKolom[] = Column::make('DT_RowIndex')

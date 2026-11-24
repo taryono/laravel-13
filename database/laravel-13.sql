@@ -1080,42 +1080,87 @@ INSERT INTO `admission_timelines` VALUES (8, 1, 'Daftar Ulang Fisik di Sekolah',
 -- Table structure for admissions
 -- ----------------------------
 DROP TABLE IF EXISTS `admissions`;
-CREATE TABLE `admissions`  (
-  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
-  `school_id` bigint UNSIGNED NOT NULL,
-  `academic_year_id` bigint UNSIGNED NOT NULL,
-  `class_level_id` bigint UNSIGNED NULL DEFAULT NULL,
-  `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `code` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `start_date` date NOT NULL,
-  `end_date` date NOT NULL,
-  `quota` int NOT NULL DEFAULT 0,
-  `registration_fee` decimal(15, 2) NOT NULL DEFAULT 0.00,
-  `min_age` int NULL DEFAULT NULL,
-  `max_age` int NULL DEFAULT NULL,
-  `requirements` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
-  `is_active` tinyint(1) NOT NULL DEFAULT 1,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL,
-  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
-  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
-  PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `admissions_school_code_unique`(`school_id` ASC, `code` ASC) USING BTREE,
-  INDEX `admissions_school_index`(`school_id` ASC) USING BTREE,
-  INDEX `admissions_academic_year_index`(`academic_year_id` ASC) USING BTREE,
-  INDEX `admissions_class_level_index`(`class_level_id` ASC) USING BTREE,
-  INDEX `admissions_dates_index`(`start_date` ASC, `end_date` ASC) USING BTREE,
-  INDEX `admissions_is_active_index`(`is_active` ASC) USING BTREE,
-  INDEX `admissions_deleted_at_index`(`deleted_at` ASC) USING BTREE,
-  INDEX `admissions_created_by_index`(`created_by` ASC) USING BTREE,
-  INDEX `admissions_updated_by_index`(`updated_by` ASC) USING BTREE,
-  CONSTRAINT `admissions_academic_year_id_foreign` FOREIGN KEY (`academic_year_id`) REFERENCES `academic_years` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `admissions_class_level_id_foreign` FOREIGN KEY (`class_level_id`) REFERENCES `class_levels` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `admissions_school_id_foreign` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+CREATE TABLE `admissions` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
 
+    -- Foreign keys
+    `school_id` BIGINT UNSIGNED NOT NULL,
+    `academic_year_id` BIGINT UNSIGNED NOT NULL,
+    `class_level_id` BIGINT UNSIGNED NULL,
+
+    -- Identitas
+    `name` VARCHAR(100) NOT NULL,
+    `code` VARCHAR(20) NOT NULL,
+    `type` VARCHAR(20) NULL DEFAULT 'REGULAR',
+
+    -- Periode
+    `start_date` DATE NOT NULL,
+    `end_date` DATE NOT NULL,
+
+    -- Kuota & biaya
+    `quota` INT UNSIGNED NOT NULL DEFAULT 0,
+    `registration_fee` DECIMAL(15,2) NOT NULL DEFAULT 0.00,
+
+    -- Batas usia minimum
+    `min_age_years` TINYINT UNSIGNED NULL,
+    `min_age_months` TINYINT UNSIGNED NULL,
+    `min_age_reference_date` DATE NULL,
+
+    -- Batas usia maksimum
+    `max_age_years` TINYINT UNSIGNED NULL,
+    `max_age_months` TINYINT UNSIGNED NULL,
+    `max_age_reference_date` DATE NULL,
+
+    -- Lainnya
+    `requirements` TEXT NULL,
+    `is_active` TINYINT(1) NOT NULL DEFAULT 1,
+
+    -- Timestamps & soft deletes
+    `created_at` TIMESTAMP NULL,
+    `updated_at` TIMESTAMP NULL,
+    `deleted_at` TIMESTAMP NULL,
+
+    -- Audit
+    `created_by` BIGINT UNSIGNED NULL,
+    `updated_by` BIGINT UNSIGNED NULL,
+
+    -- Generated column untuk unique constraint soft-delete friendly
+    `is_not_deleted` TINYINT(1)
+        GENERATED ALWAYS AS (CASE WHEN `deleted_at` IS NULL THEN 1 ELSE NULL END) STORED,
+
+    PRIMARY KEY (`id`),
+
+    -- Unique: 1 kode hanya boleh 1x per sekolah selama belum dihapus
+    UNIQUE KEY `uq_admissions_school_code_active`
+        (`school_id`, `code`, `is_not_deleted`),
+
+    -- Indexes
+    KEY `idx_admissions_school_year_active`
+        (`school_id`, `academic_year_id`, `is_active`),
+    KEY `idx_admissions_dates`
+        (`start_date`, `end_date`),
+
+    -- Foreign keys
+    CONSTRAINT `fk_admissions_school`
+        FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+
+    CONSTRAINT `fk_admissions_academic_year`
+        FOREIGN KEY (`academic_year_id`) REFERENCES `academic_years` (`id`)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+
+    CONSTRAINT `fk_admissions_class_level`
+        FOREIGN KEY (`class_level_id`) REFERENCES `class_levels` (`id`)
+        ON DELETE SET NULL ON UPDATE CASCADE,
+
+    CONSTRAINT `fk_admissions_created_by`
+        FOREIGN KEY (`created_by`) REFERENCES `users` (`id`)
+        ON DELETE SET NULL ON UPDATE CASCADE,
+
+    CONSTRAINT `fk_admissions_updated_by`
+        FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`)
+        ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 -- ----------------------------
 -- Records of admissions
 -- ----------------------------

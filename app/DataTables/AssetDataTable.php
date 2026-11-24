@@ -106,8 +106,8 @@ class AssetDataTable extends DataTable
             'UTF-8'
         );
 
-        $editUrl = e(route('asset.edit', $row));
-        $deleteUrl = e(route('asset.destroy', $row));
+        $editUrl = e(route('asset.edit', $row->id));
+        $deleteUrl = e(route('asset.destroy', $row->id));
 
         return <<<HTML
             <div class="d-flex justify-content-center gap-1">

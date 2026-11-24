@@ -52,14 +52,12 @@ class AdmissionController extends MainController
     public function create(): View
     {
         $admission = new Admission();
-        $result = $this->getForm($admission);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
-
-        return view(
-            'Admission::create',
-            compact('admission', 'forms', 'groupedForms')
-        );
+        return view('Admission::create', [
+            'admission' => $admission,
+            'schools' => \Models\School::orderBy('name')->get(['id', 'name']),
+            'academicYears' => \Models\AcademicYear::orderByDesc('name')->get(['id', 'name']),
+            'classLevels' => \Models\ClassLevel::orderBy('id')->get(['id', 'name']),
+        ]);
     }
 
     /**
@@ -124,14 +122,12 @@ class AdmissionController extends MainController
     public function edit($id): View
     {
         $admission = $this->model->findOrFail($id);
-        $result = $this->getForm($admission);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
-
-        return view(
-            'Admission::edit',
-            compact('admission', 'forms', 'groupedForms')
-        );
+        return view('Admission::edit', [
+            'admission' => $admission,
+            'schools' => \Models\School::orderBy('name')->get(['id', 'name']),
+            'academicYears' => \Models\AcademicYear::orderByDesc('name')->get(['id', 'name']),
+            'classLevels' => \Models\ClassLevel::orderBy('id')->get(['id', 'name']),
+        ]);
     }
 
     /**

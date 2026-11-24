@@ -60,8 +60,8 @@ class RegionDataTable extends DataTable
             'UTF-8'
         );
 
-        $editUrl = e(route('region.edit', $row));
-        $deleteUrl = e(route('region.destroy', $row));
+        $editUrl = e(route('region.edit', $row->id));
+        $deleteUrl = e(route('region.destroy', $row->id));
 
         return <<<HTML
             <div class="d-flex justify-content-center gap-1">

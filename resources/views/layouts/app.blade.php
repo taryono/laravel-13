@@ -62,7 +62,7 @@
     <nav class="bnsp-topnav" id="bnspTopnav">
         <div class="bnsp-topnav-brand">
             <span class="material-symbols-outlined">workspace_premium</span>
-            <span>BNSP Portal</span>
+            <span>EduPulse</span>
         </div>
 
         {{-- Flash Messages Container --}}

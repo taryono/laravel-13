@@ -53,15 +53,15 @@ class AdmissionTestResultDataTable extends DataTable
         $context = htmlspecialchars(
             json_encode([
                 'executeDraw' => true,
-                'tableId'     => 'admission-test-result-table',
+                'tableId' => 'admission-test-result-table',
                 'reloadDelay' => 500,
             ]),
             ENT_QUOTES,
             'UTF-8'
         );
 
-        $editUrl   = e(route('admission_test_result.edit', $row));
-        $deleteUrl = e(route('admission_test_result.destroy', $row));
+        $editUrl = e(route('admission_test_result.edit', $row->id));
+        $deleteUrl = e(route('admission_test_result.destroy', $row->id));
 
         return <<<HTML
             <div class="d-flex justify-content-center gap-1">
@@ -138,7 +138,7 @@ class AdmissionTestResultDataTable extends DataTable
                  * Custom Bootstrap 5 layout.
                  */
                 'dom' =>
-                '<"row mb-3"' .
+                    '<"row mb-3"' .
                     '<"col-md-6 d-flex align-items-center"B>' .
                     '<"col-md-6"f>' .
                     '>' .

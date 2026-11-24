@@ -53,15 +53,15 @@ class ExtracurricularDataTable extends DataTable
         $context = htmlspecialchars(
             json_encode([
                 'executeDraw' => true,
-                'tableId'     => 'extracurricular-table',
+                'tableId' => 'extracurricular-table',
                 'reloadDelay' => 500,
             ]),
             ENT_QUOTES,
             'UTF-8'
         );
 
-        $editUrl   = e(route('extracurricular.edit', $row));
-        $deleteUrl = e(route('extracurricular.destroy', $row));
+        $editUrl = e(route('extracurricular.edit', $row->id));
+        $deleteUrl = e(route('extracurricular.destroy', $row->id));
 
         return <<<HTML
             <div class="d-flex justify-content-center gap-1">
@@ -138,7 +138,7 @@ class ExtracurricularDataTable extends DataTable
                  * Custom Bootstrap 5 layout.
                  */
                 'dom' =>
-                '<"row mb-3"' .
+                    '<"row mb-3"' .
                     '<"col-md-6 d-flex align-items-center"B>' .
                     '<"col-md-6"f>' .
                     '>' .

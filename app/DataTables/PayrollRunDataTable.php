@@ -60,8 +60,8 @@ class PayrollRunDataTable extends DataTable
             'UTF-8'
         );
 
-        $editUrl = e(route('payroll_run.edit', $row));
-        $deleteUrl = e(route('payroll_run.destroy', $row));
+        $editUrl = e(route('payroll_run.edit', $row->id));
+        $deleteUrl = e(route('payroll_run.destroy', $row->id));
 
         return <<<HTML
             <div class="d-flex justify-content-center gap-1">

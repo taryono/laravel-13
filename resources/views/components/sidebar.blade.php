@@ -3,20 +3,23 @@
 
 <aside class="bnsp-sidebar d-flex flex-column" id="bnspSidebar">
     <div class="bnsp-sidebar-brand mb-3 px-2">
-        <h1 class="h5 fw-bold text-white mb-1">BNSP Portal</h1>
+        <h1 class="h5 fw-bold text-white mb-1">EduPulse</h1>
         <p class="text-white-50 small text-uppercase mb-0" style="font-size:.7rem;">National Agency</p>
     </div>
 
-    @if(isset($activeMenuCategory) && $activeMenuCategory)
+    @if (isset($activeMenuCategory) && $activeMenuCategory)
         <div class="px-2 mb-2">
-            <div class="d-flex align-items-center justify-content-between p-2 rounded bg-white bg-opacity-10 text-white border border-white border-opacity-15">
+            <div
+                class="d-flex align-items-center justify-content-between p-2 rounded bg-white bg-opacity-10 text-white border border-white border-opacity-15">
                 <div class="d-flex align-items-center gap-2 overflow-hidden">
-                    <span class="material-symbols-outlined fs-6 text-warning">{{ $activeMenuCategory->icon ?? 'apps' }}</span>
-                    <span class="small fw-semibold text-truncate" title="{{ $activeMenuCategory->name }}">{{ $activeMenuCategory->name }}</span>
+                    <span
+                        class="material-symbols-outlined fs-6 text-warning">{{ $activeMenuCategory->icon ?? 'apps' }}</span>
+                    <span class="small fw-semibold text-truncate"
+                        title="{{ $activeMenuCategory->name }}">{{ $activeMenuCategory->name }}</span>
                 </div>
-                <a href="{{ route('dashboard.select-category.get', ['id' => 'all']) }}" 
-                   class="btn btn-sm text-white-50 p-0 ms-1 d-flex align-items-center" 
-                   title="Reset filter (tampilkan semua menu)">
+                <a href="{{ route('dashboard.select-category.get', ['id' => 'all']) }}"
+                    class="btn btn-sm text-white-50 p-0 ms-1 d-flex align-items-center"
+                    title="Reset filter (tampilkan semua menu)">
                     <span class="material-symbols-outlined fs-6">close</span>
                 </a>
             </div>
@@ -26,20 +29,15 @@
     {{-- Search Input Menu Sidebar --}}
     <div class="bnsp-sidebar-search px-2 mb-2">
         <div class="position-relative d-flex align-items-center">
-            <span class="material-symbols-outlined position-absolute text-white-50 pointer-events-none" 
-                  style="font-size: 1.15rem; left: 10px; pointer-events: none;">search</span>
-            <input type="text"
-                   id="bnspSidebarSearch"
-                   class="form-control form-control-sm bnsp-search-input text-white"
-                   style="padding-left: 2.1rem; padding-right: 2rem;"
-                   placeholder="Cari menu... (Ctrl+K)"
-                   autocomplete="off"
-                   aria-label="Cari menu sidebar">
-            <button type="button" 
-                    id="bnspSidebarSearchClear" 
-                    class="btn btn-sm text-white-50 p-0 position-absolute end-0 me-2 d-none align-items-center justify-content-center" 
-                    style="width: 22px; height: 22px;" 
-                    title="Hapus pencarian">
+            <span class="material-symbols-outlined position-absolute text-white-50 pointer-events-none"
+                style="font-size: 1.15rem; left: 10px; pointer-events: none;">search</span>
+            <input type="text" id="bnspSidebarSearch"
+                class="form-control form-control-sm bnsp-search-input text-white"
+                style="padding-left: 2.1rem; padding-right: 2rem;" placeholder="Cari menu... (Ctrl+K)"
+                autocomplete="off" aria-label="Cari menu sidebar">
+            <button type="button" id="bnspSidebarSearchClear"
+                class="btn btn-sm text-white-50 p-0 position-absolute end-0 me-2 d-none align-items-center justify-content-center"
+                style="width: 22px; height: 22px;" title="Hapus pencarian">
                 <span class="material-symbols-outlined" style="font-size: 1rem;">close</span>
             </button>
         </div>
@@ -72,9 +70,11 @@
     .bnsp-sidebar-search {
         transition: opacity .2s ease;
     }
+
     .bnsp-sidebar.collapsed .bnsp-sidebar-search {
         display: none !important;
     }
+
     .bnsp-search-input {
         background-color: rgba(255, 255, 255, 0.08);
         border: 1px solid rgba(255, 255, 255, 0.15);
@@ -84,10 +84,12 @@
         height: 34px;
         transition: all 0.2s ease;
     }
+
     .bnsp-search-input::placeholder {
         color: rgba(255, 255, 255, 0.45);
         font-size: 0.8125rem;
     }
+
     .bnsp-search-input:focus {
         background-color: rgba(255, 255, 255, 0.14);
         border-color: rgba(255, 255, 255, 0.35);
@@ -95,6 +97,7 @@
         outline: none;
         color: #fff !important;
     }
+
     .bnsp-search-highlight {
         background-color: rgba(255, 222, 162, 0.35);
         color: #fff;
@@ -102,7 +105,8 @@
         padding: 0 2px;
         font-weight: 700;
     }
-    .bnsp-nav-item.search-match-parent > .bnsp-submenu {
+
+    .bnsp-nav-item.search-match-parent>.bnsp-submenu {
         max-height: none !important;
         display: block !important;
     }
@@ -124,7 +128,8 @@
         function ensureOriginalState() {
             sidebarNav.querySelectorAll('.bnsp-nav-item').forEach(item => {
                 if (!item.hasAttribute('data-initial-open')) {
-                    item.setAttribute('data-initial-open', item.classList.contains('open') ? 'true' : 'false');
+                    item.setAttribute('data-initial-open', item.classList.contains('open') ? 'true' :
+                        'false');
                 }
                 const link = item.querySelector(':scope > .bnsp-nav-link');
                 const label = link ? link.querySelector('.nav-label') : null;
@@ -144,7 +149,8 @@
         function filterNode(item, query) {
             const link = item.querySelector(':scope > .bnsp-nav-link');
             const label = link ? link.querySelector('.nav-label') : null;
-            const originalTitle = label ? (label.getAttribute('data-original-title') || label.textContent.trim()) : '';
+            const originalTitle = label ? (label.getAttribute('data-original-title') || label.textContent
+            .trim()) : '';
 
             let selfMatch = false;
             if (query && originalTitle) {
@@ -181,7 +187,8 @@
                 if (label) {
                     if (selfMatch) {
                         const regex = new RegExp(`(${escapeRegExp(query)})`, 'gi');
-                        label.innerHTML = originalTitle.replace(regex, '<span class="bnsp-search-highlight">$1</span>');
+                        label.innerHTML = originalTitle.replace(regex,
+                            '<span class="bnsp-search-highlight">$1</span>');
                     } else {
                         label.textContent = originalTitle;
                     }
@@ -194,7 +201,8 @@
                         submenu.querySelectorAll('.bnsp-nav-item').forEach(c => {
                             c.classList.remove('d-none');
                             const cLabel = c.querySelector('.nav-label');
-                            if (cLabel) cLabel.textContent = cLabel.getAttribute('data-original-title') || cLabel.textContent.trim();
+                            if (cLabel) cLabel.textContent = cLabel.getAttribute(
+                                'data-original-title') || cLabel.textContent.trim();
                         });
                     }
                 }
