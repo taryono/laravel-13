@@ -374,35 +374,41 @@ CREATE TABLE `extracurricular_achievements` (
   CONSTRAINT `extracurricular_achievements_ibfk_7` FOREIGN KEY (`verified_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
+
+
 -- ----------------------------
--- Table structure for `extracurricular_attendances`
+-- Table structure for extracurricular_attendances
 -- ----------------------------
 DROP TABLE IF EXISTS `extracurricular_attendances`;
 CREATE TABLE `extracurricular_attendances` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `student_extracurricular_id` bigint unsigned NOT NULL,
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `student_extracurricular_id` bigint UNSIGNED NOT NULL,
+  `extracurricular_day_id` bigint UNSIGNED NOT NULL,
   `meeting_date` date NOT NULL,
-  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `recorded_by` bigint unsigned DEFAULT NULL,
-  `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PRESENT',
+  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `recorded_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
-  `created_by` bigint unsigned DEFAULT NULL,
-  `updated_by` bigint unsigned DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `is_not_deleted` tinyint(1) GENERATED ALWAYS AS (IF(`deleted_at` IS NULL, 1, NULL)) VIRTUAL COMMENT 'Helper untuk unique constraint dengan softDeletes',
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE KEY `extracurricular_attendances_unique` (`student_extracurricular_id`,`meeting_date`) USING BTREE,
-  KEY `extracurricular_attendances_student_extracurricular_index` (`student_extracurricular_id`) USING BTREE,
-  KEY `extracurricular_attendances_date_index` (`meeting_date`) USING BTREE,
-  KEY `extracurricular_attendances_status_index` (`status`) USING BTREE,
-  KEY `extracurricular_attendances_recorded_by_index` (`recorded_by`) USING BTREE,
-  KEY `extracurricular_attendances_deleted_at_index` (`deleted_at`) USING BTREE,
-  KEY `extracurricular_attendances_created_by_index` (`created_by`) USING BTREE,
-  KEY `extracurricular_attendances_updated_by_index` (`updated_by`) USING BTREE,
-  CONSTRAINT `extracurricular_attendances_recorded_by_foreign` FOREIGN KEY (`recorded_by`) REFERENCES `teachers` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `extracurricular_attendances_student_extracurricular_id_foreign` FOREIGN KEY (`student_extracurricular_id`) REFERENCES `student_extracurriculars` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
+  UNIQUE INDEX `uq_ext_att_active_record` (`student_extracurricular_id` ASC, `extracurricular_day_id` ASC, `meeting_date` ASC, `is_not_deleted` ASC) USING BTREE,
+  INDEX `idx_ext_att_day_date` (`extracurricular_day_id` ASC, `meeting_date` ASC) USING BTREE,
+  INDEX `idx_ext_att_date_status` (`meeting_date` ASC, `status` ASC) USING BTREE,
+  INDEX `idx_ext_att_active_deleted` (`is_active` ASC, `deleted_at` ASC) USING BTREE,
+  INDEX `fk_ext_att_teacher` (`recorded_by` ASC) USING BTREE,
+  INDEX `fk_ext_att_created_by` (`created_by` ASC) USING BTREE,
+  INDEX `fk_ext_att_updated_by` (`updated_by` ASC) USING BTREE,
+  CONSTRAINT `fk_ext_att_student_ext` FOREIGN KEY (`student_extracurricular_id`) REFERENCES `student_extracurriculars` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_ext_att_day` FOREIGN KEY (`extracurricular_day_id`) REFERENCES `extracurricular_days` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_ext_att_teacher` FOREIGN KEY (`recorded_by`) REFERENCES `teachers` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `fk_ext_att_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `fk_ext_att_updated_by` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Table structure for `extracurricular_coaches`

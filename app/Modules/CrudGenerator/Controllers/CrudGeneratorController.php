@@ -64,7 +64,6 @@ class CrudGeneratorController extends MainController
         // Semua organisasi
         $organizations = Organization::getTree();
         $parentOptions = $this->flattenForSelect($tree);
-        //$menuCategories = \Models\MenuCategory::where('is_active', 1)->pluck('name', 'id')->toArray();
         $menuCategories = \Models\MenuCategory::where('is_active', 1)->get();
         return view('CrudGenerator::index', compact('icons', 'tables', 'roles', 'filtered', 'parentOptions', 'organizations', 'menuCategories'));
     }
