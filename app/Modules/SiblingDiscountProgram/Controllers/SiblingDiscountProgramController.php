@@ -65,7 +65,7 @@ class SiblingDiscountProgramController extends MainController
     /**
      * Store a newly created resource.
      */
-    public function store(Request $request)
+    public function store(StoreSiblingDiscountProgramRequest $request)
     {
         $validated = $request->validate([
                             'organization_id' => ['required', 'integer'],
@@ -88,7 +88,10 @@ class SiblingDiscountProgramController extends MainController
 
         try {
             $model = DB::transaction(function () use ($validated) {
-                return SiblingDiscountProgram::create($validated);
+                $program = SiblingDiscountProgram::create($validated);
+                $this->syncRulesAndAllocations($program, $request->input('rules', []));
+
+            return $program->load('rules.allocations');
             });
 
             return $this->successResponse(
@@ -134,7 +137,7 @@ class SiblingDiscountProgramController extends MainController
     /**
      * Update the specified resource.
      */
-    public function update(Request $request, $id)
+    public function update(UpdateSiblingDiscountProgramRequest $request, $id)
     {
         $validated = $request->validate([
                         'organization_id' => ['required', 'integer'],
@@ -162,6 +165,10 @@ class SiblingDiscountProgramController extends MainController
                 $validated
             ) {
                 $siblingDiscountProgram->update($validated);
+
+                $this->syncRulesAndAllocations($siblingDiscountProgram, $request->input('rules', []));
+
+                return $siblingDiscountProgram->fresh(['rules.allocations']);
             });
 
             return $this->successResponse(
@@ -197,8 +204,12 @@ class SiblingDiscountProgramController extends MainController
             $siblingDiscountProgram = $this->model->findOrFail($id);
 
             DB::transaction(function () use ($siblingDiscountProgram) {
+                foreach ($siblingDiscountProgram->rules as $rule) {
+                    $rule->allocations()->delete();
+                    $rule->delete();
+                }
                 $siblingDiscountProgram->delete();
-            });
+            }); 
 
             return $this->successResponse(
                 $request,
@@ -222,4 +233,83 @@ class SiblingDiscountProgramController extends MainController
             );
         }
     } 
+
+    public function show(Request $request, SiblingDiscountProgram $siblingDiscountProgram): View|JsonResponse
+    {
+        $siblingDiscountProgram->load([
+            'school',
+            'rules' => fn ($q) => $q->orderByDesc('priority')->with('allocations'),
+        ]);
+
+        if ($request->wantsJson()) {
+            return response()->json($siblingDiscountProgram);
+        }
+
+        return view('sibling-discount-programs.show', compact('siblingDiscountProgram'));
+    }
+
+
+    /**
+     * Helper sinkronisasi nested rules dan allocations secara atomik.
+     */
+    protected function syncRulesAndAllocations(SiblingDiscountProgram $program, array $rulesData): void
+    {
+        $retainedRuleIds = [];
+
+        foreach ($rulesData as $ruleItem) {
+            $ruleAttributes = [
+                'min_sibling_count' => $ruleItem['min_sibling_count'],
+                'max_sibling_count' => $ruleItem['max_sibling_count'] ?? null,
+                'discount_type'     => $ruleItem['discount_type'],
+                'discount_value'    => $ruleItem['discount_value'],
+                'priority'          => $ruleItem['priority'] ?? 0,
+                'is_active'         => $ruleItem['is_active'] ?? true,
+            ];
+
+            if (!empty($ruleItem['id'])) {
+                $rule = $program->rules()->where('id', $ruleItem['id'])->firstOrFail();
+                $rule->update($ruleAttributes);
+            } else {
+                $rule = $program->rules()->create($ruleAttributes);
+            }
+
+            $retainedRuleIds[] = $rule->id;
+
+            // Sinkronisasi Allocations untuk Rule ini
+            $retainedAllocationIds = [];
+
+            foreach ($ruleItem['allocations'] as $allocItem) {
+                $targetType = $allocItem['target_type'];
+
+                $allocAttributes = [
+                    'target_type'        => $targetType,
+                    'sibling_order_from' => $targetType === 'specific_order' ? ($allocItem['sibling_order_from'] ?? null) : null,
+                    'sibling_order_to'   => $targetType === 'specific_order' ? ($allocItem['sibling_order_to'] ?? null) : null,
+                    'discount_type'      => $allocItem['discount_type'],
+                    'discount_value'     => $allocItem['discount_value'],
+                ];
+
+                if (!empty($allocItem['id'])) {
+                    $allocation = $rule->allocations()->where('id', $allocItem['id'])->firstOrFail();
+                    $allocation->update($allocAttributes);
+                } else {
+                    $allocation = $rule->allocations()->create($allocAttributes);
+                }
+
+                $retainedAllocationIds[] = $allocation->id;
+            }
+
+            // Soft-delete allocations lama yang dihapus dari form
+            $rule->allocations()
+                ->whereNotIn('id', $retainedAllocationIds)
+                ->delete();
+        }
+
+        // Soft-delete rules lama beserta allocations-nya jika dihapus dari form
+        $rulesToDelete = $program->rules()->whereNotIn('id', $retainedRuleIds)->get();
+        foreach ($rulesToDelete as $oldRule) {
+            $oldRule->allocations()->delete();
+            $oldRule->delete();
+        }
+    }
 }

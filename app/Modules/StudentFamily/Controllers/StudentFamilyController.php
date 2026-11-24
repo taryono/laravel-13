@@ -212,4 +212,101 @@ class StudentFamilyController extends MainController
             );
         }
     } 
+
+    /**
+     * Menampilkan detail keluarga beserta daftar anggota & kelayakan diskon.
+     */
+    public function show(Request $request, StudentFamily $studentFamily): View|JsonResponse
+    {
+        $studentFamily->load([
+            'primaryParent',
+            'members' => fn ($q) => $q->with(['student', 'applicant'])->orderBy('sibling_order'),
+            'eligibilities.discountProgram',
+        ]);
+
+        if ($request->wantsJson()) {
+            return response()->json($studentFamily);
+        }
+
+        return view('student-families.show', compact('studentFamily'));
+    }
+
+    // =========================================================================
+    // MANAJEMEN ANGGOTA KELUARGA (STUDENT FAMILY MEMBERS)
+    // =========================================================================
+
+    /**
+     * Menambahkan siswa atau pendaftar baru ke dalam keluarga.
+     * Urutan sibling_order & kelayakan otomatis dihitung oleh StudentFamilyMemberObserver.
+     */
+    public function storeMember(
+        StoreStudentFamilyMemberRequest $request,
+        StudentFamily $studentFamily
+    ): JsonResponse|RedirectResponse {
+        $member = DB::transaction(function () use ($request, $studentFamily) {
+            return $studentFamily->members()->create([
+                'organization_id' => $studentFamily->organization_id,
+                'student_id'      => $request->student_id,
+                'applicant_id'    => $request->applicant_id,
+                'relation'        => $request->relation ?? 'Anak Kandung',
+                'is_active'       => $request->boolean('is_active', true),
+                'joined_at'       => $request->joined_at ?? now()->toDateString(),
+                'left_at'         => $request->left_at,
+            ]);
+        });
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'Anggota keluarga berhasil ditambahkan.',
+                'data'    => $member->fresh(['student', 'applicant']),
+            ], 201);
+        }
+
+        return back()->with('success', 'Anggota keluarga berhasil ditambahkan.');
+    }
+
+    /**
+     * Memperbarui data anggota keluarga (status aktif, tanggal masuk/keluar, dll).
+     */
+    public function updateMember(
+        UpdateStudentFamilyMemberRequest $request,
+        StudentFamily $studentFamily,
+        StudentFamilyMember $member
+    ): JsonResponse|RedirectResponse {
+        abort_if($member->student_family_id !== $studentFamily->id, 404);
+
+        DB::transaction(function () use ($request, $member) {
+            $member->update($request->validated());
+        });
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'Data anggota keluarga berhasil diperbarui.',
+                'data'    => $member->fresh(['student', 'applicant']),
+            ]);
+        }
+
+        return back()->with('success', 'Data anggota keluarga berhasil diperbarui.');
+    }
+
+    /**
+     * Menghapus anggota dari keluarga (soft delete).
+     */
+    public function destroyMember(
+        Request $request,
+        StudentFamily $studentFamily,
+        StudentFamilyMember $member
+    ): JsonResponse|RedirectResponse {
+        abort_if($member->student_family_id !== $studentFamily->id, 404);
+
+        DB::transaction(function () use ($member) {
+            $member->delete();
+        });
+
+        if ($request->wantsJson()) {
+            return response()->json(['message' => 'Anggota keluarga berhasil dihapus.']);
+        }
+
+        return back()->with('success', 'Anggota keluarga berhasil dihapus.');
+    }
 }
