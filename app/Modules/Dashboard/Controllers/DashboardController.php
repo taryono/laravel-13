@@ -3,6 +3,8 @@
 namespace App\Modules\Dashboard\Controllers;
 
 use App\Http\Controllers\MainController;
+use App\Http\Resources\BosDashboardResource;
+use App\Services\Finance\BosDashboardService;
 use Models\Deduction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -11,10 +13,11 @@ use Illuminate\Support\Facades\Route;
 use Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Models\BosPeriod;
 
 class DashboardController extends MainController
 {
-    public function __construct()
+    public function __construct(protected BosDashboardService $bosDashboardService)
     {
         parent::__construct(new Deduction());
     }
@@ -152,7 +155,7 @@ class DashboardController extends MainController
             ['label' => 'Profil', 'icon' => 'person', 'url' => '#', 'active' => false],
         ])->map(fn(array $item) => (object) $item);
         $today = $now->translatedFormat('l, d F Y');
-        // return view('Dashboard::index', compact('app', 'school', 'user', 'greeting', 'today', 'attendance', 'menus', 'menuPagination', 'agendas', 'navItems'));
+
         if (!session()->has('active_menu_category_id')) {
             return view('Dashboard::index', compact('app', 'school', 'user', 'greeting', 'today', 'attendance', 'menus', 'menuPagination', 'agendas', 'navItems'));
         } else {
@@ -206,87 +209,90 @@ class DashboardController extends MainController
     {
         $category = \Models\MenuCategory::findOrFail($categoryId);
         $view = str_replace('-', '', \Illuminate\Support\Str::camel($category->code));
-        return $this->{$view . "View"}($request);
+        if (method_exists($this, $view . "View")) {
+            return $this->{$view . "View"}($request);
+        }
+        return redirect()->to('/dashboard/default-view')->with('error', 'View not found');
     }
 
     private function financeView($request)
     {
-        return view('Dashboard::dashboard.finance.index');
+        return $this->viewResolver('Dashboard::dashboard.finance.index', []);
     }
 
     private function academicView($request)
     {
-        return view('Dashboard::dashboard.academic.index');
+        return $this->viewResolver('Dashboard::dashboard.academic.index', []);
     }
 
     private function absenceView($request)
     {
-        return view('Dashboard::dashboard.absence.index');
+        return $this->viewResolver('Dashboard::dashboard.absence.index', []);
     }
 
     private function accountingView($request)
     {
-        return view('Dashboard::dashboard.accounting.index');
+        return $this->viewResolver('Dashboard::dashboard.accounting.index', []);
     }
 
     private function cbtView($request)
     {
-        return view('Dashboard::dashboard.cbt.index');
+        return $this->viewResolver('Dashboard::dashboard.cbt.index', []);
     }
 
     private function transportView($request)
     {
-        return view('Dashboard::dashboard.transport.index');
+        return $this->viewResolver('Dashboard::dashboard.transport.index', []);
     }
 
     private function alumniView($request)
     {
-        return view('Dashboard::dashboard.alumni.index');
+        return $this->viewResolver('Dashboard::dashboard.alumni.index', []);
     }
 
     private function settingsView($request)
     {
-        return view('Dashboard::dashboard.settings.index');
+        return $this->viewResolver('Dashboard::dashboard.settings.index', []);
     }
 
     private function assessmentView($request)
     {
-        return view('Dashboard::dashboard.assessment.index');
+        return $this->viewResolver('Dashboard::dashboard.assessment.index', []);
     }
 
     private function budgetingView($request)
     {
-        return view('Dashboard::dashboard.budgeting.index');
+        return $this->viewResolver('Dashboard::dashboard.budgeting.index', []);
     }
 
     private function canteenView($request)
     {
-        return view('Dashboard::dashboard.canteen.index');
+        return $this->viewResolver('Dashboard::dashboard.canteen.index', []);
     }
 
     private function employeeView($request)
     {
-        return view('Dashboard::dashboard.employee.index');
+        return $this->viewResolver('Dashboard::dashboard.employee.index', []);
     }
 
     private function inventoryView($request)
     {
-        return view('Dashboard::dashboard.inventory.index');
+        return $this->viewResolver('Dashboard::dashboard.inventory.index', []);
     }
 
     private function libraryView($request)
     {
-        return view('Dashboard::dashboard.library.index');
+        return $this->viewResolver('Dashboard::dashboard.library.index', []);
     }
 
     private function menuManagmentView($request)
     {
-        return view('Dashboard::dashboard.menu-managment.index');
+        return $this->viewResolver('Dashboard::dashboard.menu-managment.index', []);
     }
 
     private function parentView($request)
     {
-        return view('Dashboard::dashboard.parent.index');
+        return $this->viewResolver('Dashboard::dashboard.parent.index', []);
     }
 
     private function ppdbView($request)
@@ -422,25 +428,25 @@ class DashboardController extends MainController
 
     private function recruitmentView($request)
     {
-        return view('Dashboard::dashboard.recruitment.index');
+        return $this->viewResolver('Dashboard::dashboard.recruitment.index', []);
     }
     private function studentView($request)
     {
-        return view('Dashboard::dashboard.student.index');
+        return $this->viewResolver('Dashboard::dashboard.student.index', []);
     }
     private function proctoringView($request)
     {
-        return view('Dashboard::dashboard.proctoring.index');
+        return $this->viewResolver('Dashboard::dashboard.proctoring.index', []);
     }
 
     private function shuttleServiceView($request)
     {
-        return view('Dashboard::dashboard.shuttle-service.index');
+        return $this->viewResolver('Dashboard::dashboard.shuttle-service.index', []);
     }
 
     private function facilityView($request)
     {
-        return view('Dashboard::dashboard.facility.index');
+        return $this->viewResolver('Dashboard::dashboard.facility.index', []);
     }
 
     private function cmsView($request)
@@ -494,7 +500,61 @@ class DashboardController extends MainController
 
     private function payrollView($request)
     {
-        return view('Dashboard::dashboard.payroll.index');
+        return $this->viewResolver('Dashboard::dashboard.payroll.index', []);
     }
 
+    private function bosView(Request $request)
+    {
+        $schoolId = $request->user()->school_id ?? session('active_school_id');
+
+        // 1. Ambil daftar periode BOS sekolah untuk dropdown filter periode di header
+        $periods = BosPeriod::where('school_id', $schoolId)
+            ->where('is_active', true)
+            ->orderByDesc('academic_year_id')
+            ->orderByDesc('period_number')
+            ->get();
+
+        // 2. Tentukan periode aktif (dari query string ?period_id=... atau periode terbaru)
+        $activePeriodId = $request->integer('period_id') ?: $periods->first()?->id;
+
+        // Jika sekolah belum memiliki periode BOS sama sekali, kirim state kosong ke view
+        if (!$activePeriodId) {
+            return $this->viewResolver('Dashboard::dashboard.bos.index', [
+                'periods' => $periods,
+                'dashboard' => null,
+            ]);
+        }
+
+        // 3. Ambil data mentah dari BosDashboardService
+        $rawDashboardData = $this->bosDashboardService->getDashboardData(
+            bosPeriodId: $activePeriodId,
+            filters: $request->only(['category', 'search', 'per_page', 'page'])
+        );
+
+        // 4. Transformasi via BosDashboardResource (otomatis membungkus BosTransactionResource)
+        // Gunakan ->resolve($request) agar menjadi array PHP bersih untuk Blade
+        $dashboard = (new BosDashboardResource($rawDashboardData))->resolve($request);
+
+        // Jika request berasal dari AJAX/Fetch (misal saat klik tab filter atau pagination tabel)
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json($dashboard);
+        }
+
+        return $this->viewResolver('Dashboard::dashboard.bos.index', [
+            'periods' => $periods,
+            'dashboard' => $dashboard,
+        ]);
+    }
+
+    private function viewResolver($viewName, $data = [])
+    {
+        if (view()->exists($viewName)) {
+            return view($viewName, $data);
+        }
+    }
+
+    public function defaultView(Request $request)
+    {
+        return view('Dashboard::blank', []);
+    }
 }

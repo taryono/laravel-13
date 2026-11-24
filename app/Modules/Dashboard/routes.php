@@ -17,4 +17,5 @@ Route::group(['prefix' => 'dashboard', 'namespace' => 'App\Modules\Dashboard\Con
     Route::post('/select-category/{id?}', ['as' => 'dashboard.select-category', 'uses' => 'DashboardController@selectCategory']);
     Route::get('/select-category/{id?}', ['as' => 'dashboard.select-category.get', 'uses' => 'DashboardController@selectCategory']);
     Route::match(['get', 'post'], '/select-category/{id?}', 'DashboardController@selectCategory');
+    Route::get('/default-view', ['as' => 'dashboard.default-view', 'uses' => 'DashboardController@defaultView']);
 });

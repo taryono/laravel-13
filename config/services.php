@@ -35,4 +35,6 @@ return [
         ],
     ],
 
+    'arkas' => ['endpoint' => env('ARKAS_GATEWAY_URL'), 'token' => env('ARKAS_API_TOKEN')]
+
 ];
