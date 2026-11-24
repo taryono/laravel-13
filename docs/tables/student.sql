@@ -586,25 +586,81 @@ CREATE TABLE `extracurriculars` (
 -- ----------------------------
 DROP TABLE IF EXISTS `parents`;
 CREATE TABLE `parents` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `organization_id` bigint unsigned NOT NULL,
-  `user_id` bigint unsigned DEFAULT NULL,
-  `name` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `phone` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `email` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `address` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `work` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL,
-  `created_by` bigint unsigned DEFAULT NULL,
-  `updated_by` bigint unsigned DEFAULT NULL,
-  PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE KEY `idx_parents_user_id_unique` (`user_id`) USING BTREE,
-  KEY `idx_parents_organization_id` (`organization_id`) USING BTREE,
-  KEY `idx_parents_phone` (`phone`) USING BTREE,
-  KEY `idx_parents_deleted_at` (`deleted_at`) USING BTREE,
-  CONSTRAINT `parents_org_fk` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `organization_id` BIGINT UNSIGNED NOT NULL,
+  `user_id` BIGINT UNSIGNED DEFAULT NULL,
+
+  -- Identitas
+  `name` VARCHAR(150) NOT NULL,
+  `nik` CHAR(16) DEFAULT NULL,
+  `gender` ENUM('L','P') DEFAULT NULL,
+  `birth_place` VARCHAR(100) DEFAULT NULL,
+  `birth_year` SMALLINT DEFAULT NULL,
+  `birth_date` DATE DEFAULT NULL,
+  `religion` VARCHAR(20) DEFAULT NULL,
+  `nationality` VARCHAR(3) DEFAULT 'IDN',
+
+  -- Hubungan dengan siswa
+  `relation` ENUM('father','mother','guardian','other') NOT NULL,
+  `relation_detail` VARCHAR(50) DEFAULT NULL,
+  `is_biological` TINYINT(1) DEFAULT NULL,
+  `is_primary_contact` TINYINT(1) NOT NULL DEFAULT 0,
+  `lives_with_student` TINYINT(1) DEFAULT NULL,
+
+  -- Kontak
+  `phone` VARCHAR(20) NOT NULL,
+  `home_phone` VARCHAR(20) DEFAULT NULL,
+  `whatsapp` VARCHAR(20) DEFAULT NULL,
+  `email` VARCHAR(100) DEFAULT NULL,
+
+  -- Alamat
+  `address` TEXT,
+  `address_line` TEXT,
+  `rt` VARCHAR(5) DEFAULT NULL,
+  `rw` VARCHAR(5) DEFAULT NULL,
+  `village` VARCHAR(100) DEFAULT NULL,
+  `district` VARCHAR(100) DEFAULT NULL,
+  `city` VARCHAR(100) DEFAULT NULL,
+  `province` VARCHAR(100) DEFAULT NULL,
+  `postal_code` VARCHAR(10) DEFAULT NULL,
+
+  -- Sosial-ekonomi
+  `education_level` ENUM(
+    'Tidak Sekolah','SD','SMP','SMA/SMK','D1-D3','S1','S2','S3'
+  ) DEFAULT NULL,
+  `occupation` VARCHAR(100) DEFAULT NULL,
+  `income_range` ENUM(
+    '< 1 juta','1 - 3 juta','3 - 5 juta','5 - 10 juta','> 10 juta'
+  ) DEFAULT NULL,
+  `workplace` VARCHAR(150) DEFAULT NULL,
+  `position` VARCHAR(100) DEFAULT NULL,
+
+  -- Kebutuhan khusus & status
+  `special_needs` TEXT,
+  `is_alive` TINYINT(1) NOT NULL DEFAULT 1,
+  `death_date` DATE DEFAULT NULL,
+  `is_active` TINYINT(1) NOT NULL DEFAULT 1,
+
+  -- Dokumen
+  `family_card_number` VARCHAR(16) DEFAULT NULL,
+  `photo_path` VARCHAR(255) DEFAULT NULL,
+  `notes` TEXT,
+
+  `created_at` TIMESTAMP NULL DEFAULT NULL,
+  `updated_at` TIMESTAMP NULL DEFAULT NULL,
+  `deleted_at` TIMESTAMP NULL DEFAULT NULL,
+  `created_by` BIGINT UNSIGNED DEFAULT NULL,
+  `updated_by` BIGINT UNSIGNED DEFAULT NULL,
+
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_parents_user_id_unique` (`user_id`),
+  UNIQUE KEY `idx_parents_org_nik_unique` (`organization_id`,`nik`),
+  KEY `idx_parents_organization_id` (`organization_id`),
+  KEY `idx_parents_phone` (`phone`),
+  KEY `idx_parents_deleted_at` (`deleted_at`),
+  KEY `idx_parents_relation` (`relation`),
+  CONSTRAINT `parents_org_fk` FOREIGN KEY (`organization_id`)
+    REFERENCES `organizations` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
 -- ----------------------------

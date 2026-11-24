@@ -8,9 +8,16 @@ class ParentModel extends SoftDeletableModel
     protected $guarded = ['id'];
 
     protected $casts = [
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
-        'deleted_at' => 'datetime',
+        'is_biological'      => 'boolean',
+        'is_primary_contact' => 'boolean',
+        'lives_with_student' => 'boolean',
+        'is_alive'           => 'boolean',
+        'is_active'          => 'boolean',
+        'birth_date'         => 'date',
+        'death_date'         => 'date',
+        'created_at'         => 'datetime',
+        'updated_at'         => 'datetime',
+        'deleted_at'         => 'datetime',
     ];
 
     public function organization()
