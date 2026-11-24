@@ -1,16 +1,14 @@
 <?php
 
-namespace App\Models;
+namespace Models;
 
 use App\Traits\Blameable;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
-class SiblingDiscountEligibility extends Model
+class SiblingDiscountEligibility extends SoftDeletableModel
 {
-    use HasFactory, SoftDeletes, Blameable;
+    use Blameable;
 
     protected $table = 'sibling_discount_eligibilities';
 

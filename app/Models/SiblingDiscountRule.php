@@ -3,15 +3,12 @@
 namespace Models;
 
 use App\Traits\Blameable;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
-class SiblingDiscountRule extends Model
+class SiblingDiscountRule extends SoftDeletableModel
 {
-    use HasFactory, SoftDeletes, Blameable;
+    use Blameable;
 
     protected $table = 'sibling_discount_rules';
 
