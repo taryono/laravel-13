@@ -57,6 +57,9 @@ class AppServiceProvider extends ServiceProvider
         });
 
         View::composer('layouts.*', function ($view) {
+            if (!Schema::hasTable('organizations')) {
+                return $view;
+            }
             $view->with('organization', Organization::first());
         });
         Employee::observe(EmployeeObserver::class);
