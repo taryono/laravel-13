@@ -67,13 +67,7 @@ class ParentsController extends MainController
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-                            'organization_id' => ['required', 'integer'],
-            'user_id' => ['required', 'integer'],
-            'name' => ['required', 'string', 'max:255'],
-            'nik' => ['required', 'string', 'max:255'],
-            'gender' => ['required', 'string', 'max:255'],
-        ]);
+        $validated = $this->validated($request);
 
         try {
             $model = DB::transaction(function () use ($validated) {
@@ -125,13 +119,7 @@ class ParentsController extends MainController
      */
     public function update(Request $request, $id)
     {
-        $validated = $request->validate([
-                        'organization_id' => ['required', 'integer'],
-            'user_id' => ['required', 'integer'],
-            'name' => ['required', 'string', 'max:255'],
-            'nik' => ['required', 'string', 'max:255'],
-            'gender' => ['required', 'string', 'max:255'],
-        ]);
+        $validated = $this->validated($request, $id);
 
         try {
             $parents = $this->model->findOrFail($id);
@@ -200,4 +188,54 @@ class ParentsController extends MainController
             );
         }
     } 
+
+    protected function validated(Request $request, ?int $ignoreId = null): array
+    {
+        $orgId = $request->input('organization_id') ?? auth()->user()?->organization_id;
+
+        $data = $request->validate([
+            'organization_id'    => ['required', 'exists:organizations,id'],
+            'name'               => ['required', 'string', 'max:150'],
+            'nik'                => ['nullable', 'digits:16',
+                Rule::unique('parents', 'nik')->where('organization_id', $orgId)->ignore($ignoreId)
+            ],
+            'gender'             => ['nullable', Rule::in(['L', 'P'])],
+            'birth_place'        => ['nullable', 'string', 'max:100'],
+            'birth_year'         => ['nullable', 'integer', 'min:1900', 'max:' . date('Y')],
+            'birth_date'         => ['nullable', 'date'],
+            'religion'           => ['nullable', 'string', 'max:20'],
+            'nationality'        => ['nullable', 'string', 'max:3'],
+            'relation'           => ['required', Rule::in(['father', 'mother', 'guardian', 'other'])],
+            'relation_detail'    => ['nullable', 'string', 'max:50'],
+            'phone'              => ['required', 'string', 'max:20'],
+            'home_phone'         => ['nullable', 'string', 'max:20'],
+            'whatsapp'           => ['nullable', 'string', 'max:20'],
+            'email'              => ['nullable', 'email', 'max:100'],
+            'address'            => ['nullable', 'string'],
+            'address_line'       => ['nullable', 'string'],
+            'rt'                 => ['nullable', 'string', 'max:5'],
+            'rw'                 => ['nullable', 'string', 'max:5'],
+            'village'            => ['nullable', 'string', 'max:100'],
+            'district'           => ['nullable', 'string', 'max:100'],
+            'city'               => ['nullable', 'string', 'max:100'],
+            'province'           => ['nullable', 'string', 'max:100'],
+            'postal_code'        => ['nullable', 'string', 'max:10'],
+            'education_level'    => ['nullable', Rule::in(['Tidak Sekolah','SD','SMP','SMA/SMK','D1-D3','S1','S2','S3'])],
+            'occupation'         => ['nullable', 'string', 'max:100'],
+            'income_range'       => ['nullable', Rule::in(['< 1 juta','1 - 3 juta','3 - 5 juta','5 - 10 juta','> 10 juta'])],
+            'workplace'          => ['nullable', 'string', 'max:150'],
+            'position'           => ['nullable', 'string', 'max:100'],
+            'special_needs'      => ['nullable', 'string'],
+            'death_date'         => ['nullable', 'required_if:is_alive,0', 'date'],
+            'family_card_number' => ['nullable', 'digits:16'],
+            'notes'              => ['nullable', 'string'],
+        ]);
+
+        // Normalisasi boolean (checkbox)
+        foreach (['is_biological','is_primary_contact','lives_with_student','is_alive','is_active'] as $f) {
+            $data[$f] = $request->boolean($f);
+        }
+
+        return $data;
+    }
 }
