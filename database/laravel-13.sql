@@ -25109,6 +25109,126 @@ CREATE TABLE `sorogan_schedules`  (
 -- Records of sorogan_schedules
 -- ----------------------------
 
+DROP TABLE IF EXISTS `dormitories`;
+CREATE TABLE `dormitories`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `organization_id` bigint UNSIGNED NULL DEFAULT NULL COMMENT 'FK ke organizations', 
+  `code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Kode asrama',
+  `name` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Nama asrama',
+  `gender_type` enum('male','female','mixed') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'male',
+  `capacity` int UNSIGNED NOT NULL DEFAULT 0,
+  `address` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `phone` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uq_dormitories_org_code`(`organization_id` ASC, `code` ASC) USING BTREE,
+  INDEX `idx_dormitories_org`(`organization_id` ASC) USING BTREE, 
+  INDEX `idx_dormitories_gender`(`gender_type` ASC) USING BTREE,
+  INDEX `idx_dormitories_active`(`is_active` ASC) USING BTREE,
+  INDEX `fk_dormitories_created_by`(`created_by` ASC) USING BTREE,
+  INDEX `fk_dormitories_updated_by`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `dormitories_ibfk_1` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT, 
+  CONSTRAINT `dormitories_ibfk_3` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `dormitories_ibfk_4` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+DROP TABLE IF EXISTS `sorogan_sessions`;
+CREATE TABLE `sorogan_sessions`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `sorogan_schedule_id` bigint UNSIGNED NULL DEFAULT NULL COMMENT 'FK ke sorogan_schedules',
+  `organization_id` bigint UNSIGNED NULL DEFAULT NULL COMMENT 'FK ke organizations',
+  `kitab_reference_id` bigint UNSIGNED NULL DEFAULT NULL COMMENT 'FK ke kitab_references',
+  `teacher_id` bigint UNSIGNED NULL DEFAULT NULL COMMENT 'FK ke teachers',
+  `employee_id` bigint UNSIGNED NULL DEFAULT NULL COMMENT 'FK ke employees',
+  `dormitory_id` bigint UNSIGNED NULL DEFAULT NULL COMMENT 'FK ke dormitories',
+  `room_id` bigint UNSIGNED NULL DEFAULT NULL COMMENT 'FK ke rooms',
+  `academic_year_id` bigint UNSIGNED NULL DEFAULT NULL COMMENT 'FK ke academic_years',
+  `academic_semester_id` bigint UNSIGNED NULL DEFAULT NULL COMMENT 'FK ke academic_semesters',
+  `title` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `session_date` date NOT NULL,
+  `start_time` time NOT NULL,
+  `end_time` time NOT NULL,
+  `actual_start_at` datetime NULL DEFAULT NULL,
+  `actual_end_at` datetime NULL DEFAULT NULL,
+  `location` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `chapter` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `page_from` int UNSIGNED NULL DEFAULT NULL,
+  `page_to` int UNSIGNED NULL DEFAULT NULL,
+  `topic` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `status` enum('scheduled','ongoing','completed','cancelled','postponed') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'scheduled',
+  `cancellation_reason` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `total_participants` int UNSIGNED NOT NULL DEFAULT 0,
+  `present_count` int UNSIGNED NOT NULL DEFAULT 0,
+  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_sorogan_sess_schedule`(`sorogan_schedule_id` ASC) USING BTREE,
+  INDEX `idx_sorogan_sess_org`(`organization_id` ASC) USING BTREE,
+  INDEX `idx_sorogan_sess_kitab`(`kitab_reference_id` ASC) USING BTREE,
+  INDEX `idx_sorogan_sess_teacher`(`teacher_id` ASC) USING BTREE,
+  INDEX `idx_sorogan_sess_employee`(`employee_id` ASC) USING BTREE,
+  INDEX `idx_sorogan_sess_dormitory`(`dormitory_id` ASC) USING BTREE,
+  INDEX `idx_sorogan_sess_room`(`room_id` ASC) USING BTREE,
+  INDEX `idx_sorogan_sess_year`(`academic_year_id` ASC) USING BTREE,
+  INDEX `idx_sorogan_sess_semester`(`academic_semester_id` ASC) USING BTREE,
+  INDEX `idx_sorogan_sess_date`(`session_date` ASC) USING BTREE,
+  INDEX `idx_sorogan_sess_status`(`status` ASC) USING BTREE,
+  INDEX `fk_sorogan_sess_created_by`(`created_by` ASC) USING BTREE,
+  INDEX `fk_sorogan_sess_updated_by`(`updated_by` ASC) USING BTREE,
+  CONSTRAINT `sorogan_sessions_ibfk_1` FOREIGN KEY (`sorogan_schedule_id`) REFERENCES `sorogan_schedules` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `sorogan_sessions_ibfk_2` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `sorogan_sessions_ibfk_3` FOREIGN KEY (`kitab_reference_id`) REFERENCES `kitab_references` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `sorogan_sessions_ibfk_4` FOREIGN KEY (`teacher_id`) REFERENCES `teachers` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `sorogan_sessions_ibfk_5` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `sorogan_sessions_ibfk_6` FOREIGN KEY (`dormitory_id`) REFERENCES `dormitories` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `sorogan_sessions_ibfk_7` FOREIGN KEY (`room_id`) REFERENCES `rooms` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `sorogan_sessions_ibfk_8` FOREIGN KEY (`academic_year_id`) REFERENCES `academic_years` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `sorogan_sessions_ibfk_9` FOREIGN KEY (`academic_semester_id`) REFERENCES `academic_semesters` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `sorogan_sessions_ibfk_10` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `sorogan_sessions_ibfk_11` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+
+DROP TABLE IF EXISTS `room_supervisors`;
+CREATE TABLE `room_supervisors` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `room_id` bigint UNSIGNED NOT NULL COMMENT 'FK ke rooms',
+  `employee_id` bigint UNSIGNED NOT NULL COMMENT 'FK ke employees (ustadzah/ustadz)',
+  `role` enum('head','assistant') NOT NULL DEFAULT 'assistant' COMMENT 'head = penanggung jawab utama',
+  `start_date` date NULL DEFAULT NULL,
+  `end_date` date NULL DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `notes` varchar(255) NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `uq_room_sup_room_emp` (`room_id`, `employee_id`),
+  KEY `idx_room_sup_room` (`room_id`),
+  KEY `idx_room_sup_employee` (`employee_id`),
+  KEY `idx_room_sup_role` (`role`),
+  KEY `fk_room_sup_created_by` (`created_by`),
+  KEY `fk_room_sup_updated_by` (`updated_by`),
+  CONSTRAINT `fk_room_sup_room` FOREIGN KEY (`room_id`) REFERENCES `rooms` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `fk_room_sup_employee` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `fk_room_sup_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `fk_room_sup_updated_by` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+
+
 -- ----------------------------
 -- Table structure for stock_adjustment_items
 -- ----------------------------

@@ -2,12 +2,12 @@
 
 namespace App\Services;
 
-use App\Models\SiblingDiscountAllocation;
-use App\Models\SiblingDiscountEligibility;
-use App\Models\SiblingDiscountProgram;
-use App\Models\SiblingDiscountRule;
-use App\Models\StudentFamily;
-use App\Models\StudentFamilyMember;
+use Models\SiblingDiscountAllocation;
+use Models\SiblingDiscountEligibility;
+use Models\SiblingDiscountProgram;
+use Models\SiblingDiscountRule;
+use Models\StudentFamily;
+use Models\StudentFamilyMember;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -59,7 +59,7 @@ class SiblingDiscountService
         return DB::transaction(function () use ($family, $academicYearId, $schoolId, $referenceDate) {
             // Pastikan urutan anak mutakhir
             $activeMembers = $this->recalculateSiblingOrders($family);
-            $siblingCount  = $activeMembers->count();
+            $siblingCount = $activeMembers->count();
 
             // Cari program diskon aktif yang memenuhi syarat jumlah saudara
             $program = $this->resolveApplicableProgram(
@@ -82,18 +82,18 @@ class SiblingDiscountService
 
                 $eligibility = SiblingDiscountEligibility::updateOrCreate(
                     [
-                        'academic_year_id'  => $academicYearId,
+                        'academic_year_id' => $academicYearId,
                         'student_family_id' => $family->id,
-                        'student_id'        => $member->student_id,
+                        'student_id' => $member->student_id,
                     ],
                     [
-                        'organization_id'     => $family->organization_id,
-                        'applicant_id'        => $member->applicant_id,
-                        'sibling_count'       => $siblingCount,
-                        'sibling_order'       => $member->sibling_order,
-                        'is_eligible'         => $isEligible,
+                        'organization_id' => $family->organization_id,
+                        'applicant_id' => $member->applicant_id,
+                        'sibling_count' => $siblingCount,
+                        'sibling_order' => $member->sibling_order,
+                        'is_eligible' => $isEligible,
                         'discount_program_id' => $isEligible ? $program->id : null,
-                        'snapshot_date'       => $referenceDate->toDateString(),
+                        'snapshot_date' => $referenceDate->toDateString(),
                     ]
                 );
 
@@ -125,17 +125,17 @@ class SiblingDiscountService
         ?Carbon $referenceDate = null
     ): array {
         $referenceDate = $referenceDate ?? now();
-        $family        = $member->family;
+        $family = $member->family;
 
         $defaultResponse = [
-            'is_eligible'     => false,
-            'program_code'    => null,
-            'sibling_count'   => 0,
-            'sibling_order'   => (int) ($member->sibling_order ?? 0),
-            'discount_type'   => null,
-            'discount_value'  => 0.0,
+            'is_eligible' => false,
+            'program_code' => null,
+            'sibling_count' => 0,
+            'sibling_order' => (int) ($member->sibling_order ?? 0),
+            'discount_type' => null,
+            'discount_value' => 0.0,
             'discount_amount' => 0.0,
-            'final_amount'    => max(0.0, $baseFee),
+            'final_amount' => max(0.0, $baseFee),
         ];
 
         if (!$family || !$family->is_active || !$member->is_active) {
@@ -143,8 +143,8 @@ class SiblingDiscountService
         }
 
         $activeMembers = $family->members()->where('is_active', true)->get();
-        $siblingCount  = $activeMembers->count();
-        $siblingOrder  = (int) $member->sibling_order;
+        $siblingCount = $activeMembers->count();
+        $siblingOrder = (int) $member->sibling_order;
 
         $defaultResponse['sibling_count'] = $siblingCount;
 
@@ -173,24 +173,24 @@ class SiblingDiscountService
         }
 
         // 4. Hitung nominal diskon
-        $discountType  = $allocation->discount_type;
+        $discountType = $allocation->discount_type;
         $discountValue = (float) $allocation->discount_value;
 
         $discountAmount = match ($discountType) {
-            'percentage'   => round(($baseFee * $discountValue) / 100, 2),
+            'percentage' => round(($baseFee * $discountValue) / 100, 2),
             'fixed_amount' => min($baseFee, $discountValue),
-            default        => 0.0,
+            default => 0.0,
         };
 
         return [
-            'is_eligible'     => $discountAmount > 0,
-            'program_code'    => $program->code,
-            'sibling_count'   => $siblingCount,
-            'sibling_order'   => $siblingOrder,
-            'discount_type'   => $discountType,
-            'discount_value'  => $discountValue,
+            'is_eligible' => $discountAmount > 0,
+            'program_code' => $program->code,
+            'sibling_count' => $siblingCount,
+            'sibling_order' => $siblingOrder,
+            'discount_type' => $discountType,
+            'discount_value' => $discountValue,
             'discount_amount' => $discountAmount,
-            'final_amount'    => max(0.0, round($baseFee - $discountAmount, 2)),
+            'final_amount' => max(0.0, round($baseFee - $discountAmount, 2)),
         ];
     }
 
@@ -217,11 +217,11 @@ class SiblingDiscountService
             })
             ->where(function ($query) use ($dateString) {
                 $query->whereNull('start_date')
-                      ->orWhere('start_date', '<=', $dateString);
+                    ->orWhere('start_date', '<=', $dateString);
             })
             ->where(function ($query) use ($dateString) {
                 $query->whereNull('end_date')
-                      ->orWhere('end_date', '>=', $dateString);
+                    ->orWhere('end_date', '>=', $dateString);
             })
             // Prioritaskan yang memiliki school_id spesifik dibanding global (NULL)
             ->orderByRaw('school_id IS NULL ASC')
@@ -239,7 +239,7 @@ class SiblingDiscountService
             ->where('min_sibling_count', '<=', $siblingCount)
             ->where(function ($query) use ($siblingCount) {
                 $query->whereNull('max_sibling_count')
-                      ->orWhere('max_sibling_count', '>=', $siblingCount);
+                    ->orWhere('max_sibling_count', '>=', $siblingCount);
             })
             ->orderByDesc('priority')
             ->orderByDesc('min_sibling_count')
@@ -262,16 +262,16 @@ class SiblingDiscountService
 
         foreach ($allocations as $allocation) {
             $matches = match ($allocation->target_type) {
-                'all_members'    => true,
-                'second_onward'  => $siblingOrder >= 2,
-                'oldest'         => $siblingOrder === 1,
-                'youngest'       => $siblingOrder === $totalSiblings,
+                'all_members' => true,
+                'second_onward' => $siblingOrder >= 2,
+                'oldest' => $siblingOrder === 1,
+                'youngest' => $siblingOrder === $totalSiblings,
                 'specific_order' => $this->matchesOrderRange(
                     $siblingOrder,
                     $allocation->sibling_order_from,
                     $allocation->sibling_order_to
                 ),
-                default          => false,
+                default => false,
             };
 
             if ($matches) {
@@ -301,9 +301,9 @@ class SiblingDiscountService
 
 // Contoh Penggunaan di Controller / Action PHP
 
-// use App\Models\StudentFamily;
-// use App\Models\StudentFamilyMember;
-// use App\Services\SiblingDiscountService;
+// use Models\StudentFamily;
+// use Models\StudentFamilyMember;
+// use Services\SiblingDiscountService;
 
 // class InvoiceDiscountController extends Controller
 // {

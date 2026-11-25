@@ -2,9 +2,9 @@
 
 namespace App\Services\Report;
 
-use App\Models\GradingRule;
-use App\Models\ReportTemplate;
-use App\Models\Student;
+use Models\GradingRule;
+use Models\ReportTemplate;
+use Models\Student;
 
 final class ReportContext
 {

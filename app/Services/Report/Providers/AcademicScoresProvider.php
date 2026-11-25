@@ -2,7 +2,7 @@
 
 namespace App\Services\Report\Providers;
 
-use App\Models\FinalScore;
+use Models\FinalScore;
 use App\Services\Grading\GradingService;
 use App\Services\Report\Contracts\ReportDataProvider;
 use App\Services\Report\ReportContext;
@@ -39,9 +39,9 @@ class AcademicScoresProvider implements ReportDataProvider
             ->where('semester', $ctx->semester) // filter semester dari context, bukan relasi "active"
             ->get()
             ->sortBy([
-                fn ($a, $b) => ($a->classroomSubject->subject->sort_order ?? PHP_INT_MAX)
+                fn($a, $b) => ($a->classroomSubject->subject->sort_order ?? PHP_INT_MAX)
                     <=> ($b->classroomSubject->subject->sort_order ?? PHP_INT_MAX),
-                fn ($a, $b) => strcmp(
+                fn($a, $b) => strcmp(
                     $a->classroomSubject->subject->name ?? '',
                     $b->classroomSubject->subject->name ?? ''
                 ),
@@ -56,21 +56,21 @@ class AcademicScoresProvider implements ReportDataProvider
             $grade = $this->grading->resolve($numeric, $rule);
 
             return [
-                'index'            => $i + 1,
-                'subject'          => ['name' => $s->classroomSubject->subject->name ?? '-'],
+                'index' => $i + 1,
+                'subject' => ['name' => $s->classroomSubject->subject->name ?? '-'],
                 // komponen (tetap dipertahankan agar template lama tidak rusak)
                 'assignment_score' => $s->assignment_score ?? 0,
-                'midterm_score'    => $s->midterm_score ?? 0,
-                'final_score'      => $s->final_score ?? 0,
+                'midterm_score' => $s->midterm_score ?? 0,
+                'final_score' => $s->final_score ?? 0,
                 // hasil akhir
-                'numeric_score'    => $numeric,
-                'letter'           => $grade['letter'],
-                'predicate'        => $grade['predicate'],
-                'description'      => $grade['description'],
+                'numeric_score' => $numeric,
+                'letter' => $grade['letter'],
+                'predicate' => $grade['predicate'],
+                'description' => $grade['description'],
             ];
         })->all();
 
-        $numericValues = collect($items)->pluck('numeric_score')->filter(fn ($v) => $v !== null);
+        $numericValues = collect($items)->pluck('numeric_score')->filter(fn($v) => $v !== null);
 
         $average = $numericValues->isNotEmpty()
             ? $this->grading->round((float) $numericValues->avg(), $rule)
@@ -79,11 +79,11 @@ class AcademicScoresProvider implements ReportDataProvider
         $averageGrade = $this->grading->resolve($average, $rule);
 
         return [
-            'academic_scores'   => $items,
-            'total_score'       => $numericValues->isNotEmpty() ? $numericValues->sum() : null,
-            'average_score'     => $average ?? 0,
+            'academic_scores' => $items,
+            'total_score' => $numericValues->isNotEmpty() ? $numericValues->sum() : null,
+            'average_score' => $average ?? 0,
             'average_predicate' => $averageGrade['predicate'],
-            'average_letter'    => $averageGrade['letter'],
+            'average_letter' => $averageGrade['letter'],
         ];
     }
 
@@ -91,31 +91,39 @@ class AcademicScoresProvider implements ReportDataProvider
     {
         return [
             'academic_scores' => [
-                'type'   => 'collection',
-                'label'  => 'Daftar Nilai Mata Pelajaran',
+                'type' => 'collection',
+                'label' => 'Daftar Nilai Mata Pelajaran',
                 'fields' => [
-                    ['field' => 'index',            'label' => 'No',              'type' => 'number'],
-                    ['field' => 'subject.name',     'label' => 'Mata Pelajaran',  'type' => 'string'],
-                    ['field' => 'assignment_score', 'label' => 'Nilai Tugas',     'type' => 'number'],
-                    ['field' => 'midterm_score',    'label' => 'Nilai UTS',       'type' => 'number'],
-                    ['field' => 'final_score',      'label' => 'Nilai UAS',       'type' => 'number'],
-                    ['field' => 'numeric_score',    'label' => 'Nilai Akhir',     'type' => 'number'],
-                    ['field' => 'letter',           'label' => 'Huruf',           'type' => 'string'],
-                    ['field' => 'predicate',        'label' => 'Predikat',        'type' => 'string'],
-                    ['field' => 'description',      'label' => 'Deskripsi',       'type' => 'string'],
+                    ['field' => 'index', 'label' => 'No', 'type' => 'number'],
+                    ['field' => 'subject.name', 'label' => 'Mata Pelajaran', 'type' => 'string'],
+                    ['field' => 'assignment_score', 'label' => 'Nilai Tugas', 'type' => 'number'],
+                    ['field' => 'midterm_score', 'label' => 'Nilai UTS', 'type' => 'number'],
+                    ['field' => 'final_score', 'label' => 'Nilai UAS', 'type' => 'number'],
+                    ['field' => 'numeric_score', 'label' => 'Nilai Akhir', 'type' => 'number'],
+                    ['field' => 'letter', 'label' => 'Huruf', 'type' => 'string'],
+                    ['field' => 'predicate', 'label' => 'Predikat', 'type' => 'string'],
+                    ['field' => 'description', 'label' => 'Deskripsi', 'type' => 'string'],
                 ],
             ],
             'total_score' => [
-                'type' => 'scalar', 'label' => 'Jumlah Nilai', 'valueType' => 'number',
+                'type' => 'scalar',
+                'label' => 'Jumlah Nilai',
+                'valueType' => 'number',
             ],
             'average_score' => [
-                'type' => 'scalar', 'label' => 'Rata-rata', 'valueType' => 'number',
+                'type' => 'scalar',
+                'label' => 'Rata-rata',
+                'valueType' => 'number',
             ],
             'average_predicate' => [
-                'type' => 'scalar', 'label' => 'Predikat Rata-rata', 'valueType' => 'string',
+                'type' => 'scalar',
+                'label' => 'Predikat Rata-rata',
+                'valueType' => 'string',
             ],
             'average_letter' => [
-                'type' => 'scalar', 'label' => 'Huruf Rata-rata', 'valueType' => 'string',
+                'type' => 'scalar',
+                'label' => 'Huruf Rata-rata',
+                'valueType' => 'string',
             ],
         ];
     }

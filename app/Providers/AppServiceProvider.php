@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Contracts\Foundation\CachesRoutes;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
@@ -40,15 +41,13 @@ class AppServiceProvider extends ServiceProvider
         $modulesPath = app_path('Modules');
 
         if (File::exists($modulesPath)) {
-            $routesAreCached = $this->app->routesAreCached();
+            $routesAreCached = $this->app instanceof CachesRoutes ? $this->app->routesAreCached() : false;
             $modules = File::directories($modulesPath);
 
             foreach ($modules as $module) {
                 $moduleName = basename($module);
-                $kebabName = Str::kebab($moduleName); // Contoh: Product -> product
-
                 // FIX: Hanya daftarkan route jika belum di-cache agar tidak menduplikasi ribuan route di runtime
-                if (! $routesAreCached && File::exists("{$module}/routes.php")) {
+                if (!$routesAreCached && File::exists("{$module}/routes.php")) {
                     Route::group([], "{$module}/routes.php");
                 }
                 if (File::exists("{$module}/Views")) {
@@ -83,7 +82,7 @@ class AppServiceProvider extends ServiceProvider
         // Membatasi maksimal 5 percobaan per menit agar tidak mudah di-brute-force
         RateLimiter::for('login', function (Request $request) {
             $throttleKey = Str::transliterate(
-                Str::lower($request->input('email', '')).'|'.$request->ip()
+                Str::lower($request->input('email', '')) . '|' . $request->ip()
             );
 
             return [
@@ -101,8 +100,8 @@ class AppServiceProvider extends ServiceProvider
         // 2. Limiter Umum API (User ID jika sudah login, atau IP jika guest)
         RateLimiter::for('api', function (Request $request) {
             return $request->user()
-                ? Limit::perMinute(120)->by('user:'.$request->user()->id)
-                : Limit::perMinute(60)->by('ip:'.$request->ip());
+                ? Limit::perMinute(120)->by('user:' . $request->user()->id)
+                : Limit::perMinute(60)->by('ip:' . $request->ip());
         });
 
         // 3. Limiter Ketat untuk Endpoint Berat / Sensitif (misal: Export PDF/Word, Sync, Payment Webhook)

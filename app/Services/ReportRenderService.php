@@ -2,19 +2,21 @@
 
 namespace App\Services;
 
-use App\Models\ReportTemplate;
-use App\Models\Student;
-use App\Models\FinalScore;
-use App\Models\SoroganSession;
-use App\Models\MemorizationRecord;
-use App\Models\PesantrenScore;
-use App\Models\ParentStudent;
-use App\Models\ParentGuardian;
+use Models\ReportTemplate;
+use Models\Student;
+use Models\FinalScore;
+use Models\SoroganSession;
+use Models\MemorizationRecord;
+use Models\PesantrenScore;
+use Models\ParentStudent;
+use Models\ParentGuardian;
 use LightnCandy\LightnCandy;
+use LightnCandy\Flags;
 use App\Services\Report\ReportContext;
 use App\Services\Report\ReportDataRegistry;
-use App\Models\ReportCard;
+use Models\ReportCard;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ReportRenderService
 {
@@ -68,10 +70,10 @@ class ReportRenderService
     {
         try {
             $php = LightnCandy::compile($template, [
-                'flags' => LightnCandy::FLAG_HANDLEBARS
-                    | LightnCandy::FLAG_HANDLEBARSJS
-                    | LightnCandy::FLAG_ERROR_EXCEPTION
-                    | LightnCandy::FLAG_RUNTIMEPARTIAL,
+                'flags' => Flags::FLAG_HANDLEBARS
+                    | Flags::FLAG_HANDLEBARSJS
+                    | Flags::FLAG_ERROR_EXCEPTION
+                    | Flags::FLAG_RUNTIMEPARTIAL,
                 'delimiters' => ['[[', ']]'],
                 'helpers' => [
                     'formatDate' => function ($context, $options) {
@@ -99,7 +101,7 @@ class ReportRenderService
 
             return $render($data);
         } catch (\Throwable $e) { // @phpstan-ignore-line
-            \Log::error('LightnCandy render error: ' . $e->getMessage(), [
+            Log::error('LightnCandy render error: ' . $e->getMessage(), [
                 'template' => substr($template, 0, 500),
             ]);
             return $template; // fallback: return raw

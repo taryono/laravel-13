@@ -3,7 +3,7 @@
 
 namespace App\Services;
 
-use App\Models\ReportTemplate;
+use Models\ReportTemplate;
 
 class ReportCompilerService
 {
@@ -264,13 +264,13 @@ class ReportCompilerService
                     $found = collect($columns)->search(function ($col) {
                         return in_array($col['field'] ?? '', ['numeric_score', 'final_score', 'score']);
                     });
-                    $targetIdx = ($found !== false) ? (int)$found : max(0, $colCount - 2);
+                    $targetIdx = ($found !== false) ? (int) $found : max(0, $colCount - 2);
                 } else {
-                    $targetIdx = (int)$targetIdx;
+                    $targetIdx = (int) $targetIdx;
                 }
 
                 $beforeSpan = $targetIdx;
-                $afterSpan  = $colCount - $targetIdx - 1;
+                $afterSpan = $colCount - $targetIdx - 1;
 
                 $labelTd = '';
                 if ($beforeSpan > 0) {

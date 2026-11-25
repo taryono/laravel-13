@@ -2,7 +2,7 @@
 
 namespace App\Services\Grading;
 
-use App\Models\GradingRule;
+use Models\GradingRule;
 
 /**
  * Versi minimal: pembulatan dan konversi nilai -> predikat mengikuti GradingRule.
@@ -22,7 +22,7 @@ class GradingService
         ['min' => 80, 'letter' => 'B', 'predicate' => 'Jayyid Jiddan'],
         ['min' => 70, 'letter' => 'C', 'predicate' => 'Jayyid'],
         ['min' => 60, 'letter' => 'D', 'predicate' => 'Maqbul'],
-        ['min' => 0,  'letter' => 'E', 'predicate' => 'Rasib'],
+        ['min' => 0, 'letter' => 'E', 'predicate' => 'Rasib'],
     ];
 
     public function round(?float $value, ?GradingRule $rule): ?float
@@ -35,8 +35,8 @@ class GradingService
         $factor = 10 ** $decimals;
 
         return match ($rule->rounding_mode ?? 'nearest') {
-            'up'    => ceil($value * $factor) / $factor,
-            'down'  => floor($value * $factor) / $factor,
+            'up' => ceil($value * $factor) / $factor,
+            'down' => floor($value * $factor) / $factor,
             default => round($value, $decimals),
         };
     }
@@ -56,8 +56,8 @@ class GradingService
             foreach (self::LEGACY_SCALE as $band) {
                 if ($score >= $band['min']) {
                     return [
-                        'letter'      => $band['letter'],
-                        'predicate'   => $band['predicate'],
+                        'letter' => $band['letter'],
+                        'predicate' => $band['predicate'],
                         'description' => '',
                     ];
                 }
@@ -67,15 +67,15 @@ class GradingService
         }
 
         $range = $rule->scaleRanges
-            ->first(fn ($r) => $score >= $r->min_score && $score <= $r->max_score);
+            ->first(fn($r) => $score >= $r->min_score && $score <= $r->max_score);
 
-        if (! $range) {
+        if (!$range) {
             return $empty;
         }
 
         return [
-            'letter'      => (string) $range->letter,
-            'predicate'   => (string) $range->predicate,
+            'letter' => (string) $range->letter,
+            'predicate' => (string) $range->predicate,
             'description' => (string) ($range->description ?? ''),
         ];
     }

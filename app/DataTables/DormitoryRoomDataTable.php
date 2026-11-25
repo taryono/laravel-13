@@ -17,7 +17,7 @@ class DormitoryRoomDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['dormitory_id', 'organization_id', 'building_id', 'room_id', 'code', 'name', 'floor', 'capacity', 'occupied', 'room_type', 'facilities', 'monthly_fee', 'currency_id', 'condition', 'is_active', 'notes', 'created_by', 'updated_by'];
+    protected array $columns = ['dormitory.name', 'organization.name', 'building.name', 'room.name', 'code', 'name', 'floor', 'capacity', 'occupied', 'room_type', 'facilities', 'monthly_fee', 'currency_id', 'condition', 'is_active', 'notes', 'created_by', 'updated_by'];
 
     /**
      * Build DataTable response.

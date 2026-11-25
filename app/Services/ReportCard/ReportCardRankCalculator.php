@@ -3,7 +3,7 @@
 
 namespace App\Services\ReportCard;
 
-use App\Models\ReportCard;
+use Models\ReportCard;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -52,8 +52,8 @@ class ReportCardRankCalculator
 
         Log::info('Rank in class calculated', [
             'class_level_id' => $classLevelId,
-            'period_id'      => $periodId,
-            'total_updated'  => $updated,
+            'period_id' => $periodId,
+            'total_updated' => $updated,
         ]);
 
         return $updated;
@@ -132,7 +132,7 @@ class ReportCardRankCalculator
 
         return [
             'classes' => $classUpdated,
-            'levels'  => $levelUpdated,
+            'levels' => $levelUpdated,
         ];
     }
 
@@ -157,28 +157,28 @@ class ReportCardRankCalculator
     {
         $result = [];
         $prevAverage = null;
-        $prevTotal   = null;
+        $prevTotal = null;
         $currentRank = 0;
-        $counter     = 0;
+        $counter = 0;
 
         foreach ($reportCards as $rc) {
             $counter++;
 
             $isTie = $prevAverage !== null
                 && (float) $rc->average_score === (float) $prevAverage
-                && (float) $rc->total_score   === (float) $prevTotal;
+                && (float) $rc->total_score === (float) $prevTotal;
 
             if (!$isTie) {
                 $currentRank = $counter;
             }
 
             $result[] = [
-                'id'   => $rc->id,
+                'id' => $rc->id,
                 'rank' => $currentRank,
             ];
 
             $prevAverage = $rc->average_score;
-            $prevTotal   = $rc->total_score;
+            $prevTotal = $rc->total_score;
         }
 
         return $result;

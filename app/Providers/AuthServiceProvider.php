@@ -12,14 +12,31 @@ use Illuminate\Support\ServiceProvider;
 
 class AuthServiceProvider extends ServiceProvider
 {
-    protected $policies = [
+    /**
+     * The model to policy mappings for the application.
+     *
+     * @var array<class-string, class-string>
+     */
+    protected array $policies = [
         \App\Models\User::class => \App\Policies\UserPolicy::class,
     ];
 
     public function register(): void {}
 
+    /**
+     * Register the application's policies.
+     */
+    public function registerPolicies(): void
+    {
+        foreach ($this->policies as $model => $policy) {
+            Gate::policy($model, $policy);
+        }
+    }
+
     public function boot(): void
     {
+        $this->registerPolicies();
+
         // Super Admin = semua izin
         Gate::before(function ($user, $ability) {
             if (method_exists($user, 'isSuperUser') && $user->isSuperUser()) {
