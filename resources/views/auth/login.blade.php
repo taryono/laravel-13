@@ -49,7 +49,8 @@
             <div class="input-group-custom">
                 <i class="bi bi-person input-icon"></i>
                 <input type="text" id="loginEmail" name="email" class="form-control"
-                    placeholder="Enter your email or ID" value="{{ old('email', 'admin@contoh.id') }}" required autofocus />
+                    placeholder="Enter your email or ID" value="{{ old('email', 'admin@contoh.id') }}" required
+                    autofocus />
             </div>
             <div class="invalid-msg" id="emailErr">Please enter your email or Student ID.</div>
 
@@ -99,8 +100,11 @@
     </div>
 
     <!-- Footer -->
-    <div class="auth-footer">
+    <div class="auth-footer d-none">
         Don't have an account? <a href="{{ route('register') }}">Sign up here</a>
+    </div>
+    <div class="auth-footer">
+        <a href="{{ route('welcome.index') }}">Kembali ke Home</a>
     </div>
 
     <script>

@@ -129,5 +129,26 @@ return [
         'Html' => Kkxdev\HtmlCompat\Facades\Html::class,
     ])->toArray(),
 
+    'central_domain' => env('APP_CENTRAL_DOMAIN', '127.0.0.1'),
 
+    'central_domains' => array_values(array_unique(array_filter([
+        '127.0.0.1',
+        'localhost',
+        (function () {
+            $domain = env('APP_CENTRAL_DOMAIN');
+            if (! $domain) return null;
+            if (str_contains($domain, '://')) {
+                return parse_url($domain, PHP_URL_HOST) ?: $domain;
+            }
+            return explode(':', $domain)[0];
+        })(),
+        (function () {
+            $appUrl = env('APP_URL');
+            if (! $appUrl) return null;
+            if (str_contains($appUrl, '://')) {
+                return parse_url($appUrl, PHP_URL_HOST) ?: $appUrl;
+            }
+            return explode(':', $appUrl)[0];
+        })(),
+    ]))),
 ];

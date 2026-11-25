@@ -53,7 +53,9 @@
     </nav>
 
     {{-- ISI HALAMAN — BAGIAN YANG BERUBAH — --}}
-    @yield('content')
+    <main>
+        @yield('content')
+    </main>
 
     <!-- FOOTER -->
     <footer>

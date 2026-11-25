@@ -40,14 +40,15 @@ class AppServiceProvider extends ServiceProvider
         $modulesPath = app_path('Modules');
 
         if (File::exists($modulesPath)) {
+            $routesAreCached = $this->app->routesAreCached();
             $modules = File::directories($modulesPath);
 
             foreach ($modules as $module) {
                 $moduleName = basename($module);
                 $kebabName = Str::kebab($moduleName); // Contoh: Product -> product
 
-                // FIX: Menggunakan Route::group() untuk meload file routes.php secara aman
-                if (File::exists("{$module}/routes.php")) {
+                // FIX: Hanya daftarkan route jika belum di-cache agar tidak menduplikasi ribuan route di runtime
+                if (! $routesAreCached && File::exists("{$module}/routes.php")) {
                     Route::group([], "{$module}/routes.php");
                 }
                 if (File::exists("{$module}/Views")) {
