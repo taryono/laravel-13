@@ -3,6 +3,18 @@ namespace Models;
 
 class BosReportItem extends SoftDeletableModel
 {
+    protected function casts(): array
+    {
+        return [
+            'allocation_amount' => 'decimal:2',
+            'received_amount' => 'decimal:2',
+            'realization_amount' => 'decimal:2',
+            'remaining_amount' => 'decimal:2',
+            'percentage' => 'decimal:2',
+            'item_data' => 'array',
+            'is_active' => 'boolean',
+        ];
+    }
     // Relasi
     public function bosReport()
     {

@@ -69,8 +69,8 @@ class AcademicYearDataTable extends DataTable
             'UTF-8'
         );
         if ($row->id) {
-            $editUrl = e(route('academic_year.edit', $row));
-            $deleteUrl = e(route('academic_year.destroy', $row));
+            $editUrl = e(route('academic_year.edit', $row->id));
+            $deleteUrl = e(route('academic_year.destroy', $row->id));
         } else {
             $editUrl = "#";
             $deleteUrl = "#";

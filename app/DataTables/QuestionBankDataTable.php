@@ -53,15 +53,15 @@ class QuestionBankDataTable extends DataTable
         $context = htmlspecialchars(
             json_encode([
                 'executeDraw' => true,
-                'tableId'     => 'question-bank-table',
+                'tableId' => 'question-bank-table',
                 'reloadDelay' => 500,
             ]),
             ENT_QUOTES,
             'UTF-8'
         );
 
-        $editUrl   = e(route('question_bank.edit', $row));
-        $deleteUrl = e(route('question_bank.destroy', $row));
+        $editUrl = e(route('question_bank.edit', $row->id));
+        $deleteUrl = e(route('question_bank.destroy', $row->id));
 
         return <<<HTML
             <div class="d-flex justify-content-center gap-1">
@@ -138,7 +138,7 @@ class QuestionBankDataTable extends DataTable
                  * Custom Bootstrap 5 layout.
                  */
                 'dom' =>
-                '<"row mb-3"' .
+                    '<"row mb-3"' .
                     '<"col-md-6 d-flex align-items-center"B>' .
                     '<"col-md-6"f>' .
                     '>' .

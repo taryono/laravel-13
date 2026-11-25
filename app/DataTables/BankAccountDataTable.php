@@ -58,15 +58,15 @@ class BankAccountDataTable extends DataTable
         $context = htmlspecialchars(
             json_encode([
                 'executeDraw' => true,
-                'tableId'     => 'bank-account-table',
+                'tableId' => 'bank-account-table',
                 'reloadDelay' => 500,
             ]),
             ENT_QUOTES,
             'UTF-8'
         );
 
-        $editUrl   = e(route('bank_account.edit', $row));
-        $deleteUrl = e(route('bank_account.destroy', $row));
+        $editUrl = e(route('bank_account.edit', $row->id));
+        $deleteUrl = e(route('bank_account.destroy', $row->id));
 
         return <<<HTML
             <div class="d-flex justify-content-center gap-1">
@@ -143,7 +143,7 @@ class BankAccountDataTable extends DataTable
                  * Custom Bootstrap 5 layout.
                  */
                 'dom' =>
-                '<"row mb-3"' .
+                    '<"row mb-3"' .
                     '<"col-md-6 d-flex align-items-center"B>' .
                     '<"col-md-6"f>' .
                     '>' .

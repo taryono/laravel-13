@@ -60,8 +60,8 @@ class SubdistrictDataTable extends DataTable
             'UTF-8'
         );
 
-        $editUrl = e(route('subdistrict.edit', $row));
-        $deleteUrl = e(route('subdistrict.destroy', $row));
+        $editUrl = e(route('subdistrict.edit', $row->id));
+        $deleteUrl = e(route('subdistrict.destroy', $row->id));
 
         return <<<HTML
             <div class="d-flex justify-content-center gap-1">

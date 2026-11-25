@@ -60,8 +60,8 @@ class PayrollPeriodDataTable extends DataTable
             'UTF-8'
         );
 
-        $editUrl = e(route('payroll_period.edit', $row));
-        $deleteUrl = e(route('payroll_period.destroy', $row));
+        $editUrl = e(route('payroll_period.edit', $row->id));
+        $deleteUrl = e(route('payroll_period.destroy', $row->id));
 
         return <<<HTML
             <div class="d-flex justify-content-center gap-1">

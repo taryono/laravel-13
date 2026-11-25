@@ -60,8 +60,8 @@ class BonusDataTable extends DataTable
             'UTF-8'
         );
 
-        $editUrl = e(route('bonus.edit', $row));
-        $deleteUrl = e(route('bonus.destroy', $row));
+        $editUrl = e(route('bonus.edit', $row->id));
+        $deleteUrl = e(route('bonus.destroy', $row->id));
 
         return <<<HTML
             <div class="d-flex justify-content-center gap-1">

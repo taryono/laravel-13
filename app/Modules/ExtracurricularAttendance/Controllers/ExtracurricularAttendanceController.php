@@ -162,22 +162,21 @@ class ExtracurricularAttendanceController extends MainController
 
             return $this->successResponse(
                 $request,
-                'Data ExtracurricularAttendance berhasil dihapus.'
+                'Data Kehadiran Ekstrakurikuler berhasil dihapus.'
             );
         } catch (Throwable $e) {
-            // $extracurricularAttendance->getKey() yang bisa undefined.
             Log::error(
-                'Gagal menghapus ExtracurricularAttendance.',
+                'Gagal menghapus Kehadiran Ekstrakurikuler.',
                 [
                     'exception' => $e,
-                    'ExtracurricularAttendance_id' => $id,
+                    'extracurricular_attendance_id' => $id,
                     'user_id' => request()->user()?->id,
                 ]
             );
 
             return $this->errorResponse(
                 $request,
-                'Data ExtracurricularAttendance gagal dihapus.'
+                'Data Kehadiran Ekstrakurikuler gagal dihapus.'
             );
         }
     }
@@ -186,7 +185,7 @@ class ExtracurricularAttendanceController extends MainController
     {
         $extracurriculars = Extracurricular::where('is_active', true)
             ->orderBy('name')
-            ->pluck('name', 'id');
+            ->pluck('name', 'id')->toArray();
 
         // Susun daftar jadwal per kegiatan untuk JS
         $scheduleMapping = [];
@@ -201,7 +200,7 @@ class ExtracurricularAttendanceController extends MainController
             });
         });
 
-        $students = Student::orderBy('name')->pluck('name', 'id');
+        $students = Student::orderBy('name')->pluck('name', 'id')->toArray();
 
         return [
             'extracurriculars' => $extracurriculars,

@@ -62,8 +62,8 @@ class StudentParentDataTable extends DataTable
             'UTF-8'
         );
 
-        $editUrl = e(route('student_parent.edit', $row));
-        $deleteUrl = e(route('student_parent.destroy', $row));
+        $editUrl = e(route('student_parent.edit', $row->id));
+        $deleteUrl = e(route('student_parent.destroy', $row->id));
 
         return <<<HTML
             <div class="d-flex justify-content-center gap-1">

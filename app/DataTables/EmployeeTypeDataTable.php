@@ -60,8 +60,8 @@ class EmployeeTypeDataTable extends DataTable
             'UTF-8'
         );
 
-        $editUrl = e(route('employee_type.edit', $row));
-        $deleteUrl = e(route('employee_type.destroy', $row));
+        $editUrl = e(route('employee_type.edit', $row->id));
+        $deleteUrl = e(route('employee_type.destroy', $row->id));
 
         return <<<HTML
             <div class="d-flex justify-content-center gap-1">

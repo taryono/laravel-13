@@ -60,8 +60,8 @@ class ExamPackageDataTable extends DataTable
             'UTF-8'
         );
 
-        $editUrl = e(route('exam_package.edit', $row));
-        $deleteUrl = e(route('exam_package.destroy', $row));
+        $editUrl = e(route('exam_package.edit', $row->id));
+        $deleteUrl = e(route('exam_package.destroy', $row->id));
 
         return <<<HTML
             <div class="d-flex justify-content-center gap-1">

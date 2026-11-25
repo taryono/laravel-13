@@ -60,8 +60,8 @@ class CurriculumCourseDataTable extends DataTable
             'UTF-8'
         );
 
-        $editUrl = e(route('curriculum_course.edit', $row));
-        $deleteUrl = e(route('curriculum_course.destroy', $row));
+        $editUrl = e(route('curriculum_course.edit', $row->id));
+        $deleteUrl = e(route('curriculum_course.destroy', $row->id));
 
         return <<<HTML
             <div class="d-flex justify-content-center gap-1">

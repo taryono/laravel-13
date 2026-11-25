@@ -44,7 +44,7 @@ class DemoRequestDataTable extends DataTable
             })
             ->editColumn('package', function ($row) {
                 $pkg = strtolower($row->package);
-                $class = match($pkg) {
+                $class = match ($pkg) {
                     'starter' => 'background:rgba(13,202,240,0.12);color:#0dcaf0;border:1px solid rgba(13,202,240,0.3);',
                     'professional' => 'background:rgba(47,92,224,0.12);color:#3b82f6;border:1px solid rgba(47,92,224,0.3);',
                     'enterprise' => 'background:rgba(168,85,247,0.12);color:#a855f7;border:1px solid rgba(168,85,247,0.3);',
@@ -54,7 +54,8 @@ class DemoRequestDataTable extends DataTable
                 return "<span class='badge rounded-pill px-2 py-1' style='{$class}'>{$name}</span>";
             })
             ->editColumn('demo_datetime', function ($row) {
-                if (!$row->demo_datetime) return '-';
+                if (!$row->demo_datetime)
+                    return '-';
                 $dt = \Carbon\Carbon::parse($row->demo_datetime);
                 $date = $dt->translatedFormat('d M Y');
                 $time = $dt->format('H:i') . ' WIB';
@@ -105,14 +106,14 @@ class DemoRequestDataTable extends DataTable
         $context = htmlspecialchars(
             json_encode([
                 'executeDraw' => true,
-                'tableId'     => 'demo-request-table',
+                'tableId' => 'demo-request-table',
                 'reloadDelay' => 500,
             ]),
             ENT_QUOTES,
             'UTF-8'
         );
 
-        $editUrl   = e(route('demo_request.edit', $row));
+        $editUrl = e(route('demo_request.e.destroy', $row->id));
         $deleteUrl = e(route('demo_request.destroy', $row));
 
         return <<<HTML
@@ -189,13 +190,13 @@ class DemoRequestDataTable extends DataTable
                  */
                 'dom' =>
                     '<"row mb-3"' .
-                        '<"col-md-6 d-flex align-items-center"B>' .
-                        '<"col-md-6"f>' .
+                    '<"col-md-6 d-flex align-items-center"B>' .
+                    '<"col-md-6"f>' .
                     '>' .
                     'rt' .
                     '<"row mt-3"' .
-                        '<"col-md-6"i>' .
-                        '<"col-md-6 d-flex justify-content-md-end"p>' .
+                    '<"col-md-6"i>' .
+                    '<"col-md-6 d-flex justify-content-md-end"p>' .
                     '>',
 
                 /*
@@ -314,12 +315,12 @@ class DemoRequestDataTable extends DataTable
      * explode() dari string literal seperti versi lama, yang rapuh
      * terhadap karakter khusus pada nama kolom.
      */
-     
+
     protected function getColumns(): array
     {
         return collect($this->columns)
-            ->map(fn (string $kolom) => Column::make($kolom)
-                ->title(ucwords(str_replace(['_',"."], [' ',' '], $kolom))))
+            ->map(fn(string $kolom) => Column::make($kolom)
+                ->title(ucwords(str_replace(['_', "."], [' ', ' '], $kolom))))
             // 1. PREPEND: Masukkan kolom No di posisi PALING AWAL (indeks 0)
             ->prepend(
                 Column::make('DT_RowIndex')

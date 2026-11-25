@@ -28,25 +28,25 @@ class GradeScaleDataTable extends DataTable
             ->addColumn('action', function ($row) {
                 return $this->renderActionButtons($row);
             })// Badge untuk is_active
-        ->addColumn('is_active', function ($row) {
-            if ($row->is_active == 1) {
-                return '<span class="badge bg-success">Active</span>';
-            }
-            return '<span class="badge bg-danger">Inactive</span>';
-        })
+            ->addColumn('is_active', function ($row) {
+                if ($row->is_active == 1) {
+                    return '<span class="badge bg-success">Active</span>';
+                }
+                return '<span class="badge bg-danger">Inactive</span>';
+            })
 
-        // Nama untuk created_by
-        ->addColumn('created_by', function ($row) {
-            return $row->creator?->name ?? '-';
-        })
+            // Nama untuk created_by
+            ->addColumn('created_by', function ($row) {
+                return $row->creator?->name ?? '-';
+            })
 
-        // Nama untuk updated_by
-        ->addColumn('updated_by', function ($row) {
-            return $row->updater?->name ?? '-';
-        })
+            // Nama untuk updated_by
+            ->addColumn('updated_by', function ($row) {
+                return $row->updater?->name ?? '-';
+            })
 
-        // ⚠️ PENTING: Masukkan semua kolom yang pakai HTML ke rawColumns
-        ->rawColumns(['action', 'is_active'])
+            // ⚠️ PENTING: Masukkan semua kolom yang pakai HTML ke rawColumns
+            ->rawColumns(['action', 'is_active'])
             ->addIndexColumn()
             ->setRowId('id');
     }
@@ -71,15 +71,15 @@ class GradeScaleDataTable extends DataTable
         $context = htmlspecialchars(
             json_encode([
                 'executeDraw' => true,
-                'tableId'     => 'grade-scale-table',
+                'tableId' => 'grade-scale-table',
                 'reloadDelay' => 500,
             ]),
             ENT_QUOTES,
             'UTF-8'
         );
 
-        $editUrl   = e(route('grade_scale.edit', $row));
-        $deleteUrl = e(route('grade_scale.destroy', $row));
+        $editUrl = e(route('grade_scale.edit', $row->id));
+        $deleteUrl = e(route('grade_scale.destroy', $row->id));
 
         return <<<HTML
             <div class="d-flex justify-content-center gap-1">
@@ -157,13 +157,13 @@ class GradeScaleDataTable extends DataTable
                  */
                 'dom' =>
                     '<"row mb-3"' .
-                        '<"col-md-6 d-flex align-items-center"B>' .
-                        '<"col-md-6"f>' .
+                    '<"col-md-6 d-flex align-items-center"B>' .
+                    '<"col-md-6"f>' .
                     '>' .
                     'rt' .
                     '<"row mt-3"' .
-                        '<"col-md-6"i>' .
-                        '<"col-md-6 d-flex justify-content-md-end"p>' .
+                    '<"col-md-6"i>' .
+                    '<"col-md-6 d-flex justify-content-md-end"p>' .
                     '>',
 
                 /*
@@ -282,12 +282,12 @@ class GradeScaleDataTable extends DataTable
      * explode() dari string literal seperti versi lama, yang rapuh
      * terhadap karakter khusus pada nama kolom.
      */
-     
+
     protected function getColumns(): array
     {
         return collect($this->columns)
-            ->map(fn (string $kolom) => Column::make($kolom)
-                ->title(ucwords(str_replace(['_',"."], [' ',' '], $kolom))))
+            ->map(fn(string $kolom) => Column::make($kolom)
+                ->title(ucwords(str_replace(['_', "."], [' ', ' '], $kolom))))
             // 1. PREPEND: Masukkan kolom No di posisi PALING AWAL (indeks 0)
             ->prepend(
                 Column::make('DT_RowIndex')

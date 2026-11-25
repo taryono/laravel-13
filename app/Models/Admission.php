@@ -1,10 +1,9 @@
 <?php
 
 namespace Models;
-
+use Illuminate\Database\Eloquent\Builder;
 class Admission extends SoftDeletableModel
 {
-    protected $table = 'admissions';
     protected $fillable = [
         'school_id',
         'academic_year_id',
@@ -18,13 +17,33 @@ class Admission extends SoftDeletableModel
         'registration_fee',
         'min_age',
         'max_age',
-        'requirements'
+        'requirements',
+        'is_active',
+        'created_by',
+        'updated_by',
     ];
 
-    protected $casts = [
-        'start_date' => 'date',
-        'end_date' => 'date',
+    protected $hidden = [
+        'is_not_deleted',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'start_date' => 'date',
+            'end_date' => 'date',
+            'min_age_reference_date' => 'date',
+            'max_age_reference_date' => 'date',
+            'quota' => 'integer',
+            'registration_fee' => 'decimal:2',
+            'min_age_years' => 'integer',
+            'min_age_months' => 'integer',
+            'max_age_years' => 'integer',
+            'max_age_months' => 'integer',
+            'is_active' => 'boolean',
+            'is_not_deleted' => 'boolean',
+        ];
+    }
 
     // Relasi
     public function school()
@@ -120,5 +139,71 @@ class Admission extends SoftDeletableModel
                 'description' => 'Membawa berkas fisik asli ke sekolah tujuan',
             ],
         ];
+    }
+
+    public function scopeOpenToday(Builder $query): Builder
+    {
+        $today = now()->toDateString();
+
+        return $query->where('is_active', true)
+            ->whereDate('start_date', '<=', $today)
+            ->whereDate('end_date', '>=', $today);
+    }
+
+    public function getTypeLabelAttribute(): string
+    {
+        return match (strtoupper((string) $this->type)) {
+            'REGULAR' => 'Jalur Reguler',
+            'ACHIEVEMENT' => 'Jalur Prestasi',
+            'AFFIRMATION' => 'Jalur Afirmasi / Beasiswa',
+            'TRANSFER' => 'Siswa Pindahan',
+            default => $this->type ?? '-',
+        };
+    }
+
+    /**
+     * Memeriksa apakah tanggal lahir calon siswa memenuhi syarat gelombang ini.
+     */
+    public function isEligibleBirthDate(\Carbon\CarbonInterface $birthDate): array
+    {
+        if ($this->min_age_years !== null && $this->min_age_reference_date !== null) {
+            $latestAllowedBirth = $this->min_age_reference_date->copy()
+                ->subYears($this->min_age_years)
+                ->subMonths($this->min_age_months ?? 0);
+
+            if ($birthDate->gt($latestAllowedBirth)) {
+                return [
+                    'eligible' => false,
+                    'reason' => sprintf(
+                        'Usia belum mencukupi syarat minimal %d thn %d bln pada %s (maksimal lahir %s).',
+                        $this->min_age_years,
+                        $this->min_age_months,
+                        $this->min_age_reference_date->translatedFormat('d F Y'),
+                        $latestAllowedBirth->translatedFormat('d F Y')
+                    ),
+                ];
+            }
+        }
+
+        if ($this->max_age_years !== null && $this->max_age_reference_date !== null) {
+            $earliestAllowedBirth = $this->max_age_reference_date->copy()
+                ->subYears($this->max_age_years)
+                ->subMonths($this->max_age_months ?? 0);
+
+            if ($birthDate->lt($earliestAllowedBirth)) {
+                return [
+                    'eligible' => false,
+                    'reason' => sprintf(
+                        'Usia melebihi batas maksimal %d thn %d bln pada %s (minimal lahir %s).',
+                        $this->max_age_years,
+                        $this->max_age_months,
+                        $this->max_age_reference_date->translatedFormat('d F Y'),
+                        $earliestAllowedBirth->translatedFormat('d F Y')
+                    ),
+                ];
+            }
+        }
+
+        return ['eligible' => true, 'reason' => null];
     }
 }

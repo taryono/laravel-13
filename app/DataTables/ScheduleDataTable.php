@@ -60,8 +60,8 @@ class ScheduleDataTable extends DataTable
             'UTF-8'
         );
 
-        $editUrl = e(route('schedule.edit', $row));
-        $deleteUrl = e(route('schedule.destroy', $row));
+        $editUrl = e(route('schedule.edit', $row->id));
+        $deleteUrl = e(route('schedule.destroy', $row->id));
 
         return <<<HTML
             <div class="d-flex justify-content-center gap-1">

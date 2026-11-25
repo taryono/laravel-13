@@ -2,6 +2,7 @@
 
 namespace App\DataTables;
 
+use App\Enums\AttendanceStatus;
 use Models\ExtracurricularAttendance;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
@@ -13,59 +14,91 @@ use Yajra\DataTables\Services\DataTable;
 class ExtracurricularAttendanceDataTable extends DataTable
 {
     /**
-     * Kolom yang ditampilkan di tabel (selain DT_RowIndex & action).
-     * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
-     * opsi --columns.
+     * Definisi kolom: 'data_path' => ['title' => '...', 'name' => 'relasi.kolom']
      */
-    protected array $columns = ['student_extracurricular_id', 'meeting_date', 'status', 'notes', 'recorded_by', 'is_active', 'created_by', 'updated_by'];
+    protected array $columns = [
+        'student_extracurricular.extracurricular.name' => [
+            'title' => 'Ekstrakurikuler',
+            'name' => 'studentExtracurricular.extracurricular.name',
+        ],
+        'student_extracurricular.student.name' => [
+            'title' => 'Siswa',
+            'name' => 'studentExtracurricular.student.name',
+        ],
+        'meeting_date' => [
+            'title' => 'Tanggal Pertemuan',
+            'name' => 'meeting_date',
+        ],
+        'status' => [
+            'title' => 'Status',
+            'name' => 'status',
+        ],
+        'notes' => [
+            'title' => 'Catatan',
+            'name' => 'notes',
+        ],
+        'recorder.name' => [
+            'title' => 'Dicatat Oleh',
+            'name' => 'recorder.name',
+        ],
+        'is_active' => [
+            'title' => 'Aktif',
+            'name' => 'is_active',
+        ],
+    ];
 
-    /**
-     * Build DataTable response.
-     */
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
-            ->addColumn('action', function ($row) {
-                return $this->renderActionButtons($row);
+            ->editColumn('meeting_date', fn($row) => $row->meeting_date?->format('d-m-Y') ?? '-')
+            ->editColumn('status', function ($row) {
+                $status = $row->status instanceof AttendanceStatus
+                    ? $row->status
+                    : AttendanceStatus::tryFrom((string) $row->status);
+
+                return match ($status) {
+                    AttendanceStatus::PRESENT => '<span class="badge bg-success">Hadir</span>',
+                    AttendanceStatus::SICK => '<span class="badge bg-warning text-dark">Sakit</span>',
+                    AttendanceStatus::PERMIT => '<span class="badge bg-info text-dark">Izin</span>',
+                    AttendanceStatus::ABSENT => '<span class="badge bg-danger">Alpa</span>',
+                    AttendanceStatus::LATE => '<span class="badge bg-secondary">Terlambat</span>',
+                    default => '<span class="badge bg-light text-dark">-</span>',
+                };
             })
+            ->editColumn('notes', fn($row) => e($row->notes ?? '-'))
+            ->editColumn('recorder.name', fn($row) => e($row->recorder?->name ?? '-'))
+            ->editColumn('is_active', fn($row) => $row->is_active
+                ? '<span class="badge bg-success">Aktif</span>'
+                : '<span class="badge bg-secondary">Nonaktif</span>')
+            ->addColumn('action', fn($row) => $this->renderActionButtons($row))
             ->addIndexColumn()
-            ->rawColumns(['action']) // ✅ Tetap wajib ada!
+            ->rawColumns(['action', 'status', 'is_active'])
             ->setRowId('id');
     }
 
-    /**
-     * Render tombol aksi (edit & delete) untuk satu baris.
-     *
-     * - $row->name di-escape dengan e() untuk mencegah XSS/attribute
-     *   breakout jika nilainya mengandung karakter " atau <script>.
-     * - Payload data-datatable-context dibangun via json_encode() lalu
-     *   di-escape dengan htmlspecialchars() supaya valid ditaruh di
-     *   dalam attribute HTML (bukan concat string manual yang rawan
-     *   attribute-nya terpotong).
-     * - Class tombol delete WAJIB "delete-button" (bukan "delete") supaya
-     *   cocok dengan selector di public/assets/js/button.js:
-     *   .on('click', '.delete-button', this.handleDeleteButton)
-     */
     protected function renderActionButtons($row): string
     {
-        $title = e('Detail ExtracurricularAttendance ' . $row->name);
+        $title = e(
+            'Kehadiran ' .
+            ($row->studentExtracurricular?->student?->name ?? '-') . ' - ' .
+            ($row->studentExtracurricular?->extracurricular?->name ?? '-')
+        );
 
         $context = htmlspecialchars(
             json_encode([
                 'executeDraw' => true,
-                'tableId'     => 'extracurricular-attendance-table',
+                'tableId' => 'extracurricular-attendance-table',
                 'reloadDelay' => 500,
             ]),
             ENT_QUOTES,
             'UTF-8'
         );
 
-        $editUrl   = e(route('extracurricular_attendance.edit', $row));
-        $deleteUrl = e(route('extracurricular_attendance.destroy', $row));
+        $editUrl = e(route('extracurricular_attendance.edit', $row->id));
+        $deleteUrl = e(route('extracurricular_attendance.destroy', $row->id));
 
         return <<<HTML
             <div class="d-flex justify-content-center gap-1">
-
                 <button
                     type="button"
                     class="btn btn-sm btn-primary"
@@ -86,59 +119,37 @@ class ExtracurricularAttendanceDataTable extends DataTable
                     data-confirm-delete="true"
                     data-is_execute_drawer="true"
                     data-url="{$deleteUrl}"
-                    title="Hapus"
-                >
+                    title="Hapus">
                     <span class="material-symbols-outlined">delete</span>
                 </button>
-
             </div>
         HTML;
     }
 
-    /**
-     * Get query source of DataTable.
-     */
     public function query(ExtracurricularAttendance $model): QueryBuilder
     {
-        return $model->newQuery();
+        return $model->newQuery()
+            ->select('extracurricular_attendances.*')
+            ->with([
+                'studentExtracurricular:id,student_id,extracurricular_id',
+                'studentExtracurricular.student:id,name',
+                'studentExtracurricular.extracurricular:id,name',
+                'recorder:id,name',
+            ]);
     }
 
-    /**
-     * Configure DataTable HTML builder.
-     */
     public function html(): HtmlBuilder
     {
         return $this->builder()
-
-            /*
-             * Example:
-             * Asesi -> asesi-table
-             * Asesor -> asesor-table
-             */
             ->setTableId('extracurricular-attendance-table')
-
             ->columns($this->getColumns())
-
-            /*
-             * Server-side AJAX endpoint.
-             */
             ->minifiedAjax(route('extracurricular_attendance.index'))
-
-            /*
-             * Default sorting:
-             * column index 1 = name
-             */
-            ->orderBy(1)
-
+            // Indeks 3 = kolom meeting_date (0: No, 1: Ekskul, 2: Siswa, 3: Tanggal)
+            ->orderBy(3, 'desc')
             ->selectStyleSingle()
-
             ->parameters([
-
-                /*
-                 * Custom Bootstrap 5 layout.
-                 */
                 'dom' =>
-                '<"row mb-3"' .
+                    '<"row mb-3"' .
                     '<"col-md-6 d-flex align-items-center"B>' .
                     '<"col-md-6"f>' .
                     '>' .
@@ -147,59 +158,24 @@ class ExtracurricularAttendanceDataTable extends DataTable
                     '<"col-md-6"i>' .
                     '<"col-md-6 d-flex justify-content-md-end"p>' .
                     '>',
-
-                /*
-                 * Let CSS / column configuration
-                 * control widths.
-                 */
                 'autoWidth' => false,
-
-                /*
-                 * Responsive DataTable.
-                 */
                 'responsive' => true,
-
-                /*
-                 * Processing indicator.
-                 */
                 'processing' => true,
-
-                /*
-                 * Server-side processing.
-                 */
                 'serverSide' => true,
-
-                /*
-                 * Save DataTable state.
-                 */
                 'stateSave' => false,
-
-                /*
-                 * Language.
-                 */
                 'language' => [
                     'processing' => '
                         <div class="d-flex align-items-center gap-2">
-                            <div
-                                class="spinner-border spinner-border-sm text-primary"
-                                role="status"
-                            ></div>
+                            <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
                             <span>Memuat data...</span>
                         </div>
                     ',
-
                     'search' => 'Cari:',
-
                     'lengthMenu' => 'Tampilkan _MENU_ data',
-
                     'info' => 'Menampilkan _START_ sampai _END_ dari _TOTAL_ data',
-
                     'infoEmpty' => 'Tidak ada data',
-
                     'zeroRecords' => 'Data tidak ditemukan',
-
                     'emptyTable' => 'Belum ada data',
-
                     'paginate' => [
                         'first' => 'Awal',
                         'last' => 'Akhir',
@@ -208,78 +184,40 @@ class ExtracurricularAttendanceDataTable extends DataTable
                     ],
                 ],
             ])
-
-            /*
-             * DataTable buttons.
-             */
             ->buttons([
-
                 Button::make('excel')
-                    ->text(
-                        '<span class="material-symbols-outlined align-middle me-1">
-                            download
-                        </span> Excel'
-                    )
+                    ->text('<span class="material-symbols-outlined align-middle me-1">download</span> Excel')
                     ->className('btn btn-success btn-sm'),
-
                 Button::make('csv')
-                    ->text(
-                        '<span class="material-symbols-outlined align-middle me-1">
-                            description
-                        </span> CSV'
-                    )
+                    ->text('<span class="material-symbols-outlined align-middle me-1">description</span> CSV')
                     ->className('btn btn-primary btn-sm'),
-
                 Button::make('pdf')
-                    ->text(
-                        '<span class="material-symbols-outlined align-middle me-1">
-                            picture_as_pdf
-                        </span> PDF'
-                    )
+                    ->text('<span class="material-symbols-outlined align-middle me-1">picture_as_pdf</span> PDF')
                     ->className('btn btn-danger btn-sm'),
-
                 Button::make('print')
-                    ->text(
-                        '<span class="material-symbols-outlined align-middle me-1">
-                            print
-                        </span> Print'
-                    )
+                    ->text('<span class="material-symbols-outlined align-middle me-1">print</span> Print')
                     ->className('btn btn-primary btn-sm'),
-
                 Button::make([
                     'text' => '<span class="material-symbols-outlined align-middle">refresh</span>',
-                    'className' => 'btn btn-secondary',
-                    'action' => 'function (e, dt, node, config) {
-                        dt.ajax.reload(null, false);
-                    }',
-                ])->className('btn btn-secondary'),
+                    'action' => 'function (e, dt, node, config) { dt.ajax.reload(null, false); }',
+                ])->className('btn btn-secondary btn-sm'),
             ]);
     }
-
-    /**
-     * Get DataTable columns.
-     *
-     * Dibangun langsung dari property $columns (array literal yang sudah
-     * digenerate di atas oleh make:crud-yajra) -- tidak lagi pakai
-     * explode() dari string literal seperti versi lama, yang rapuh
-     * terhadap karakter khusus pada nama kolom.
-     */
 
     protected function getColumns(): array
     {
         return collect($this->columns)
-            ->map(fn(string $kolom) => Column::make($kolom)
-                ->title(ucwords(str_replace(['_', "."], [' ', ' '], $kolom))))
-            // 1. PREPEND: Masukkan kolom No di posisi PALING AWAL (indeks 0)
+            ->map(fn(array $config, string $dataKey) => Column::make($dataKey)
+                ->name($config['name'])
+                ->title($config['title']))
             ->prepend(
                 Column::make('DT_RowIndex')
                     ->title('No')
                     ->orderable(false)
                     ->searchable(false)
-                    ->width(80)
+                    ->width(60)
                     ->addClass('text-center')
             )
-            // 2. PUSH: Masukkan kolom Aksi di posisi PALING AKHIR
             ->push(
                 Column::computed('action')
                     ->exportable(false)
@@ -288,12 +226,10 @@ class ExtracurricularAttendanceDataTable extends DataTable
                     ->addClass('text-center')
                     ->title('Aksi')
             )
-            ->all(); // Konversi collection kembali menjadi array di akhir
+            ->values()
+            ->all();
     }
 
-    /**
-     * Get filename for export.
-     */
     protected function filename(): string
     {
         return 'ExtracurricularAttendance_' . date('YmdHis');

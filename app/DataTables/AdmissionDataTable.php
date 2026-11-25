@@ -17,7 +17,7 @@ class AdmissionDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['school.name', 'academic_year.name', 'class_level.name', 'name', 'code', 'type', 'start_date', 'end_date', 'quota', 'registration_fee', 'min_age', 'max_age', 'requirements', 'is_active'];
+    protected array $columns = ['school.name', 'academic_year.name', 'class_level.name', 'name', 'code', 'type', 'start_date', 'end_date', 'quota', 'registration_fee', 'min_age_years', 'min_age_months', 'min_age_reference_date', 'max_age_years', 'max_age_months', 'max_age_reference_date', 'requirements', 'is_active'];
 
     /**
      * Build DataTable response.
@@ -53,15 +53,15 @@ class AdmissionDataTable extends DataTable
         $context = htmlspecialchars(
             json_encode([
                 'executeDraw' => true,
-                'tableId'     => 'admission-table',
+                'tableId' => 'admission-table',
                 'reloadDelay' => 500,
             ]),
             ENT_QUOTES,
             'UTF-8'
         );
 
-        $editUrl   = e(route('admission.edit', $row));
-        $deleteUrl = e(route('admission.destroy', $row));
+        $editUrl = e(route('admission.edit', $row->id));
+        $deleteUrl = e(route('admission.destroy', $row->id));
 
         return <<<HTML
             <div class="d-flex justify-content-center gap-1">
@@ -138,7 +138,7 @@ class AdmissionDataTable extends DataTable
                  * Custom Bootstrap 5 layout.
                  */
                 'dom' =>
-                '<"row mb-3"' .
+                    '<"row mb-3"' .
                     '<"col-md-6 d-flex align-items-center"B>' .
                     '<"col-md-6"f>' .
                     '>' .

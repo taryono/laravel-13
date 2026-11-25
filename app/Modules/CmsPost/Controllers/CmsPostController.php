@@ -3,6 +3,7 @@
 namespace App\Modules\CmsPost\Controllers;
 
 use App\DataTables\CmsPostDataTable;
+use App\Enums\PostStatus;
 use App\Http\Controllers\MainController;
 use App\Models\User;
 use Models\CmsPost;
@@ -14,6 +15,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
+use Models\CmsCategory;
 use Throwable;
 
 class CmsPostController extends MainController
@@ -46,17 +48,12 @@ class CmsPostController extends MainController
     /**
      * Show the form for creating a new resource.
      */
-    public function create(): View
+    public function create()
     {
-        $cmsPost = new CmsPost();
-        $result = $this->getForm($cmsPost);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
-
-        return view(
-            'CmsPost::create',
-            compact('cmsPost', 'forms', 'groupedForms')
-        );
+        return view('CmsPost::create', [
+            'categories' => CmsCategory::orderBy('name')->get(['id', 'name']),
+            'statuses' => PostStatus::cases(),
+        ]);
     }
 
     /**
@@ -160,14 +157,11 @@ class CmsPostController extends MainController
     public function edit($id): View
     {
         $cmsPost = $this->model->findOrFail($id);
-        $result = $this->getForm($cmsPost);
-        $forms = $result['forms'];
-        $groupedForms = $result['grouped'];
-
-        return view(
-            'CmsPost::edit',
-            compact('cmsPost', 'forms', 'groupedForms')
-        );
+        return view('CmsPost::edit', [
+            'post' => $cmsPost,
+            'categories' => CmsCategory::orderBy('name')->get(['id', 'name']),
+            'statuses' => PostStatus::cases(),
+        ]);
     }
 
     /**
@@ -337,5 +331,20 @@ class CmsPostController extends MainController
                 'Data CmsPost gagal dihapus.'
             );
         }
+    }
+
+    // Tambahkan di App\Http\Controllers\CmsPostController.php
+    public function uploadImage(\Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
+    {
+        $request->validate([
+            'file' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+        ]);
+
+        $path = $request->file('file')->store('cms/posts/content', 'public');
+
+        // TinyMCE mewajibkan key JSON bernama 'location'
+        return response()->json([
+            'location' => \Illuminate\Support\Facades\Storage::disk('public')->url($path),
+        ]);
     }
 }

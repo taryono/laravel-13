@@ -3,6 +3,22 @@ namespace Models;
 
 class BosReport extends SoftDeletableModel
 {
+    protected function casts(): array
+    {
+        return [
+            'start_date' => 'date',
+            'end_date' => 'date',
+            'total_allocation' => 'decimal:2',
+            'total_received' => 'decimal:2',
+            'total_used' => 'decimal:2',
+            'total_remaining' => 'decimal:2',
+            'percentage' => 'decimal:2',
+            'report_data' => 'array',
+            'submitted_at' => 'datetime',
+            'verified_at' => 'datetime',
+            'is_active' => 'boolean',
+        ];
+    }
     // Relasi
     public function school()
     {

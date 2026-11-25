@@ -4,6 +4,7 @@ namespace App\Modules\RkasRealization\Controllers;
 
 use App\DataTables\RkasRealizationDataTable;
 use App\Http\Controllers\MainController;
+use App\Services\Finance\RealizationService;
 use Models\RkasRealization;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -15,7 +16,7 @@ use Throwable;
 
 class RkasRealizationController extends MainController
 {
-    public function __construct()
+    public function __construct(protected RealizationService $realizationService)
     {
         parent::__construct(new RkasRealization());
     }
@@ -87,8 +88,11 @@ class RkasRealizationController extends MainController
         ]);
 
         try {
-            $model = DB::transaction(function () use ($validated) {
-                return RkasRealization::create($validated);
+            $model = DB::transaction(function () use ($validated, $request) {
+                return $this->realizationService->record(
+                    payload: $validated,
+                    userId: $request->user()->id
+                );
             });
 
             return $this->successResponse(

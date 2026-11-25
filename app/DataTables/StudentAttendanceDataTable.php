@@ -53,15 +53,15 @@ class StudentAttendanceDataTable extends DataTable
         $context = htmlspecialchars(
             json_encode([
                 'executeDraw' => true,
-                'tableId'     => 'student-attendance-table',
+                'tableId' => 'student-attendance-table',
                 'reloadDelay' => 500,
             ]),
             ENT_QUOTES,
             'UTF-8'
         );
 
-        $editUrl   = e(route('student_attendance.edit', $row));
-        $deleteUrl = e(route('student_attendance.destroy', $row));
+        $editUrl = e(route('student_attendance.edit', $row->id));
+        $deleteUrl = e(route('student_attendance.destroy', $row->id));
 
         return <<<HTML
             <div class="d-flex justify-content-center gap-1">
@@ -138,7 +138,7 @@ class StudentAttendanceDataTable extends DataTable
                  * Custom Bootstrap 5 layout.
                  */
                 'dom' =>
-                '<"row mb-3"' .
+                    '<"row mb-3"' .
                     '<"col-md-6 d-flex align-items-center"B>' .
                     '<"col-md-6"f>' .
                     '>' .
