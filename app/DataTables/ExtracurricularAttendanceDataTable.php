@@ -159,7 +159,7 @@ class ExtracurricularAttendanceDataTable extends DataTable
                     '<"col-md-6 d-flex justify-content-md-end"p>' .
                     '>',
                 'autoWidth' => false,
-                'responsive' => true,
+                'responsive' => false,
                 'processing' => true,
                 'serverSide' => true,
                 'stateSave' => false,

@@ -157,7 +157,7 @@ class InvoiceDataTable extends DataTable
                 /*
                  * Responsive DataTable.
                  */
-                'responsive' => true,
+                'responsive' => false,
 
                 /*
                  * Processing indicator.

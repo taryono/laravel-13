@@ -62,14 +62,14 @@ class RoleDataTable extends DataTable
         $context = htmlspecialchars(
             json_encode([
                 'executeDraw' => true,
-                'tableId'     => 'role-table',
+                'tableId' => 'role-table',
                 'reloadDelay' => 500,
             ]),
             ENT_QUOTES,
             'UTF-8'
         );
 
-        $editUrl   = e(route('role.edit', $row->id));
+        $editUrl = e(route('role.edit', $row->id));
         $deleteUrl = e(route('role.destroy', $row->id));
 
         return <<<HTML
@@ -121,7 +121,7 @@ class RoleDataTable extends DataTable
             'is_system' => 'boolean',
             'parent_id' => 'integer',
         ]);
-        GlobalSearch::search($query,  ['parent'],  $this->columns);
+        GlobalSearch::search($query, ['parent'], $this->columns);
         return $query;
     }
 
@@ -158,7 +158,7 @@ class RoleDataTable extends DataTable
                  * Custom Bootstrap 5 layout.
                  */
                 'dom' =>
-                '<"row mb-3"' .
+                    '<"row mb-3"' .
                     '<"col-md-6 d-flex align-items-center"B>' .
                     '<"col-md-6"f>' .
                     '>' .
@@ -177,7 +177,7 @@ class RoleDataTable extends DataTable
                 /*
                  * Responsive DataTable.
                  */
-                'responsive' => true,
+                'responsive' => false,
 
                 /*
                  * Processing indicator.

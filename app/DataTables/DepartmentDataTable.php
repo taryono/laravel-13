@@ -30,16 +30,16 @@ class DepartmentDataTable extends DataTable
                 return $this->renderActionButtons($row);
             })
             ->addIndexColumn()
-            
+
             ->addColumn('parent_name', function ($row) {
                 return $row->parent ? $row->parent->name : '-';
             })
-            
+
             // 🔥 Gunakan scope dari model
             ->orderColumn('parent_name', function ($query, $order) {
                 $query->orderHierarchical($order);
             })
-            
+
             ->rawColumns(['action'])
             ->setRowId('id');
     }
@@ -64,14 +64,14 @@ class DepartmentDataTable extends DataTable
         $context = htmlspecialchars(
             json_encode([
                 'executeDraw' => true,
-                'tableId'     => 'department-table',
+                'tableId' => 'department-table',
                 'reloadDelay' => 500,
             ]),
             ENT_QUOTES,
             'UTF-8'
-        ); 
-        $editUrl   = e(url('department/edit/'.$row->id));
-        $deleteUrl = e(url('department/destroy/'.$row->id));
+        );
+        $editUrl = e(url('department/edit/' . $row->id));
+        $deleteUrl = e(url('department/destroy/' . $row->id));
 
         return <<<HTML
             <div class="d-flex justify-content-center gap-1">
@@ -157,13 +157,13 @@ class DepartmentDataTable extends DataTable
                  */
                 'dom' =>
                     '<"row mb-3"' .
-                        '<"col-md-6 d-flex align-items-center"B>' .
-                        '<"col-md-6"f>' .
+                    '<"col-md-6 d-flex align-items-center"B>' .
+                    '<"col-md-6"f>' .
                     '>' .
                     'rt' .
                     '<"row mt-3"' .
-                        '<"col-md-6"i>' .
-                        '<"col-md-6 d-flex justify-content-md-end"p>' .
+                    '<"col-md-6"i>' .
+                    '<"col-md-6 d-flex justify-content-md-end"p>' .
                     '>',
 
                 /*
@@ -175,7 +175,7 @@ class DepartmentDataTable extends DataTable
                 /*
                  * Responsive DataTable.
                  */
-                'responsive' => true,
+                'responsive' => false,
 
                 /*
                  * Processing indicator.
@@ -282,7 +282,7 @@ class DepartmentDataTable extends DataTable
      * explode() dari string literal seperti versi lama, yang rapuh
      * terhadap karakter khusus pada nama kolom.
      */
-     protected function getColumns(): array
+    protected function getColumns(): array
     {
         return [
             Column::make('DT_RowIndex')
@@ -291,33 +291,33 @@ class DepartmentDataTable extends DataTable
                 ->searchable(false)
                 ->width(50)
                 ->addClass('text-center'),
-            
+
             Column::make('code')
                 ->title('Kode Department')
                 ->width(120),
-            
+
             Column::make('name')
                 ->title('Nama Department')
                 ->width(200),
-            
+
             // 🔥 Kolom parent_name (tambahan)
             Column::make('parent_name')
                 ->title('Parent Department')
                 ->width(150)
                 ->searchable(true), // Bisa di-search
-                // orderColumn sudah di handle di dataTable()
-            
+            // orderColumn sudah di handle di dataTable()
+
             // 🔥 Atau gunakan parent_id dengan editColumn
             Column::make('parent_id')
                 ->title('Parent')
                 ->width(150)
-                ->searchable(true), 
-            
+                ->searchable(true),
+
             Column::make('is_active')
                 ->title('Status')
                 ->width(100)
                 ->addClass('text-center'),
-            
+
             Column::computed('action')
                 ->exportable(false)
                 ->printable(false)

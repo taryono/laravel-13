@@ -157,7 +157,7 @@ class CurrencyDataTable extends DataTable
                 /*
                  * Responsive DataTable.
                  */
-                'responsive' => true,
+                'responsive' => false,
 
                 /*
                  * Processing indicator.

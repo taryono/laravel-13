@@ -106,7 +106,7 @@ class CmsPostDataTable extends DataTable
             ->parameters([
                 'dom' => '<"row mb-3"<"col-md-6 d-flex align-items-center"B><"col-md-6"f>>rt<"row mt-3"<"col-md-6"i><"col-md-6 d-flex justify-content-md-end"p>>',
                 'autoWidth' => false,
-                'responsive' => true,
+                'responsive' => false,
                 'processing' => true,
                 'serverSide' => true,
             ])

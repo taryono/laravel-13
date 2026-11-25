@@ -165,7 +165,7 @@ class EmployeeDataTable extends DataTable
                     '>',
 
                 'autoWidth' => false,
-                'responsive' => true,
+                'responsive' => false,
                 'processing' => true,
                 'serverSide' => true,
                 'stateSave' => false,

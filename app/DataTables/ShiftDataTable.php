@@ -16,10 +16,10 @@ class ShiftDataTable extends DataTable
      * Kolom yang ditampilkan di tabel
      */
     protected array $columns = [
-        'code', 
-        'name', 
-        'start_time', 
-        'end_time', 
+        'code',
+        'name',
+        'start_time',
+        'end_time',
         'grace_period_start',
         'grace_period_end',
         'overtime_min_threshold',
@@ -63,7 +63,7 @@ class ShiftDataTable extends DataTable
                 return '<span class="badge bg-secondary">Tidak</span>';
             })
             ->editColumn('is_active', function ($row) {
-                return $row->is_active 
+                return $row->is_active
                     ? '<span class="badge bg-success">Aktif</span>'
                     : '<span class="badge bg-danger">Nonaktif</span>';
             })
@@ -81,14 +81,14 @@ class ShiftDataTable extends DataTable
         $context = htmlspecialchars(
             json_encode([
                 'executeDraw' => true,
-                'tableId'     => 'shift-table',
+                'tableId' => 'shift-table',
                 'reloadDelay' => 500,
             ]),
             ENT_QUOTES,
             'UTF-8'
         );
 
-        $editUrl   = e(route('shift.edit', $row->id));
+        $editUrl = e(route('shift.edit', $row->id));
         $deleteUrl = e(route('shift.destroy', $row->id));
 
         // Detail URL untuk melihat employee yang menggunakan shift ini
@@ -158,17 +158,17 @@ class ShiftDataTable extends DataTable
             ->parameters([
                 'dom' =>
                     '<"row mb-3"' .
-                        '<"col-md-4 d-flex align-items-center"B>' .
-                        '<"col-md-4"l>' .
-                        '<"col-md-4"f>' .
+                    '<"col-md-4 d-flex align-items-center"B>' .
+                    '<"col-md-4"l>' .
+                    '<"col-md-4"f>' .
                     '>' .
                     'rt' .
                     '<"row mt-3"' .
-                        '<"col-md-6"i>' .
-                        '<"col-md-6 d-flex justify-content-md-end"p>' .
+                    '<"col-md-6"i>' .
+                    '<"col-md-6 d-flex justify-content-md-end"p>' .
                     '>',
                 'autoWidth' => false,
-                'responsive' => true,
+                'responsive' => false,
                 'processing' => true,
                 'serverSide' => true,
                 'stateSave' => false,
@@ -222,8 +222,8 @@ class ShiftDataTable extends DataTable
     protected function getColumns(): array
     {
         return collect($this->columns)
-            ->map(fn (string $kolom) => Column::make($kolom)
-                ->title(ucwords(str_replace(['_',"."], [' ',' '], $kolom))))
+            ->map(fn(string $kolom) => Column::make($kolom)
+                ->title(ucwords(str_replace(['_', "."], [' ', ' '], $kolom))))
             // 1. PREPEND: Masukkan kolom No di posisi PALING AWAL (indeks 0)
             ->prepend(
                 Column::make('DT_RowIndex')

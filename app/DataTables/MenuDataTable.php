@@ -28,8 +28,8 @@ class MenuDataTable extends DataTable
                             data-toggle="ajax-modal"
                             data-size="lg"
                             data-method="GET"
-                            data-title="Detail Menu '.$row->name.'"
-                            data-url="'. route('menu.edit', $row->id).'"
+                            data-title="Detail Menu ' . $row->name . '"
+                            data-url="' . route('menu.edit', $row->id) . '"
                             data-datatable-context=\'{"executeDraw":true,"tableId":"action-table","reloadDelay":500}\'
                             data-submit=\'<button class="btn btn-primary modal-submit" type="button" data-datatable-id="menu-table">Simpan</button>\'
                             data-cancel=\'<button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Batal</button>\'>
@@ -68,7 +68,7 @@ class MenuDataTable extends DataTable
     /**
      * Configure DataTable HTML builder.
      */
-     public function html(): HtmlBuilder
+    public function html(): HtmlBuilder
     {
         return $this->builder()
 
@@ -107,13 +107,13 @@ class MenuDataTable extends DataTable
                  */
                 'dom' =>
                     '<"row mb-3"' .
-                        '<"col-md-6 d-flex align-items-center"B>' .
-                        '<"col-md-6"f>' .
+                    '<"col-md-6 d-flex align-items-center"B>' .
+                    '<"col-md-6"f>' .
                     '>' .
                     'rt' .
                     '<"row mt-3"' .
-                        '<"col-md-6"i>' .
-                        '<"col-md-6 d-flex justify-content-md-end"p>' .
+                    '<"col-md-6"i>' .
+                    '<"col-md-6 d-flex justify-content-md-end"p>' .
                     '>',
 
                 /*
@@ -125,7 +125,7 @@ class MenuDataTable extends DataTable
                 /*
                  * Responsive DataTable.
                  */
-                'responsive' => true,
+                'responsive' => false,
 
                 /*
                  * Processing indicator.
@@ -245,7 +245,7 @@ class MenuDataTable extends DataTable
         return [
 
             Column::make('DT_RowIndex')
-            ->title('No')
+                ->title('No')
                 ->width(80)
                 ->addClass('text-center'),
 

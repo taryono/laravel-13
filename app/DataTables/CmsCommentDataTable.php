@@ -17,7 +17,7 @@ class CmsCommentDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['post_id', 'user_id', 'parent_id', 'name', 'email', 'body', 'status', 'ip_address', 'user_agent'];
+    protected array $columns = ['post.name', 'user.name', 'parent.name', 'name', 'email', 'body', 'status', 'ip_address', 'user_agent'];
 
     /**
      * Build DataTable response.
@@ -100,7 +100,7 @@ class CmsCommentDataTable extends DataTable
      */
     public function query(CmsComment $model): QueryBuilder
     {
-        return $model->newQuery();
+        return $model->newQuery()->with('post:id,name', 'user:id,name', 'parent:id,name');
     }
 
     /**
@@ -157,7 +157,7 @@ class CmsCommentDataTable extends DataTable
                 /*
                  * Responsive DataTable.
                  */
-                'responsive' => true,
+                'responsive' => false,
 
                 /*
                  * Processing indicator.

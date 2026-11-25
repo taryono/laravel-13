@@ -151,7 +151,7 @@ class PayslipDataTable extends DataTable
                     '<"col-md-6 d-flex justify-content-md-end"p>' .
                     '>',
                 'autoWidth' => false,
-                'responsive' => true,
+                'responsive' => false,
                 'processing' => true,
                 'serverSide' => true,
                 'stateSave' => false,
@@ -205,13 +205,13 @@ class PayslipDataTable extends DataTable
         return collect($this->columns)
             ->map(function (string $kolom) {
                 $titles = [
-                    'payslip_number'        => 'No. Slip',
-                    'employee.name'         => 'Karyawan',
+                    'payslip_number' => 'No. Slip',
+                    'employee.name' => 'Karyawan',
                     'payroll_period.period' => 'Periode',
-                    'gross_salary'          => 'Gaji Kotor',
-                    'total_deduction'       => 'Potongan',
-                    'net_salary'            => 'Gaji Bersih',
-                    'status'                => 'Status',
+                    'gross_salary' => 'Gaji Kotor',
+                    'total_deduction' => 'Potongan',
+                    'net_salary' => 'Gaji Bersih',
+                    'status' => 'Status',
                 ];
 
                 return Column::make($kolom)
