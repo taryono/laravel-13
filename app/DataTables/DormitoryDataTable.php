@@ -17,7 +17,7 @@ class DormitoryDataTable extends DataTable
      * Digenerate langsung sebagai array literal oleh make:crud-yajra dari
      * opsi --columns.
      */
-    protected array $columns = ['organizationname', 'code', 'name', 'gender_type', 'capacity', 'address', 'phone', 'is_active'];
+    protected array $columns = ['organization.name', 'code', 'name', 'gender_type', 'capacity', 'address', 'phone', 'is_active'];
 
     /**
      * Build DataTable response.
@@ -60,8 +60,13 @@ class DormitoryDataTable extends DataTable
             'UTF-8'
         );
 
-        $editUrl   = e(route('dormitory.edit', $row));
-        $deleteUrl = e(route('dormitory.destroy', $row));
+        if (!empty($row->id)) {
+            $editUrl   = e(route('dormitory.edit', $row->id));
+            $deleteUrl = e(route('dormitory.destroy', $row->id));
+        } else {
+            $editUrl   = '#';
+            $deleteUrl = '#';
+        }
 
         return <<<HTML
             <div class="d-flex justify-content-center gap-1">
@@ -100,7 +105,7 @@ class DormitoryDataTable extends DataTable
      */
     public function query(Dormitory $model): QueryBuilder
     {
-        return $model->newQuery();
+        return $model->newQuery()->select('dormitories.*')->with(['organization']);
     }
 
     /**

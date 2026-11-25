@@ -110,7 +110,7 @@ class CurriculumController extends MainController
     public function edit($id): View
     {
         $curriculum = $this->model->findOrFail($id);
-        $curriculum->load('assignments');
+        $curriculum->load('curriculum_assignments');
 
         return view('Curriculum::edit', [
             'curriculum' => $curriculum,

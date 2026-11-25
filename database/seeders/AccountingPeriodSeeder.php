@@ -1,0 +1,302 @@
+<?php
+
+namespace Database\Seeders;
+
+use Models\AccountingPeriod;
+use Illuminate\Database\Seeder;
+use Carbon\Carbon;
+
+class AccountingPeriodSeeder extends Seeder
+{
+    public function run()
+    {
+        // ⚠️ Sesuaikan ID ini dengan data di sistem kamu!
+        $defaultOrgId = 1;
+        $fiscalYear2025Id = 1; // ID Tahun Buku 2025
+        $fiscalYear2026Id = 2; // ID Tahun Buku 2026
+        $fiscalYear2027Id = 3; // ID Tahun Buku 2027
+        $defaultUserId = 1; // user yang menutup periode
+
+        $periods = [
+            // Periode 2025 (sudah ditutup)
+            [
+                'organization_id' => $defaultOrgId,
+                'fiscal_year_id' => $fiscalYear2025Id,
+                'period' => '2025-01',
+                'start_date' => Carbon::create(2025, 1, 1),
+                'end_date' => Carbon::create(2025, 1, 31),
+                'status' => 'closed',
+                'closed_at' => Carbon::create(2025, 2, 1, 10, 0),
+                'closed_by' => $defaultUserId,
+            ],
+            [
+                'organization_id' => $defaultOrgId,
+                'fiscal_year_id' => $fiscalYear2025Id,
+                'period' => '2025-02',
+                'start_date' => Carbon::create(2025, 2, 1),
+                'end_date' => Carbon::create(2025, 2, 28),
+                'status' => 'closed',
+                'closed_at' => Carbon::create(2025, 3, 1, 10, 0),
+                'closed_by' => $defaultUserId,
+            ],
+            [
+                'organization_id' => $defaultOrgId,
+                'fiscal_year_id' => $fiscalYear2025Id,
+                'period' => '2025-03',
+                'start_date' => Carbon::create(2025, 3, 1),
+                'end_date' => Carbon::create(2025, 3, 31),
+                'status' => 'closed',
+                'closed_at' => Carbon::create(2025, 4, 1, 10, 0),
+                'closed_by' => $defaultUserId,
+            ],
+            [
+                'organization_id' => $defaultOrgId,
+                'fiscal_year_id' => $fiscalYear2025Id,
+                'period' => '2025-04',
+                'start_date' => Carbon::create(2025, 4, 1),
+                'end_date' => Carbon::create(2025, 4, 30),
+                'status' => 'closed',
+                'closed_at' => Carbon::create(2025, 5, 1, 10, 0),
+                'closed_by' => $defaultUserId,
+            ],
+            [
+                'organization_id' => $defaultOrgId,
+                'fiscal_year_id' => $fiscalYear2025Id,
+                'period' => '2025-05',
+                'start_date' => Carbon::create(2025, 5, 1),
+                'end_date' => Carbon::create(2025, 5, 31),
+                'status' => 'closed',
+                'closed_at' => Carbon::create(2025, 6, 1, 10, 0),
+                'closed_by' => $defaultUserId,
+            ],
+            [
+                'organization_id' => $defaultOrgId,
+                'fiscal_year_id' => $fiscalYear2025Id,
+                'period' => '2025-06',
+                'start_date' => Carbon::create(2025, 6, 1),
+                'end_date' => Carbon::create(2025, 6, 30),
+                'status' => 'closed',
+                'closed_at' => Carbon::create(2025, 7, 1, 10, 0),
+                'closed_by' => $defaultUserId,
+            ],
+            [
+                'organization_id' => $defaultOrgId,
+                'fiscal_year_id' => $fiscalYear2025Id,
+                'period' => '2025-07',
+                'start_date' => Carbon::create(2025, 7, 1),
+                'end_date' => Carbon::create(2025, 7, 31),
+                'status' => 'closed',
+                'closed_at' => Carbon::create(2025, 8, 1, 10, 0),
+                'closed_by' => $defaultUserId,
+            ],
+            [
+                'organization_id' => $defaultOrgId,
+                'fiscal_year_id' => $fiscalYear2025Id,
+                'period' => '2025-08',
+                'start_date' => Carbon::create(2025, 8, 1),
+                'end_date' => Carbon::create(2025, 8, 31),
+                'status' => 'closed',
+                'closed_at' => Carbon::create(2025, 9, 1, 10, 0),
+                'closed_by' => $defaultUserId,
+            ],
+            [
+                'organization_id' => $defaultOrgId,
+                'fiscal_year_id' => $fiscalYear2025Id,
+                'period' => '2025-09',
+                'start_date' => Carbon::create(2025, 9, 1),
+                'end_date' => Carbon::create(2025, 9, 30),
+                'status' => 'closed',
+                'closed_at' => Carbon::create(2025, 10, 1, 10, 0),
+                'closed_by' => $defaultUserId,
+            ],
+            [
+                'organization_id' => $defaultOrgId,
+                'fiscal_year_id' => $fiscalYear2025Id,
+                'period' => '2025-10',
+                'start_date' => Carbon::create(2025, 10, 1),
+                'end_date' => Carbon::create(2025, 10, 31),
+                'status' => 'closed',
+                'closed_at' => Carbon::create(2025, 11, 1, 10, 0),
+                'closed_by' => $defaultUserId,
+            ],
+            [
+                'organization_id' => $defaultOrgId,
+                'fiscal_year_id' => $fiscalYear2025Id,
+                'period' => '2025-11',
+                'start_date' => Carbon::create(2025, 11, 1),
+                'end_date' => Carbon::create(2025, 11, 30),
+                'status' => 'closed',
+                'closed_at' => Carbon::create(2025, 12, 1, 10, 0),
+                'closed_by' => $defaultUserId,
+            ],
+            [
+                'organization_id' => $defaultOrgId,
+                'fiscal_year_id' => $fiscalYear2025Id,
+                'period' => '2025-12',
+                'start_date' => Carbon::create(2025, 12, 1),
+                'end_date' => Carbon::create(2025, 12, 31),
+                'status' => 'closed',
+                'closed_at' => Carbon::create(2026, 1, 1, 10, 0),
+                'closed_by' => $defaultUserId,
+            ],
+
+            // Periode 2026 (beberapa sudah tutup, sebagian masih buka)
+            [
+                'organization_id' => $defaultOrgId,
+                'fiscal_year_id' => $fiscalYear2026Id,
+                'period' => '2026-01',
+                'start_date' => Carbon::create(2026, 1, 1),
+                'end_date' => Carbon::create(2026, 1, 31),
+                'status' => 'closed',
+                'closed_at' => Carbon::create(2026, 2, 1, 10, 0),
+                'closed_by' => $defaultUserId,
+            ],
+            [
+                'organization_id' => $defaultOrgId,
+                'fiscal_year_id' => $fiscalYear2026Id,
+                'period' => '2026-02',
+                'start_date' => Carbon::create(2026, 2, 1),
+                'end_date' => Carbon::create(2026, 2, 28),
+                'status' => 'closed',
+                'closed_at' => Carbon::create(2026, 3, 1, 10, 0),
+                'closed_by' => $defaultUserId,
+            ],
+            [
+                'organization_id' => $defaultOrgId,
+                'fiscal_year_id' => $fiscalYear2026Id,
+                'period' => '2026-03',
+                'start_date' => Carbon::create(2026, 3, 1),
+                'end_date' => Carbon::create(2026, 3, 31),
+                'status' => 'closed',
+                'closed_at' => Carbon::create(2026, 4, 1, 10, 0),
+                'closed_by' => $defaultUserId,
+            ],
+            [
+                'organization_id' => $defaultOrgId,
+                'fiscal_year_id' => $fiscalYear2026Id,
+                'period' => '2026-04',
+                'start_date' => Carbon::create(2026, 4, 1),
+                'end_date' => Carbon::create(2026, 4, 30),
+                'status' => 'closed',
+                'closed_at' => Carbon::create(2026, 5, 1, 10, 0),
+                'closed_by' => $defaultUserId,
+            ],
+            [
+                'organization_id' => $defaultOrgId,
+                'fiscal_year_id' => $fiscalYear2026Id,
+                'period' => '2026-05',
+                'start_date' => Carbon::create(2026, 5, 1),
+                'end_date' => Carbon::create(2026, 5, 31),
+                'status' => 'closed',
+                'closed_at' => Carbon::create(2026, 6, 1, 10, 0),
+                'closed_by' => $defaultUserId,
+            ],
+            [
+                'organization_id' => $defaultOrgId,
+                'fiscal_year_id' => $fiscalYear2026Id,
+                'period' => '2026-06',
+                'start_date' => Carbon::create(2026, 6, 1),
+                'end_date' => Carbon::create(2026, 6, 30),
+                'status' => 'closed',
+                'closed_at' => Carbon::create(2026, 7, 1, 10, 0),
+                'closed_by' => $defaultUserId,
+            ],
+            [
+                'organization_id' => $defaultOrgId,
+                'fiscal_year_id' => $fiscalYear2026Id,
+                'period' => '2026-07',
+                'start_date' => Carbon::create(2026, 7, 1),
+                'end_date' => Carbon::create(2026, 7, 31),
+                'status' => 'closed',
+                'closed_at' => Carbon::create(2026, 8, 1, 10, 0),
+                'closed_by' => $defaultUserId,
+            ],
+            [
+                'organization_id' => $defaultOrgId,
+                'fiscal_year_id' => $fiscalYear2026Id,
+                'period' => '2026-08',
+                'start_date' => Carbon::create(2026, 8, 1),
+                'end_date' => Carbon::create(2026, 8, 31),
+                'status' => 'closed',
+                'closed_at' => Carbon::create(2026, 9, 1, 10, 0),
+                'closed_by' => $defaultUserId,
+            ],
+            [
+                'organization_id' => $defaultOrgId,
+                'fiscal_year_id' => $fiscalYear2026Id,
+                'period' => '2026-09',
+                'start_date' => Carbon::create(2026, 9, 1),
+                'end_date' => Carbon::create(2026, 9, 30),
+                'status' => 'closed',
+                'closed_at' => Carbon::create(2026, 10, 1, 10, 0),
+                'closed_by' => $defaultUserId,
+            ],
+            [
+                'organization_id' => $defaultOrgId,
+                'fiscal_year_id' => $fiscalYear2026Id,
+                'period' => '2026-10',
+                'start_date' => Carbon::create(2026, 10, 1),
+                'end_date' => Carbon::create(2026, 10, 31),
+                'status' => 'soft_closed',
+                'closed_at' => null,
+                'closed_by' => null,
+            ],
+            [
+                'organization_id' => $defaultOrgId,
+                'fiscal_year_id' => $fiscalYear2026Id,
+                'period' => '2026-11',
+                'start_date' => Carbon::create(2026, 11, 1),
+                'end_date' => Carbon::create(2026, 11, 30),
+                'status' => 'open',
+                'closed_at' => null,
+                'closed_by' => null,
+            ],
+            [
+                'organization_id' => $defaultOrgId,
+                'fiscal_year_id' => $fiscalYear2026Id,
+                'period' => '2026-12',
+                'start_date' => Carbon::create(2026, 12, 1),
+                'end_date' => Carbon::create(2026, 12, 31),
+                'status' => 'open',
+                'closed_at' => null,
+                'closed_by' => null,
+            ],
+
+            // Periode 2027 (masih buka)
+            [
+                'organization_id' => $defaultOrgId,
+                'fiscal_year_id' => $fiscalYear2027Id,
+                'period' => '2027-01',
+                'start_date' => Carbon::create(2027, 1, 1),
+                'end_date' => Carbon::create(2027, 1, 31),
+                'status' => 'open',
+                'closed_at' => null,
+                'closed_by' => null,
+            ],
+            [
+                'organization_id' => $defaultOrgId,
+                'fiscal_year_id' => $fiscalYear2027Id,
+                'period' => '2027-02',
+                'start_date' => Carbon::create(2027, 2, 1),
+                'end_date' => Carbon::create(2027, 2, 28),
+                'status' => 'open',
+                'closed_at' => null,
+                'closed_by' => null,
+            ],
+            [
+                'organization_id' => $defaultOrgId,
+                'fiscal_year_id' => $fiscalYear2027Id,
+                'period' => '2027-03',
+                'start_date' => Carbon::create(2027, 3, 1),
+                'end_date' => Carbon::create(2027, 3, 31),
+                'status' => 'open',
+                'closed_at' => null,
+                'closed_by' => null,
+            ],
+        ];
+
+        foreach ($periods as $period) {
+            AccountingPeriod::create($period);
+        }
+    }
+}

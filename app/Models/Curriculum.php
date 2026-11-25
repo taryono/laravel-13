@@ -5,21 +5,19 @@ namespace Models;
 class Curriculum extends SoftDeletableModel
 {
     protected $table = 'curriculums';
-    // Relasi
     protected $fillable = [
         'organization_id',
-        'school_id',
-        'report_card_id',
         'name',
         'code',
         'type',
         'description',
         'start_year',
         'end_year',
-        'is_active',
     ];
+
     protected $casts = [
-        'is_active' => 'boolean',
+        'start_year' => 'integer',
+        'end_year' => 'integer',
     ];
     public function organization()
     {
@@ -34,6 +32,11 @@ class Curriculum extends SoftDeletableModel
     public function report_card()
     {
         return $this->hasMany(ReportCard::class);
+    }
+
+    public function curriculum_assignments()
+    {
+        return $this->hasMany(CurriculumAssignment::class);
     }
 
     // Scope

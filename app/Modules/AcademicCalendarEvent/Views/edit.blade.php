@@ -9,7 +9,7 @@
     <div class="col-md-8 mb-3">
         <label for="title" class="form-label">Judul Event <span class="text-danger">*</span></label>
         <input type="text" name="title" id="title" class="form-control @error('title') is-invalid @enderror"
-            value="{{ old('title') }}" maxlength="200" required>
+            value="{{ old('title', $academic_calendar_event->title) }}" maxlength="200" required>
         @error('title')
             <div class="invalid-feedback">{{ $message }}</div>
         @enderror
@@ -18,14 +18,7 @@
     {{-- Tipe Event --}}
     <div class="col-md-4 mb-3">
         <label for="event_type" class="form-label">Tipe Event</label>
-        <select name="event_type" id="event_type" class="form-select @error('event_type') is-invalid @enderror">
-            <option value="">-- Pilih Tipe --</option>
-            <option value="academic" {{ old('event_type') == 'academic' ? 'selected' : '' }}>Akademik</option>
-            <option value="meeting" {{ old('event_type') == 'meeting' ? 'selected' : '' }}>Rapat</option>
-            <option value="holiday" {{ old('event_type') == 'holiday' ? 'selected' : '' }}>Libur</option>
-            <option value="activity" {{ old('event_type') == 'activity' ? 'selected' : '' }}>Kegiatan</option>
-            <option value="other" {{ old('event_type') == 'other' ? 'selected' : '' }}>Lainnya</option>
-        </select>
+        {{ Form::select('event_type', $event_types ?? [], $academic_calendar_event->event_type, ['class' => 'form-select', 'id' => 'event_type', 'placeholder' => '-- Pilih Tipe --', 'required' => true]) }}
         @error('event_type')
             <div class="invalid-feedback">{{ $message }}</div>
         @enderror
@@ -95,8 +88,7 @@
     <div class="col-md-6 mb-3">
         <label for="location" class="form-label">Lokasi</label>
         <input type="text" name="location" id="location"
-            class="form-control @error('location') is-invalid @enderror" value="{{ old('location') }}"
-            maxlength="200">
+            class="form-control @error('location') is-invalid @enderror" value="{{ old('location') }}" maxlength="200">
         @error('location')
             <div class="invalid-feedback">{{ $message }}</div>
         @enderror

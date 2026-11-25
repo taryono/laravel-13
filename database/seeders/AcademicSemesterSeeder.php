@@ -157,20 +157,20 @@ class AcademicSemesterSeeder extends Seeder
         Carbon $now
     ): array {
         return [
-            'organization_id'  => $orgId,
-            'school_id'        => $schoolId,
+            'organization_id' => $orgId,
+            'school_id' => $schoolId,
             'academic_year_id' => $yearId,
-            'code'             => $code,
-            'name'             => $name,
-            'type'             => $type,
-            'start_date'       => $startDate,
-            'end_date'         => $endDate,
-            'krs_start_date'   => $krsStart,
-            'krs_end_date'     => $krsEnd,
-            'is_active'        => 1,
-            'is_current'       => $isCurrent ? 1 : 0,
-            'created_at'       => $now,
-            'updated_at'       => $now,
+            'code' => $code,
+            'name' => $name,
+            'type' => $type,
+            'start_date' => $startDate,
+            'end_date' => $endDate,
+            'krs_start_date' => $krsStart,
+            'krs_end_date' => $krsEnd,
+            'is_active' => 1,
+            'is_current' => $isCurrent ? 1 : 0,
+            'created_at' => $now,
+            'updated_at' => $now,
         ];
     }
 

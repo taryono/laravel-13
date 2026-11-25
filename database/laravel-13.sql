@@ -109326,4 +109326,31 @@ CREATE TABLE `yudisiums`  (
 -- Records of yudisiums
 -- ----------------------------
 
+-- ----------------------------
+-- Table structure for event_types
+-- ----------------------------
+DROP TABLE IF EXISTS `event_types`;
+CREATE TABLE `event_types`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `organization_id` bigint UNSIGNED NOT NULL,
+  `parent_id` bigint UNSIGNED NULL DEFAULT NULL,
+  `code` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `icon` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `color` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `sort_order` int UNSIGNED NOT NULL DEFAULT 0,
+  `is_system` tinyint(1) NOT NULL DEFAULT 0,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `show_to_trial` tinyint(1) NOT NULL DEFAULT 0,  
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `event_types_org_code_unique`(`organization_id`, `code`) USING BTREE,
+  INDEX `event_types_parent_id_foreign`(`parent_id`) USING BTREE,
+  INDEX `event_types_is_system_index`(`is_system`) USING BTREE,
+  INDEX `event_types_org_active_sort_index`(`organization_id`, `is_active`, `sort_order`) USING BTREE
+) ENGINE = MyISAM AUTO_INCREMENT = 19 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+
 SET FOREIGN_KEY_CHECKS = 1;

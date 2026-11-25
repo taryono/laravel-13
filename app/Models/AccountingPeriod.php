@@ -49,7 +49,7 @@ class AccountingPeriod extends SoftDeletableModel
 
     public function closedBy()
     {
-        return $this->belongsTo(User::class, 'closed_by');
+        return $this->belongsTo(\App\Models\User::class, 'closed_by');
     }
     // Scope
     public function scopeActive($query)

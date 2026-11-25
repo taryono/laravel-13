@@ -32,10 +32,10 @@ class AcademicCalendarEventDataTable extends DataTable
                 return $row->is_active ? '<span class="badge bg-success">Aktif</span>' : '<span class="badge bg-danger">Tidak Aktif</span>';
             })
             ->editColumn('start_date', function ($row) {
-                return $row->start_date->format('d F Y');
+                return $row->start_date ? $row->start_date->format('d F Y') : '-';
             })
             ->editColumn('end_date', function ($row) {
-                return $row->end_date->format('d F Y');
+                return $row->end_date ? $row->end_date->format('d F Y') : '-';
             })
             ->addIndexColumn()
             ->rawColumns(['action', 'status']) // ✅ Tetap wajib ada!
@@ -57,7 +57,8 @@ class AcademicCalendarEventDataTable extends DataTable
      */
     protected function renderActionButtons($row): string
     {
-        $title = e('Detail AcademicCalendarEvent ' . $row->name);
+        $displayName = $row->title ?? $row->name ?? '';
+        $title = e('Detail AcademicCalendarEvent ' . $displayName);
 
         $context = htmlspecialchars(
             json_encode([
@@ -69,8 +70,13 @@ class AcademicCalendarEventDataTable extends DataTable
             'UTF-8'
         );
 
-        $editUrl = e(route('academic_calendar_event.edit', $row->id));
-        $deleteUrl = e(route('academic_calendar_event.destroy', $row->id));
+        if (!empty($row->id)) {
+            $editUrl = e(route('academic_calendar_event.edit', $row->id));
+            $deleteUrl = e(route('academic_calendar_event.destroy', $row->id));
+        } else {
+            $editUrl = '#';
+            $deleteUrl = '#';
+        }
 
         return <<<HTML
             <div class="d-flex justify-content-center gap-1">
@@ -109,7 +115,7 @@ class AcademicCalendarEventDataTable extends DataTable
      */
     public function query(AcademicCalendarEvent $model): QueryBuilder
     {
-        return $model->newQuery()->With(['organization']);
+        return $model->newQuery()->with(['organization:id,name', 'academic_year:id,name', 'school:id,name']);
     }
 
     /**

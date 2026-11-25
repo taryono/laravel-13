@@ -51,14 +51,16 @@ class AcademicCalendarEventController extends MainController
      */
     public function create(): View
     {
-        $organizationId = auth()->user()->organization_id; // sesuaikan logikamu
-        $schoolId = auth()->user()->school_id;
+        $organizationId = request()->user()->organization_id; // sesuaikan logikamu
+        $schoolId = request()->user()->school_id;
         $academicYearId = session('academic_year_id'); // sesuaikan
+        $event_types = \Models\EventType::pluck('name', 'id')->toArray();
 
         return view('AcademicCalendarEvent::create', compact(
             'organizationId',
             'schoolId',
-            'academicYearId'
+            'academicYearId',
+            'event_types'
         ));
     }
 
@@ -121,14 +123,14 @@ class AcademicCalendarEventController extends MainController
      */
     public function edit($id): View
     {
-        $academicCalendarEvent = $this->model->findOrFail($id);
-        $organizationId = auth()->user()->organization_id;
-        $schoolId = auth()->user()->school_id;
+        $academic_calendar_event = $this->model->findOrFail($id);
+        $organizationId = request()->user()->organization_id;
+        $schoolId = request()->user()->school_id;
         $academicYearId = session('academic_year_id');
-
+        $event_types = \Models\EventType::pluck('name', 'id')->toArray();
         return view(
             'AcademicCalendarEvent::edit',
-            compact('academicCalendarEvent', 'organizationId', 'schoolId', 'academicYearId')
+            compact('academic_calendar_event', 'organizationId', 'schoolId', 'academicYearId', 'event_types')
         );
     }
 
