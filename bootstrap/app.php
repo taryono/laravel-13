@@ -44,6 +44,12 @@ return Application::configure(basePath: dirname(__DIR__))
             ResolveActiveOrganization::class,
         ]);
 
+        // Otomatis menerapkan RateLimiter::for('api', ...) ke seluruh group middleware 'api'
+        $middleware->throttleApi('api');
+        
+        // Jika menggunakan Redis untuk menyimpan counter rate limit (sangat disarankan di production)
+        $middleware->throttleWithRedis();
+
         // ==========================================
         // GUEST REDIRECT (RedirectIfAuthenticated)
         // ==========================================
