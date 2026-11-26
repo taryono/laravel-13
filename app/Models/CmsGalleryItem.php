@@ -1,11 +1,18 @@
 <?php
 namespace Models;
 
-class CmsGalleryItem extends SoftDeletableModel
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Support\Facades\Storage;
+
+class CmsGalleryItem extends Model
 {
+    protected $table = 'cms_gallery_items';
+
     protected $fillable = [
-        'cms_gallery_id',
-        'cms_media_id',
+        'gallery_id',
+        'media_id',
         'image',
         'caption',
         'sort_order',
@@ -16,21 +23,24 @@ class CmsGalleryItem extends SoftDeletableModel
     ];
 
     // Relasi
+    public function gallery(): BelongsTo
+    {
+        return $this->belongsTo(CmsGallery::class, 'gallery_id');
+    }
+
     public function cms_gallery(): BelongsTo
     {
-        return $this->belongsTo(CmsGallery::class, 'cms_gallery_id');
+        return $this->belongsTo(CmsGallery::class, 'gallery_id');
+    }
+
+    public function media(): BelongsTo
+    {
+        return $this->belongsTo(CmsMedia::class, 'media_id');
     }
 
     public function cms_media(): BelongsTo
     {
-        return $this->belongsTo(CmsMedia::class, 'cms_media_id');
-    }
-
-
-    // Scope
-    public function scopeActive($query)
-    {
-        return $query->where('is_active', true);
+        return $this->belongsTo(CmsMedia::class, 'media_id');
     }
 
     /**

@@ -306,7 +306,7 @@ CREATE TABLE `demo_requests` (
   KEY `demo_requests_email_index` (`email`),
   KEY `demo_requests_phone_index` (`phone`),
   KEY `demo_requests_demo_datetime_index` (`demo_datetime`)
-) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ----------------------------
 -- Table structure for `dictionaries`
@@ -1795,7 +1795,7 @@ CREATE TABLE `template_assets` (
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ----------------------------
 -- Table structure for `trial_registration_education_level`
@@ -1872,7 +1872,7 @@ CREATE TABLE `trial_registration_role_modules` (
   UNIQUE KEY `trm_registration_role_module_unique` (`trial_registration_id`,`role_id`,`module_id`),
   KEY `trial_registration_role_modules_role_id_foreign` (`role_id`),
   KEY `trial_registration_role_modules_module_id_foreign` (`module_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=37 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ----------------------------
 -- Table structure for `trial_registrations`

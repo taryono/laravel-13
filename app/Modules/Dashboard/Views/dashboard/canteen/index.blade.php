@@ -1,9 +1,9 @@
 @extends('layouts.app')
 @section('title', 'Kantin & Cashless')
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('assets/css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/dashboard/dashboard.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/ep-subnav.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/canteen.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/dashboard/canteen.css') }}">
 @endpush
 @section('content')
     <div class="canteen">

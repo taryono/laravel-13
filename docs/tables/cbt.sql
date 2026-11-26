@@ -658,7 +658,7 @@ CREATE TABLE `test_schedules` (
   KEY `idx_cbt_session` (`cbt_session_id`) USING BTREE,
   KEY `fk_test_schedules_room` (`room_id`) USING BTREE,
   KEY `fk_test_schedules_exam_package` (`exam_package_id`) USING BTREE
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
 
 -- ----------------------------
 -- Table structure for `test_types`
@@ -703,6 +703,6 @@ CREATE TABLE `test_types` (
   KEY `idx_parent` (`parent_id`) USING BTREE,
   KEY `idx_order` (`order`) USING BTREE,
   KEY `idx_school` (`school_id`) USING BTREE
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
 
 SET FOREIGN_KEY_CHECKS = 1;

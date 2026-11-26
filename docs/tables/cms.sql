@@ -60,7 +60,7 @@ CREATE TABLE `cms_activity_logs` (
   KEY `cms_activity_logs_user_id_foreign` (`user_id`) USING BTREE,
   KEY `cms_activity_logs_subject_type_subject_id_index` (`subject_type`,`subject_id`) USING BTREE,
   KEY `cms_activity_logs_action_index` (`action`) USING BTREE
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
 -- ----------------------------
 -- Table structure for `cms_banners`
@@ -82,7 +82,7 @@ CREATE TABLE `cms_banners` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   KEY `cms_banners_position_is_active_index` (`position`,`is_active`) USING BTREE
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
 -- ----------------------------
 -- Table structure for `cms_categories`
@@ -104,7 +104,7 @@ CREATE TABLE `cms_categories` (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY `cms_categories_slug_unique` (`slug`) USING BTREE,
   KEY `cms_categories_parent_id_foreign` (`parent_id`) USING BTREE
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
 -- ----------------------------
 -- Table structure for `cms_comments`
@@ -128,7 +128,7 @@ CREATE TABLE `cms_comments` (
   KEY `cms_comments_user_id_foreign` (`user_id`) USING BTREE,
   KEY `cms_comments_parent_id_foreign` (`parent_id`) USING BTREE,
   KEY `cms_comments_post_id_status_index` (`cms_post_id`,`status`) USING BTREE
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
 -- ----------------------------
 -- Table structure for `cms_contact_messages`
@@ -149,7 +149,7 @@ CREATE TABLE `cms_contact_messages` (
   `deleted_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   KEY `cms_contact_messages_is_read_index` (`is_read`) USING BTREE
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
 -- ----------------------------
 -- Table structure for `cms_galleries`
@@ -168,7 +168,7 @@ CREATE TABLE `cms_galleries` (
   `deleted_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY `cms_galleries_slug_unique` (`slug`) USING BTREE
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
 -- ----------------------------
 -- Table structure for `cms_gallery_items`
@@ -186,7 +186,7 @@ CREATE TABLE `cms_gallery_items` (
   PRIMARY KEY (`id`) USING BTREE,
   KEY `cms_gallery_items_gallery_id_foreign` (`cms_gallery_id`) USING BTREE,
   KEY `cms_gallery_items_media_id_foreign` (`cms_media_id`) USING BTREE
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
 -- ----------------------------
 -- Table structure for `cms_media`
@@ -211,7 +211,7 @@ CREATE TABLE `cms_media` (
   PRIMARY KEY (`id`) USING BTREE,
   KEY `cms_media_user_id_foreign` (`user_id`) USING BTREE,
   KEY `cms_media_mime_type_index` (`mime_type`) USING BTREE
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
 -- ----------------------------
 -- Table structure for `cms_pages`
@@ -240,7 +240,7 @@ CREATE TABLE `cms_pages` (
   KEY `cms_pages_user_id_foreign` (`user_id`) USING BTREE,
   KEY `cms_pages_parent_id_foreign` (`parent_id`) USING BTREE,
   KEY `cms_pages_status_index` (`status`) USING BTREE
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
 -- ----------------------------
 -- Table structure for `cms_post_revisions`
@@ -259,7 +259,7 @@ CREATE TABLE `cms_post_revisions` (
   PRIMARY KEY (`id`) USING BTREE,
   KEY `cms_post_revisions_user_id_foreign` (`user_id`) USING BTREE,
   KEY `cms_post_revisions_post_id_revision_number_index` (`cms_post_id`,`revision_number`) USING BTREE
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
 -- ----------------------------
 -- Table structure for `cms_post_tag`
@@ -270,7 +270,7 @@ CREATE TABLE `cms_post_tag` (
   `cms_tag_id` bigint unsigned NOT NULL,
   PRIMARY KEY (`cms_post_id`,`cms_tag_id`) USING BTREE,
   KEY `cms_post_tag_tag_id_foreign` (`cms_tag_id`) USING BTREE
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=FIXED;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=FIXED;
 
 -- ----------------------------
 -- Table structure for `cms_post_translations`
@@ -291,7 +291,7 @@ CREATE TABLE `cms_post_translations` (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY `cms_post_translations_post_id_locale_unique` (`cms_post_id`,`locale`) USING BTREE,
   UNIQUE KEY `cms_post_translations_locale_slug_unique` (`locale`,`slug`) USING BTREE
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
 -- ----------------------------
 -- Table structure for `cms_posts`
@@ -344,7 +344,7 @@ CREATE TABLE `cms_redirects` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY `cms_redirects_from_url_unique` (`from_url`) USING BTREE
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
 -- ----------------------------
 -- Table structure for `cms_settings`
@@ -361,7 +361,7 @@ CREATE TABLE `cms_settings` (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY `cms_settings_key_unique` (`key`) USING BTREE,
   KEY `cms_settings_group_index` (`group`) USING BTREE
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
 -- ----------------------------
 -- Table structure for `cms_subscribers`
@@ -380,7 +380,7 @@ CREATE TABLE `cms_subscribers` (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY `cms_subscribers_email_unique` (`email`) USING BTREE,
   UNIQUE KEY `cms_subscribers_token_unique` (`token`) USING BTREE
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
 -- ----------------------------
 -- Table structure for `cms_tags`
@@ -394,7 +394,7 @@ CREATE TABLE `cms_tags` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY `cms_tags_slug_unique` (`slug`) USING BTREE
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
 -- ----------------------------
 -- Table structure for `sliders`
@@ -420,6 +420,6 @@ CREATE TABLE `sliders` (
   `deleted_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   KEY `sliders_is_active_order_index` (`is_active`,`sort_order`) USING BTREE
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
 SET FOREIGN_KEY_CHECKS = 1;

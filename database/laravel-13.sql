@@ -1350,7 +1350,7 @@ CREATE TABLE `applicant_applicant_category`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `applicant_applicant_category_applicant_id_foreign`(`applicant_id`) USING BTREE,
   INDEX `applicant_applicant_category_applicant_category_id_foreign`(`applicant_category_id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Fixed;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Fixed;
 
 -- ----------------------------
 -- Records of applicant_applicant_category
@@ -1422,7 +1422,7 @@ CREATE TABLE `applicant_choices`  (
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Fixed;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Fixed;
 
 -- ----------------------------
 -- Records of applicant_choices
@@ -1494,7 +1494,7 @@ CREATE TABLE `applicant_invoice_items`  (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of applicant_invoice_items
@@ -2276,7 +2276,7 @@ CREATE TABLE `asset_depreciation_logs`  (
   INDEX `asset_depreciation_logs_updated_by_foreign`(`updated_by`) USING BTREE,
   INDEX `asset_depreciation_logs_asset_id_period_date_index`(`asset_id`, `period_date`) USING BTREE,
   INDEX `asset_depreciation_logs_is_posted_index`(`is_posted`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of asset_depreciation_logs
@@ -4218,7 +4218,7 @@ CREATE TABLE `cities`  (
   `updated_at` timestamp NOT NULL ON UPDATE CURRENT_TIMESTAMP,
   `deleted_at` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 819 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 819 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of cities
@@ -4974,7 +4974,7 @@ CREATE TABLE `cms_activity_logs`  (
   INDEX `cms_activity_logs_user_id_foreign`(`user_id`) USING BTREE,
   INDEX `cms_activity_logs_subject_type_subject_id_index`(`subject_type`, `subject_id`) USING BTREE,
   INDEX `cms_activity_logs_action_index`(`action`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of cms_activity_logs
@@ -5000,7 +5000,7 @@ CREATE TABLE `cms_banners`  (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `cms_banners_position_is_active_index`(`position`, `is_active`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of cms_banners
@@ -5026,7 +5026,7 @@ CREATE TABLE `cms_categories`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `cms_categories_slug_unique`(`slug`) USING BTREE,
   INDEX `cms_categories_parent_id_foreign`(`parent_id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of cms_categories
@@ -5054,7 +5054,7 @@ CREATE TABLE `cms_comments`  (
   INDEX `cms_comments_user_id_foreign`(`user_id`) USING BTREE,
   INDEX `cms_comments_parent_id_foreign`(`parent_id`) USING BTREE,
   INDEX `cms_comments_post_id_status_index`(`post_id`, `status`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of cms_comments
@@ -5079,7 +5079,7 @@ CREATE TABLE `cms_contact_messages`  (
   `deleted_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `cms_contact_messages_is_read_index`(`is_read`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of cms_contact_messages
@@ -5102,7 +5102,7 @@ CREATE TABLE `cms_galleries`  (
   `deleted_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `cms_galleries_slug_unique`(`slug`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of cms_galleries
@@ -5124,7 +5124,7 @@ CREATE TABLE `cms_gallery_items`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `cms_gallery_items_gallery_id_foreign`(`gallery_id`) USING BTREE,
   INDEX `cms_gallery_items_media_id_foreign`(`media_id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of cms_gallery_items
@@ -5153,7 +5153,7 @@ CREATE TABLE `cms_media`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `cms_media_user_id_foreign`(`user_id`) USING BTREE,
   INDEX `cms_media_mime_type_index`(`mime_type`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of cms_media
@@ -5186,7 +5186,7 @@ CREATE TABLE `cms_pages`  (
   INDEX `cms_pages_user_id_foreign`(`user_id`) USING BTREE,
   INDEX `cms_pages_parent_id_foreign`(`parent_id`) USING BTREE,
   INDEX `cms_pages_status_index`(`status`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of cms_pages
@@ -5209,7 +5209,7 @@ CREATE TABLE `cms_post_revisions`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `cms_post_revisions_user_id_foreign`(`user_id`) USING BTREE,
   INDEX `cms_post_revisions_post_id_revision_number_index`(`post_id`, `revision_number`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of cms_post_revisions
@@ -5224,7 +5224,7 @@ CREATE TABLE `cms_post_tag`  (
   `tag_id` bigint UNSIGNED NOT NULL,
   PRIMARY KEY (`post_id`, `tag_id`) USING BTREE,
   INDEX `cms_post_tag_tag_id_foreign`(`tag_id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = FIXED;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = FIXED;
 
 -- ----------------------------
 -- Records of cms_post_tag
@@ -5249,7 +5249,7 @@ CREATE TABLE `cms_post_translations`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `cms_post_translations_post_id_locale_unique`(`post_id`, `locale`) USING BTREE,
   UNIQUE INDEX `cms_post_translations_locale_slug_unique`(`locale`, `slug`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of cms_post_translations
@@ -5286,7 +5286,7 @@ CREATE TABLE `cms_posts`  (
   INDEX `cms_posts_status_index`(`status`) USING BTREE,
   INDEX `cms_posts_published_at_index`(`published_at`) USING BTREE,
   INDEX `cms_posts_status_published_at_index`(`status`, `published_at`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of cms_posts
@@ -5307,7 +5307,7 @@ CREATE TABLE `cms_redirects`  (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `cms_redirects_from_url_unique`(`from_url`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of cms_redirects
@@ -5329,7 +5329,7 @@ CREATE TABLE `cms_settings`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `cms_settings_key_unique`(`key`) USING BTREE,
   INDEX `cms_settings_group_index`(`group`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of cms_settings
@@ -5352,7 +5352,7 @@ CREATE TABLE `cms_subscribers`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `cms_subscribers_email_unique`(`email`) USING BTREE,
   UNIQUE INDEX `cms_subscribers_token_unique`(`token`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of cms_subscribers
@@ -5370,7 +5370,7 @@ CREATE TABLE `cms_tags`  (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `cms_tags_slug_unique`(`slug`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of cms_tags
@@ -5851,7 +5851,7 @@ CREATE TABLE `curriculum_assignments`  (
   INDEX `ca_school_index`(`school_id`) USING BTREE,
   INDEX `ca_class_level_index`(`class_level_id`) USING BTREE,
   INDEX `ca_academic_year_index`(`academic_year_id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Fixed;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Fixed;
 
 -- ----------------------------
 -- Records of curriculum_assignments
@@ -5875,7 +5875,7 @@ CREATE TABLE `curriculum_competencies`  (
   `deleted_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `cc_phase_index`(`curriculum_phase_id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of curriculum_competencies
@@ -5993,7 +5993,7 @@ CREATE TABLE `curriculum_phase_class_level`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `cpcl_unique`(`curriculum_phase_id`, `class_level_id`) USING BTREE,
   INDEX `cpcl_class_level_fk`(`class_level_id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Fixed;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Fixed;
 
 -- ----------------------------
 -- Records of curriculum_phase_class_level
@@ -6171,7 +6171,7 @@ CREATE TABLE `curriculums`  (
   INDEX `curriculums_type_index`(`type`) USING BTREE,
   INDEX `curriculums_is_active_index`(`is_active`) USING BTREE,
   INDEX `curriculums_deleted_at_index`(`deleted_at`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of curriculums
@@ -6421,7 +6421,7 @@ CREATE TABLE `demo_requests`  (
   INDEX `demo_requests_email_index`(`email`) USING BTREE,
   INDEX `demo_requests_phone_index`(`phone`) USING BTREE,
   INDEX `demo_requests_demo_datetime_index`(`demo_datetime`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of demo_requests
@@ -6851,7 +6851,7 @@ CREATE TABLE `districts`  (
   `updated_at` timestamp NOT NULL ON UPDATE CURRENT_TIMESTAMP,
   `deleted_at` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 7740 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 7740 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of districts
@@ -18429,7 +18429,7 @@ CREATE TABLE `menu_categories`  (
   INDEX `menu_categories_parent_id_foreign`(`parent_id`) USING BTREE,
   INDEX `menu_categories_is_system_index`(`is_system`) USING BTREE,
   INDEX `menu_categories_org_active_sort_index`(`organization_id`, `is_active`, `sort_order`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 19 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 19 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of menu_categories
@@ -22379,7 +22379,7 @@ CREATE TABLE `regions`  (
   `updated_at` timestamp NOT NULL ON UPDATE CURRENT_TIMESTAMP,
   `deleted_at` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 35 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 35 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of regions
@@ -22465,7 +22465,7 @@ CREATE TABLE `report_builder_components`  (
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 23 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 23 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of report_builder_components
@@ -22856,7 +22856,7 @@ CREATE TABLE `report_data_sources`  (
   INDEX `report_data_sources_organization_id_index`(`organization_id`) USING BTREE,
   INDEX `report_data_sources_category_index`(`category`) USING BTREE,
   INDEX `report_data_sources_is_active_index`(`is_active`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 19 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 19 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of report_data_sources
@@ -22933,7 +22933,7 @@ CREATE TABLE `report_template_curriculums`  (
   `deleted_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `report_template_curriculums_report_template_id_foreign`(`report_template_id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Fixed;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Fixed;
 
 -- ----------------------------
 -- Records of report_template_curriculums
@@ -22958,7 +22958,7 @@ CREATE TABLE `report_template_signatories`  (
   `deleted_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `report_template_signatories_report_template_id_foreign`(`report_template_id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of report_template_signatories
@@ -22979,7 +22979,7 @@ CREATE TABLE `report_template_versions`  (
   `deleted_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `report_template_versions_template_id_foreign`(`template_id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 14 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 14 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of report_template_versions
@@ -23028,7 +23028,7 @@ CREATE TABLE `report_templates`  (
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 21 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 21 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of report_templates
@@ -24708,7 +24708,7 @@ CREATE TABLE `school_role_modules`  (
   INDEX `school_role_modules_role_id_foreign`(`role_id`) USING BTREE,
   INDEX `school_role_modules_module_id_foreign`(`module_id`) USING BTREE,
   INDEX `srm_org_school_index`(`organization_id`, `school_id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 33 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Fixed;
+) ENGINE = InnoDB AUTO_INCREMENT = 33 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Fixed;
 
 -- ----------------------------
 -- Records of school_role_modules
@@ -24955,7 +24955,7 @@ CREATE TABLE `sliders`  (
   `deleted_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `sliders_is_active_order_index`(`is_active`, `sort_order`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sliders
@@ -107709,7 +107709,7 @@ CREATE TABLE `tax_types`  (
   `deleted_at` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `tax_types_code_unique`(`code`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of tax_types
@@ -107861,7 +107861,7 @@ CREATE TABLE `template_assets`  (
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of template_assets
@@ -107936,7 +107936,7 @@ CREATE TABLE `test_schedules`  (
   INDEX `idx_cbt_session`(`cbt_session_id`) USING BTREE,
   INDEX `fk_test_schedules_room`(`room_id`) USING BTREE,
   INDEX `fk_test_schedules_exam_package`(`exam_package_id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of test_schedules
@@ -107985,7 +107985,7 @@ CREATE TABLE `test_types`  (
   INDEX `idx_parent`(`parent_id`) USING BTREE,
   INDEX `idx_order`(`order`) USING BTREE,
   INDEX `idx_school`(`school_id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of test_types
@@ -108398,7 +108398,7 @@ CREATE TABLE `trial_registration_role_modules`  (
   UNIQUE INDEX `trm_registration_role_module_unique`(`trial_registration_id`, `role_id`, `module_id`) USING BTREE,
   INDEX `trial_registration_role_modules_role_id_foreign`(`role_id`) USING BTREE,
   INDEX `trial_registration_role_modules_module_id_foreign`(`module_id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 37 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Fixed;
+) ENGINE = InnoDB AUTO_INCREMENT = 37 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Fixed;
 
 -- ----------------------------
 -- Records of trial_registration_role_modules
@@ -109380,6 +109380,6 @@ CREATE TABLE `event_types`  (
   INDEX `event_types_parent_id_foreign`(`parent_id`) USING BTREE,
   INDEX `event_types_is_system_index`(`is_system`) USING BTREE,
   INDEX `event_types_org_active_sort_index`(`organization_id`, `is_active`, `sort_order`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 19 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 19 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 SET FOREIGN_KEY_CHECKS = 1;

@@ -9,13 +9,12 @@ use Illuminate\Support\Facades\Schema;
  * Perkuat integritas data kantin + dompet digital.
  *
  * Asumsi kondisi awal = dump SQL terakhir (wallet_cards, wallet_topups,
- * canteen_tenant_users masih MyISAM, FK belum lengkap).
+ * canteen_tenant_users masih InnoDB, FK belum lengkap).
  * Jika sebagian perubahan sudah Anda jalankan manual, hapus bagian yang sudah ada.
  *
  * Cadangkan database sebelum menjalankan.
  */
-return new class extends Migration
-{
+return new class extends Migration {
     public function up(): void
     {
         // 0. Pastikan tidak ada data yatim yang membuat FK gagal dibuat.
@@ -25,12 +24,12 @@ return new class extends Migration
         $this->assertNoOrphans('canteen_tenant_users', 'user_id', 'users');
         $this->assertNoOrphans('canteen_orders', 'wallet_transaction_id', 'wallet_transactions');
 
-        // 1. MyISAM -> InnoDB (syarat transaksi & foreign key)
+        // 1. InnoDB -> InnoDB (syarat transaksi & foreign key)
         foreach (['wallet_cards', 'wallet_topups', 'canteen_tenant_users'] as $table) {
             DB::statement("ALTER TABLE `{$table}` ENGINE = InnoDB ROW_FORMAT = DYNAMIC");
         }
 
-        // 2. Foreign key untuk tabel yang tadinya MyISAM
+        // 2. Foreign key untuk tabel yang tadinya InnoDB
         Schema::table('wallet_cards', function (Blueprint $t) {
             $t->foreign('digital_wallet_id', 'wallet_cards_wallet_fk')
                 ->references('id')->on('digital_wallets')
@@ -133,7 +132,7 @@ return new class extends Migration
     }
 
     /**
-     * Rollback dasar. Engine tidak dikembalikan ke MyISAM dan nilai enum
+     * Rollback dasar. Engine tidak dikembalikan ke InnoDB dan nilai enum
      * 'adjustment' tidak dikembalikan ke typo, karena itu memang tidak diinginkan.
      */
     public function down(): void

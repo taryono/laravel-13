@@ -158,6 +158,7 @@ class CmsPostController extends MainController
     {
         $cmsPost = $this->model->findOrFail($id);
         return view('CmsPost::edit', [
+            'cmsPost' => $cmsPost,
             'post' => $cmsPost,
             'categories' => CmsCategory::orderBy('name')->get(['id', 'name']),
             'statuses' => PostStatus::cases(),

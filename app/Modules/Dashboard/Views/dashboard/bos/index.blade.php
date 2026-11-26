@@ -2,9 +2,9 @@
 
 @section('title', 'Modul Dana BOS - EduPortal')
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('assets/css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/dashboard/dashboard.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/ep-subnav.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/bos.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/dashboard/bos.css') }}">
 @endpush
 @section('content')
     <div class="bos-page-wrapper py-4 px-3 px-lg-4">

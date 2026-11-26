@@ -1,9 +1,9 @@
 @extends('layouts.app')
 @section('title', 'Shuttle Service & Transportasi')
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('assets/css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/dashboard/dashboard.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/ep-subnav.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/shuttle-service.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/dashboard/shuttle-service.css') }}">
 @endpush
 @section('content')
     <div class="shuttle-service">

@@ -1,4 +1,4 @@
-{{ Form::open(['method' => 'POST', 'route' => ['cms_gallery.store'], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
+{{ Form::open(['method' => 'POST', 'route' => ['cms_gallery.store'], 'class' => 'form-horizontal form-validation', 'id' => 'formCmsGallery', 'enctype' => 'multipart/form-data']) }}
 <div class="row">
     @forelse ($forms as $key => $form)
         <div class="col-md-6 mb-3">

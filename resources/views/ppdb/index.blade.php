@@ -63,7 +63,12 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        h1, h2, h3, h4, h5, .brand-font {
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        .brand-font {
             font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
             letter-spacing: -0.02em;
         }
@@ -81,11 +86,13 @@
             padding: 7px 0;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
+
         .top-ticker a {
             color: #93c5fd;
             text-decoration: none;
             transition: color 0.2s;
         }
+
         .top-ticker a:hover {
             color: #ffffff;
             text-decoration: underline;
@@ -102,15 +109,18 @@
             z-index: 1040;
             transition: all 0.3s ease;
         }
+
         .navbar-ppdb.scrolled {
             box-shadow: 0 8px 30px rgba(0, 40, 142, 0.08);
         }
+
         .navbar-brand-wrapper {
             display: flex;
             align-items: center;
             gap: 12px;
             text-decoration: none;
         }
+
         .navbar-brand-badge {
             width: 44px;
             height: 44px;
@@ -122,6 +132,7 @@
             color: #fff;
             box-shadow: 0 4px 12px rgba(0, 40, 142, 0.25);
         }
+
         .nav-link-custom {
             font-size: 0.92rem;
             font-weight: 600;
@@ -130,7 +141,9 @@
             border-radius: 8px;
             transition: all 0.2s;
         }
-        .nav-link-custom:hover, .nav-link-custom.active {
+
+        .nav-link-custom:hover,
+        .nav-link-custom.active {
             color: var(--brand-primary);
             background: var(--brand-primary-subtle);
         }
@@ -151,11 +164,13 @@
             gap: 8px;
             text-decoration: none;
         }
+
         .btn-brand-primary:hover {
             color: #fff;
             transform: translateY(-2px);
             box-shadow: 0 8px 22px rgba(0, 40, 142, 0.35);
         }
+
         .btn-brand-outline {
             border: 1.8px solid var(--brand-primary);
             color: var(--brand-primary);
@@ -170,6 +185,7 @@
             gap: 8px;
             text-decoration: none;
         }
+
         .btn-brand-outline:hover {
             background: var(--brand-primary-subtle);
             color: var(--brand-primary-dark);
@@ -180,11 +196,12 @@
         .hero-section {
             position: relative;
             background: radial-gradient(circle at 10% 20%, rgba(239, 244, 255, 0.85) 0%, rgba(255, 255, 255, 1) 70%),
-                        radial-gradient(circle at 90% 80%, rgba(224, 242, 254, 0.6) 0%, rgba(255, 255, 255, 0) 50%);
+                radial-gradient(circle at 90% 80%, rgba(224, 242, 254, 0.6) 0%, rgba(255, 255, 255, 0) 50%);
             padding: 4.5rem 0 3.5rem;
             border-bottom: 1px solid var(--brand-border);
             overflow: hidden;
         }
+
         .hero-decor-circle {
             position: absolute;
             border-radius: 50%;
@@ -192,6 +209,7 @@
             opacity: 0.45;
             pointer-events: none;
         }
+
         .hero-decor-1 {
             width: 400px;
             height: 400px;
@@ -199,6 +217,7 @@
             top: -100px;
             right: -80px;
         }
+
         .hero-decor-2 {
             width: 320px;
             height: 320px;
@@ -206,6 +225,7 @@
             bottom: -80px;
             left: -80px;
         }
+
         .status-pill {
             display: inline-flex;
             align-items: center;
@@ -219,6 +239,7 @@
             font-weight: 700;
             margin-bottom: 1.25rem;
         }
+
         .status-dot-pulse {
             width: 8px;
             height: 8px;
@@ -226,6 +247,7 @@
             border-radius: 50%;
             position: relative;
         }
+
         .status-dot-pulse::after {
             content: '';
             position: absolute;
@@ -237,9 +259,17 @@
             background-color: rgba(16, 185, 129, 0.4);
             animation: pulse-ring 1.8s infinite cubic-bezier(0.4, 0, 0.6, 1);
         }
+
         @keyframes pulse-ring {
-            0% { transform: scale(0.8); opacity: 1; }
-            100% { transform: scale(2.2); opacity: 0; }
+            0% {
+                transform: scale(0.8);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(2.2);
+                opacity: 0;
+            }
         }
 
         .hero-title {
@@ -249,11 +279,13 @@
             color: var(--brand-navy);
             margin-bottom: 1.25rem;
         }
+
         .hero-title-highlight {
             background: linear-gradient(135deg, var(--brand-primary), #0284c7);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
+
         .hero-subtitle {
             font-size: clamp(1rem, 1.3vw, 1.15rem);
             color: var(--brand-muted);
@@ -269,6 +301,7 @@
             overflow: visible;
             box-shadow: var(--shadow-float);
         }
+
         .hero-main-img {
             width: 100%;
             height: auto;
@@ -278,6 +311,7 @@
             display: block;
             border: 4px solid #ffffff;
         }
+
         .floating-badge {
             position: absolute;
             background: rgba(255, 255, 255, 0.95);
@@ -292,18 +326,26 @@
             z-index: 2;
             animation: floatSlow 4s ease-in-out infinite alternate;
         }
+
         .floating-badge-top {
             top: -20px;
             left: -20px;
         }
+
         .floating-badge-bottom {
             bottom: -20px;
             right: -15px;
             animation-delay: -2s;
         }
+
         @keyframes floatSlow {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(-8px); }
+            0% {
+                transform: translateY(0);
+            }
+
+            100% {
+                transform: translateY(-8px);
+            }
         }
 
         /* ── METRIC STATS STRIP ── */
@@ -317,11 +359,13 @@
             position: relative;
             z-index: 10;
         }
+
         .stat-item {
             display: flex;
             align-items: center;
             gap: 14px;
         }
+
         .stat-icon {
             width: 48px;
             height: 48px;
@@ -334,12 +378,14 @@
             font-size: 1.35rem;
             flex-shrink: 0;
         }
+
         .stat-number {
             font-size: 1.4rem;
             font-weight: 800;
             color: var(--brand-navy);
             line-height: 1.1;
         }
+
         .stat-label {
             font-size: 0.8rem;
             color: var(--brand-muted);
@@ -351,9 +397,11 @@
         .section-padding {
             padding: 4.8rem 0;
         }
+
         .section-header {
             margin-bottom: 3rem;
         }
+
         .section-tag {
             display: inline-block;
             font-size: 0.78rem;
@@ -366,12 +414,14 @@
             border-radius: 9999px;
             margin-bottom: 0.65rem;
         }
+
         .section-title {
             font-size: clamp(1.8rem, 2.8vw, 2.4rem);
             font-weight: 800;
             color: var(--brand-navy);
             margin-bottom: 0.6rem;
         }
+
         .section-desc {
             font-size: 1rem;
             color: var(--brand-muted);
@@ -391,15 +441,18 @@
             flex-direction: column;
             height: 100%;
         }
+
         .admission-card:hover {
             border-color: #93c5fd;
             box-shadow: var(--shadow-elevated);
             transform: translateY(-4px);
         }
+
         .admission-card.is-active-wave {
             border-color: #bfdbfe;
             background: linear-gradient(180deg, #ffffff 0%, #f9fbff 100%);
         }
+
         .admission-card.is-active-wave::before {
             content: '';
             position: absolute;
@@ -410,6 +463,7 @@
             background: linear-gradient(90deg, var(--brand-primary), var(--brand-accent));
             border-radius: 0 0 4px 4px;
         }
+
         .badge-wave-type {
             font-size: 0.72rem;
             font-weight: 700;
@@ -421,18 +475,21 @@
             color: var(--brand-primary);
             border: 1px solid #bfdbfe;
         }
+
         .info-pill-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 10px;
             margin: 1.4rem 0;
         }
+
         .info-pill-box {
             background: #f8fafc;
             border: 1px solid #f1f5f9;
             border-radius: 10px;
             padding: 10px 12px;
         }
+
         .info-pill-label {
             font-size: 0.7rem;
             color: var(--brand-muted);
@@ -440,6 +497,7 @@
             font-weight: 600;
             margin-bottom: 2px;
         }
+
         .info-pill-val {
             font-size: 0.88rem;
             font-weight: 700;
@@ -454,6 +512,7 @@
             gap: 6px;
             margin-bottom: 1.5rem;
         }
+
         .path-chip {
             font-size: 0.74rem;
             font-weight: 600;
@@ -477,11 +536,13 @@
             display: flex;
             flex-direction: column;
         }
+
         .jalur-card:hover {
             box-shadow: var(--shadow-elevated);
             transform: translateY(-4px);
             border-color: #cbd5e1;
         }
+
         .jalur-icon-box {
             width: 54px;
             height: 54px;
@@ -492,10 +553,26 @@
             font-size: 1.5rem;
             margin-bottom: 1.25rem;
         }
-        .icon-blue { background: #eff6ff; color: #2563eb; }
-        .icon-emerald { background: #ecfdf5; color: #059669; }
-        .icon-amber { background: #fffbeb; color: #d97706; }
-        .icon-purple { background: #faf5ff; color: #7c3aed; }
+
+        .icon-blue {
+            background: #eff6ff;
+            color: #2563eb;
+        }
+
+        .icon-emerald {
+            background: #ecfdf5;
+            color: #059669;
+        }
+
+        .icon-amber {
+            background: #fffbeb;
+            color: #d97706;
+        }
+
+        .icon-purple {
+            background: #faf5ff;
+            color: #7c3aed;
+        }
 
         .jalur-quota-tag {
             font-size: 0.74rem;
@@ -509,6 +586,7 @@
         .step-container {
             position: relative;
         }
+
         .step-card {
             background: #ffffff;
             border: 1px solid var(--brand-border);
@@ -518,11 +596,13 @@
             position: relative;
             transition: all 0.25s ease;
         }
+
         .step-card:hover {
             border-color: var(--brand-primary);
             box-shadow: var(--shadow-subtle);
             transform: translateY(-3px);
         }
+
         .step-badge {
             width: 42px;
             height: 42px;
@@ -546,6 +626,7 @@
             padding: 2.2rem;
             box-shadow: var(--shadow-subtle);
         }
+
         .doc-check-item {
             display: flex;
             align-items: flex-start;
@@ -553,9 +634,11 @@
             padding: 12px 0;
             border-bottom: 1px dashed #e2e8f0;
         }
+
         .doc-check-item:last-child {
             border-bottom: none;
         }
+
         .doc-check-icon {
             color: var(--brand-success);
             font-size: 1.25rem;
@@ -573,6 +656,7 @@
             position: relative;
             overflow: hidden;
         }
+
         .cek-status-box::after {
             content: '';
             position: absolute;
@@ -584,6 +668,7 @@
             border-radius: 50%;
             pointer-events: none;
         }
+
         .search-input-group {
             background: #ffffff;
             border-radius: 14px;
@@ -591,6 +676,7 @@
             display: flex;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
         }
+
         .search-input-group input {
             border: none;
             padding: 12px 18px;
@@ -600,6 +686,7 @@
             outline: none;
             color: var(--brand-navy);
         }
+
         .search-input-group input::placeholder {
             color: #94a3b8;
         }
@@ -623,6 +710,7 @@
             overflow: hidden;
             background: #ffffff;
         }
+
         .accordion-ppdb .accordion-button {
             font-weight: 700;
             color: var(--brand-navy);
@@ -631,10 +719,12 @@
             background: #ffffff;
             box-shadow: none;
         }
+
         .accordion-ppdb .accordion-button:not(.collapsed) {
             color: var(--brand-primary);
             background: #f8faff;
         }
+
         .accordion-ppdb .accordion-body {
             color: var(--brand-muted);
             font-size: 0.92rem;
@@ -651,6 +741,7 @@
             position: relative;
             overflow: hidden;
         }
+
         .cta-banner::before {
             content: '';
             position: absolute;
@@ -669,11 +760,13 @@
             padding: 4rem 0 2rem;
             font-size: 0.9rem;
         }
+
         .footer-ppdb h6 {
             color: #ffffff;
             font-weight: 700;
             margin-bottom: 1.2rem;
         }
+
         .footer-link {
             color: #94a3b8;
             text-decoration: none;
@@ -681,10 +774,12 @@
             display: inline-block;
             margin-bottom: 8px;
         }
+
         .footer-link:hover {
             color: #ffffff;
             transform: translateX(3px);
         }
+
         .footer-bottom {
             border-top: 1px solid rgba(255, 255, 255, 0.08);
             margin-top: 3rem;
@@ -697,14 +792,17 @@
             position: relative;
             padding: 1rem 0;
         }
+
         .timeline-item {
             position: relative;
             padding-left: 45px;
             padding-bottom: 2rem;
         }
+
         .timeline-item:last-child {
             padding-bottom: 0;
         }
+
         .timeline-item::before {
             content: '';
             position: absolute;
@@ -714,9 +812,11 @@
             width: 2px;
             background: #e2e8f0;
         }
+
         .timeline-item:last-child::before {
             display: none;
         }
+
         .timeline-dot {
             position: absolute;
             left: 5px;
@@ -730,6 +830,7 @@
             align-items: center;
             justify-content: center;
         }
+
         .timeline-dot.active {
             background: var(--brand-primary);
             border-color: #93c5fd;
@@ -742,31 +843,39 @@
                 padding: 3rem 0 2.5rem;
                 text-align: center;
             }
+
             .hero-subtitle {
                 margin: 0 auto 2rem;
             }
+
             .hero-cta-group {
                 justify-content: center;
             }
+
             .floating-badge {
                 display: none;
             }
+
             .stats-strip {
                 margin-top: 1.5rem;
             }
         }
+
         @media (max-width: 576px) {
             .info-pill-grid {
                 grid-template-columns: 1fr;
             }
+
             .cek-status-box {
                 padding: 2rem 1.25rem;
             }
+
             .search-input-group {
                 flex-direction: column;
                 gap: 8px;
                 padding: 8px;
             }
+
             .search-input-group .btn-brand-primary {
                 width: 100%;
                 justify-content: center;
@@ -782,12 +891,14 @@
         <div class="container d-flex flex-wrap justify-content-between align-items-center gap-2">
             <div class="d-flex align-items-center gap-2">
                 <span class="badge bg-warning text-dark px-2 py-1 fw-bold" style="font-size: 0.72rem;">INFO RESMI</span>
-                <span>Penerimaan Peserta Didik Baru (PPDB) Tahun Ajaran {{ $admissions->first()?->academic_year?->name ?? '2025/2026' }} Resmi Dibuka!</span>
+                <span>Penerimaan Peserta Didik Baru (PPDB) Tahun Ajaran
+                    {{ $admissions->first()?->academic_year?->name ?? '2025/2026' }} Resmi Dibuka!</span>
             </div>
             <div class="d-flex align-items-center gap-3">
                 <a href="#bantuan"><i class="fa-solid fa-headset me-1"></i> Helpdesk PPDB</a>
                 <span class="text-white-50">|</span>
-                <a href="https://wa.me/6281234567890?text=Halo%20Panitia%20PPDB,%20saya%20butuh%20informasi" target="_blank">
+                <a href="https://wa.me/6281234567890?text=Halo%20Panitia%20PPDB,%20saya%20butuh%20informasi"
+                    target="_blank">
                     <i class="fa-brands fa-whatsapp text-success me-1"></i> WA Panitia
                 </a>
             </div>
@@ -802,7 +913,8 @@
                     <i class="fa-solid fa-graduation-cap fs-5"></i>
                 </div>
                 <div>
-                    <div class="brand-font fw-bold" style="color: var(--brand-navy); font-size: 1.15rem; line-height: 1.1;">
+                    <div class="brand-font fw-bold"
+                        style="color: var(--brand-navy); font-size: 1.15rem; line-height: 1.1;">
                         PPDB ONLINE
                     </div>
                     <div class="text-muted" style="font-size: 0.75rem; font-weight: 500;">
@@ -885,13 +997,15 @@
                             <i class="fa-solid fa-circle-play"></i>
                             <span>Panduan Alur</span>
                         </a>
-                        <a href="#cek-status" class="btn btn-link text-decoration-none fw-semibold text-muted d-flex align-items-center gap-1">
+                        <a href="#cek-status"
+                            class="btn btn-link text-decoration-none fw-semibold text-muted d-flex align-items-center gap-1">
                             <i class="fa-solid fa-search text-primary"></i> Cek Hasil / Kelulusan
                         </a>
                     </div>
 
                     {{-- Quick Trust Badges --}}
-                    <div class="pt-3 border-top d-flex flex-wrap align-items-center gap-4 text-muted" style="font-size: 0.85rem;">
+                    <div class="pt-3 border-top d-flex flex-wrap align-items-center gap-4 text-muted"
+                        style="font-size: 0.85rem;">
                         <div class="d-flex align-items-center gap-2">
                             <i class="fa-solid fa-shield-halved text-primary fs-5"></i>
                             <span>Data Aman &amp; Terverifikasi</span>
@@ -916,14 +1030,15 @@
                                 <i class="fa-solid fa-circle-check fs-5"></i>
                             </div>
                             <div>
-                                <div class="fw-bold" style="font-size: 0.85rem; color: var(--brand-navy);">Akreditasi A Unggul</div>
+                                <div class="fw-bold" style="font-size: 0.85rem; color: var(--brand-navy);">Akreditasi
+                                    A Unggul</div>
                                 <div class="text-muted" style="font-size: 0.72rem;">Sekolah Rujukan Nasional</div>
                             </div>
                         </div>
 
                         {{-- Hero Image --}}
-                        <img src="{{ asset('assets/images/ppdb_hero_banner.jpg') }}"
-                            alt="Siswa Berprestasi PPDB" class="hero-main-img"
+                        <img src="{{ asset('assets/images/ppdb_hero_banner.jpg') }}" alt="Siswa Berprestasi PPDB"
+                            class="hero-main-img"
                             onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80';">
 
                         {{-- Bottom Floating Badge --}}
@@ -1001,7 +1116,8 @@
                 <span class="section-tag">Jadwal &amp; Pendaftaran</span>
                 <h2 class="section-title">Gelombang Pendaftaran Dibuka</h2>
                 <p class="section-desc mx-auto">
-                    Pilih gelombang pendaftaran yang sesuai dengan jenjang dan jalur pilihan Anda. Pastikan mengisi formulir sebelum batas waktu penutupan.
+                    Pilih gelombang pendaftaran yang sesuai dengan jenjang dan jalur pilihan Anda. Pastikan mengisi
+                    formulir sebelum batas waktu penutupan.
                 </p>
             </div>
 
@@ -1033,13 +1149,16 @@
                                 </div>
 
                                 @if ($isOpen)
-                                    <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 rounded-pill fw-bold"
+                                    <span
+                                        class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 rounded-pill fw-bold"
                                         style="font-size: 0.78rem;">
-                                        <span class="spinner-grow spinner-grow-sm me-1" role="status" style="width: 0.5rem; height: 0.5rem;"></span>
+                                        <span class="spinner-grow spinner-grow-sm me-1" role="status"
+                                            style="width: 0.5rem; height: 0.5rem;"></span>
                                         Dibuka
                                     </span>
                                 @else
-                                    <span class="badge bg-secondary-subtle text-secondary px-3 py-2 rounded-pill fw-bold"
+                                    <span
+                                        class="badge bg-secondary-subtle text-secondary px-3 py-2 rounded-pill fw-bold"
                                         style="font-size: 0.78rem;">
                                         Ditutup
                                     </span>
@@ -1049,10 +1168,13 @@
                             {{-- Info Parameters --}}
                             <div class="info-pill-grid">
                                 <div class="info-pill-box">
-                                    <div class="info-pill-label"><i class="fa-solid fa-calendar-days text-primary me-1"></i> Periode Pendaftaran</div>
+                                    <div class="info-pill-label"><i
+                                            class="fa-solid fa-calendar-days text-primary me-1"></i> Periode
+                                        Pendaftaran</div>
                                     <div class="info-pill-val">
                                         @if ($startDate && $endDate)
-                                            {{ $startDate->translatedFormat('d M Y') }} - {{ $endDate->translatedFormat('d M Y') }}
+                                            {{ $startDate->translatedFormat('d M Y') }} -
+                                            {{ $endDate->translatedFormat('d M Y') }}
                                         @else
                                             Sesuai Kalender Akademik
                                         @endif
@@ -1060,14 +1182,16 @@
                                 </div>
 
                                 <div class="info-pill-box">
-                                    <div class="info-pill-label"><i class="fa-solid fa-users text-primary me-1"></i> Total Daya Tampung</div>
+                                    <div class="info-pill-label"><i class="fa-solid fa-users text-primary me-1"></i>
+                                        Total Daya Tampung</div>
                                     <div class="info-pill-val">
                                         {{ $admission->quota ? $admission->quota . ' Kursi' : 'Menyesuaikan Kuota' }}
                                     </div>
                                 </div>
 
                                 <div class="info-pill-box">
-                                    <div class="info-pill-label"><i class="fa-solid fa-receipt text-primary me-1"></i> Biaya Pendaftaran</div>
+                                    <div class="info-pill-label"><i class="fa-solid fa-receipt text-primary me-1"></i>
+                                        Biaya Pendaftaran</div>
                                     <div class="info-pill-val text-success">
                                         @if ($admission->registration_fee > 0)
                                             Rp {{ number_format($admission->registration_fee, 0, ',', '.') }}
@@ -1078,7 +1202,8 @@
                                 </div>
 
                                 <div class="info-pill-box">
-                                    <div class="info-pill-label"><i class="fa-solid fa-child text-primary me-1"></i> Ketentuan Usia</div>
+                                    <div class="info-pill-label"><i class="fa-solid fa-child text-primary me-1"></i>
+                                        Ketentuan Usia</div>
                                     <div class="info-pill-val">
                                         @if ($admission->min_age || $admission->max_age)
                                             {{ $admission->min_age ?? '0' }} - {{ $admission->max_age ?? '21' }} Tahun
@@ -1091,7 +1216,8 @@
 
                             {{-- Paths preview --}}
                             <div class="mb-3">
-                                <div class="text-muted fw-semibold mb-2" style="font-size: 0.76rem; text-transform: uppercase;">
+                                <div class="text-muted fw-semibold mb-2"
+                                    style="font-size: 0.76rem; text-transform: uppercase;">
                                     Jalur Penerimaan Tersedia:
                                 </div>
                                 <div class="path-chip-group">
@@ -1099,38 +1225,52 @@
                                         @foreach ($admission->paths as $path)
                                             <span class="path-chip">
                                                 <i class="fa-solid fa-check text-primary"></i> {{ $path->name }}
-                                                @if ($path->quota) ({{ $path->quota }} kursi) @endif
+                                                @if ($path->quota)
+                                                    ({{ $path->quota }} kursi)
+                                                @endif
                                             </span>
                                         @endforeach
                                     @else
-                                        <span class="path-chip"><i class="fa-solid fa-check text-primary"></i> Jalur Zonasi (50%)</span>
-                                        <span class="path-chip"><i class="fa-solid fa-check text-primary"></i> Jalur Prestasi (25%)</span>
-                                        <span class="path-chip"><i class="fa-solid fa-check text-primary"></i> Jalur Afirmasi (20%)</span>
-                                        <span class="path-chip"><i class="fa-solid fa-check text-primary"></i> Perpindahan Ortu (5%)</span>
+                                        <span class="path-chip"><i class="fa-solid fa-check text-primary"></i> Jalur
+                                            Zonasi (50%)</span>
+                                        <span class="path-chip"><i class="fa-solid fa-check text-primary"></i> Jalur
+                                            Prestasi (25%)</span>
+                                        <span class="path-chip"><i class="fa-solid fa-check text-primary"></i> Jalur
+                                            Afirmasi (20%)</span>
+                                        <span class="path-chip"><i class="fa-solid fa-check text-primary"></i>
+                                            Perpindahan Ortu (5%)</span>
                                     @endif
                                 </div>
                             </div>
 
                             {{-- Requirements excerpt if any --}}
                             @if ($admission->requirements)
-                                <div class="p-3 bg-light rounded-3 mb-4" style="font-size: 0.82rem; border-left: 3px solid var(--brand-accent);">
-                                    <strong><i class="fa-solid fa-clipboard-list text-primary me-1"></i> Catatan Persyaratan:</strong>
-                                    <p class="mb-0 text-muted mt-1">{{ Str::limit($admission->requirements, 120) }}</p>
+                                <div class="p-3 bg-light rounded-3 mb-4"
+                                    style="font-size: 0.82rem; border-left: 3px solid var(--brand-accent);">
+                                    <strong><i class="fa-solid fa-clipboard-list text-primary me-1"></i> Catatan
+                                        Persyaratan:</strong>
+                                    <p class="mb-0 text-muted mt-1">{{ Str::limit($admission->requirements, 120) }}
+                                    </p>
                                 </div>
                             @endif
 
                             {{-- Action buttons --}}
-                            <div class="mt-auto pt-3 border-top d-flex flex-wrap align-items-center justify-content-between gap-3">
+                            <div
+                                class="mt-auto pt-3 border-top d-flex flex-wrap align-items-center justify-content-between gap-3">
                                 <div>
                                     @if ($endDate && $daysLeft !== null && $daysLeft >= 0)
-                                        <span class="badge bg-warning-subtle text-warning-emphasis px-3 py-2 rounded-pill fw-semibold" style="font-size: 0.78rem;">
-                                            <i class="fa-regular fa-clock me-1"></i> Sisa {{ $daysLeft }} Hari Lagi
+                                        <span
+                                            class="badge bg-warning-subtle text-warning-emphasis px-3 py-2 rounded-pill fw-semibold"
+                                            style="font-size: 0.78rem;">
+                                            <i class="fa-regular fa-clock me-1"></i> Sisa {{ $daysLeft }} Hari
+                                            Lagi
                                         </span>
                                     @endif
                                 </div>
 
                                 <div class="d-flex gap-2">
-                                    <a href="{{ route('ppdb.register', $admission->code) }}" class="btn-brand-primary">
+                                    <a href="{{ route('ppdb.register', $admission->code) }}"
+                                        class="btn-brand-primary">
                                         <span>Isi Formulir Pendaftaran</span>
                                         <i class="fa-solid fa-arrow-right"></i>
                                     </a>
@@ -1146,7 +1286,8 @@
                             </div>
                             <h4 class="fw-bold">Belum Ada Gelombang Pendaftaran Dibuka</h4>
                             <p class="text-muted mx-auto" style="max-width: 500px;">
-                                Saat ini panitia PPDB belum membuka gelombang pendaftaran baru. Silakan pantau website secara berkala atau hubungi panitia melalui layanan kontak helpdesk kami.
+                                Saat ini panitia PPDB belum membuka gelombang pendaftaran baru. Silakan pantau website
+                                secara berkala atau hubungi panitia melalui layanan kontak helpdesk kami.
                             </p>
                             <a href="#bantuan" class="btn btn-brand-primary mt-2">
                                 <i class="fa-solid fa-headset me-1"></i> Hubungi Helpdesk PPDB
@@ -1162,16 +1303,20 @@
     <section class="section-padding bg-white" id="jalur">
         <div class="container">
             @php
-                $pathsList = isset($admissionPaths) && $admissionPaths->isNotEmpty()
-                    ? $admissionPaths
-                    : ($admissions->first()?->paths ?? collect());
+                $pathsList =
+                    isset($admissionPaths) && $admissionPaths->isNotEmpty()
+                        ? $admissionPaths
+                        : $admissions->first()?->paths ?? collect();
             @endphp
 
             <div class="text-center section-header">
                 <span class="section-tag">Ketentuan Penerimaan</span>
-                <h2 class="section-title">{{ $pathsList->count() > 0 ? $pathsList->count() . ' Jalur Seleksi Masuk Resmi' : 'Jalur Seleksi Masuk Resmi' }}</h2>
+                <h2 class="section-title">
+                    {{ $pathsList->count() > 0 ? $pathsList->count() . ' Jalur Seleksi Masuk Resmi' : 'Jalur Seleksi Masuk Resmi' }}
+                </h2>
                 <p class="section-desc mx-auto">
-                    Ketahui jalur penerimaan yang paling sesuai dengan kriteria, domisili, atau prestasi calon peserta didik baru.
+                    Ketahui jalur penerimaan yang paling sesuai dengan kriteria, domisili, atau prestasi calon peserta
+                    didik baru.
                 </p>
             </div>
 
@@ -1192,12 +1337,18 @@
                                 'icon_class' => 'icon-emerald',
                                 'badge_class' => 'bg-success-subtle text-success border border-success-subtle',
                             ],
-                            str_contains($codeUpper, 'AFIRMASI') || str_contains($codeUpper, 'KETM') || str_contains($codeUpper, 'ABK') => [
+                            str_contains($codeUpper, 'AFIRMASI') ||
+                                str_contains($codeUpper, 'KETM') ||
+                                str_contains($codeUpper, 'ABK')
+                                => [
                                 'icon' => 'fa-solid fa-hands-holding-child',
                                 'icon_class' => 'icon-amber',
                                 'badge_class' => 'bg-warning-subtle text-warning-emphasis border border-warning-subtle',
                             ],
-                            str_contains($codeUpper, 'PINDAH') || str_contains($codeUpper, 'MUTASI') || str_contains($codeUpper, 'TUGAS') => [
+                            str_contains($codeUpper, 'PINDAH') ||
+                                str_contains($codeUpper, 'MUTASI') ||
+                                str_contains($codeUpper, 'TUGAS')
+                                => [
                                 'icon' => 'fa-solid fa-briefcase',
                                 'icon_class' => 'icon-purple',
                                 'badge_class' => 'bg-secondary-subtle text-secondary border border-secondary-subtle',
@@ -1212,7 +1363,9 @@
                         // Decode requirements JSON
                         $req = is_array($path->requirements)
                             ? $path->requirements
-                            : (is_string($path->requirements) ? json_decode($path->requirements, true) : []);
+                            : (is_string($path->requirements)
+                                ? json_decode($path->requirements, true)
+                                : []);
                         $docs = $req['documents'] ?? [];
                         $notes = $req['notes'] ?? null;
                         $criteria = $req['criteria'] ?? null;
@@ -1245,13 +1398,18 @@
                             @if (($path->min_score && $path->min_score > 0) || $criteria)
                                 <div class="d-flex flex-wrap gap-1 mb-3">
                                     @if ($path->min_score && $path->min_score > 0)
-                                        <span class="badge bg-light text-dark border px-2 py-1" style="font-size: 0.72rem;">
-                                            <i class="fa-solid fa-chart-line text-success me-1"></i> Min. Nilai: {{ number_format($path->min_score, 0) }}
+                                        <span class="badge bg-light text-dark border px-2 py-1"
+                                            style="font-size: 0.72rem;">
+                                            <i class="fa-solid fa-chart-line text-success me-1"></i> Min. Nilai:
+                                            {{ number_format($path->min_score, 0) }}
                                         </span>
                                     @endif
                                     @if ($criteria)
-                                        <span class="badge bg-light text-dark border px-2 py-1" style="font-size: 0.72rem;">
-                                            <i class="fa-solid fa-sliders text-primary me-1"></i> Bobot: {{ $criteria['academic_weight'] ?? 60 }}% : {{ $criteria['achievement_weight'] ?? 40 }}%
+                                        <span class="badge bg-light text-dark border px-2 py-1"
+                                            style="font-size: 0.72rem;">
+                                            <i class="fa-solid fa-sliders text-primary me-1"></i> Bobot:
+                                            {{ $criteria['academic_weight'] ?? 60 }}% :
+                                            {{ $criteria['achievement_weight'] ?? 40 }}%
                                         </span>
                                     @endif
                                 </div>
@@ -1260,14 +1418,18 @@
                             {{-- Preview Requirements Documents --}}
                             @if (!empty($docs))
                                 <div class="p-2 rounded-3 bg-light border mb-3" style="font-size: 0.78rem;">
-                                    <div class="fw-bold text-dark mb-1 d-flex align-items-center justify-content-between">
-                                        <span><i class="fa-solid fa-file-lines text-primary me-1"></i> Berkas Syarat:</span>
-                                        <span class="text-muted" style="font-size: 0.7rem;">{{ count($docs) }} Dokumen</span>
+                                    <div
+                                        class="fw-bold text-dark mb-1 d-flex align-items-center justify-content-between">
+                                        <span><i class="fa-solid fa-file-lines text-primary me-1"></i> Berkas
+                                            Syarat:</span>
+                                        <span class="text-muted" style="font-size: 0.7rem;">{{ count($docs) }}
+                                            Dokumen</span>
                                     </div>
                                     <ul class="list-unstyled mb-0 text-muted">
                                         @foreach (array_slice($docs, 0, 2) as $doc)
                                             <li class="text-truncate mb-1" title="{{ $doc }}">
-                                                <i class="fa-solid fa-check text-success me-1"></i> {{ $doc }}
+                                                <i class="fa-solid fa-check text-success me-1"></i>
+                                                {{ $doc }}
                                             </li>
                                         @endforeach
                                     </ul>
@@ -1277,7 +1439,8 @@
                             {{-- Notes if available --}}
                             @if ($notes)
                                 <div class="text-muted mb-3" style="font-size: 0.76rem; line-height: 1.4;">
-                                    <i class="fa-solid fa-circle-info text-primary me-1"></i> {{ Str::limit($notes, 75) }}
+                                    <i class="fa-solid fa-circle-info text-primary me-1"></i>
+                                    {{ Str::limit($notes, 75) }}
                                 </div>
                             @endif
 
@@ -1310,13 +1473,16 @@
         @php
             $req = is_array($path->requirements)
                 ? $path->requirements
-                : (is_string($path->requirements) ? json_decode($path->requirements, true) : []);
+                : (is_string($path->requirements)
+                    ? json_decode($path->requirements, true)
+                    : []);
             $docs = $req['documents'] ?? [];
             $notes = $req['notes'] ?? null;
             $criteria = $req['criteria'] ?? null;
             $targetAdmission = $path->admission ?? $admissions->first();
         @endphp
-        <div class="modal fade" id="modalJalur{{ $path->id }}" tabindex="-1" aria-labelledby="modalJalurLabel{{ $path->id }}" aria-hidden="true">
+        <div class="modal fade" id="modalJalur{{ $path->id }}" tabindex="-1"
+            aria-labelledby="modalJalurLabel{{ $path->id }}" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-lg">
                 <div class="modal-content rounded-4 border-0 shadow-lg">
                     <div class="modal-header border-bottom py-3 px-4">
@@ -1328,7 +1494,8 @@
                                 {{ $path->name }}
                             </h5>
                         </div>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
                     </div>
                     <div class="modal-body p-4">
                         <p class="text-muted mb-4">{{ $path->description }}</p>
@@ -1337,13 +1504,16 @@
                             <div class="col-sm-4">
                                 <div class="p-3 bg-light rounded-3">
                                     <div class="text-muted small fw-semibold">Daya Tampung / Kuota</div>
-                                    <div class="fs-5 fw-bold text-dark">{{ $path->quota ? $path->quota . ' Kursi' : 'Sesuai Juknis' }}</div>
+                                    <div class="fs-5 fw-bold text-dark">
+                                        {{ $path->quota ? $path->quota . ' Kursi' : 'Sesuai Juknis' }}</div>
                                 </div>
                             </div>
                             <div class="col-sm-4">
                                 <div class="p-3 bg-light rounded-3">
                                     <div class="text-muted small fw-semibold">Batas Nilai Minimum</div>
-                                    <div class="fs-5 fw-bold text-dark">{{ $path->min_score && $path->min_score > 0 ? number_format($path->min_score, 0) : 'Tanpa Batas Nilai' }}</div>
+                                    <div class="fs-5 fw-bold text-dark">
+                                        {{ $path->min_score && $path->min_score > 0 ? number_format($path->min_score, 0) : 'Tanpa Batas Nilai' }}
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-sm-4">
@@ -1351,7 +1521,8 @@
                                     <div class="text-muted small fw-semibold">Periode Pendaftaran</div>
                                     <div class="fw-bold text-dark" style="font-size: 0.95rem;">
                                         @if ($path->open_date && $path->close_date)
-                                            {{ \Carbon\Carbon::parse($path->open_date)->translatedFormat('d M') }} - {{ \Carbon\Carbon::parse($path->close_date)->translatedFormat('d M Y') }}
+                                            {{ \Carbon\Carbon::parse($path->open_date)->translatedFormat('d M') }} -
+                                            {{ \Carbon\Carbon::parse($path->close_date)->translatedFormat('d M Y') }}
                                         @else
                                             Sesuai Gelombang
                                         @endif
@@ -1361,15 +1532,20 @@
                         </div>
 
                         @if ($criteria)
-                            <div class="alert alert-info py-2.5 px-3 rounded-3 mb-4 d-flex align-items-center gap-2" style="font-size: 0.85rem;">
+                            <div class="alert alert-info py-2.5 px-3 rounded-3 mb-4 d-flex align-items-center gap-2"
+                                style="font-size: 0.85rem;">
                                 <i class="fa-solid fa-sliders fs-5 text-primary"></i>
                                 <div>
-                                    <strong>Formula Pembobotan:</strong> Nilai Rapor Akademik ({{ $criteria['academic_weight'] ?? 60 }}%) + Sertifikat Prestasi ({{ $criteria['achievement_weight'] ?? 40 }}%).
+                                    <strong>Formula Pembobotan:</strong> Nilai Rapor Akademik
+                                    ({{ $criteria['academic_weight'] ?? 60 }}%) + Sertifikat Prestasi
+                                    ({{ $criteria['achievement_weight'] ?? 40 }}%).
                                 </div>
                             </div>
                         @endif
 
-                        <h6 class="fw-bold mb-3 text-dark"><i class="fa-solid fa-file-circle-check text-primary me-2"></i> Dokumen &amp; Berkas yang Wajib Disiapkan:</h6>
+                        <h6 class="fw-bold mb-3 text-dark"><i
+                                class="fa-solid fa-file-circle-check text-primary me-2"></i> Dokumen &amp; Berkas yang
+                            Wajib Disiapkan:</h6>
                         @if (!empty($docs))
                             <div class="list-group list-group-flush mb-4 border rounded-3 overflow-hidden">
                                 @foreach ($docs as $docItem)
@@ -1380,12 +1556,15 @@
                                 @endforeach
                             </div>
                         @else
-                            <p class="text-muted small">Sesuai persyaratan dokumen standar (KK, Akta Kelahiran, Rapor, Ijazah/SKL, dan Pas Foto).</p>
+                            <p class="text-muted small">Sesuai persyaratan dokumen standar (KK, Akta Kelahiran, Rapor,
+                                Ijazah/SKL, dan Pas Foto).</p>
                         @endif
 
                         @if ($notes)
-                            <div class="p-3 bg-light rounded-3 text-muted" style="font-size: 0.85rem; border-left: 4px solid var(--brand-accent);">
-                                <strong><i class="fa-solid fa-circle-exclamation text-primary me-1"></i> Catatan Khusus Panitia:</strong>
+                            <div class="p-3 bg-light rounded-3 text-muted"
+                                style="font-size: 0.85rem; border-left: 4px solid var(--brand-accent);">
+                                <strong><i class="fa-solid fa-circle-exclamation text-primary me-1"></i> Catatan Khusus
+                                    Panitia:</strong>
                                 <div class="mt-1">{{ $notes }}</div>
                             </div>
                         @endif
@@ -1393,7 +1572,8 @@
                     <div class="modal-footer border-top py-3 px-4 d-flex justify-content-between">
                         <button type="button" class="btn btn-light" data-bs-dismiss="modal">Tutup</button>
                         @if ($targetAdmission)
-                            <a href="{{ route('ppdb.register', $targetAdmission->code) }}?path={{ $path->code }}" class="btn btn-brand-primary">
+                            <a href="{{ route('ppdb.register', $targetAdmission->code) }}?path={{ $path->code }}"
+                                class="btn btn-brand-primary">
                                 <i class="fa-solid fa-pen-to-square me-1"></i> Isi Formulir Jalur Ini
                             </a>
                         @endif
@@ -1418,9 +1598,11 @@
                 <div class="col-md-6 col-lg-3">
                     <div class="step-card">
                         <div class="step-badge">1</div>
-                        <h4 class="fw-bold mb-2" style="font-size: 1.1rem; color: var(--brand-navy);">Pilih Gelombang &amp; Isi Data</h4>
+                        <h4 class="fw-bold mb-2" style="font-size: 1.1rem; color: var(--brand-navy);">Pilih Gelombang
+                            &amp; Isi Data</h4>
                         <p class="text-muted" style="font-size: 0.86rem; line-height: 1.6;">
-                            Pilih gelombang aktif dan lengkapi formulir pendaftaran: biodata siswa, NIK, NISN, alamat domisili, dan data orang tua/wali.
+                            Pilih gelombang aktif dan lengkapi formulir pendaftaran: biodata siswa, NIK, NISN, alamat
+                            domisili, dan data orang tua/wali.
                         </p>
                     </div>
                 </div>
@@ -1428,9 +1610,11 @@
                 <div class="col-md-6 col-lg-3">
                     <div class="step-card">
                         <div class="step-badge" style="background: var(--brand-accent);">2</div>
-                        <h4 class="fw-bold mb-2" style="font-size: 1.1rem; color: var(--brand-navy);">Unggah Dokumen Berkas</h4>
+                        <h4 class="fw-bold mb-2" style="font-size: 1.1rem; color: var(--brand-navy);">Unggah Dokumen
+                            Berkas</h4>
                         <p class="text-muted" style="font-size: 0.86rem; line-height: 1.6;">
-                            Upload hasil scan/foto dokumen asli (KK, Akta Kelahiran, Rapor/SKL, dan sertifikat prestasi jika ada) dalam format PDF/JPG.
+                            Upload hasil scan/foto dokumen asli (KK, Akta Kelahiran, Rapor/SKL, dan sertifikat prestasi
+                            jika ada) dalam format PDF/JPG.
                         </p>
                     </div>
                 </div>
@@ -1438,9 +1622,11 @@
                 <div class="col-md-6 col-lg-3">
                     <div class="step-card">
                         <div class="step-badge" style="background: var(--brand-success);">3</div>
-                        <h4 class="fw-bold mb-2" style="font-size: 1.1rem; color: var(--brand-navy);">Verifikasi oleh Panitia</h4>
+                        <h4 class="fw-bold mb-2" style="font-size: 1.1rem; color: var(--brand-navy);">Verifikasi oleh
+                            Panitia</h4>
                         <p class="text-muted" style="font-size: 0.86rem; line-height: 1.6;">
-                            Tim verifikator PPDB memeriksa keabsahan dan kelengkapan dokumen. Calon siswa menerima bukti tanda bukti pendaftaran resmi.
+                            Tim verifikator PPDB memeriksa keabsahan dan kelengkapan dokumen. Calon siswa menerima bukti
+                            tanda bukti pendaftaran resmi.
                         </p>
                     </div>
                 </div>
@@ -1448,9 +1634,11 @@
                 <div class="col-md-6 col-lg-3">
                     <div class="step-card">
                         <div class="step-badge" style="background: var(--brand-navy);">4</div>
-                        <h4 class="fw-bold mb-2" style="font-size: 1.1rem; color: var(--brand-navy);">Pengumuman &amp; Daftar Ulang</h4>
+                        <h4 class="fw-bold mb-2" style="font-size: 1.1rem; color: var(--brand-navy);">Pengumuman &amp;
+                            Daftar Ulang</h4>
                         <p class="text-muted" style="font-size: 0.86rem; line-height: 1.6;">
-                            Cek status kelulusan di portal PPDB online dan lakukan registrasi ulang fisik/online sesuai jadwal yang ditentukan.
+                            Cek status kelulusan di portal PPDB online dan lakukan registrasi ulang fisik/online sesuai
+                            jadwal yang ditentukan.
                         </p>
                     </div>
                 </div>
@@ -1467,7 +1655,8 @@
                     <span class="section-tag">Berkas Pendaftaran</span>
                     <h2 class="section-title mb-3">Persyaratan Dokumen yang Wajib Disiapkan</h2>
                     <p class="text-muted mb-4" style="font-size: 0.95rem;">
-                        Pastikan seluruh berkas difoto/scan dengan jelas, tidak terpotong, dan dapat dibaca dengan mudah oleh tim verifikasi.
+                        Pastikan seluruh berkas difoto/scan dengan jelas, tidak terpotong, dan dapat dibaca dengan mudah
+                        oleh tim verifikasi.
                     </p>
 
                     <div class="docs-card">
@@ -1479,23 +1668,28 @@
                             <i class="fa-solid fa-circle-check doc-check-icon"></i>
                             <div>
                                 <div class="fw-bold" style="font-size: 0.92rem;">Kartu Keluarga (KK) Asli</div>
-                                <div class="text-muted" style="font-size: 0.8rem;">Diterbitkan paling singkat 1 (satu) tahun sebelum tanggal pendaftaran PPDB.</div>
+                                <div class="text-muted" style="font-size: 0.8rem;">Diterbitkan paling singkat 1 (satu)
+                                    tahun sebelum tanggal pendaftaran PPDB.</div>
                             </div>
                         </div>
 
                         <div class="doc-check-item">
                             <i class="fa-solid fa-circle-check doc-check-icon"></i>
                             <div>
-                                <div class="fw-bold" style="font-size: 0.92rem;">Akta Kelahiran / Surat Kenal Lahir</div>
-                                <div class="text-muted" style="font-size: 0.8rem;">Dokumen resmi dari Dinas Kependudukan dan Pencatatan Sipil (Dukcapil).</div>
+                                <div class="fw-bold" style="font-size: 0.92rem;">Akta Kelahiran / Surat Kenal Lahir
+                                </div>
+                                <div class="text-muted" style="font-size: 0.8rem;">Dokumen resmi dari Dinas
+                                    Kependudukan dan Pencatatan Sipil (Dukcapil).</div>
                             </div>
                         </div>
 
                         <div class="doc-check-item">
                             <i class="fa-solid fa-circle-check doc-check-icon"></i>
                             <div>
-                                <div class="fw-bold" style="font-size: 0.92rem;">Ijazah / Surat Keterangan Lulus (SKL)</div>
-                                <div class="text-muted" style="font-size: 0.8rem;">Dari sekolah jenjang sebelumnya yang mencantumkan nilai rata-rata resmi.</div>
+                                <div class="fw-bold" style="font-size: 0.92rem;">Ijazah / Surat Keterangan Lulus (SKL)
+                                </div>
+                                <div class="text-muted" style="font-size: 0.8rem;">Dari sekolah jenjang sebelumnya
+                                    yang mencantumkan nilai rata-rata resmi.</div>
                             </div>
                         </div>
 
@@ -1503,7 +1697,8 @@
                             <i class="fa-solid fa-circle-check doc-check-icon"></i>
                             <div>
                                 <div class="fw-bold" style="font-size: 0.92rem;">Buku Rapor Semester 1 s.d. 5</div>
-                                <div class="text-muted" style="font-size: 0.8rem;">Scan halaman nilai pengetahuan &amp; keterampilan yang telah dilegalisir kepala sekolah.</div>
+                                <div class="text-muted" style="font-size: 0.8rem;">Scan halaman nilai pengetahuan
+                                    &amp; keterampilan yang telah dilegalisir kepala sekolah.</div>
                             </div>
                         </div>
 
@@ -1511,21 +1706,26 @@
                             <i class="fa-solid fa-circle-check doc-check-icon"></i>
                             <div>
                                 <div class="fw-bold" style="font-size: 0.92rem;">Pas Foto Berwarna Terbaru (3x4)</div>
-                                <div class="text-muted" style="font-size: 0.8rem;">Format JPG/PNG, seragam sekolah asal, latar belakang polos (merah/biru).</div>
+                                <div class="text-muted" style="font-size: 0.8rem;">Format JPG/PNG, seragam sekolah
+                                    asal, latar belakang polos (merah/biru).</div>
                             </div>
                         </div>
 
                         <div class="doc-check-item">
                             <i class="fa-solid fa-circle-check doc-check-icon"></i>
                             <div>
-                                <div class="fw-bold" style="font-size: 0.92rem;">Surat Pertanggungjawaban Mutlak (SPTJM)</div>
-                                <div class="text-muted" style="font-size: 0.8rem;">Format formulir SPTJM disediakan di sistem dan dibubuhi materai Rp 10.000.</div>
+                                <div class="fw-bold" style="font-size: 0.92rem;">Surat Pertanggungjawaban Mutlak
+                                    (SPTJM)</div>
+                                <div class="text-muted" style="font-size: 0.8rem;">Format formulir SPTJM disediakan di
+                                    sistem dan dibubuhi materai Rp 10.000.</div>
                             </div>
                         </div>
 
-                        <div class="mt-3 p-3 bg-light rounded-3 d-flex align-items-center gap-2 text-muted" style="font-size: 0.8rem;">
+                        <div class="mt-3 p-3 bg-light rounded-3 d-flex align-items-center gap-2 text-muted"
+                            style="font-size: 0.8rem;">
                             <i class="fa-solid fa-circle-info text-primary fs-5"></i>
-                            <span>Format file yang didukung: <strong>PDF, JPG, PNG</strong> (Ukuran maksimal 2 MB per berkas).</span>
+                            <span>Format file yang didukung: <strong>PDF, JPG, PNG</strong> (Ukuran maksimal 2 MB per
+                                berkas).</span>
                         </div>
                     </div>
                 </div>
@@ -1534,9 +1734,11 @@
                 <div class="col-lg-5">
                     <div class="p-4 p-md-5 rounded-4 bg-light border shadow-sm">
                         <span class="section-tag mb-2">Agenda PPDB</span>
-                        <h3 class="fw-bold mb-3" style="color: var(--brand-navy); font-size: 1.4rem;">Garis Waktu Kegiatan</h3>
+                        <h3 class="fw-bold mb-3" style="color: var(--brand-navy); font-size: 1.4rem;">Garis Waktu
+                            Kegiatan</h3>
                         <p class="text-muted mb-4" style="font-size: 0.86rem;">
-                            Jadwal estimasi tahapan seleksi PPDB Tahun Ajaran {{ $admissions->first()?->academic_year?->name ?? '2025/2026' }}.
+                            Jadwal estimasi tahapan seleksi PPDB Tahun Ajaran
+                            {{ $admissions->first()?->academic_year?->name ?? '2025/2026' }}.
                         </p>
 
                         <div class="timeline-wrapper">
@@ -1544,34 +1746,44 @@
                                 <div class="timeline-dot active">
                                     <i class="fa-solid fa-check text-white" style="font-size: 11px;"></i>
                                 </div>
-                                <div class="fw-bold" style="color: var(--brand-navy); font-size: 0.95rem;">1. Sosialisasi &amp; Pendaftaran Akun</div>
-                                <div class="text-muted" style="font-size: 0.82rem;">Pengenalan jalur, pembuatan akun siswa, dan pengisian data diri awal.</div>
+                                <div class="fw-bold" style="color: var(--brand-navy); font-size: 0.95rem;">1.
+                                    Sosialisasi &amp; Pendaftaran Akun</div>
+                                <div class="text-muted" style="font-size: 0.82rem;">Pengenalan jalur, pembuatan akun
+                                    siswa, dan pengisian data diri awal.</div>
                             </div>
 
                             <div class="timeline-item">
                                 <div class="timeline-dot active">
                                     <i class="fa-solid fa-pen text-white" style="font-size: 11px;"></i>
                                 </div>
-                                <div class="fw-bold text-primary" style="font-size: 0.95rem;">2. Pendaftaran Online &amp; Upload Dokumen</div>
-                                <div class="text-muted" style="font-size: 0.82rem;">Pemilihan jalur sekolah dan pengunggahan berkas digital (24 Jam Online).</div>
+                                <div class="fw-bold text-primary" style="font-size: 0.95rem;">2. Pendaftaran Online
+                                    &amp; Upload Dokumen</div>
+                                <div class="text-muted" style="font-size: 0.82rem;">Pemilihan jalur sekolah dan
+                                    pengunggahan berkas digital (24 Jam Online).</div>
                             </div>
 
                             <div class="timeline-item">
                                 <div class="timeline-dot"></div>
-                                <div class="fw-bold" style="color: var(--brand-navy); font-size: 0.95rem;">3. Verifikasi &amp; Uji Berkas Fisik</div>
-                                <div class="text-muted" style="font-size: 0.82rem;">Pemeriksaan keaslian sertifikat dan koordinat domisili calon siswa.</div>
+                                <div class="fw-bold" style="color: var(--brand-navy); font-size: 0.95rem;">3.
+                                    Verifikasi &amp; Uji Berkas Fisik</div>
+                                <div class="text-muted" style="font-size: 0.82rem;">Pemeriksaan keaslian sertifikat
+                                    dan koordinat domisili calon siswa.</div>
                             </div>
 
                             <div class="timeline-item">
                                 <div class="timeline-dot"></div>
-                                <div class="fw-bold" style="color: var(--brand-navy); font-size: 0.95rem;">4. Pengumuman Kelulusan Resmi</div>
-                                <div class="text-muted" style="font-size: 0.82rem;">Diumumkan secara serentak melalui portal resmi PPDB online.</div>
+                                <div class="fw-bold" style="color: var(--brand-navy); font-size: 0.95rem;">4.
+                                    Pengumuman Kelulusan Resmi</div>
+                                <div class="text-muted" style="font-size: 0.82rem;">Diumumkan secara serentak melalui
+                                    portal resmi PPDB online.</div>
                             </div>
 
                             <div class="timeline-item">
                                 <div class="timeline-dot"></div>
-                                <div class="fw-bold" style="color: var(--brand-navy); font-size: 0.95rem;">5. Daftar Ulang Siswa Diterima</div>
-                                <div class="text-muted" style="font-size: 0.82rem;">Penyerahan berkas fisik dan penyelesaian administrasi siswa baru.</div>
+                                <div class="fw-bold" style="color: var(--brand-navy); font-size: 0.95rem;">5. Daftar
+                                    Ulang Siswa Diterima</div>
+                                <div class="text-muted" style="font-size: 0.82rem;">Penyerahan berkas fisik dan
+                                    penyelesaian administrasi siswa baru.</div>
                             </div>
                         </div>
 
@@ -1592,12 +1804,16 @@
             <div class="cek-status-box">
                 <div class="row align-items-center g-4">
                     <div class="col-lg-6">
-                        <span class="badge bg-white text-primary px-3 py-1 rounded-pill fw-bold mb-3" style="font-size: 0.78rem;">
+                        <span class="badge bg-white text-primary px-3 py-1 rounded-pill fw-bold mb-3"
+                            style="font-size: 0.78rem;">
                             LAYANAN MANDIRI
                         </span>
-                        <h2 class="fw-bold text-white mb-2" style="font-size: 2rem;">Cek Status &amp; Hasil Seleksi</h2>
+                        <h2 class="fw-bold text-white mb-2" style="font-size: 2rem;">Cek Status &amp; Hasil Seleksi
+                        </h2>
                         <p class="text-white-50 mb-0" style="font-size: 0.95rem; line-height: 1.6;">
-                            Sudah pernah mendaftar? Masukkan Nomor Registrasi Pendaftaran Anda (misal: <code>PPDB-2025-XXXX</code>) atau Nomor Induk Kependudukan (NIK) untuk melacak verifikasi berkas dan pengumuman hasil seleksi.
+                            Sudah pernah mendaftar? Masukkan Nomor Registrasi Pendaftaran Anda (misal:
+                            <code>PPDB-2025-XXXX</code>) atau Nomor Induk Kependudukan (NIK) untuk melacak verifikasi
+                            berkas dan pengumuman hasil seleksi.
                         </p>
                     </div>
 
@@ -1607,8 +1823,7 @@
                             <div class="search-input-group">
                                 <input type="text" name="registration_number"
                                     value="{{ old('registration_number') }}"
-                                    placeholder="Masukkan No. Registrasi atau NIK..."
-                                    required autocomplete="off">
+                                    placeholder="Masukkan No. Registrasi atau NIK..." required autocomplete="off">
                                 <button type="submit" class="btn-brand-primary">
                                     <i class="fa-solid fa-magnifying-glass"></i>
                                     <span>Cek Sekarang</span>
@@ -1634,7 +1849,8 @@
                     <div class="applicant-result-card animate__animated animate__fadeInUp">
                         <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-3">
                             <div>
-                                <span class="badge bg-primary-subtle text-primary px-3 py-1 rounded-pill fw-bold mb-1" style="font-size: 0.75rem;">
+                                <span class="badge bg-primary-subtle text-primary px-3 py-1 rounded-pill fw-bold mb-1"
+                                    style="font-size: 0.75rem;">
                                     NO. REG: {{ $res->registration_number }}
                                 </span>
                                 <h4 class="fw-bold mb-1" style="color: var(--brand-navy);">{{ $res->name }}</h4>
@@ -1651,11 +1867,11 @@
                                         'LULUS', 'DITERIMA', 'VERIFIED' => 'bg-success text-white',
                                         'SUBMITTED', 'PENDING' => 'bg-warning text-dark',
                                         'DITOLAK' => 'bg-danger text-white',
-                                        default => 'bg-secondary text-white'
+                                        default => 'bg-secondary text-white',
                                     };
                                 @endphp
                                 <span class="badge {{ $badgeColor }} px-3 py-2 rounded-pill fs-6 fw-bold">
-                                    {{ is_object($res->status) ? ($res->status->name ?? $statusName) : $statusName }}
+                                    {{ is_object($res->status) ? $res->status->name ?? $statusName : $statusName }}
                                 </span>
                             </div>
                         </div>
@@ -1671,7 +1887,8 @@
                             </div>
                             <div class="col-sm-4">
                                 <span class="fw-semibold text-dark d-block">Tanggal Registrasi:</span>
-                                {{ $res->registered_at ? \Carbon\Carbon::parse($res->registered_at)->translatedFormat('d M Y, H:i') : '-' }} WIB
+                                {{ $res->registered_at ? \Carbon\Carbon::parse($res->registered_at)->translatedFormat('d M Y, H:i') : '-' }}
+                                WIB
                             </div>
                         </div>
 
@@ -1698,7 +1915,8 @@
                 <span class="section-tag">Bantuan &amp; Informasi</span>
                 <h2 class="section-title">Pertanyaan yang Sering Diajukan</h2>
                 <p class="section-desc mx-auto">
-                    Temukan jawaban cepat atas pertanyaan seputar tata cara pendaftaran, syarat berkas, dan sistem seleksi PPDB.
+                    Temukan jawaban cepat atas pertanyaan seputar tata cara pendaftaran, syarat berkas, dan sistem
+                    seleksi PPDB.
                 </p>
             </div>
 
@@ -1717,7 +1935,10 @@
                             <div id="collapseOne" class="accordion-collapse collapse show"
                                 data-bs-parent="#accordionPpdbFaq">
                                 <div class="accordion-body">
-                                    Untuk sekolah negeri, seluruh proses pendaftaran PPDB dari awal hingga pengumuman adalah <strong>100% Bebas Biaya (Gratis)</strong> sesuai ketentuan Kemendikbudristek dan Pemda. Untuk program khusus berbayar, rincian biaya tertera secara transparan pada rincian gelombang terkait.
+                                    Untuk sekolah negeri, seluruh proses pendaftaran PPDB dari awal hingga pengumuman
+                                    adalah <strong>100% Bebas Biaya (Gratis)</strong> sesuai ketentuan Kemendikbudristek
+                                    dan Pemda. Untuk program khusus berbayar, rincian biaya tertera secara transparan
+                                    pada rincian gelombang terkait.
                                 </div>
                             </div>
                         </div>
@@ -1734,7 +1955,10 @@
                             <div id="collapseTwo" class="accordion-collapse collapse"
                                 data-bs-parent="#accordionPpdbFaq">
                                 <div class="accordion-body">
-                                    Selama status pendaftaran Anda masih dalam tahap <em>DRAFT</em> atau belum diverifikasi final oleh panitia, Anda dapat login ke portal siswa dan melakukan pembaruan berkas. Jika sudah terlanjur difinalisasi, silakan datang langsung ke loket helpdesk PPDB di sekolah untuk mengajukan revisi.
+                                    Selama status pendaftaran Anda masih dalam tahap <em>DRAFT</em> atau belum
+                                    diverifikasi final oleh panitia, Anda dapat login ke portal siswa dan melakukan
+                                    pembaruan berkas. Jika sudah terlanjur difinalisasi, silakan datang langsung ke
+                                    loket helpdesk PPDB di sekolah untuk mengajukan revisi.
                                 </div>
                             </div>
                         </div>
@@ -1751,7 +1975,10 @@
                             <div id="collapseThree" class="accordion-collapse collapse"
                                 data-bs-parent="#accordionPpdbFaq">
                                 <div class="accordion-body">
-                                    Calon siswa hanya diperbolehkan memilih 1 jalur seleksi utama dalam satu gelombang pendaftaran. Namun, jika Anda tidak lolos pada Tahap 1 (misal: Jalur Afirmasi atau Prestasi), Anda diperkenankan mendaftar kembali pada Tahap 2 (Jalur Zonasi) sesuai jadwal yang ditetapkan.
+                                    Calon siswa hanya diperbolehkan memilih 1 jalur seleksi utama dalam satu gelombang
+                                    pendaftaran. Namun, jika Anda tidak lolos pada Tahap 1 (misal: Jalur Afirmasi atau
+                                    Prestasi), Anda diperkenankan mendaftar kembali pada Tahap 2 (Jalur Zonasi) sesuai
+                                    jadwal yang ditetapkan.
                                 </div>
                             </div>
                         </div>
@@ -1768,7 +1995,10 @@
                             <div id="collapseFour" class="accordion-collapse collapse"
                                 data-bs-parent="#accordionPpdbFaq">
                                 <div class="accordion-body">
-                                    Jarak dihitung berdasarkan garis lurus (geolokasi koordinat) antara titik alamat tempat tinggal sesuai Kartu Keluarga (KK) menuju titik koordinat gerbang utama sekolah. Sistem secara otomatis menghitung jarak tersebut saat Anda memasukkan alamat.
+                                    Jarak dihitung berdasarkan garis lurus (geolokasi koordinat) antara titik alamat
+                                    tempat tinggal sesuai Kartu Keluarga (KK) menuju titik koordinat gerbang utama
+                                    sekolah. Sistem secara otomatis menghitung jarak tersebut saat Anda memasukkan
+                                    alamat.
                                 </div>
                             </div>
                         </div>
@@ -1785,7 +2015,9 @@
                             <div id="collapseFive" class="accordion-collapse collapse"
                                 data-bs-parent="#accordionPpdbFaq">
                                 <div class="accordion-body">
-                                    Hasil seleksi resmi diumumkan pada tanggal yang tercantum di jadwal gelombang pukul 10:00 WIB. Anda dapat langsung mengecek status kelulusan pada fitur <strong>Cek Status</strong> di website ini menggunakan Nomor Registrasi atau NIK Anda.
+                                    Hasil seleksi resmi diumumkan pada tanggal yang tercantum di jadwal gelombang pukul
+                                    10:00 WIB. Anda dapat langsung mengecek status kelulusan pada fitur <strong>Cek
+                                        Status</strong> di website ini menggunakan Nomor Registrasi atau NIK Anda.
                                 </div>
                             </div>
                         </div>
@@ -1800,18 +2032,21 @@
         <div class="cta-banner">
             <div class="row align-items-center g-4">
                 <div class="col-lg-8">
-                    <span class="badge bg-white text-primary px-3 py-1 rounded-pill fw-bold mb-3" style="font-size: 0.78rem;">
+                    <span class="badge bg-white text-primary px-3 py-1 rounded-pill fw-bold mb-3"
+                        style="font-size: 0.78rem;">
                         PENDAFTARAN TERBATAS
                     </span>
                     <h2 class="fw-bold text-white mb-2" style="font-size: clamp(1.8rem, 2.5vw, 2.4rem);">
                         Siap Menjadi Bagian dari Generasi Berprestasi?
                     </h2>
                     <p class="text-white-50 mb-0" style="font-size: 1rem; max-width: 600px;">
-                        Jangan lewatkan kesempatan menimba ilmu di lingkungan belajar modern yang mendukung potensi akademik dan karakter Anda.
+                        Jangan lewatkan kesempatan menimba ilmu di lingkungan belajar modern yang mendukung potensi
+                        akademik dan karakter Anda.
                     </p>
                 </div>
                 <div class="col-lg-4 text-lg-end">
-                    <a href="#gelombang" class="btn btn-light text-primary fw-bold py-3 px-4 rounded-3 shadow-sm fs-6">
+                    <a href="#gelombang"
+                        class="btn btn-light text-primary fw-bold py-3 px-4 rounded-3 shadow-sm fs-6">
                         <i class="fa-solid fa-paper-plane me-2"></i> Pilih Gelombang &amp; Daftar
                     </a>
                 </div>
@@ -1830,7 +2065,8 @@
                         </div>
                         <h4 class="fw-bold mb-2" style="color: var(--brand-navy);">WhatsApp Panitia</h4>
                         <p class="text-muted" style="font-size: 0.88rem;">
-                            Butuh bantuan kilat seputar kendala teknis atau pengunggahan berkas? Hubungi helpdesk WhatsApp kami.
+                            Butuh bantuan kilat seputar kendala teknis atau pengunggahan berkas? Hubungi helpdesk
+                            WhatsApp kami.
                         </p>
                         <div class="mt-auto">
                             <a href="https://wa.me/6281234567890?text=Halo%20Admin%20PPDB,%20saya%20ingin%20bertanya%20mengenai%20pendaftaran"
@@ -1851,9 +2087,12 @@
                             Layanan konsultasi tatap muka dan verifikasi berkas fisik di sekretariat panitia:
                         </p>
                         <ul class="list-unstyled text-muted" style="font-size: 0.84rem;">
-                            <li class="mb-1"><i class="fa-solid fa-check text-success me-2"></i> <strong>Senin - Kamis:</strong> 08:00 - 15:00 WIB</li>
-                            <li class="mb-1"><i class="fa-solid fa-check text-success me-2"></i> <strong>Jumat:</strong> 08:00 - 11:30 WIB</li>
-                            <li><i class="fa-solid fa-triangle-exclamation text-warning me-2"></i> <strong>Sabtu - Minggu:</strong> Libur (Sistem Online Tetap Aktif)</li>
+                            <li class="mb-1"><i class="fa-solid fa-check text-success me-2"></i> <strong>Senin -
+                                    Kamis:</strong> 08:00 - 15:00 WIB</li>
+                            <li class="mb-1"><i class="fa-solid fa-check text-success me-2"></i>
+                                <strong>Jumat:</strong> 08:00 - 11:30 WIB</li>
+                            <li><i class="fa-solid fa-triangle-exclamation text-warning me-2"></i> <strong>Sabtu -
+                                    Minggu:</strong> Libur (Sistem Online Tetap Aktif)</li>
                         </ul>
                     </div>
                 </div>
@@ -1891,12 +2130,17 @@
                         </div>
                     </div>
                     <p style="font-size: 0.88rem; max-width: 440px;" class="text-muted">
-                        Portal Resmi Penerimaan Peserta Didik Baru (PPDB) terintegrasi berbasis digital. Memfasilitasi pendaftaran yang adil, transparan, akuntabel, dan bebas dari diskriminasi.
+                        Portal Resmi Penerimaan Peserta Didik Baru (PPDB) terintegrasi berbasis digital. Memfasilitasi
+                        pendaftaran yang adil, transparan, akuntabel, dan bebas dari diskriminasi.
                     </p>
                     <div class="d-flex gap-3 mt-3">
-                        <a href="#" class="btn btn-sm btn-outline-light rounded-circle" style="width: 36px; height: 36px; padding: 6px;"><i class="fa-brands fa-instagram"></i></a>
-                        <a href="#" class="btn btn-sm btn-outline-light rounded-circle" style="width: 36px; height: 36px; padding: 6px;"><i class="fa-brands fa-youtube"></i></a>
-                        <a href="#" class="btn btn-sm btn-outline-light rounded-circle" style="width: 36px; height: 36px; padding: 6px;"><i class="fa-brands fa-facebook"></i></a>
+                        <a href="#" class="btn btn-sm btn-outline-light rounded-circle"
+                            style="width: 36px; height: 36px; padding: 6px;"><i
+                                class="fa-brands fa-instagram"></i></a>
+                        <a href="#" class="btn btn-sm btn-outline-light rounded-circle"
+                            style="width: 36px; height: 36px; padding: 6px;"><i class="fa-brands fa-youtube"></i></a>
+                        <a href="#" class="btn btn-sm btn-outline-light rounded-circle"
+                            style="width: 36px; height: 36px; padding: 6px;"><i class="fa-brands fa-facebook"></i></a>
                     </div>
                 </div>
 
@@ -1927,20 +2171,24 @@
                         Hubungi panitia jika mengalami kendala akun atau nomor pendaftaran:
                     </p>
                     <div class="p-3 rounded-3" style="background: rgba(255, 255, 255, 0.05); font-size: 0.82rem;">
-                        <div><i class="fa-solid fa-headset me-2 text-primary"></i> <strong>Helpdesk:</strong> 08:00 - 15:30 WIB</div>
-                        <div class="mt-1"><i class="fa-brands fa-whatsapp me-2 text-success"></i> <strong>WhatsApp:</strong> 0812-3456-7890</div>
+                        <div><i class="fa-solid fa-headset me-2 text-primary"></i> <strong>Helpdesk:</strong> 08:00 -
+                            15:30 WIB</div>
+                        <div class="mt-1"><i class="fa-brands fa-whatsapp me-2 text-success"></i>
+                            <strong>WhatsApp:</strong> 0812-3456-7890</div>
                     </div>
                 </div>
             </div>
 
             <div class="footer-bottom d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
                 <div>
-                    &copy; {{ date('Y') }} Panitia PPDB Online {{ $admissions->first()?->school?->name ?? 'Sekolah' }}. Seluruh hak cipta dilindungi.
+                    &copy; {{ date('Y') }} Panitia PPDB Online
+                    {{ $admissions->first()?->school?->name ?? 'Sekolah' }}. Seluruh hak cipta dilindungi.
                 </div>
                 <div class="d-flex gap-3">
                     <a href="#" class="footer-link mb-0" style="font-size: 0.8rem;">Kebijakan Privasi</a>
                     <a href="#" class="footer-link mb-0" style="font-size: 0.8rem;">Syarat &amp; Ketentuan</a>
-                    <a href="{{ url('/') }}" class="footer-link mb-0" style="font-size: 0.8rem;">Portal Utama</a>
+                    <a href="{{ url('/') }}" class="footer-link mb-0" style="font-size: 0.8rem;">Portal
+                        Utama</a>
                 </div>
             </div>
         </div>
@@ -1951,10 +2199,10 @@
 
     {{-- Interactive Scroll Script --}}
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             // Navbar shadow on scroll
             const navbar = document.querySelector('.navbar-ppdb');
-            window.addEventListener('scroll', function () {
+            window.addEventListener('scroll', function() {
                 if (window.scrollY > 30) {
                     navbar.classList.add('scrolled');
                 } else {
@@ -1964,7 +2212,7 @@
 
             // Smooth scroll for anchor links
             document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
+                anchor.addEventListener('click', function(e) {
                     const targetId = this.getAttribute('href');
                     if (targetId && targetId !== '#') {
                         const targetElem = document.querySelector(targetId);

@@ -60,7 +60,7 @@ CREATE TABLE `asset_depreciation_logs` (
   KEY `asset_depreciation_logs_updated_by_foreign` (`updated_by`) USING BTREE,
   KEY `asset_depreciation_logs_asset_id_period_date_index` (`asset_id`,`period_date`) USING BTREE,
   KEY `asset_depreciation_logs_is_posted_index` (`is_posted`) USING BTREE
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
 -- ----------------------------
 -- Table structure for `asset_depreciations`

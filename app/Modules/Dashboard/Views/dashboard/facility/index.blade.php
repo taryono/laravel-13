@@ -1,9 +1,9 @@
 @extends('layouts.app')
 @section('title', 'Fasilitas & Sarpras')
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('assets/css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/dashboard/dashboard.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/ep-subnav.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/facility.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/dashboard/facility.css') }}">
 @endpush
 @section('content')
     @include('Dashboard::partials.ep_subnav', [
@@ -100,7 +100,7 @@
                 <span class="fs-label-sm text-on-surface lh-tight fw-semibold">Lapor Rusak</span>
             </button>
             <!-- Action
-                                <!-- Action 2 -->
+                                        <!-- Action 2 -->
             <button
                 class="d-flex flex-column align-items-center text-center p-2 rounded-4 bg-surface-container-lowest border border-outline-variant border-opacity-25 btn-scale transition-all shadow-sm"
                 type="button">

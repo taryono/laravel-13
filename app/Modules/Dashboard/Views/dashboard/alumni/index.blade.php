@@ -1,9 +1,9 @@
 @extends('layouts.app')
 @section('title', 'Alumni & Tracer Study')
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('assets/css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/dashboard/dashboard.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/ep-subnav.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/alumni.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/dashboard/alumni.css') }}">
 @endpush
 @section('content')
     <div class="alumni">

@@ -241,7 +241,7 @@ CREATE TABLE `curriculum_assignments` (
   KEY `ca_school_index` (`school_id`),
   KEY `ca_class_level_index` (`class_level_id`),
   KEY `ca_academic_year_index` (`academic_year_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ----------------------------
 -- Table structure for `curriculum_competencies`
@@ -261,7 +261,7 @@ CREATE TABLE `curriculum_competencies` (
   `deleted_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `cc_phase_index` (`curriculum_phase_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ----------------------------
 -- Table structure for `curriculum_courses`
@@ -363,7 +363,7 @@ CREATE TABLE `curriculum_phase_class_level` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `cpcl_unique` (`curriculum_phase_id`,`class_level_id`),
   KEY `cpcl_class_level_fk` (`class_level_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ----------------------------
 -- Table structure for `curriculum_phases`
@@ -505,7 +505,7 @@ CREATE TABLE `curriculums` (
   KEY `curriculums_type_index` (`type`),
   KEY `curriculums_is_active_index` (`is_active`),
   KEY `curriculums_deleted_at_index` (`deleted_at`)
-) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ----------------------------
 -- Table structure for `education_levels`

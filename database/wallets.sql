@@ -140,7 +140,7 @@ CREATE TABLE `canteen_tenant_users`  (
   `role` enum('owner','cashier') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'owner',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uq_tenant_user`(`canteen_tenant_id`, `user_id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Fixed;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Fixed;
 
 -- ----------------------------
 -- Table structure for canteen_tenants
@@ -192,7 +192,7 @@ CREATE TABLE `wallet_topups`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uq_topup_ref`(`payment_reference`) USING BTREE,
   INDEX `idx_topup_wallet`(`digital_wallet_id`, `status`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for digital_wallets
@@ -234,7 +234,7 @@ CREATE TABLE `wallet_cards`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uq_card_uid`(`card_uid`) USING BTREE,
   INDEX `idx_card_wallet`(`digital_wallet_id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for wallet_transactions

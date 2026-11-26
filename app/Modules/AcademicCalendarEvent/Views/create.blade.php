@@ -1,4 +1,4 @@
-{{ Form::open(['method' => 'POST', 'route' => ['academic_calendar_event.store'], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
+{{ Form::open(['method' => 'POST', 'route' => ['academic_calendar_event.store'], 'class' => 'form-horizontal form-validation', 'id' => 'formAcademicCalendarEvent', 'enctype' => 'multipart/form-data']) }}
 {{-- Kolom tersembunyi (sudah ada datanya) --}}
 <input type="hidden" name="organization_id" value="{{ $organizationId }}">
 <input type="hidden" name="school_id" value="{{ $schoolId }}">

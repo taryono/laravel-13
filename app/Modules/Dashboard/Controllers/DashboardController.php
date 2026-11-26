@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Str;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Models\BosPeriod;
@@ -449,53 +450,242 @@ class DashboardController extends MainController
         return $this->viewResolver('Dashboard::dashboard.facility.index', []);
     }
 
+    public function cmsDirectView(Request $request)
+    {
+        $cmsCategory = Schema::hasTable('menu_categories')
+            ? DB::table('menu_categories')->where('code', 'cms')->first()
+            : null;
+
+        if ($cmsCategory) {
+            session(['active_menu_category_id' => $cmsCategory->id]);
+        }
+
+        return $this->cmsView($request);
+    }
+
     private function cmsView($request)
     {
-        // Dynamic metrics with fallback
-        $publishedPosts = Schema::hasTable('cms_posts') ? DB::table('cms_posts')->where('status', 'published')->count() : 0;
-        $draftPosts = Schema::hasTable('cms_posts') ? DB::table('cms_posts')->whereIn('status', ['draft', 'pending'])->count() : 0;
-        $announcementsCount = Schema::hasTable('announcements') ? DB::table('announcements')->where('is_active', 1)->count() : 0;
-        $galleriesCount = Schema::hasTable('cms_galleries') ? DB::table('cms_galleries')->count() : 0;
-        $pagesCount = Schema::hasTable('cms_pages') ? DB::table('cms_pages')->count() : 0;
-        $slidersCount = Schema::hasTable('sliders') ? DB::table('sliders')->where('is_active', 1)->count() : 0;
-        $documentsCount = Schema::hasTable('documents') ? DB::table('documents')->count() : 0;
-        $achievementsCount = Schema::hasTable('achievements') ? DB::table('achievements')->count() : 0;
-        $mediaCount = Schema::hasTable('cms_media') ? DB::table('cms_media')->count() : 0;
-        $eventsCount = Schema::hasTable('academic_calendar_events') ? DB::table('academic_calendar_events')->count() : 0;
+        // 1. Konten Terbit / Draft (cms_posts & cms_pages)
+        $publishedPosts = Schema::hasTable('cms_posts')
+            ? DB::table('cms_posts')->where('status', 'published')->whereNull('deleted_at')->count()
+            : 0;
+        $publishedPages = Schema::hasTable('cms_pages')
+            ? DB::table('cms_pages')->where('status', 'published')->whereNull('deleted_at')->count()
+            : 0;
+        $totalPublished = $publishedPosts + $publishedPages;
 
-        $totalPublished = ($publishedPosts + $announcementsCount + $pagesCount) ?: 248;
-        $totalDraft = $draftPosts ?: 12;
+        $draftPosts = Schema::hasTable('cms_posts')
+            ? DB::table('cms_posts')->whereIn('status', ['draft', 'pending', 'pending_review'])->whereNull('deleted_at')->count()
+            : 0;
+        $draftPages = Schema::hasTable('cms_pages')
+            ? DB::table('cms_pages')->whereIn('status', ['draft', 'pending_review'])->whereNull('deleted_at')->count()
+            : 0;
+        $totalDraft = $draftPosts + $draftPages;
 
-        // Fetch recent published items if available
+        $pendingReviewCount = Schema::hasTable('cms_posts')
+            ? DB::table('cms_posts')->whereIn('status', ['pending', 'pending_review'])->whereNull('deleted_at')->count()
+            : 0;
+
+        // 2. Pengunjung Bulan Ini (cms_visitor_stats)
+        $now = Carbon::now();
+        $currentMonthVisitors = Schema::hasTable('cms_visitor_stats')
+            ? (int) DB::table('cms_visitor_stats')->whereYear('date', $now->year)->whereMonth('date', $now->month)->sum('page_views')
+            : 0;
+        $lastMonthVisitors = Schema::hasTable('cms_visitor_stats')
+            ? (int) DB::table('cms_visitor_stats')->whereYear('date', $now->copy()->subMonth()->year)->whereMonth('date', $now->copy()->subMonth()->month)->sum('page_views')
+            : 0;
+
+        if ($currentMonthVisitors === 0 && Schema::hasTable('cms_posts')) {
+            $currentMonthVisitors = (int) DB::table('cms_posts')->sum('view_count');
+        }
+
+        $visitorGrowthPercent = $lastMonthVisitors > 0
+            ? round((($currentMonthVisitors - $lastMonthVisitors) / $lastMonthVisitors) * 100)
+            : 12;
+
+        // 3. Penyimpanan Media (cms_media)
+        $mediaCount = Schema::hasTable('cms_media')
+            ? DB::table('cms_media')->whereNull('deleted_at')->count()
+            : 0;
+        $mediaTotalBytes = Schema::hasTable('cms_media')
+            ? (int) DB::table('cms_media')->whereNull('deleted_at')->sum('size')
+            : 0;
+        $mediaQuotaBytes = 10 * 1024 * 1024 * 1024; // 10 GB
+        $mediaPercentage = $mediaQuotaBytes > 0 ? round(($mediaTotalBytes / $mediaQuotaBytes) * 100, 1) : 0;
+
+        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
+        $bytes = max($mediaTotalBytes, 0);
+        $pow = $bytes > 0 ? floor(log($bytes) / log(1024)) : 0;
+        $pow = min($pow, count($units) - 1);
+        $mediaFormattedSize = round($bytes / (1024 ** $pow), 1) . ' ' . $units[$pow];
+
+        // 4. Modul Konten counts
+        $announcementsCount = Schema::hasTable('cms_posts')
+            ? DB::table('cms_posts')
+                ->where('status', 'published')
+                ->whereNull('deleted_at')
+                ->whereExists(function ($q) {
+                    $q->select(DB::raw(1))
+                        ->from('cms_categories')
+                        ->whereColumn('cms_categories.id', 'cms_posts.cms_category_id')
+                        ->where('cms_categories.slug', 'pengumuman');
+                })->count()
+            : 0;
+        if ($announcementsCount === 0 && Schema::hasTable('announcements')) {
+            $announcementsCount = DB::table('announcements')->where('is_active', 1)->count();
+        }
+
+        $galleriesCount = Schema::hasTable('cms_galleries')
+            ? DB::table('cms_galleries')->where('is_active', 1)->whereNull('deleted_at')->count()
+            : 0;
+
+        $eventsCount = Schema::hasTable('academic_calendar_events')
+            ? DB::table('academic_calendar_events')->whereNull('deleted_at')->count()
+            : 0;
+
+        $pagesCount = Schema::hasTable('cms_pages')
+            ? DB::table('cms_pages')->where('status', 'published')->whereNull('deleted_at')->count()
+            : 0;
+
+        $bannersCount = Schema::hasTable('cms_banners')
+            ? DB::table('cms_banners')->where('is_active', 1)->whereNull('deleted_at')->count()
+            : 0;
+        if ($bannersCount === 0 && Schema::hasTable('sliders')) {
+            $bannersCount = DB::table('sliders')->where('is_active', 1)->count();
+        }
+
+        $documentsCount = Schema::hasTable('cms_media')
+            ? DB::table('cms_media')->whereNotNull('document_category')->whereNull('deleted_at')->count()
+            : 0;
+        if ($documentsCount === 0 && Schema::hasTable('documents')) {
+            $documentsCount = DB::table('documents')->whereNull('deleted_at')->count();
+        }
+
+        $achievementsCount = Schema::hasTable('achievements')
+            ? DB::table('achievements')->whereNull('deleted_at')->count()
+            : 0;
+        if (Schema::hasTable('cms_testimonials')) {
+            $achievementsCount += DB::table('cms_testimonials')->where('is_active', 1)->count();
+        }
+
+        // 5. Status Website Online (cms_settings)
+        $siteStatus = 'Online';
+        if (Schema::hasTable('cms_settings')) {
+            $statusSetting = DB::table('cms_settings')
+                ->whereIn('key', ['site_status', 'maintenance_mode', 'website_status'])
+                ->whereNull('deleted_at')
+                ->get()
+                ->keyBy('key');
+
+            if (isset($statusSetting['maintenance_mode']) && in_array($statusSetting['maintenance_mode']->value, ['1', 'true', 1])) {
+                $siteStatus = 'Maintenance';
+            } elseif (isset($statusSetting['site_status']) && !empty($statusSetting['site_status']->value)) {
+                $siteStatus = ucfirst($statusSetting['site_status']->value);
+            } elseif (isset($statusSetting['website_status']) && !empty($statusSetting['website_status']->value)) {
+                $siteStatus = ucfirst($statusSetting['website_status']->value);
+            }
+        }
+
+        // 6. Konten Terbaru (cms_posts)
         $recentItems = collect();
         if (Schema::hasTable('cms_posts')) {
-            $recentPosts = DB::table('cms_posts')
-                ->select('title', 'created_at', 'status', DB::raw("'Berita' as type_label"), DB::raw("'bg-secondary-c' as dot_class"))
-                ->orderByDesc('id')
-                ->limit(2)
-                ->get();
-            $recentItems = $recentItems->merge($recentPosts);
-        }
-        if (Schema::hasTable('announcements')) {
-            $recentAnnounce = DB::table('announcements')
-                ->select('title', 'created_at', DB::raw("'published' as status"), DB::raw("'Pengumuman' as type_label"), DB::raw("'bg-primary-container' as dot_class"))
-                ->orderByDesc('id')
-                ->limit(2)
-                ->get();
-            $recentItems = $recentItems->merge($recentAnnounce);
+            $recentItems = DB::table('cms_posts')
+                ->leftJoin('cms_categories', 'cms_posts.cms_category_id', '=', 'cms_categories.id')
+                ->select(
+                    'cms_posts.id',
+                    'cms_posts.title',
+                    'cms_posts.slug',
+                    'cms_posts.status',
+                    'cms_posts.view_count',
+                    'cms_posts.published_at',
+                    'cms_posts.created_at',
+                    'cms_categories.name as category_name',
+                    'cms_categories.slug as category_slug'
+                )
+                ->where('cms_posts.status', 'published')
+                ->whereNull('cms_posts.deleted_at')
+                ->orderByDesc('cms_posts.published_at')
+                ->orderByDesc('cms_posts.id')
+                ->limit(5)
+                ->get()
+                ->map(function ($item) {
+                    $cat = strtolower($item->category_name ?? '');
+                    if (str_contains($cat, 'pengumuman')) {
+                        $item->dot_class = 'bg-primary-container';
+                        $item->type_label = 'Pengumuman';
+                    } elseif (str_contains($cat, 'prestasi')) {
+                        $item->dot_class = 'bg-gold';
+                        $item->type_label = 'Prestasi';
+                    } elseif (str_contains($cat, 'kegiatan')) {
+                        $item->dot_class = 'bg-on-primary-fixed-variant';
+                        $item->type_label = 'Galeri & Kegiatan';
+                    } else {
+                        $item->dot_class = 'bg-secondary-c';
+                        $item->type_label = $item->category_name ?: 'Berita';
+                    }
+                    $views = (int) ($item->view_count ?? 0);
+                    $item->views_formatted = $views > 0 ? number_format($views, 0, ',', '.') . ' dilihat' : 'Aktif';
+                    return $item;
+                });
         }
 
-        // Fetch pending items if available
+        // 7. Menunggu Review (cms_posts dengan status draft/pending)
         $pendingItems = collect();
         if (Schema::hasTable('cms_posts')) {
-            $pendingPosts = DB::table('cms_posts')
-                ->whereIn('status', ['draft', 'pending'])
-                ->orderByDesc('id')
-                ->limit(2)
-                ->get();
-            $pendingItems = $pendingPosts;
+            $pendingItems = DB::table('cms_posts')
+                ->leftJoin('cms_categories', 'cms_posts.cms_category_id', '=', 'cms_categories.id')
+                ->leftJoin('users', 'cms_posts.user_id', '=', 'users.id')
+                ->select(
+                    'cms_posts.id',
+                    'cms_posts.title',
+                    'cms_posts.slug',
+                    'cms_posts.excerpt',
+                    'cms_posts.content',
+                    'cms_posts.status',
+                    'cms_posts.created_at',
+                    'cms_categories.name as category_name',
+                    'users.name as author_name'
+                )
+                ->whereIn('cms_posts.status', ['pending_review', 'pending', 'draft'])
+                ->whereNull('cms_posts.deleted_at')
+                ->orderByRaw("CASE WHEN cms_posts.status IN ('pending_review', 'pending') THEN 1 ELSE 2 END")
+                ->orderByDesc('cms_posts.id')
+                ->limit(5)
+                ->get()
+                ->map(function ($item) {
+                    $item->category_label = $item->category_name ?: 'Berita / Artikel';
+                    $item->author_name = $item->author_name ?: 'Admin / Staf';
+                    $item->snippet = !empty($item->excerpt) ? $item->excerpt : Str::limit(strip_tags($item->content ?? ''), 75);
+                    return $item;
+                });
         }
-        return view('Dashboard::dashboard.cms.index', compact('achievementsCount', 'documentsCount', 'galleriesCount', 'draftPosts', 'eventsCount', 'mediaCount', 'pagesCount', 'pendingItems', 'pendingPosts', 'publishedPosts', 'recentAnnounce', 'recentItems', 'recentPosts', 'slidersCount', 'totalDraft', 'totalPublished', 'announcementsCount'));
+
+        return view('Dashboard::dashboard.cms.index', compact(
+            'totalPublished',
+            'publishedPosts',
+            'publishedPages',
+            'totalDraft',
+            'draftPosts',
+            'draftPages',
+            'pendingReviewCount',
+            'currentMonthVisitors',
+            'lastMonthVisitors',
+            'visitorGrowthPercent',
+            'mediaCount',
+            'mediaTotalBytes',
+            'mediaFormattedSize',
+            'mediaPercentage',
+            'announcementsCount',
+            'galleriesCount',
+            'eventsCount',
+            'pagesCount',
+            'bannersCount',
+            'documentsCount',
+            'achievementsCount',
+            'siteStatus',
+            'recentItems',
+            'pendingItems'
+        ));
     }
 
     private function payrollView($request)

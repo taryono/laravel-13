@@ -1,4 +1,4 @@
-{{ Form::model($academic_calendar_event, ['method' => 'PUT', 'route' => ['academic_calendar_event.update', $academic_calendar_event->id], 'class' => 'form-horizontal form-validation', 'enctype' => 'multipart/form-data']) }}
+{{ Form::model($academic_calendar_event, ['method' => 'PUT', 'route' => ['academic_calendar_event.update', $academic_calendar_event->id], 'class' => 'form-horizontal form-validation', 'id' => 'formAcademicCalendarEvent', 'enctype' => 'multipart/form-data']) }}
 {{-- Kolom tersembunyi (sudah ada datanya) --}}
 <input type="hidden" name="organization_id" value="{{ $organizationId }}">
 <input type="hidden" name="school_id" value="{{ $schoolId }}">

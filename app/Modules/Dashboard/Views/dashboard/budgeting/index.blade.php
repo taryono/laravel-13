@@ -1,9 +1,9 @@
 @extends('layouts.app')
 @section('title', 'Budgeting & RAPBS')
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('assets/css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/dashboard/dashboard.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/ep-subnav.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/budgeting.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/dashboard/budgeting.css') }}">
 @endpush
 @section('content')
     <div class="bgt d-flex flex-column gap-4">

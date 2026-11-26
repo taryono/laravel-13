@@ -106,7 +106,7 @@ CREATE TABLE `menu_categories` (
   KEY `menu_categories_parent_id_foreign` (`parent_id`),
   KEY `menu_categories_is_system_index` (`is_system`),
   KEY `menu_categories_org_active_sort_index` (`organization_id`,`is_active`,`sort_order`)
-) ENGINE=MyISAM AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ----------------------------
 -- Table structure for `menu_role`
@@ -469,7 +469,7 @@ CREATE TABLE `school_role_modules` (
   KEY `school_role_modules_role_id_foreign` (`role_id`),
   KEY `school_role_modules_module_id_foreign` (`module_id`),
   KEY `srm_org_school_index` (`organization_id`,`school_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ----------------------------
 -- Table structure for `schools`

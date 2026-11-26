@@ -1,9 +1,9 @@
 @extends('layouts.app')
 @section('title', 'Perpustakaan & E-Library')
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('assets/css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/dashboard/dashboard.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/ep-subnav.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/library.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/dashboard/library.css') }}">
 @endpush
 @section('content')
     <div class="lib">

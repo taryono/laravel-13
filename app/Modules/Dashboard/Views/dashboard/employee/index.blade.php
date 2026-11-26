@@ -1,13 +1,13 @@
 @extends('layouts.app')
 @section('title', 'Karyawan')
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('assets/css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/dashboard/dashboard.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/ep-subnav.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/employee.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/dashboard/employee.css') }}">
 @endpush
 @section('content')
     @include('Dashboard::partials.ep_subnav', [
-        'title' => 'Modul Keuangan & Kas',
+        'title' => 'Modul Karyawan  & SDM',
         'badge' => 'Realisasi SPP 92%',
         'subtitle' => 'Tata Usaha, Penerimaan SPP & Ringkasan Arus Kas Sekolah',
         'metaIcon' => 'calendar_month',

@@ -1,9 +1,9 @@
 @extends('layouts.app')
 @section('title', 'Data Akademik')
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('assets/css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/dashboard/dashboard.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/ep-subnav.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/academic.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/dashboard/academic.css') }}">
 @endpush
 @section('content')
     <div class="academic-dashboard">
@@ -108,12 +108,15 @@
                         <div class="progress-bar" role="progressbar" style="width:85%;" aria-valuenow="85" aria-valuemin="0"
                             aria-valuemax="100"></div>
                     </div>
-                    <div class="d-flex align-items-center justify-content-between text-body-sm pt-2 border-top border-surface-variant flex-wrap gap-2">
+                    <div
+                        class="d-flex align-items-center justify-content-between text-body-sm pt-2 border-top border-surface-variant flex-wrap gap-2">
                         <span class="text-on-surface-variant d-flex align-items-center gap-1">
                             <span class="material-symbols-outlined text-secondary" style="font-size:16px;">verified</span>
                             31 dari 36 Rombel Terverifikasi
                         </span>
-                        <button type="button" class="btn btn-link p-0 text-decoration-none text-primary text-label-sm fw-semibold">Cek Detail</button>
+                        <button type="button"
+                            class="btn btn-link p-0 text-decoration-none text-primary text-label-sm fw-semibold">Cek
+                            Detail</button>
                     </div>
                 </section>
 
@@ -134,7 +137,8 @@
                                             <span class="text-title-sm text-primary">Kelas X (Fase E)</span>
                                             <span class="pill-secondary">12 Kelas</span>
                                         </div>
-                                        <p class="text-body-sm text-outline mt-1 mb-0">396 Siswa Terdaftar • Kurikulum Merdeka Murni</p>
+                                        <p class="text-body-sm text-outline mt-1 mb-0">396 Siswa Terdaftar • Kurikulum
+                                            Merdeka Murni</p>
                                     </div>
                                     <span class="material-symbols-outlined text-outline">chevron_right</span>
                                 </div>
@@ -160,7 +164,8 @@
                                             <span class="text-title-sm text-primary">Kelas XI (Fase F)</span>
                                             <span class="pill-secondary">12 Kelas</span>
                                         </div>
-                                        <p class="text-body-sm text-outline mt-1 mb-0">392 Siswa Terdaftar • Peminatan Terpadu</p>
+                                        <p class="text-body-sm text-outline mt-1 mb-0">392 Siswa Terdaftar • Peminatan
+                                            Terpadu</p>
                                     </div>
                                     <span class="material-symbols-outlined text-outline">chevron_right</span>
                                 </div>
@@ -170,8 +175,8 @@
                                         <span class="text-primary fw-semibold">88%</span>
                                     </div>
                                     <div class="progress progress-thin progress-primary">
-                                        <div class="progress-bar" role="progressbar" style="width:88%;" aria-valuenow="88"
-                                            aria-valuemin="0" aria-valuemax="100"></div>
+                                        <div class="progress-bar" role="progressbar" style="width:88%;"
+                                            aria-valuenow="88" aria-valuemin="0" aria-valuemax="100"></div>
                                     </div>
                                 </div>
                             </div>
@@ -186,7 +191,8 @@
                                             <span class="text-title-sm text-primary">Kelas XII (Fase F Akhir)</span>
                                             <span class="pill-secondary">12 Kelas</span>
                                         </div>
-                                        <p class="text-body-sm text-outline mt-1 mb-0">392 Siswa Terdaftar • Persiapan UTBK &amp; Portofolio</p>
+                                        <p class="text-body-sm text-outline mt-1 mb-0">392 Siswa Terdaftar • Persiapan UTBK
+                                            &amp; Portofolio</p>
                                     </div>
                                     <span class="material-symbols-outlined text-outline">chevron_right</span>
                                 </div>
@@ -196,8 +202,8 @@
                                         <span class="text-secondary fw-semibold">96%</span>
                                     </div>
                                     <div class="progress progress-thin progress-secondary">
-                                        <div class="progress-bar" role="progressbar" style="width:96%;" aria-valuenow="96"
-                                            aria-valuemin="0" aria-valuemax="100"></div>
+                                        <div class="progress-bar" role="progressbar" style="width:96%;"
+                                            aria-valuenow="96" aria-valuemin="0" aria-valuemax="100"></div>
                                     </div>
                                 </div>
                             </div>
@@ -254,7 +260,9 @@
                 <section class="card-soft p-3 p-md-4" aria-label="Mata Pelajaran Unggulan">
                     <div class="d-flex align-items-center justify-content-between mb-3">
                         <h2 class="text-title-sm text-primary mb-0">Mata Pelajaran Unggulan</h2>
-                        <button type="button" class="btn btn-link p-0 text-decoration-none text-secondary text-label-sm fw-semibold">Semua Mapel</button>
+                        <button type="button"
+                            class="btn btn-link p-0 text-decoration-none text-secondary text-label-sm fw-semibold">Semua
+                            Mapel</button>
                     </div>
                     <div class="divide-surface">
                         <!-- Matematika -->

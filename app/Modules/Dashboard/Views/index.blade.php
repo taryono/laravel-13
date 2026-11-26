@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('title', 'Dashboard')
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('assets/css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/dashboard/dashboard.css') }}">
 @endpush
 @section('content')
 
@@ -266,7 +266,7 @@
 
                                 // Update tombol Sebelumnya (Prev)
                                 if (btnPrev) {
-                                    btnPrev.setAttribute('data-page', p.current_page-1);
+                                    btnPrev.setAttribute('data-page', p.current_page - 1);
                                     if (p.has_prev) {
                                         btnPrev.style.removeProperty('display');
                                     } else {

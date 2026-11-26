@@ -3,7 +3,7 @@
 @push('styles')
     <link rel="stylesheet" href="{{ asset('assets/css/dashboard.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/ep-subnav.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/absence.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/dashboard/absence.css') }}">
 @endpush
 @section('content')
     @include('Dashboard::partials.ep_subnav', [

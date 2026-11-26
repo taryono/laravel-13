@@ -64,11 +64,11 @@ class CmsGalleryItemSeeder extends Seeder
                 }
 
                 // Kunci pencocokan: galeri + (media atau image)
-                $keys = ['cms_gallery_id' => $gallery->id]
-                    + ($mediaId ? ['cms_media_id' => $mediaId] : ['image' => $image]);
+                $keys = ['gallery_id' => $gallery->id]
+                    + ($mediaId ? ['media_id' => $mediaId] : ['image' => $image]);
 
                 CmsGalleryItem::updateOrCreate($keys, [
-                    'cms_media_id'   => $mediaId,
+                    'media_id'   => $mediaId,
                     'image'      => $mediaId ? null : $image,
                     'caption'    => $item['caption'] ?? null,
                     'sort_order' => $index + 1,

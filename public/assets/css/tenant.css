@@ -1,64 +1,73 @@
-    /* ===== Token warna (light) ===== */
+    /* ===== Token warna harmonis dengan front.css & welcome.css (light) ===== */
     :root {
-        --ep-surface: #f9f9ff;
-        --ep-low: #f0f3ff;
-        --ep-card: #ffffff;
-        --ep-high: #dee9ff;
-        --ep-text: #111c2c;
-        --ep-muted: #454651;
-        --ep-head: #021064;
-        --ep-teal: #006a61;
-        --ep-brand: #021064;
-        --ep-brand-cont: #1e2a78;
+        --ep-surface: var(--bg-body, #ffffff);
+        --ep-low: var(--bg-soft, #f2f5f7);
+        --ep-card: var(--bg-body, #ffffff);
+        --ep-high: #e8edf5;
+        --ep-text: var(--text-primary, #101426);
+        --ep-muted: var(--text-muted, #5b6478);
+        --ep-head: var(--text-primary, #101426);
+        --ep-teal: var(--brand-blue, #2f5ce0);
+        --ep-brand: var(--brand-blue, #2f5ce0);
+        --ep-brand-cont: var(--brand-blue-dark, #1d3fa8);
         --ep-on-brand: #ffffff;
-        --ep-on-brand-soft: #dfe0ff;
-        --ep-sec: #006a61;
-        --ep-sec-cont: #86f2e4;
-        --ep-on-sec-cont: #006f66;
-        --ep-pri-fix: #dfe0ff;
-        --ep-ter-fix: #ffdea2;
-        --ep-on-ter-fix: #261900;
-        --ep-shadow: 0 1px 4px rgba(30, 42, 120, .08);
-        --bs-body-bg: var(--ep-surface);
-        --bs-body-color: var(--ep-text);
-        --bs-body-font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-        --bs-body-font-size: .875rem;
-        --bs-border-color: rgba(118, 118, 130, .25);
+        --ep-on-brand-soft: #c7cede;
+        --ep-sec: var(--brand-blue, #2f5ce0);
+        --ep-sec-cont: #e0e7ff;
+        --ep-on-sec-cont: #1d3fa8;
+        --ep-pri-fix: #e0e7ff;
+        --ep-ter-fix: #fef3c7;
+        --ep-on-ter-fix: #92400e;
+        --ep-shadow: var(--card-shadow, 0 4px 20px rgba(20, 30, 60, .08));
+        --bs-body-bg: var(--bg-body, #ffffff);
+        --bs-body-color: var(--text-primary, #101426);
+        --bs-body-font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        --bs-body-font-size: .95rem;
+        --bs-border-color: var(--border-color, #e6e9ee);
     }
 
     /* ===== Token warna (dark) ===== */
     [data-bs-theme=dark] {
-        --ep-surface: #0e1424;
-        --ep-low: #141b2d;
-        --ep-card: #1a2237;
+        --ep-surface: var(--bg-body, #0a0e1a);
+        --ep-low: var(--bg-soft, #151d2e);
+        --ep-card: var(--bg-soft, #151d2e);
         --ep-high: #243049;
-        --ep-text: #e3e9f7;
-        --ep-muted: #b2b8cc;
-        --ep-head: #bcc3ff;
-        --ep-teal: #6bd8cb;
-        --ep-brand: #3b4ab0;
-        --ep-brand-cont: #27338a;
+        --ep-text: var(--text-primary, #e8edf5);
+        --ep-muted: var(--text-muted, #98a1b5);
+        --ep-head: var(--text-primary, #e8edf5);
+        --ep-teal: #60a5fa;
+        --ep-brand: var(--brand-blue, #2f5ce0);
+        --ep-brand-cont: var(--brand-blue-dark, #1d3fa8);
         --ep-on-brand: #ffffff;
-        --ep-on-brand-soft: #d3d7ff;
-        --ep-sec: #0e8a7e;
-        --ep-sec-cont: #00403a;
-        --ep-on-sec-cont: #86f2e4;
-        --ep-pri-fix: #2a3375;
-        --ep-ter-fix: #5c4200;
-        --ep-on-ter-fix: #ffdea2;
-        --ep-shadow: 0 1px 4px rgba(0, 0, 0, .4);
+        --ep-on-brand-soft: #98a1b5;
+        --ep-sec: var(--brand-blue, #2f5ce0);
+        --ep-sec-cont: #1e293b;
+        --ep-on-sec-cont: #93c5fd;
+        --ep-pri-fix: #1e293b;
+        --ep-ter-fix: #451a03;
+        --ep-on-ter-fix: #fde68a;
+        --ep-shadow: var(--card-shadow, 0 4px 20px rgba(0, 0, 0, .4));
     }
 
     body {
-        overflow-x: hidden
+        font-family: 'Inter', sans-serif;
+        background-color: var(--bg-body, #ffffff);
+        color: var(--text-primary, #101426);
+        overflow-x: hidden;
+        -webkit-font-smoothing: antialiased;
+        transition: background-color 0.3s ease, color 0.3s ease;
     }
 
     h1,
     h2,
     h3,
     h4,
-    h5 {
-        color: var(--ep-text)
+    h5,
+    .h-title,
+    .font-display {
+        font-family: 'Poppins', sans-serif;
+        font-weight: 700;
+        color: var(--text-primary);
     }
 
     .ms {
@@ -123,34 +132,38 @@
     }
 
     .ep-card {
-        background: var(--ep-card);
-        border: 0;
-        border-radius: 1rem;
-        box-shadow: var(--ep-shadow);
-        transition: box-shadow .2s
+        background: var(--bg-body);
+        border: 1px solid var(--border-color);
+        border-radius: 14px;
+        box-shadow: 0 4px 16px var(--card-shadow);
+        transition: box-shadow .2s ease, transform .2s ease, background .3s ease, border-color .3s ease;
     }
 
     .ep-card:hover {
-        box-shadow: 0 6px 18px rgba(30, 42, 120, .15)
+        box-shadow: 0 12px 30px var(--card-shadow);
+        transform: translateY(-2px);
     }
 
     .ep-card.static:hover {
-        box-shadow: var(--ep-shadow)
+        box-shadow: 0 4px 16px var(--card-shadow);
+        transform: none;
     }
 
     .ep-card.brand {
-        background: var(--ep-brand);
-        color: var(--ep-on-brand)
+        background: var(--brand-blue);
+        color: #ffffff;
+        border-color: var(--brand-blue);
     }
 
     .ep-card.brand h3 {
-        color: inherit
+        color: inherit;
     }
 
     .ep-card.brand-cont {
-        background: var(--ep-brand-cont);
-        color: var(--ep-on-brand);
-        box-shadow: none
+        background: var(--brand-blue-dark);
+        color: #ffffff;
+        box-shadow: none;
+        border-color: var(--brand-blue-dark);
     }
 
     .ep-card.brand-cont h3 {
@@ -237,45 +250,50 @@
     .btn-ep,
     .btn-sec,
     .btn-card {
-        border: 0;
-        border-radius: .75rem;
+        border-radius: 8px;
         font-weight: 600;
-        font-size: .8125rem;
-        padding: .6rem 1.1rem;
+        font-size: .875rem;
+        padding: .55rem 1.3rem;
         display: inline-flex;
         align-items: center;
-        gap: .4rem
+        gap: .5rem;
+        text-decoration: none;
+        transition: all 0.3s ease;
     }
 
     .btn-ep {
-        background: var(--ep-brand);
-        color: var(--ep-on-brand)
+        background: var(--brand-blue);
+        border: none;
+        color: #fff !important;
     }
 
     .btn-ep:hover {
-        background: var(--ep-brand-cont);
-        color: #fff
+        background: var(--brand-blue-dark);
+        color: #fff !important;
     }
 
     .btn-sec {
-        background: var(--ep-sec);
-        color: #fff
+        background: var(--brand-blue);
+        border: none;
+        color: #fff !important;
     }
 
     .btn-sec:hover {
-        background: var(--ep-sec-cont);
-        color: var(--ep-on-sec-cont)
+        background: var(--brand-blue-dark);
+        color: #fff !important;
     }
 
     .btn-card {
-        background: var(--ep-card);
-        color: var(--ep-teal);
-        box-shadow: var(--ep-shadow)
+        border: 1.5px solid var(--border-color);
+        color: var(--text-primary) !important;
+        background: transparent;
+        box-shadow: none;
     }
 
     .btn-card:hover {
-        background: var(--ep-sec-cont);
-        color: var(--ep-on-sec-cont)
+        background: var(--brand-blue);
+        color: #fff !important;
+        border-color: var(--brand-blue);
     }
 
     .btn-theme {
