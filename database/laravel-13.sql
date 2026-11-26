@@ -16248,6 +16248,35 @@ CREATE TABLE `facility_categories`  (
 -- ----------------------------
 
 -- ----------------------------
+-- Table structure for facility_images
+-- ----------------------------
+DROP TABLE IF EXISTS `facility_images`;
+CREATE TABLE `facility_images`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `organization_id` bigint UNSIGNED NOT NULL,
+  `facility_id` bigint UNSIGNED NOT NULL,
+  `file_path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `caption` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `is_primary` tinyint(1) NOT NULL DEFAULT 0,
+  `sort_order` int NOT NULL DEFAULT 0,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `created_by` bigint UNSIGNED NULL DEFAULT NULL,
+  `updated_by` bigint UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `facility_images_organization_id_foreign`(`organization_id` ASC) USING BTREE,
+  INDEX `facility_images_facility_id_foreign`(`facility_id` ASC) USING BTREE,
+  INDEX `facility_images_is_primary_index`(`is_primary` ASC) USING BTREE,
+  INDEX `facility_images_sort_order_index`(`sort_order` ASC) USING BTREE,
+  INDEX `facility_images_deleted_at_index`(`deleted_at` ASC) USING BTREE,
+  CONSTRAINT `facility_images_org_fk` FOREIGN KEY (`organization_id`) REFERENCES `organizations` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `facility_images_facility_fk` FOREIGN KEY (`facility_id`) REFERENCES `facilities` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `facility_images_created_by_fk` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `facility_images_updated_by_fk` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
 -- Table structure for faculties
 -- ----------------------------
 DROP TABLE IF EXISTS `faculties`;

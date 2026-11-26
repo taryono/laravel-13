@@ -14,6 +14,7 @@ class CmsPost extends SoftDeletableModel
 {
     protected $fillable = [
         'user_id',
+        'organization_id',
         'cms_category_id',
         'title',
         'slug',
@@ -67,6 +68,11 @@ class CmsPost extends SoftDeletableModel
     // =========================================================================
     // RELATIONSHIPS & ACCESSORS
     // =========================================================================
+
+    public function organization(): BelongsTo
+    {
+        return $this->belongsTo(Organization::class, 'organization_id');
+    }
 
     public function author(): BelongsTo
     {

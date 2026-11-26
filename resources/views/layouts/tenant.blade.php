@@ -38,7 +38,7 @@
                         Nusantara</span><span class="t-muted"
                         style="font-size:.6875rem;font-weight:700">EduPortal</span></span>
             </a>
-            <div class="d-flex align-items-center gap-2 order-lg-last">
+            <div class="d-flex align-items-center gap-2 order-lg-last ms-2">
                 <button class="btn-theme" id="themeToggle" type="button" aria-label="Ganti tema terang/gelap"><i
                         class="ms ms-18" id="themeIcon">dark_mode</i></button>
                 <button class="navbar-toggler border-0 shadow-none p-1" type="button" data-bs-toggle="collapse"
@@ -58,8 +58,8 @@
                     <div class="searchbox d-flex align-items-center px-2 py-1" style="min-width:12rem"><i
                             class="ms ms-18 t-muted me-1">search</i><input type="search"
                             placeholder="Cari informasi..." aria-label="Cari"></div>
-                    <a class="nav-link t-muted fw-600" href="#">Login</a>
-                    <a class="btn-ep justify-content-center" href="#ppdb-section">Daftar PPDB</a>
+                    <a class="nav-link t-muted fw-600" href="/login">Login</a>
+                    <a class="btn-ep justify-content-center" href="/ppdb" target="_blank" >Daftar PPDB</a>
                 </div>
             </div>
         </div>

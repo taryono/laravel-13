@@ -15,7 +15,7 @@
                         berbasis teknologi EduPortal yang memadukan Kurikulum Merdeka, riset ilmiah, dan pembinaan
                         karakter kepemimpinan.</p>
                     <div class="d-flex flex-wrap gap-3 pt-2">
-                        <a class="btn-ep py-3 px-4" href="#ppdb-section">Daftar PPDB 2025/2026 <i
+                        <a class="btn-ep py-3 px-4" target="_blank" href="/ppdb">Daftar PPDB 2025/2026 <i
                                 class="ms ms-18">arrow_forward</i></a>
                         <a class="btn-card py-3 px-4" href="#profil"><i class="ms ms-18">explore</i> Jelajahi
                             Profil</a>
@@ -205,64 +205,113 @@
                         <div><span class="label-sm">Kabar Sekolah</span>
                             <h2 class="h-title mt-1 mb-0">Berita &amp; Prestasi Terbaru</h2>
                         </div>
-                        <a class="t-teal fw-600 text-nowrap ms-3" href="#">Semua Berita →</a>
+                        <a class="t-teal fw-600 text-nowrap ms-3" href="{{ url('/berita') }}">Semua Berita →</a>
                     </div>
+                    @php
+                        $cmsPosts = $posts ?? \Models\CmsPost::with('category')->published()->latest('published_at')->take(3)->get();
+
+                        $defaultNewsImages = [
+                            'https://lh3.googleusercontent.com/aida-public/AB6AXuBj_cSkvGBnDbQ7lu4mg6rYcb6v4yYOwahHDY23drliDuqLKzSeIBOJwQ88f1JF8Qybb5HGjyVVhuhCwECYCekezQZKx2iY14ATezXem_nfbXQs5-qCD97yHIcMaYXUlX75dCWhZEeEKuI04x737XW9zsBsTojjfpCxaF7hs5PumYgglZcxCAotd9VOwZD2XCgxikAZfgtfBBIPd8MUMPsmDyyYttBVU7yP0HGdf8MW',
+                            'https://lh3.googleusercontent.com/aida-public/AB6AXuDLVr6z7KpKqM0joMBJXxOdnxAltKhTLIFVwnvh_E_Q4_FbK74jIXQGSKPUNJAqCMQm5YfMoI5JpAT_2WC810RNSshy9TVcAgVrxHgAYVKHQE90p_A9BYiorwa6ou_X7dZF9Uw3QFXnzclbvipPgaMcvrRC5H8QgLE0x9q0Ddts13sKihHq8KEAGN4KinqBO7N48T3e2VRQD-REQ0vE7vjY33irthGeIcFcKjzuwmm6',
+                            'https://lh3.googleusercontent.com/aida-public/AB6AXuAyRZ5OPsKAqdko2DQOpnbdpZDO-ONP88CBl9BYbMrod2VGKcS-QKJRqh4fkcfnVeqdALCt-KwWfXVIADQOhGjq0q44ulqxI7STXf7sA9AdRdySr4I9VRrdDR0eCKQyHe4Hr_YWruZuXA0Rmo299lk-p1nt-ANaCmrQ7BPd7K84ienMIgeez-2MRqx_qUcVAt-_GApocfXRNthY4KR0F7uISV-FTirXYTQg3EKd7vmI',
+                        ];
+                        $chipClasses = ['c-sec', 'c-pri', 'c-ter'];
+                    @endphp
                     <div class="row g-3">
-                        <div class="col-12 col-md-4">
-                            <article class="ep-card h-100 overflow-hidden d-flex flex-column">
-                                <div class="ratio zoom" style="--bs-aspect-ratio:62.5%"><img
-                                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuBj_cSkvGBnDbQ7lu4mg6rYcb6v4yYOwahHDY23drliDuqLKzSeIBOJwQ88f1JF8Qybb5HGjyVVhuhCwECYCekezQZKx2iY14ATezXem_nfbXQs5-qCD97yHIcMaYXUlX75dCWhZEeEKuI04x737XW9zsBsTojjfpCxaF7hs5PumYgglZcxCAotd9VOwZD2XCgxikAZfgtfBBIPd8MUMPsmDyyYttBVU7yP0HGdf8MW"
-                                        alt="Siswa memegang medali emas olimpiade sains" loading="lazy"></div>
-                                <div class="p-3 d-flex flex-column flex-grow-1 justify-content-between gap-2">
-                                    <div>
-                                        <div class="d-flex justify-content-between align-items-center mb-2"><span
-                                                class="chip c-sec">Prestasi</span><span class="fs-xs t-muted">12
-                                                Mei 2025</span></div>
-                                        <h3 class="fs-6 fw-600 clamp2">Tim Robotik SMA Nusantara Raih Medali Emas
-                                            di Ajang Nasional</h3>
-                                        <p class="fs-xs t-muted mb-0 clamp2">Inovasi robot pemilah sampah otomatis
-                                            berhasil mengungguli 40 tim dari seluruh Indonesia.</p>
-                                    </div><a class="t-head fw-600" href="#">Baca selengkapnya →</a>
+                        @if($cmsPosts->isNotEmpty())
+                            @foreach($cmsPosts as $post)
+                                @php
+                                    $postImage = null;
+                                    if (!empty($post->featured_image)) {
+                                        if (\Illuminate\Support\Str::startsWith($post->featured_image, ['http://', 'https://'])) {
+                                            $postImage = $post->featured_image;
+                                        } elseif (file_exists(public_path('storage/' . $post->featured_image)) || \Illuminate\Support\Facades\Storage::disk('public')->exists($post->featured_image)) {
+                                            $postImage = asset('storage/' . $post->featured_image);
+                                        } elseif (file_exists(public_path($post->featured_image))) {
+                                            $postImage = asset($post->featured_image);
+                                        }
+                                    }
+                                    $imgSrc = $postImage ?: ($defaultNewsImages[$loop->index % count($defaultNewsImages)]);
+                                    $chipClass = $chipClasses[$loop->index % count($chipClasses)];
+                                    $categoryName = $post->category?->name ?? 'Berita';
+                                    $publishedDate = $post->published_at
+                                        ? $post->published_at->translatedFormat('d M Y')
+                                        : ($post->created_at ? $post->created_at->translatedFormat('d M Y') : '');
+                                @endphp
+                                <div class="col-12 col-md-4">
+                                    <article class="ep-card h-100 overflow-hidden d-flex flex-column">
+                                        <div class="ratio zoom" style="--bs-aspect-ratio:62.5%"><img
+                                                src="{{ $imgSrc }}"
+                                                alt="{{ $post->title }}" loading="lazy"></div>
+                                        <div class="p-3 d-flex flex-column flex-grow-1 justify-content-between gap-2">
+                                            <div>
+                                                <div class="d-flex justify-content-between align-items-center mb-2"><span
+                                                        class="chip {{ $chipClass }}">{{ $categoryName }}</span><span
+                                                        class="fs-xs t-muted">{{ $publishedDate }}</span></div>
+                                                <h3 class="fs-6 fw-600 clamp2">{{ $post->title }}</h3>
+                                                <p class="fs-xs t-muted mb-0 clamp2">{{ $post->excerpt ?: \Illuminate\Support\Str::limit(strip_tags($post->content), 120) }}</p>
+                                            </div><a class="t-head fw-600" href="{{ url('/berita/' . $post->slug) }}">Baca selengkapnya →</a>
+                                        </div>
+                                    </article>
                                 </div>
-                            </article>
-                        </div>
-                        <div class="col-12 col-md-4">
-                            <article class="ep-card h-100 overflow-hidden d-flex flex-column">
-                                <div class="ratio zoom" style="--bs-aspect-ratio:62.5%"><img
-                                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuDLVr6z7KpKqM0joMBJXxOdnxAltKhTLIFVwnvh_E_Q4_FbK74jIXQGSKPUNJAqCMQm5YfMoI5JpAT_2WC810RNSshy9TVcAgVrxHgAYVKHQE90p_A9BYiorwa6ou_X7dZF9Uw3QFXnzclbvipPgaMcvrRC5H8QgLE0x9q0Ddts13sKihHq8KEAGN4KinqBO7N48T3e2VRQD-REQ0vE7vjY33irthGeIcFcKjzuwmm6"
-                                        alt="Sosialisasi kurikulum untuk siswa dan orang tua" loading="lazy">
-                                </div>
-                                <div class="p-3 d-flex flex-column flex-grow-1 justify-content-between gap-2">
-                                    <div>
-                                        <div class="d-flex justify-content-between align-items-center mb-2"><span
-                                                class="chip c-pri">Akademik</span><span class="fs-xs t-muted">08
-                                                Mei 2025</span></div>
-                                        <h3 class="fs-6 fw-600 clamp2">Sosialisasi Kurikulum Merdeka &amp;
-                                            Peminatan Tahun Ajaran Baru</h3>
-                                        <p class="fs-xs t-muted mb-0 clamp2">Panduan lengkap bagi siswa kelas X
-                                            dalam memilih mata pelajaran peminatan sesuai bakat.</p>
-                                    </div><a class="t-head fw-600" href="#">Baca selengkapnya →</a>
-                                </div>
-                            </article>
-                        </div>
-                        <div class="col-12 col-md-4">
-                            <article class="ep-card h-100 overflow-hidden d-flex flex-column">
-                                <div class="ratio zoom" style="--bs-aspect-ratio:62.5%"><img
-                                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuAyRZ5OPsKAqdko2DQOpnbdpZDO-ONP88CBl9BYbMrod2VGKcS-QKJRqh4fkcfnVeqdALCt-KwWfXVIADQOhGjq0q44ulqxI7STXf7sA9AdRdySr4I9VRrdDR0eCKQyHe4Hr_YWruZuXA0Rmo299lk-p1nt-ANaCmrQ7BPd7K84ienMIgeez-2MRqx_qUcVAt-_GApocfXRNthY4KR0F7uISV-FTirXYTQg3EKd7vmI"
-                                        alt="Siswa menanam pohon di taman sekolah" loading="lazy"></div>
-                                <div class="p-3 d-flex flex-column flex-grow-1 justify-content-between gap-2">
-                                    <div>
-                                        <div class="d-flex justify-content-between align-items-center mb-2"><span
-                                                class="chip c-ter">Kegiatan</span><span class="fs-xs t-muted">02
-                                                Mei 2025</span></div>
-                                        <h3 class="fs-6 fw-600 clamp2">Peringatan Hardiknas: Gerakan Sekolah Hijau
-                                            &amp; Bebas Plastik</h3>
-                                        <p class="fs-xs t-muted mb-0 clamp2">Seluruh warga sekolah berpartisipasi
-                                            dalam penanaman 200 bibit pohon di area kampus.</p>
-                                    </div><a class="t-head fw-600" href="#">Baca selengkapnya →</a>
-                                </div>
-                            </article>
-                        </div>
+                            @endforeach
+                        @else
+                            <div class="col-12 col-md-4">
+                                <article class="ep-card h-100 overflow-hidden d-flex flex-column">
+                                    <div class="ratio zoom" style="--bs-aspect-ratio:62.5%"><img
+                                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBj_cSkvGBnDbQ7lu4mg6rYcb6v4yYOwahHDY23drliDuqLKzSeIBOJwQ88f1JF8Qybb5HGjyVVhuhCwECYCekezQZKx2iY14ATezXem_nfbXQs5-qCD97yHIcMaYXUlX75dCWhZEeEKuI04x737XW9zsBsTojjfpCxaF7hs5PumYgglZcxCAotd9VOwZD2XCgxikAZfgtfBBIPd8MUMPsmDyyYttBVU7yP0HGdf8MW"
+                                            alt="Siswa memegang medali emas olimpiade sains" loading="lazy"></div>
+                                    <div class="p-3 d-flex flex-column flex-grow-1 justify-content-between gap-2">
+                                        <div>
+                                            <div class="d-flex justify-content-between align-items-center mb-2"><span
+                                                    class="chip c-sec">Prestasi</span><span class="fs-xs t-muted">12
+                                                    Mei 2025</span></div>
+                                            <h3 class="fs-6 fw-600 clamp2">Tim Robotik SMA Nusantara Raih Medali Emas
+                                                di Ajang Nasional</h3>
+                                            <p class="fs-xs t-muted mb-0 clamp2">Inovasi robot pemilah sampah otomatis
+                                                berhasil mengungguli 40 tim dari seluruh Indonesia.</p>
+                                        </div><a class="t-head fw-600" href="#">Baca selengkapnya →</a>
+                                    </div>
+                                </article>
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <article class="ep-card h-100 overflow-hidden d-flex flex-column">
+                                    <div class="ratio zoom" style="--bs-aspect-ratio:62.5%"><img
+                                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDLVr6z7KpKqM0joMBJXxOdnxAltKhTLIFVwnvh_E_Q4_FbK74jIXQGSKPUNJAqCMQm5YfMoI5JpAT_2WC810RNSshy9TVcAgVrxHgAYVKHQE90p_A9BYiorwa6ou_X7dZF9Uw3QFXnzclbvipPgaMcvrRC5H8QgLE0x9q0Ddts13sKihHq8KEAGN4KinqBO7N48T3e2VRQD-REQ0vE7vjY33irthGeIcFcKjzuwmm6"
+                                            alt="Sosialisasi kurikulum untuk siswa dan orang tua" loading="lazy">
+                                    </div>
+                                    <div class="p-3 d-flex flex-column flex-grow-1 justify-content-between gap-2">
+                                        <div>
+                                            <div class="d-flex justify-content-between align-items-center mb-2"><span
+                                                    class="chip c-pri">Akademik</span><span class="fs-xs t-muted">08
+                                                    Mei 2025</span></div>
+                                            <h3 class="fs-6 fw-600 clamp2">Sosialisasi Kurikulum Merdeka &amp;
+                                                Peminatan Tahun Ajaran Baru</h3>
+                                            <p class="fs-xs t-muted mb-0 clamp2">Panduan lengkap bagi siswa kelas X
+                                                dalam memilih mata pelajaran peminatan sesuai bakat.</p>
+                                        </div><a class="t-head fw-600" href="#">Baca selengkapnya →</a>
+                                    </div>
+                                </article>
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <article class="ep-card h-100 overflow-hidden d-flex flex-column">
+                                    <div class="ratio zoom" style="--bs-aspect-ratio:62.5%"><img
+                                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuAyRZ5OPsKAqdko2DQOpnbdpZDO-ONP88CBl9BYbMrod2VGKcS-QKJRqh4fkcfnVeqdALCt-KwWfXVIADQOhGjq0q44ulqxI7STXf7sA9AdRdySr4I9VRrdDR0eCKQyHe4Hr_YWruZuXA0Rmo299lk-p1nt-ANaCmrQ7BPd7K84ienMIgeez-2MRqx_qUcVAt-_GApocfXRNthY4KR0F7uISV-FTirXYTQg3EKd7vmI"
+                                            alt="Siswa menanam pohon di taman sekolah" loading="lazy"></div>
+                                    <div class="p-3 d-flex flex-column flex-grow-1 justify-content-between gap-2">
+                                        <div>
+                                            <div class="d-flex justify-content-between align-items-center mb-2"><span
+                                                    class="chip c-ter">Kegiatan</span><span class="fs-xs t-muted">02
+                                                    Mei 2025</span></div>
+                                            <h3 class="fs-6 fw-600 clamp2">Peringatan Hardiknas: Gerakan Sekolah Hijau
+                                                &amp; Bebas Plastik</h3>
+                                            <p class="fs-xs t-muted mb-0 clamp2">Seluruh warga sekolah berpartisipasi
+                                                dalam penanaman 200 bibit pohon di area kampus.</p>
+                                        </div><a class="t-head fw-600" href="#">Baca selengkapnya →</a>
+                                    </div>
+                                </article>
+                            </div>
+                        @endif
                     </div>
                 </div>
                 <div class="col-lg-4">
@@ -351,59 +400,103 @@
     </section>
 
     <!-- ===== FASILITAS & GALERI ===== -->
-    <section class="sec bg-low">
+    <section class="sec bg-low" id="fasilitas">
         <div class="container">
             <div class="mb-5"><span class="label-sm">Sarana &amp; Prasarana</span>
                 <h2 class="h-title mt-1 mb-0">Fasilitas Modern Penunjang Belajar</h2>
             </div>
+            @php
+                $facilityList = $facilities ?? \Models\Facility::with(['primaryImage', 'images'])->active()->orderBy('sort_order')->take(8)->get();
+
+                $defaultFacilityImages = [
+                    'https://lh3.googleusercontent.com/aida-public/AB6AXuCMLKdAyvf5fxKP4ecPV5DqJqRTIGXN8Axd3jrKq6ogG5iJ5A4VOJY3kS7NP9IvWiC4BazqNYcR000-NS9mP6BAxGq8Alc16hh6VtFFDP55X2DW6P92EPeNVkzXuADF9vftpXd0J_iF8kL5RCvXUFshh67Ozt11HMnmpNNy-jgjWiGMg1lk3yyAOLERn74umKxYlmEcekHjys7mZRW8btv3afjS5c5mpRVrSIE8Sru9',
+                    'https://lh3.googleusercontent.com/aida-public/AB6AXuA6bGEMqLYXfDKimAq_9-xIbuFQD13Aa0QjOq523L455VLBdKMp6BwZEdx_5dx4xuIo7AN6qzcnAPselU1RSmU1DUNFgFT-JrrC01mb6rTCIzp6eLrbRajfYKF9tbwgwGwjIiGNGuMmte3HOPQjt-a2gEJGjXm8QqXrK9CVyFVO6-6U73uyGctsNTNvIyW-N_uhb_UilEinS9QtgfseAmvtBUsoTD5AkeYOhwOEBUXG',
+                    'https://lh3.googleusercontent.com/aida-public/AB6AXuDSVj50QlXWF-3wBHdC_H_XO9WL1yIWhukLJGLMhUu0Xe7UNZZziLM8zciI9U3bBOSd2gcdVX7e1G9ORkNOEfB1TME460ha6ESoDf4SzMvgpiF6Y9wRAgf35qy3dExaqSXTbRmLl5loyM1Q0KoNMTNogQfKbtXRkMsZwFo5x-G4DC51JWh5bs5mQvYQhTweRLr0kodwf_yDg0NfpnRVRQoF_WB4tYl1LOW7K1pClOvb',
+                    'https://lh3.googleusercontent.com/aida-public/AB6AXuARfmy_1MWinPcbxpnQ4_8RUWXbs14BHSbSwqjv7yZK4ORZ94aOvFQxXWEDCFLevj-DZjkJNtOp-ZaNExxo6YEGl2wdYkHw01J0e8YHCboe_WxN8pC4p-WRFXYcZkAe366LPA0ckaRY4YgcD7Bjhft3ucSUz507IBGrIE5_YsUu77wp_K7BTGdws-D5UH03cHvEQjc-aG5RGIebUy_OYBXohdGpiavIDxZ9ycYoEz8-',
+                ];
+            @endphp
             <div class="row g-4 mb-5">
-                <div class="col-12 col-sm-6 col-lg-3">
-                    <div class="ep-card h-100 overflow-hidden">
-                        <div class="ratio ratio-4x3 zoom"><img
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCMLKdAyvf5fxKP4ecPV5DqJqRTIGXN8Axd3jrKq6ogG5iJ5A4VOJY3kS7NP9IvWiC4BazqNYcR000-NS9mP6BAxGq8Alc16hh6VtFFDP55X2DW6P92EPeNVkzXuADF9vftpXd0J_iF8kL5RCvXUFshh67Ozt11HMnmpNNy-jgjWiGMg1lk3yyAOLERn74umKxYlmEcekHjys7mZRW8btv3afjS5c5mpRVrSIE8Sru9"
-                                alt="Laboratorium komputer" loading="lazy"></div>
-                        <div class="p-3">
-                            <h3 class="fs-6 fw-600">Lab Komputer &amp; CBT</h3>
-                            <p class="fs-xs t-muted mb-0">120 unit PC berkecepatan tinggi dengan koneksi fiber
-                                optik.</p>
+                @if($facilityList->isNotEmpty())
+                    @foreach($facilityList as $facility)
+                        @php
+                            $imgSrc = null;
+                            $facilityImage = $facility->primaryImage ?? $facility->images->first();
+
+                            if ($facilityImage && !empty($facilityImage->file_path)) {
+                                $path = $facilityImage->file_path;
+                                if (\Illuminate\Support\Str::startsWith($path, ['http://', 'https://'])) {
+                                    $imgSrc = $path;
+                                } elseif (file_exists(public_path('storage/' . $path)) || \Illuminate\Support\Facades\Storage::disk('public')->exists($path)) {
+                                    $imgSrc = asset('storage/' . $path);
+                                } elseif (file_exists(public_path($path))) {
+                                    $imgSrc = asset($path);
+                                }
+                            }
+
+                            $finalImg = $imgSrc ?: ($defaultFacilityImages[$loop->index % count($defaultFacilityImages)]);
+                            $altText = $facilityImage?->caption ?: $facility->name;
+                        @endphp
+                        <div class="col-12 col-sm-6 col-lg-3">
+                            <div class="ep-card h-100 overflow-hidden">
+                                <div class="ratio ratio-4x3 zoom"><img
+                                        src="{{ $finalImg }}"
+                                        alt="{{ $altText }}" loading="lazy"></div>
+                                <div class="p-3">
+                                    <h3 class="fs-6 fw-600">{{ $facility->name }}</h3>
+                                    <p class="fs-xs t-muted mb-0">{{ $facility->description }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                @else
+                    <div class="col-12 col-sm-6 col-lg-3">
+                        <div class="ep-card h-100 overflow-hidden">
+                            <div class="ratio ratio-4x3 zoom"><img
+                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuCMLKdAyvf5fxKP4ecPV5DqJqRTIGXN8Axd3jrKq6ogG5iJ5A4VOJY3kS7NP9IvWiC4BazqNYcR000-NS9mP6BAxGq8Alc16hh6VtFFDP55X2DW6P92EPeNVkzXuADF9vftpXd0J_iF8kL5RCvXUFshh67Ozt11HMnmpNNy-jgjWiGMg1lk3yyAOLERn74umKxYlmEcekHjys7mZRW8btv3afjS5c5mpRVrSIE8Sru9"
+                                    alt="Laboratorium komputer" loading="lazy"></div>
+                            <div class="p-3">
+                                <h3 class="fs-6 fw-600">Lab Komputer &amp; CBT</h3>
+                                <p class="fs-xs t-muted mb-0">120 unit PC berkecepatan tinggi dengan koneksi fiber
+                                    optik.</p>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-12 col-sm-6 col-lg-3">
-                    <div class="ep-card h-100 overflow-hidden">
-                        <div class="ratio ratio-4x3 zoom"><img
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuA6bGEMqLYXfDKimAq_9-xIbuFQD13Aa0QjOq523L455VLBdKMp6BwZEdx_5dx4xuIo7AN6qzcnAPselU1RSmU1DUNFgFT-JrrC01mb6rTCIzp6eLrbRajfYKF9tbwgwGwjIiGNGuMmte3HOPQjt-a2gEJGjXm8QqXrK9CVyFVO6-6U73uyGctsNTNvIyW-N_uhb_UilEinS9QtgfseAmvtBUsoTD5AkeYOhwOEBUXG"
-                                alt="Perpustakaan digital" loading="lazy"></div>
-                        <div class="p-3">
-                            <h3 class="fs-6 fw-600">Perpustakaan Digital</h3>
-                            <p class="fs-xs t-muted mb-0">Koleksi 15.000+ buku fisik dan akses e-book nasional.</p>
+                    <div class="col-12 col-sm-6 col-lg-3">
+                        <div class="ep-card h-100 overflow-hidden">
+                            <div class="ratio ratio-4x3 zoom"><img
+                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuA6bGEMqLYXfDKimAq_9-xIbuFQD13Aa0QjOq523L455VLBdKMp6BwZEdx_5dx4xuIo7AN6qzcnAPselU1RSmU1DUNFgFT-JrrC01mb6rTCIzp6eLrbRajfYKF9tbwgwGwjIiGNGuMmte3HOPQjt-a2gEJGjXm8QqXrK9CVyFVO6-6U73uyGctsNTNvIyW-N_uhb_UilEinS9QtgfseAmvtBUsoTD5AkeYOhwOEBUXG"
+                                    alt="Perpustakaan digital" loading="lazy"></div>
+                            <div class="p-3">
+                                <h3 class="fs-6 fw-600">Perpustakaan Digital</h3>
+                                <p class="fs-xs t-muted mb-0">Koleksi 15.000+ buku fisik dan akses e-book nasional.</p>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-12 col-sm-6 col-lg-3">
-                    <div class="ep-card h-100 overflow-hidden">
-                        <div class="ratio ratio-4x3 zoom"><img
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDSVj50QlXWF-3wBHdC_H_XO9WL1yIWhukLJGLMhUu0Xe7UNZZziLM8zciI9U3bBOSd2gcdVX7e1G9ORkNOEfB1TME460ha6ESoDf4SzMvgpiF6Y9wRAgf35qy3dExaqSXTbRmLl5loyM1Q0KoNMTNogQfKbtXRkMsZwFo5x-G4DC51JWh5bs5mQvYQhTweRLr0kodwf_yDg0NfpnRVRQoF_WB4tYl1LOW7K1pClOvb"
-                                alt="Kantin sekolah cashless" loading="lazy"></div>
-                        <div class="p-3">
-                            <h3 class="fs-6 fw-600">Smart Canteen Cashless</h3>
-                            <p class="fs-xs t-muted mb-0">Kantin sehat higienis terintegrasi kartu pelajar
-                                EduPortal.</p>
+                    <div class="col-12 col-sm-6 col-lg-3">
+                        <div class="ep-card h-100 overflow-hidden">
+                            <div class="ratio ratio-4x3 zoom"><img
+                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuDSVj50QlXWF-3wBHdC_H_XO9WL1yIWhukLJGLMhUu0Xe7UNZZziLM8zciI9U3bBOSd2gcdVX7e1G9ORkNOEfB1TME460ha6ESoDf4SzMvgpiF6Y9wRAgf35qy3dExaqSXTbRmLl5loyM1Q0KoNMTNogQfKbtXRkMsZwFo5x-G4DC51JWh5bs5mQvYQhTweRLr0kodwf_yDg0NfpnRVRQoF_WB4tYl1LOW7K1pClOvb"
+                                    alt="Kantin sekolah cashless" loading="lazy"></div>
+                            <div class="p-3">
+                                <h3 class="fs-6 fw-600">Smart Canteen Cashless</h3>
+                                <p class="fs-xs t-muted mb-0">Kantin sehat higienis terintegrasi kartu pelajar
+                                    EduPortal.</p>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-12 col-sm-6 col-lg-3">
-                    <div class="ep-card h-100 overflow-hidden">
-                        <div class="ratio ratio-4x3 zoom"><img
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuARfmy_1MWinPcbxpnQ4_8RUWXbs14BHSbSwqjv7yZK4ORZ94aOvFQxXWEDCFLevj-DZjkJNtOp-ZaNExxo6YEGl2wdYkHw01J0e8YHCboe_WxN8pC4p-WRFXYcZkAe366LPA0ckaRY4YgcD7Bjhft3ucSUz507IBGrIE5_YsUu77wp_K7BTGdws-D5UH03cHvEQjc-aG5RGIebUy_OYBXohdGpiavIDxZ9ycYoEz8-"
-                                alt="Lapangan olahraga indoor" loading="lazy"></div>
-                        <div class="p-3">
-                            <h3 class="fs-6 fw-600">Lapangan Olahraga Indoor</h3>
-                            <p class="fs-xs t-muted mb-0">Arena standar nasional untuk basket, futsal, dan bulu
-                                tangkis.</p>
+                    <div class="col-12 col-sm-6 col-lg-3">
+                        <div class="ep-card h-100 overflow-hidden">
+                            <div class="ratio ratio-4x3 zoom"><img
+                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuARfmy_1MWinPcbxpnQ4_8RUWXbs14BHSbSwqjv7yZK4ORZ94aOvFQxXWEDCFLevj-DZjkJNtOp-ZaNExxo6YEGl2wdYkHw01J0e8YHCboe_WxN8pC4p-WRFXYcZkAe366LPA0ckaRY4YgcD7Bjhft3ucSUz507IBGrIE5_YsUu77wp_K7BTGdws-D5UH03cHvEQjc-aG5RGIebUy_OYBXohdGpiavIDxZ9ycYoEz8-"
+                                    alt="Lapangan olahraga indoor" loading="lazy"></div>
+                            <div class="p-3">
+                                <h3 class="fs-6 fw-600">Lapangan Olahraga Indoor</h3>
+                                <p class="fs-xs t-muted mb-0">Arena standar nasional untuk basket, futsal, dan bulu
+                                    tangkis.</p>
+                            </div>
                         </div>
                     </div>
-                </div>
+                @endif
             </div>
             <div class="mb-3"><span class="label-sm">Galeri Kampus</span>
                 <h3 class="fs-4 fw-600 t-head mt-1">Momen Kehidupan Siswa</h3>
@@ -505,7 +598,7 @@
                     <h2 class="h-title text-white">Bergabunglah Menjadi Bagian dari SMA Nusantara</h2>
                     <p class="t-soft mb-0">Gelombang 1 dibuka hingga <strong>30 Mei 2025</strong>. Tersedia jalur
                         Prestasi Akademik, Non-Akademik, dan Reguler.</p>
-                    <a class="btn-sec py-3 px-4 mt-2 shadow" href="#">Daftar Sekarang <i
+                    <a class="btn-sec py-3 px-4 mt-2 shadow" href="/ppdb" target="_blank">Daftar Sekarang <i
                             class="ms ms-18">arrow_forward</i></a>
                 </div>
                 <div class="col-lg-7">
