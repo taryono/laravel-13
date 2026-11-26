@@ -16,11 +16,9 @@ class Vendor extends SoftDeletableModel
 
     public function payableAccount()
     {
-        return $this->belongsTo(PayableAccount::class, 'payable_account_id');
+        return $this->belongsTo(ChartOfAccount::class, 'payable_account_id');
     }
 
-
-    // Scope
     public function scopeActive($query)
     {
         return $query->where('is_active', true);

@@ -63,7 +63,7 @@ class EmployeeSeeder extends Seeder
             $managerId = DB::table('employees')->insertGetId([
                 'nik' => '3273010101900001',
                 'employee_number' => 'EMP-0001',
-
+                'organization_id' => 1,
                 'user_id' => null,
 
                 'department_id' => $itDepartment,
@@ -87,15 +87,9 @@ class EmployeeSeeder extends Seeder
 
                 'join_date' => '2020-01-10',
                 'resign_date' => null,
-
-                'employment_status' => 'tetap',
-
-                'bank_name' => 'BCA',
-                'bank_account_number' => '1234567890',
-                'bank_account_name' => 'Budi Santoso',
-
+                'employment_type_id' => 3,
+                'employment_status_id' => 3,
                 'npwp' => '12.345.678.9-123.000',
-
                 'bpjs_ketenagakerjaan' => 'BPJSTK000001',
                 'bpjs_kesehatan' => 'BPJSKES000001',
 
@@ -116,7 +110,7 @@ class EmployeeSeeder extends Seeder
             DB::table('employees')->insert([
                 'nik' => '3273010201920002',
                 'employee_number' => 'EMP-0002',
-
+                'organization_id' => 1,
                 'user_id' => null,
 
                 'department_id' => $itDepartment,
@@ -139,15 +133,9 @@ class EmployeeSeeder extends Seeder
 
                 'join_date' => '2021-03-01',
                 'resign_date' => null,
-
-                'employment_status' => 'tetap',
-
-                'bank_name' => 'Mandiri',
-                'bank_account_number' => '1234567891',
-                'bank_account_name' => 'Andi Wijaya',
-
+                'employment_type_id' => 4,
+                'employment_status_id' => 4, 
                 'npwp' => '12.345.678.9-124.000',
-
                 'bpjs_ketenagakerjaan' => 'BPJSTK000002',
                 'bpjs_kesehatan' => 'BPJSKES000002',
 
@@ -168,7 +156,7 @@ class EmployeeSeeder extends Seeder
             DB::table('employees')->insert([
                 'nik' => '3273014301940003',
                 'employee_number' => 'EMP-0003',
-
+                'organization_id' => 1,
                 'user_id' => null,
 
                 'department_id' => $hrDepartment,
@@ -191,13 +179,8 @@ class EmployeeSeeder extends Seeder
 
                 'join_date' => '2022-06-15',
                 'resign_date' => null,
-
-                'employment_status' => 'kontrak',
-
-                'bank_name' => 'BNI',
-                'bank_account_number' => '1234567892',
-                'bank_account_name' => 'Siti Rahmawati',
-
+                'employment_type_id' => 1,
+                'employment_status_id' => 1,
                 'npwp' => null,
 
                 'bpjs_ketenagakerjaan' => 'BPJSTK000003',
@@ -220,7 +203,7 @@ class EmployeeSeeder extends Seeder
             DB::table('employees')->insert([
                 'nik' => '3273010101960004',
                 'employee_number' => 'EMP-0004',
-
+                 'organization_id' => 1,
                 'user_id' => null,
 
                 'department_id' => $financeDepartment,
@@ -243,13 +226,8 @@ class EmployeeSeeder extends Seeder
 
                 'join_date' => '2023-01-05',
                 'resign_date' => null,
-
-                'employment_status' => 'probation',
-
-                'bank_name' => 'BCA',
-                'bank_account_number' => '1234567893',
-                'bank_account_name' => 'Rizky Pratama',
-
+                'employment_type_id' => 2,
+                'employment_status_id' => 2,
                 'npwp' => null,
 
                 'bpjs_ketenagakerjaan' => null,

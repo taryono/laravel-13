@@ -16,7 +16,7 @@
         "laravel-datatables-vite": "^0.7.0",
         "laravel-vite-plugin": "^2.1.0",
         "sass-embedded": "^1.108.1",
-        "vite": "^7.3.6"
+        "vite": "^8.3.8"
     },
     "dependencies": {
         "jquery-validation": "^1.22.1",
