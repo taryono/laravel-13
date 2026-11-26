@@ -572,6 +572,8 @@
                             UI.notify('success', response.message);
                         }
 
+                        $(document).trigger('form:saved', [$form.attr('id'), response]);
+
                     } else {
                         UI.notify('error', response.message || 'Terjadi kesalahan');
                         if (onError) onError(response);

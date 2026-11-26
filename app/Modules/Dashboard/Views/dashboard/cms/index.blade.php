@@ -431,18 +431,27 @@
                                     </div>
                                     <div class="row g-2 pt-1">
                                         <div class="col-6">
-                                            <a href="{{ route('cms_post.preview', $p->id) }}"
-                                                class="btn-sm-edu btn-detail pressable text-decoration-none d-flex align-items-center justify-content-center gap-1">
+                                            <button type="button"
+                                                class="btn-sm-edu btn-detail pressable text-decoration-none d-flex align-items-center justify-content-center gap-1 w-100 border-0"
+                                                data-toggle="ajax-modal" data-size="lg" data-method="GET"
+                                                data-title="Pratinjau: {{ e($p->title) }}"
+                                                data-url="{{ route('cms_post.preview', $p->id) }}"
+                                                data-cancel='<button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Tutup</button>'>
                                                 <span
                                                     class="material-symbols-outlined icon-16">visibility</span><span>Pratinjau</span>
-                                            </a>
+                                            </button>
                                         </div>
                                         <div class="col-6">
-                                            <a href="{{ route('cms_post.edit', $p->id) }}"
-                                                class="btn-sm-edu btn-approve pressable text-decoration-none d-flex align-items-center justify-content-center gap-1">
+                                            <button type="button"
+                                                class="btn-sm-edu btn-approve pressable text-decoration-none d-flex align-items-center justify-content-center gap-1 w-100 border-0"
+                                                data-toggle="ajax-modal" data-size="lg" data-method="GET"
+                                                data-title="Kelola Konten: {{ e($p->title) }}"
+                                                data-url="{{ route('cms_post.edit', $p->id) }}"
+                                                data-submit='<button class="btn btn-primary" type="submit" form="formCmsPost">Simpan Perubahan</button>'
+                                                data-cancel='<button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Batal</button>'>
                                                 <span
                                                     class="material-symbols-outlined icon-16">publish</span><span>Kelola</span>
-                                            </a>
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -453,11 +462,15 @@
                                 <h3 class="text-title-sm tc-primary mb-1">Semua Draf Sudah Ditinjau</h3>
                                 <p class="text-body-sm tc-variant mb-3">Tidak ada konten yang sedang menunggu persetujuan
                                     review.</p>
-                                <a href="{{ route('cms_post.create') }}"
-                                    class="btn-edu btn-edu-outline pressable text-decoration-none d-inline-flex align-items-center gap-1">
+                                <button type="button"
+                                    class="btn-edu btn-edu-outline pressable text-decoration-none d-inline-flex align-items-center gap-1 border-0"
+                                    data-toggle="ajax-modal" data-size="lg" data-method="GET"
+                                    data-title="Tulis Berita Baru" data-url="{{ route('cms_post.create') }}"
+                                    data-submit='<button class="btn btn-primary" type="submit" form="formCmsPost">Simpan</button>'
+                                    data-cancel='<button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Batal</button>'>
                                     <span class="material-symbols-outlined icon-16">add</span>
                                     <span>Tulis Draf Baru</span>
-                                </a>
+                                </button>
                             </div>
                         @endif
                     </div>
@@ -503,3 +516,29 @@
         </a>
     </nav>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        if (window.jQuery) {
+            // Ketika form modal berhasil disimpan, reload halaman dashboard CMS agar data ter-update dan tetap berada di halaman dashboard ini
+            $(document).on('form:saved', function (e, formId) {
+                setTimeout(function () {
+                    window.location.reload();
+                }, 800);
+            });
+
+            // Fallback: jika request AJAX POST/PUT berhasil
+            $(document).on('ajaxSuccess', function (event, xhr, settings) {
+                if (settings && (settings.type === 'POST' || settings.type === 'PUT' || settings.type === 'PATCH')) {
+                    if (xhr.responseJSON && (xhr.responseJSON.success === true || xhr.responseJSON.status === 'success')) {
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 800);
+                    }
+                }
+            });
+        }
+    });
+</script>
+@endpush
